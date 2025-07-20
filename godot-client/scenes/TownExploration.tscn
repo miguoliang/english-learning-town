@@ -1,0 +1,209 @@
+[gd_scene load_steps=11 format=3 uid="uid://dlmgdfcpf1s1l"]
+
+[ext_resource type="Script" path="res://scripts/scenes/TownExplorationController.gd" id="1_scene_controller"]
+[ext_resource type="Script" uid="uid://vi8vtaotew0f" path="res://scripts/players/PlayerController.gd" id="1_6yxkv"]
+[ext_resource type="Texture2D" path="res://assets/sprites/town_map.png" id="2_town_map"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boy_front.png" id="3_boy_front"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boy_back.png" id="4_boy_back"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boy_side.png" id="5_boy_side"]
+[ext_resource type="PackedScene" uid="uid://b8kxvh4qwc8hl" path="res://scenes/NPC.tscn" id="6_npc_scene"]
+[ext_resource type="Texture2D" path="res://assets/sprites/teacher.png" id="7_teacher"]
+[ext_resource type="Texture2D" path="res://assets/sprites/shopkeeper.png" id="8_shopkeeper"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quest_indicator.png" id="9_quest_indicator"]
+[ext_resource type="Script" path="res://scripts/debug/DebugOverlay.gd" id="10_debug_overlay"]
+[ext_resource type="PackedScene" uid="uid://b8fgd3k9vk2l1" path="res://scenes/DialogueUI.tscn" id="11_dialogue_ui"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(64, 64)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_1"]
+size = Vector2(64, 64)
+
+[node name="TownExploration" type="Node2D"]
+script = ExtResource("1_scene_controller")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+enabled = true
+zoom = Vector2(0.5, 0.5)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+z_index = 10
+script = ExtResource("1_6yxkv")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+position = Vector2(0, 0)
+texture = ExtResource("3_boy_front")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+
+[node name="Environment" type="Node2D" parent="."]
+
+[node name="TownMap" type="Sprite2D" parent="Environment"]
+position = Vector2(0, 0)
+texture = ExtResource("2_town_map")
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="Teacher" parent="NPCs" instance=ExtResource("6_npc_scene")]
+position = Vector2(400, -300)
+
+[node name="Shopkeeper" parent="NPCs" instance=ExtResource("6_npc_scene")]
+position = Vector2(-500, 200)
+
+[node name="Buildings" type="Node2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TopPanel" type="Panel" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/TopPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="PlayerNameLabel" type="Label" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Player Name"
+
+[node name="VSeparator" type="VSeparator" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="MoneyLabel" type="Label" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Money: $100"
+
+[node name="VSeparator2" type="VSeparator" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Level: 1"
+
+[node name="VSeparator3" type="VSeparator" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="ExperienceLabel" type="Label" parent="UI/HUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "XP: 0/100"
+
+[node name="BottomPanel" type="Panel" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/BottomPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="MenuButton" type="Button" parent="UI/HUD/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "Menu"
+
+[node name="VSeparator" type="VSeparator" parent="UI/HUD/BottomPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="ScenarioLabel" type="Label" parent="UI/HUD/BottomPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Town Center"
+horizontal_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="UI/HUD/BottomPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="InteractButton" type="Button" parent="UI/HUD/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "Interact (E)"
+
+[node name="QuestPanel" type="Panel" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 80.0
+offset_bottom = 400.0
+
+[node name="QuestContainer" type="VBoxContainer" parent="UI/HUD/QuestPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="QuestTitle" type="Label" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+text = "Active Quest"
+theme_type_variation = &"HeaderLarge"
+
+[node name="CurrentQuestTitle" type="Label" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+text = "No active quest"
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+
+[node name="ObjectiveLabel" type="Label" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+text = "Objective:"
+theme_type_variation = &"HeaderMedium"
+
+[node name="CurrentObjective" type="Label" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+text = "No current objective"
+autowrap_mode = 2
+
+[node name="ObjectiveProgress" type="ProgressBar" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+
+[node name="QuestLogButton" type="Button" parent="UI/HUD/QuestPanel/QuestContainer"]
+layout_mode = 2
+text = "Open Quest Log"
+
+[node name="DialogueUI" parent="UI" instance=ExtResource("11_dialogue_ui")]
+
+[node name="DebugOverlay" type="CanvasLayer" parent="."]
+layer = 100
+script = ExtResource("10_debug_overlay")

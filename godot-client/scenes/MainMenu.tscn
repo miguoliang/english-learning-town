@@ -1,0 +1,226 @@
+[gd_scene load_steps=3 format=3 uid="uid://bf2r1yvqg2crt"]
+
+[ext_resource type="Script" uid="uid://b2owhrlpg3aek" path="res://scripts/ui/MainMenuUI.gd" id="1_8k3lp"]
+
+[sub_resource type="Theme" id="Theme_1hwx7"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1hwx7")
+script = ExtResource("1_8k3lp")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.137255, 0.121569, 0.12549, 1)
+
+[node name="LoginPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LoginPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+text = "English Learning Town"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayerIdLabel" type="Label" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+text = "Player ID:"
+
+[node name="PlayerIdInput" type="LineEdit" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Enter your Player ID"
+
+[node name="LoginButton" type="Button" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+text = "Login"
+
+[node name="HSeparator2" type="HSeparator" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="CreateNewPlayerButton" type="Button" parent="LoginPanel/VBoxContainer"]
+layout_mode = 2
+text = "Create New Player"
+
+[node name="CreatePlayerPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreatePlayerPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Create New Player"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayerNameLabel" type="Label" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Player Name:"
+
+[node name="PlayerNameInput" type="LineEdit" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Enter your name"
+
+[node name="GenderLabel" type="Label" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Gender:"
+
+[node name="GenderOption" type="OptionButton" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="CreatePlayerButton" type="Button" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Create Player"
+
+[node name="BackToLoginButton" type="Button" parent="CreatePlayerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Back to Login"
+
+[node name="MainMenuPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WelcomeLabel" type="Label" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "Welcome back!"
+horizontal_alignment = 1
+
+[node name="PlayerStatsLabel" type="Label" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "Level: 1
+Money: $100
+Experience: 0
+Current Scenario: town_center"
+
+[node name="HSeparator" type="HSeparator" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="StartGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "Start Game"
+
+[node name="ViewStatsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "View Statistics"
+
+[node name="LogoutButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "Logout"
+
+[node name="LoadingIndicator" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LoadingLabel" type="Label" parent="LoadingIndicator"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -12.0
+offset_right = 50.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading..."
+horizontal_alignment = 1
+
+[node name="ErrorLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Error message here"
+horizontal_alignment = 1
+autowrap_mode = 2

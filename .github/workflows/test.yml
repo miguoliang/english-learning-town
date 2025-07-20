@@ -1,0 +1,145 @@
+name: English Learning Town - Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        godot-version: ['4.3', '4.4']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: ${{ matrix.godot-version }}
+        
+    - name: Import project
+      run: |
+        cd godot-client
+        godot --headless --import --quit || true
+        
+    - name: Cache imports
+      uses: actions/cache@v3
+      with:
+        path: godot-client/.godot/imported
+        key: ${{ runner.os }}-godot-${{ matrix.godot-version }}-${{ hashFiles('godot-client/**/*.gd', 'godot-client/**/*.cs', 'godot-client/**/*.tscn', 'godot-client/**/*.tres') }}
+        restore-keys: |
+          ${{ runner.os }}-godot-${{ matrix.godot-version }}-
+          
+    - name: Run unit tests
+      run: |
+        cd godot-client
+        ./run_tests.sh --unit
+        
+    - name: Run integration tests
+      run: |
+        cd godot-client
+        ./run_tests.sh --integration
+        
+    - name: Run scene tests
+      run: |
+        cd godot-client
+        ./run_tests.sh --scene
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-godot-${{ matrix.godot-version }}
+        path: godot-client/test_results/
+        
+    - name: Generate test report
+      if: always()
+      run: |
+        cd godot-client
+        echo "## Test Results (Godot ${{ matrix.godot-version }})" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f test_results/unit_results.log ]; then
+          echo "### Unit Tests" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 20 test_results/unit_results.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ -f test_results/integration_results.log ]; then
+          echo "### Integration Tests" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 20 test_results/integration_results.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ -f test_results/scene_results.log ]; then
+          echo "### Scene Tests" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 20 test_results/scene_results.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+
+  performance-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: '4.4'
+        
+    - name: Import project
+      run: |
+        cd godot-client
+        godot --headless --import --quit || true
+        
+    - name: Run performance tests
+      run: |
+        cd godot-client
+        echo "Running performance tests..."
+        # Add performance test commands here when implemented
+        
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-results
+        path: godot-client/test_results/performance/
+
+  code-coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: '4.4'
+        
+    - name: Generate coverage report
+      run: |
+        cd godot-client
+        echo "Generating code coverage report..."
+        # Note: GDScript coverage tools are limited
+        # This is a placeholder for future coverage implementation
+        
+    - name: Upload coverage to Codecov
+      if: false  # Disabled until coverage tool is implemented
+      uses: codecov/codecov-action@v3
+      with:
+        file: godot-client/coverage.xml
+        fail_ci_if_error: true
