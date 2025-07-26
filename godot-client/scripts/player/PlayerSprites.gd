@@ -61,16 +61,20 @@ func create_sprite_frames_from_sheet(sprite_sheet_path: String) -> SpriteFrames:
 			
 			sprite_frames.add_frame(animation_name, atlas_texture)
 	
-	# Create idle animation (just the middle frame)
-	sprite_frames.add_animation("idle")
-	sprite_frames.set_animation_loop("idle", false)
-	sprite_frames.set_animation_speed("idle", 1.0)
-	
-	# Add idle frame (column 1 = middle frame, row 0 = down direction)
-	var idle_atlas = AtlasTexture.new()
-	idle_atlas.atlas = texture
-	idle_atlas.region = Rect2(1 * frame_size.x, 0 * frame_size.y, frame_size.x, frame_size.y)
-	sprite_frames.add_frame("idle", idle_atlas)
+	# Create directional idle animations (middle frame for each direction)
+	for i in range(directions.size()):
+		var direction = directions[i]
+		var idle_animation_name = "idle_" + direction
+		
+		sprite_frames.add_animation(idle_animation_name)
+		sprite_frames.set_animation_loop(idle_animation_name, false)
+		sprite_frames.set_animation_speed(idle_animation_name, 1.0)
+		
+		# Add idle frame (column 1 = middle frame for this direction)
+		var idle_atlas = AtlasTexture.new()
+		idle_atlas.atlas = texture
+		idle_atlas.region = Rect2(1 * frame_size.x, i * frame_size.y, frame_size.x, frame_size.y)
+		sprite_frames.add_frame(idle_animation_name, idle_atlas)
 	
 	return sprite_frames
 
@@ -104,9 +108,10 @@ func apply_sprite_frames():
 		animated_sprite.scale = Vector2(1.0, 1.0)
 
 func set_idle_state():
-	"""Set sprite to idle state"""
+	"""Set sprite to idle state facing the last movement direction"""
 	if animated_sprite and current_sprite_frames:
-		animated_sprite.play("idle")
+		var idle_animation = "idle_" + current_direction
+		animated_sprite.play(idle_animation)
 		is_moving = false
 
 func update_sprite_direction(direction: Vector2):
@@ -114,19 +119,18 @@ func update_sprite_direction(direction: Vector2):
 	if not animated_sprite or not current_sprite_frames:
 		return
 	
-	# Determine direction string
-	var new_direction = get_direction_string(direction)
-	current_direction = new_direction
-	
 	# Update animation based on movement
 	if direction.length() > 0:
-		# Moving - play walking animation
+		# Moving - update direction and play walking animation
+		var new_direction = get_direction_string(direction)
+		current_direction = new_direction
+		
 		var animation_name = "walk_" + current_direction
 		if animated_sprite.animation != animation_name:
 			animated_sprite.play(animation_name)
 		is_moving = true
 	else:
-		# Not moving - show idle
+		# Not moving - show idle in last movement direction
 		if is_moving:
 			set_idle_state()
 

@@ -1,7 +1,7 @@
 extends Node2D
 
 @onready var player: PlayerController = $Player
-@onready var camera: Camera2D = $Camera2D
+@onready var camera: Camera2D = $Player/Camera2D
 @onready var hud_top_panel = $UI/HUD/TopPanel/HBoxContainer
 @onready var player_name_label = $UI/HUD/TopPanel/HBoxContainer/PlayerNameLabel
 @onready var money_label = $UI/HUD/TopPanel/HBoxContainer/MoneyLabel
@@ -49,26 +49,12 @@ func initialize_scene():
 	
 	# Position player at spawn point
 	player.position = Vector2(0, 0)
-	camera.position = Vector2(0, 0)
 	print("Player positioned at: ", player.position)
-	print("Camera positioned at: ", camera.position)
 	print("Player sprite visible: ", player.get_node("Sprite2D").visible)
 	print("Player sprite modulate: ", player.get_node("Sprite2D").modulate)
 
 func setup_camera():
 	camera.enabled = true
-	
-	var tween = create_tween()
-	tween.set_loops()
-	tween.tween_method(_update_camera_position, camera.global_position, player.global_position, 0.1)
-	tween.tween_callback(_update_camera_position.bind(player.global_position))
-
-func _update_camera_position(pos: Vector2):
-	camera.global_position = pos
-
-func _process(_delta):
-	if player:
-		camera.global_position = player.global_position
 
 func connect_ui_elements():
 	menu_button.pressed.connect(_on_menu_button_pressed)

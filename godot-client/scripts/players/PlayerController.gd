@@ -10,11 +10,13 @@ signal building_entered(building_name: String)
 @onready var animated_sprite: AnimatedSprite2D = $Sprite2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var interaction_area: Area2D = $InteractionArea
+@onready var camera: Camera2D = $Camera2D
 
 # Component references
 var movement: PlayerMovement
 var sprites: PlayerSprites
 var interaction: PlayerInteraction
+var camera_controller: PlayerCamera
 
 var input_vector: Vector2 = Vector2.ZERO
 var can_move: bool = true
@@ -27,15 +29,18 @@ func _ready():
 	movement = PlayerMovement.new()
 	sprites = PlayerSprites.new()
 	interaction = PlayerInteraction.new()
+	camera_controller = PlayerCamera.new()
 	
 	add_child(movement)
 	add_child(sprites)
 	add_child(interaction)
+	add_child(camera_controller)
 	
 	# Initialize components with node references
 	movement.initialize(self)
 	sprites.initialize(animated_sprite, animation_player)
 	interaction.initialize(interaction_area)
+	camera_controller.initialize(camera, self)
 	
 	# Connect component signals
 	interaction.interaction_started.connect(_on_interaction_started)

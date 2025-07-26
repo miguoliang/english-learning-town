@@ -124,17 +124,16 @@ size = Vector2(64, 64)
 [node name="TownExploration" type="Node2D"]
 script = ExtResource("1_scene_controller")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
-
 [node name="Player" type="CharacterBody2D" parent="."]
 z_index = 10
 script = ExtResource("1_6yxkv")
 
+[node name="Camera2D" type="Camera2D" parent="Player"]
+zoom = Vector2(2, 2)
+
 [node name="Sprite2D" type="AnimatedSprite2D" parent="Player"]
 sprite_frames = SubResource("SpriteFrames_4l536")
-animation = &"walk_right"
-autoplay = "walk_down"
+animation = &"walk_down"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("RectangleShape2D_1")
@@ -148,7 +147,7 @@ shape = SubResource("RectangleShape2D_2")
 
 [node name="Environment" type="Node2D" parent="."]
 
-[node name="TownMap" type="Sprite2D" parent="Environment"]
+[node name="TownMap" type="Sprite2D" parent="Environment" groups=["town_map"]]
 texture = ExtResource("2_town_map")
 
 [node name="NPCs" type="Node2D" parent="."]
