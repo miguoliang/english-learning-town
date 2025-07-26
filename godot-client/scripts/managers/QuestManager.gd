@@ -321,3 +321,14 @@ func check_daily_quest_reset():
 		last_daily_reset_date = current_date
 		if debug_mode:
 			print("Daily quests reset for: ", current_date)
+
+func set_active_quest(quest_id: String) -> bool:
+	"""Set a specific quest as the current active quest"""
+	var quest = get_quest(quest_id)
+	if quest and quest in active_quests:
+		current_active_quest = quest
+		active_quest_changed.emit(quest)
+		if debug_mode:
+			print("Set active quest: %s" % quest.title)
+		return true
+	return false

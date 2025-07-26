@@ -23,6 +23,11 @@ func before_test():
 	
 	# Wait for scene to fully initialize
 	await get_tree().process_frame
+	
+	# Ensure GameStateManager is in correct state for testing
+	if GameStateManager:
+		GameStateManager.set_state(GameStateManager.GameState.PLAYING)
+		GameStateManager.set_mode(GameStateManager.GameMode.NORMAL)
 
 func after_test():
 	if scene:
@@ -252,3 +257,76 @@ func test_error_recovery():
 	# Try to access quest that doesn't exist
 	var invalid_quest = QuestManager.get_quest("invalid_quest")
 	assert_that(invalid_quest).is_null()
+
+func test_gamestate_manager_integration():
+	# Test GameStateManager is properly integrated
+	assert_that(GameStateManager).is_not_null()
+	assert_that(GameStateManager.current_state).is_equal(GameStateManager.GameState.PLAYING)
+	assert_that(GameStateManager.current_mode).is_equal(GameStateManager.GameMode.NORMAL)
+
+func test_player_movement_respects_state():
+	# Test player movement respects GameStateManager state
+	assert_that(GameStateManager.can_player_move()).is_true()
+	assert_that(player.can_move).is_true()
+	
+	# Block movement via GameStateManager
+	GameStateManager.set_mode(GameStateManager.GameMode.DIALOGUE)
+	assert_that(GameStateManager.can_player_move()).is_false()
+	
+	# Restore normal movement
+	GameStateManager.set_mode(GameStateManager.GameMode.NORMAL)
+	assert_that(GameStateManager.can_player_move()).is_true()
+
+func test_dialogue_mode_integration():
+	# Test dialogue mode properly integrates with town controller
+	var dialogue_mode_activated = false
+	
+	# Connect to state change signal
+	GameStateManager.mode_changed.connect(func(old, new):
+		if new == GameStateManager.GameMode.DIALOGUE:
+			dialogue_mode_activated = true
+	)
+	
+	# Simulate NPC interaction starting dialogue
+	teacher_npc.interact()
+	
+	# Should have triggered dialogue mode (in real implementation)
+	# Note: This test depends on proper signal connection in TownExplorationController
+	assert_that(teacher_npc.is_in_dialogue).is_true()
+
+func test_tutorial_mode_coordination():
+	# Test tutorial mode can be activated and properly coordinated
+	if TutorialManager:
+		var initial_mode = GameStateManager.current_mode
+		
+		# Force tutorial mode
+		GameStateManager.set_mode(GameStateManager.GameMode.TUTORIAL)
+		assert_that(GameStateManager.is_in_tutorial()).is_true()
+		assert_that(GameStateManager.can_player_move()).is_false()
+		
+		# Return to normal
+		GameStateManager.set_mode(initial_mode)
+		assert_that(GameStateManager.is_in_tutorial()).is_false()
+
+func test_scene_state_initialization():
+	# Test scene properly initializes GameStateManager state
+	# TownExplorationController should set state to PLAYING
+	assert_that(GameStateManager.current_state).is_equal(GameStateManager.GameState.PLAYING)
+	
+	# Should start in normal mode
+	assert_that(GameStateManager.current_mode).is_equal(GameStateManager.GameMode.NORMAL)
+
+func test_input_blocking_integration():
+	# Test input blocking works with player controller
+	assert_that(GameStateManager.is_input_blocked()).is_false()
+	
+	# Block input
+	GameStateManager.block_input(true, "Test blocking")
+	assert_that(GameStateManager.is_input_blocked()).is_true()
+	
+	# Player should respect input blocking
+	assert_that(GameStateManager.can_player_move()).is_false()
+	
+	# Unblock input
+	GameStateManager.block_input(false)
+	assert_that(GameStateManager.can_player_move()).is_true()

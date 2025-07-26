@@ -1,0 +1,184 @@
+[gd_scene load_steps=4 format=3 uid="uid://bq8m7h4j9k2v1"]
+
+[ext_resource type="Script" path="res://scripts/ui/QuestLogWindow.gd" id="1_quest_log_window"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.1, 0.1, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.6, 0.8, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.2, 0.2, 0.2, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="QuestLogWindow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_quest_log_window")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="QuestLogPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -300.0
+offset_right = 400.0
+offset_bottom = 300.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="QuestLogPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = -20.0
+offset_bottom = -15.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="QuestLogPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="QuestLogPanel/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Quest Log"
+theme_type_variation = &"HeaderLarge"
+
+[node name="CloseButton" type="Button" parent="QuestLogPanel/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+text = "✕"
+
+[node name="HSeparator" type="HSeparator" parent="QuestLogPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HBoxContainer" parent="QuestLogPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestListPanel" type="Panel" parent="QuestLogPanel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
+
+[node name="QuestListContainer" type="VBoxContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestListPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="QuestListTitle" type="Label" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestListPanel/QuestListContainer"]
+layout_mode = 2
+text = "Active Quests"
+theme_type_variation = &"HeaderMedium"
+
+[node name="QuestListScroll" type="ScrollContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestListPanel/QuestListContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestList" type="VBoxContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestListPanel/QuestListContainer/QuestListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VSeparator" type="VSeparator" parent="QuestLogPanel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+
+[node name="QuestDetailsPanel" type="Panel" parent="QuestLogPanel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
+
+[node name="QuestDetailsContainer" type="VBoxContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+
+[node name="QuestTitleLabel" type="Label" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+text = "Select a quest to view details"
+theme_type_variation = &"HeaderMedium"
+autowrap_mode = 2
+
+[node name="QuestDescriptionScroll" type="ScrollContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestDescriptionLabel" type="RichTextLabel" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer/QuestDescriptionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Quest description will appear here when you select a quest from the list."
+fit_content = true
+
+[node name="ObjectivesLabel" type="Label" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+text = "Objectives:"
+theme_type_variation = &"HeaderSmall"
+
+[node name="ObjectivesContainer" type="VBoxContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+
+[node name="RewardsLabel" type="Label" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+text = "Rewards:"
+theme_type_variation = &"HeaderSmall"
+
+[node name="RewardsContainer" type="VBoxContainer" parent="QuestLogPanel/VBoxContainer/ContentContainer/QuestDetailsPanel/QuestDetailsContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="QuestLogPanel/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="RefreshButton" type="Button" parent="QuestLogPanel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="TrackButton" type="Button" parent="QuestLogPanel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Track Quest"
+
+[connection signal="pressed" from="QuestLogPanel/VBoxContainer/HeaderContainer/CloseButton" to="." method="_on_close_button_pressed"]
+[connection signal="pressed" from="QuestLogPanel/VBoxContainer/ButtonContainer/RefreshButton" to="." method="_on_refresh_button_pressed"]
+[connection signal="pressed" from="QuestLogPanel/VBoxContainer/ButtonContainer/TrackButton" to="." method="_on_track_button_pressed"]

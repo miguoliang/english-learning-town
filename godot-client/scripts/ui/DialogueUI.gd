@@ -20,6 +20,12 @@ signal dialogue_continued
 signal dialogue_closed
 
 func _ready():
+	# Add to dialogue_ui group for GameStateManager integration
+	add_to_group("dialogue_ui")
+	
+	# Set z-index for conversation layer
+	z_index = ZIndex.CONVERSATION
+	
 	# Hide dialogue UI initially
 	hide_dialogue()
 	
@@ -34,6 +40,11 @@ func show_dialogue(npc: NPC, dialogue_entry: DialogueEntry):
 		
 	current_npc = npc
 	current_dialogue_entry = dialogue_entry
+	
+	# Notify GameStateManager that dialogue is starting
+	var game_state_manager = get_node_or_null("/root/GameStateManager")
+	if game_state_manager:
+		game_state_manager.start_dialogue()
 	
 	# Set speaker info
 	speaker_name_label.text = dialogue_entry.speaker_name if dialogue_entry.speaker_name != "" else npc.npc_data.name
@@ -71,6 +82,15 @@ func hide_dialogue():
 	self.hide()
 	current_dialogue_entry = null
 	current_npc = null
+	
+	# Notify GameStateManager that dialogue is ending
+	var game_state_manager = get_node_or_null("/root/GameStateManager")
+	if game_state_manager:
+		game_state_manager.end_dialogue()
+	
+	# Notify tutorial system of dialogue completion
+	if has_node("/root/TutorialManager"):
+		get_node("/root/TutorialManager")._on_dialogue_completed()
 	
 	# Play dialogue close sound
 	_play_audio_sfx("dialogue_close")
@@ -115,8 +135,13 @@ func _on_response_selected(response: DialogueResponse):
 	hide_dialogue()
 
 func _input(event):
-	"""Handle keyboard input for dialogue"""
+	"""Handle keyboard input for dialogue - now coordinated with GameStateManager"""
 	if not is_visible_in_tree():
+		return
+	
+	# Only handle input if GameStateManager allows it (dialogue mode active)
+	var game_state_manager = get_node_or_null("/root/GameStateManager")
+	if game_state_manager and not game_state_manager.is_in_dialogue():
 		return
 	
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("interact"):

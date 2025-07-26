@@ -86,6 +86,10 @@ func _on_player_entered_range(body):
 		player_in_range = true
 		name_label.visible = true
 		
+		# Notify tutorial system that player approached NPC
+		if has_node("/root/TutorialManager"):
+			get_node("/root/TutorialManager")._on_player_approached_npc()
+		
 		# Show interaction hint if not in dialogue
 		if not is_in_dialogue:
 			show_interaction_hint()
@@ -97,16 +101,29 @@ func _on_player_exited_range(body):
 		hide_interaction_hint()
 
 func show_interaction_hint():
-	# TODO: Show "Press E to talk" hint
-	pass
+	"""Show interaction hint using HintManager"""
+	if has_node("/root/HintManager"):
+		var hint_pos = global_position + Vector2(50, -60)
+		get_node("/root/HintManager").show_contextual_hint(
+			"Press [color=yellow][b]E[/b][/color] or [color=yellow][b]SPACE[/b][/color] to talk",
+			hint_pos,
+			"Talk to " + npc_data.name,
+			3.0
+		)
 
 func hide_interaction_hint():
-	# TODO: Hide interaction hint
-	pass
+	"""Hide interaction hint"""
+	if has_node("/root/HintManager"):
+		# Dismiss contextual hints for this NPC
+		get_node("/root/HintManager").dismiss_all_hints()
 
 func interact():
 	if is_in_dialogue or not npc_data.is_available_now():
 		return
+	
+	# Notify tutorial system of NPC interaction
+	if has_node("/root/TutorialManager"):
+		get_node("/root/TutorialManager")._on_player_interacted_with_npc()
 	
 	start_dialogue()
 

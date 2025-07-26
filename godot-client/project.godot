@@ -21,10 +21,14 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameManager="*res://scripts/managers/GameManager.gd"
+GameStateManager="*res://scripts/managers/GameStateManager.gd"
 APIClient="*res://scripts/networking/APIClient.gd"
 QuestManager="*res://scripts/managers/QuestManager.gd"
 DebugOverlay="*res://scripts/debug/DebugOverlay.gd"
 AudioManager="*res://scripts/managers/AudioManager.gd"
+TutorialManager="*res://scripts/managers/TutorialManager.gd"
+HintManager="*res://scripts/managers/HintManager.gd"
+NotificationManager="*res://scripts/managers/NotificationManager.gd"
 
 [display]
 

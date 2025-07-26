@@ -14,6 +14,7 @@ signal debug_toggled(enabled: bool)
 @onready var quest_info_label: Label
 @onready var player_info_label: Label
 @onready var debug_commands_label: Label
+@onready var state_info_label: Label
 
 var fps_history: Array[float] = []
 var max_fps_history: int = 60
@@ -21,7 +22,10 @@ var update_timer: float = 0.0
 
 func _ready():
 	name = "DebugOverlay"
-	layer = 100  # Ensure it's on top
+	layer = ZIndex.DEBUG  # Ensure it's on top using Z-Index constants
+	
+	# Add to debug_overlay group for GameStateManager integration
+	add_to_group("debug_overlay")
 	
 	# Check if debug mode should be enabled
 	debug_enabled = OS.is_debug_build() or OS.has_feature("debug")
@@ -32,12 +36,10 @@ func _ready():
 	print("DebugOverlay initialized (enabled: %s)" % debug_enabled)
 
 func _input(event):
-	# Toggle debug with F3 key
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_F3:
-			toggle_debug()
-		elif event.keycode == KEY_F4 and debug_enabled:
-			cycle_debug_level()
+	# Debug input is now handled by GameStateManager for proper priority
+	# This method is kept for compatibility but should not handle F-key inputs anymore
+	# F-key inputs are handled by GameStateManager._handle_debug_input()
+	pass
 
 func _process(delta):
 	if not debug_enabled:
@@ -120,9 +122,21 @@ func create_debug_labels(container: VBoxContainer):
 	var separator3 = HSeparator.new()
 	container.add_child(separator3)
 	
+	# State Info
+	state_info_label = Label.new()
+	state_info_label.text = "State: --"
+	state_info_label.add_theme_color_override("font_color", Color.YELLOW)
+	state_info_label.add_theme_font_size_override("font_size", 12)
+	state_info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	container.add_child(state_info_label)
+	
+	# Separator
+	var separator4 = HSeparator.new()
+	container.add_child(separator4)
+	
 	# Debug Commands
 	debug_commands_label = Label.new()
-	debug_commands_label.text = "F3: Toggle Debug\nF4: Cycle Level"
+	debug_commands_label.text = "F3: Toggle Debug\nF4: Cycle Level\nF5: Start Tutorial\nF6: Reset Tutorial\nF7: Print State\nF8: Fix Stuck State"
 	debug_commands_label.add_theme_color_override("font_color", Color.WHITE)
 	debug_commands_label.add_theme_font_size_override("font_size", 10)
 	debug_commands_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -137,6 +151,7 @@ func update_debug_info():
 	update_nodes_info()
 	update_quest_info()
 	update_player_info()
+	update_state_info()
 
 func update_fps_info():
 	var current_fps = Engine.get_frames_per_second()
@@ -233,6 +248,37 @@ func update_player_info():
 	
 	player_info_label.text = player_text
 
+func update_state_info():
+	"""Update game state information display"""
+	var game_state_manager = get_node_or_null("/root/GameStateManager")
+	if not game_state_manager:
+		state_info_label.text = "State: GameStateManager not found"
+		state_info_label.add_theme_color_override("font_color", Color.RED)
+		return
+	
+	var state_info = game_state_manager.get_state_info()
+	var state_text = "GAME STATE:\\nState: %s\\nMode: %s" % [state_info.state, state_info.mode]
+	
+	if state_info.input_blocked:
+		state_text += "\\nINPUT BLOCKED\\nReason: %s" % state_info.input_block_reason
+	else:
+		state_text += "\\nInput Active"
+	
+	state_text += "\\nCan Move: %s" % ("YES" if state_info.can_player_move else "NO")
+	state_text += "\\nTree Paused: %s" % ("YES" if get_tree().paused else "NO")
+	
+	# Color code based on state
+	if state_info.input_blocked or get_tree().paused:
+		state_info_label.add_theme_color_override("font_color", Color.RED)
+	elif state_info.state == "TUTORIAL":
+		state_info_label.add_theme_color_override("font_color", Color.CYAN)
+	elif state_info.mode == "DIALOGUE":
+		state_info_label.add_theme_color_override("font_color", Color.MAGENTA)
+	else:
+		state_info_label.add_theme_color_override("font_color", Color.GREEN)
+	
+	state_info_label.text = state_text
+
 func toggle_debug():
 	debug_enabled = not debug_enabled
 	set_debug_visible(debug_enabled)
@@ -279,3 +325,21 @@ func check_memory_usage():
 	
 	if current_memory > memory_threshold:
 		add_debug_info("MEMORY", "High usage: %.1f MB" % current_memory)
+
+# Tutorial debug functions
+func start_tutorial_debug():
+	"""Start tutorial via debug command"""
+	if has_node("/root/TutorialManager"):
+		print("Debug: Starting tutorial...")
+		get_node("/root/TutorialManager").force_start_tutorial()
+	else:
+		print("Debug: TutorialManager not found")
+
+func reset_tutorial_debug():
+	"""Reset tutorial progress via debug command"""
+	if has_node("/root/TutorialManager"):
+		print("Debug: Resetting tutorial progress...")
+		get_node("/root/TutorialManager").reset_tutorial_progress()
+		print("Debug: Tutorial reset complete. Restart game to see tutorial again.")
+	else:
+		print("Debug: TutorialManager not found")

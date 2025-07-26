@@ -21,6 +21,9 @@ extends Node2D
 # Dialogue UI
 @onready var dialogue_ui: DialogueUI = $UI/DialogueUI
 
+# Quest log window
+var quest_log_window: QuestLogWindow
+
 # NPCs
 @onready var npcs_node = $NPCs
 
@@ -33,7 +36,12 @@ func _ready():
 	connect_ui_elements()
 	update_hud()
 	setup_quest_ui()
+	setup_quest_log_window()
 	setup_npcs()
+	
+	# Set initial game state
+	if GameStateManager:
+		GameStateManager.set_state(GameStateManager.GameState.PLAYING)
 
 func initialize_scene():
 	print("TownExploration scene initialized")
@@ -94,7 +102,10 @@ func _on_interact_button_pressed():
 		player.try_interact()
 
 func _on_quest_log_button_pressed():
-	print("Quest log button pressed - TODO: Open quest log window")
+	if quest_log_window:
+		quest_log_window.show_quest_log()
+	else:
+		print("Quest log window not initialized")
 
 func setup_quest_ui():
 	# Connect to quest manager signals
@@ -134,37 +145,51 @@ func _on_quest_started(quest: QuestData):
 	print("Quest started: ", quest.title)
 	update_quest_ui()
 	
-	# Show brief notification
-	show_quest_notification("New Quest: " + quest.title, Color.GREEN)
+	# Show quest started notification
+	if has_node("/root/NotificationManager"):
+		get_node("/root/NotificationManager").show_quest_started(quest.title)
 
 func _on_quest_completed(quest: QuestData):
 	print("Quest completed: ", quest.title)
 	update_quest_ui()
 	
-	# Show completion notification
-	show_quest_notification("Quest Completed: " + quest.title, Color.GOLD)
-	
-	# Show rewards
-	var reward_text = "Rewards: "
-	if quest.experience_reward > 0:
-		reward_text += str(quest.experience_reward) + " XP "
-	if quest.money_reward > 0:
-		reward_text += "$" + str(quest.money_reward)
-	show_quest_notification(reward_text, Color.CYAN)
+	# Show quest completion notification with rewards
+	if has_node("/root/NotificationManager"):
+		get_node("/root/NotificationManager").show_quest_completed(quest.title, quest.experience_reward, quest.money_reward)
 
 func _on_quest_objective_completed(quest: QuestData, objective: QuestObjective):
 	print("Objective completed: ", objective.description)
 	update_quest_ui()
 	
-	# Show objective completion
-	show_quest_notification("✓ " + objective.description, Color.LIGHT_GREEN)
+	# Show objective completion notification
+	if has_node("/root/NotificationManager"):
+		var completed_count = 0
+		for obj in quest.objectives:
+			if obj.is_completed:
+				completed_count += 1
+		var progress_percentage = (completed_count / float(quest.objectives.size())) * 100.0
+		get_node("/root/NotificationManager").show_objective_completed(objective.description, progress_percentage)
 
 func _on_active_quest_changed(quest: QuestData):
 	update_quest_ui()
 
 func show_quest_notification(text: String, color: Color):
-	# TODO: Create a proper notification system
-	print("NOTIFICATION: ", text)
+	"""Show quest notification using the notification system"""
+	if has_node("/root/NotificationManager"):
+		# Determine notification type based on color
+		var title = "Quest Update"
+		if color == Color.GREEN:
+			title = "New Quest!"
+		elif color == Color.GOLD:
+			title = "Quest Complete!"
+		elif color == Color.LIGHT_GREEN:
+			title = "Objective Complete!"
+		elif color == Color.CYAN:
+			title = "Reward!"
+		
+		get_node("/root/NotificationManager").show_custom_notification(title, text, 5.0)
+	else:
+		print("NOTIFICATION: ", text)
 
 func setup_npcs():
 	# Create NPC Manager
@@ -200,6 +225,11 @@ func setup_npcs():
 func _on_npc_dialogue_started(npc: NPC):
 	"""Handle when an NPC starts dialogue"""
 	print("TownController: Dialogue started with ", npc.npc_data.name)
+	
+	# Notify GameStateManager of dialogue mode
+	if GameStateManager:
+		GameStateManager.start_dialogue()
+	
 	if npc.current_dialogue_tree.size() > 0:
 		var dialogue_entry = npc.current_dialogue_tree[npc.current_dialogue_index]
 		dialogue_ui.show_dialogue(npc, dialogue_entry)
@@ -210,7 +240,11 @@ func _on_npc_dialogue_started(npc: NPC):
 
 func _on_npc_dialogue_ended(npc: NPC):
 	"""Handle when NPC dialogue ends"""
-	# Ensure player movement is re-enabled
+	# Notify GameStateManager that dialogue ended
+	if GameStateManager:
+		GameStateManager.end_dialogue()
+	
+	# Ensure player movement is re-enabled (handled by GameStateManager now)
 	if player:
 		player.enable_movement(true)
 
@@ -236,3 +270,30 @@ func _on_dialogue_closed():
 	var current_npc = dialogue_ui.current_npc
 	if current_npc:
 		current_npc.end_dialogue()
+
+func setup_quest_log_window():
+	"""Initialize the quest log window"""
+	var quest_log_scene = load("res://scenes/QuestLogWindow.tscn")
+	if quest_log_scene:
+		quest_log_window = quest_log_scene.instantiate()
+		add_child(quest_log_window)
+		
+		# Connect quest log signals
+		quest_log_window.quest_selected.connect(_on_quest_selected)
+		quest_log_window.quest_tracked.connect(_on_quest_tracked)
+		quest_log_window.window_closed.connect(_on_quest_log_closed)
+	else:
+		print("Warning: Could not load QuestLogWindow.tscn")
+
+func _on_quest_selected(quest: QuestData):
+	"""Handle quest selection in quest log"""
+	print("Quest selected: %s" % quest.title)
+
+func _on_quest_tracked(quest_id: String):
+	"""Handle quest tracking change"""
+	print("Now tracking quest: %s" % quest_id)
+	update_quest_ui()
+
+func _on_quest_log_closed():
+	"""Handle quest log window being closed"""
+	print("Quest log closed")
