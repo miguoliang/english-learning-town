@@ -82,6 +82,23 @@ const CloseButton = styled.button`
   }
 `;
 
+const EscapeHint = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+`;
+
+const EscapeKey = styled.span`
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+`;
+
 const DialogueText = styled(motion.div)`
   color: white;
   font-size: 1.1rem;
@@ -363,6 +380,21 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
     }
   }, [npcId]);
 
+  // ESC key handler to close dialogue
+  useEffect(() => {
+    const handleEscapePress = (event: KeyboardEvent) => {
+      if (event.code === 'Escape') {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscapePress);
+    return () => {
+      window.removeEventListener('keydown', handleEscapePress);
+    };
+  }, [onClose]);
+
   const highlightVocabulary = (text: string, vocabulary: string[] = []) => {
     if (!vocabulary.length) return text;
 
@@ -447,6 +479,10 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
             </SpeakerAvatar>
             <SpeakerName>{currentDialogue.speakerName}</SpeakerName>
           </SpeakerInfo>
+          <EscapeHint>
+            <EscapeKey>ESC</EscapeKey>
+            to close
+          </EscapeHint>
           <CloseButton onClick={onClose}>×</CloseButton>
         </DialogueHeader>
 

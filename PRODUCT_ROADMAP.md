@@ -22,6 +22,7 @@ Create an engaging educational RPG that makes English learning natural and enjoy
 #### ⭐ Recently Added: Keyboard-Based Controls
 - **Arrow Key Movement**: 16-pixel grid-based movement using arrow keys
 - **Space Bar Interactions**: Press SPACE to talk with nearby NPCs
+- **ESC Key Dialogue Closing**: Press ESC to close conversation dialogues ⭐ NEW
 - **Proximity Detection**: 60-pixel interaction range for comfortable gameplay
 - **Visual Feedback**: NPCs glow green when within interaction range
 - **Responsive Controls**: Instant response without animation delays
