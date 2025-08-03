@@ -113,12 +113,13 @@ const ResponseOptions = styled.div`
   gap: 8px;
 `;
 
-const ResponseButton = styled(motion.button)<{ isCorrect?: boolean }>`
-  background: ${props => props.isCorrect 
-    ? 'linear-gradient(135deg, #00b894 0%, #00a085 100%)'
-    : 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)'
-  };
-  border: none;
+const ResponseButton = styled(motion.button)<{ isCorrect?: boolean; isSelected?: boolean }>`
+  background: ${props => {
+    if (props.isCorrect) return 'linear-gradient(135deg, #00b894 0%, #00a085 100%)';
+    if (props.isSelected) return 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)';
+    return 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
+  }};
+  border: ${props => props.isSelected ? '2px solid #ffffff' : 'none'};
   border-radius: 8px;
   padding: 12px 16px;
   color: white;
@@ -126,9 +127,14 @@ const ResponseButton = styled(motion.button)<{ isCorrect?: boolean }>`
   cursor: pointer;
   text-align: left;
   transition: all 0.3s ease;
+  transform: ${props => props.isSelected ? 'translateX(8px) scale(1.02)' : 'translateX(0)'};
+  box-shadow: ${props => props.isSelected 
+    ? '0 6px 20px rgba(232, 67, 147, 0.4)' 
+    : '0 2px 8px rgba(0, 0, 0, 0.1)'
+  };
   
   &:hover {
-    transform: translateX(4px);
+    transform: ${props => props.isSelected ? 'translateX(8px) scale(1.02)' : 'translateX(4px)'};
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
   
@@ -368,6 +374,7 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
   const [currentDialogue, setCurrentDialogue] = useState<DialogueEntry | null>(null);
   const [hasResponded, setHasResponded] = useState(false);
   const [learnedVocabulary, setLearnedVocabulary] = useState<string[]>([]);
+  const [selectedResponseIndex, setSelectedResponseIndex] = useState(0);
   
   const { updateQuestObjective } = useQuestStore();
   const { addVocabulary } = useGameStore();
@@ -377,23 +384,45 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
     const dialogues = npcDialogues[npcId];
     if (dialogues && dialogues.length > 0) {
       setCurrentDialogue(dialogues[0]);
+      setSelectedResponseIndex(0);
     }
   }, [npcId]);
 
-  // ESC key handler to close dialogue
+  // Keyboard handlers for ESC and arrow key navigation
   useEffect(() => {
-    const handleEscapePress = (event: KeyboardEvent) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // ESC key to close dialogue
       if (event.code === 'Escape') {
         event.preventDefault();
         onClose();
+        return;
+      }
+
+      // Arrow key navigation for response selection
+      if (currentDialogue?.responses && currentDialogue.responses.length > 0 && !hasResponded) {
+        const maxIndex = currentDialogue.responses.length - 1;
+        
+        if (event.code === 'ArrowUp') {
+          event.preventDefault();
+          setSelectedResponseIndex(prev => prev > 0 ? prev - 1 : maxIndex);
+        } else if (event.code === 'ArrowDown') {
+          event.preventDefault();
+          setSelectedResponseIndex(prev => prev < maxIndex ? prev + 1 : 0);
+        } else if (event.code === 'Enter' || event.code === 'Space') {
+          event.preventDefault();
+          const selectedResponse = currentDialogue.responses[selectedResponseIndex];
+          if (selectedResponse) {
+            handleResponseClick(selectedResponse);
+          }
+        }
       }
     };
 
-    window.addEventListener('keydown', handleEscapePress);
+    window.addEventListener('keydown', handleKeyPress);
     return () => {
-      window.removeEventListener('keydown', handleEscapePress);
+      window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [onClose]);
+  }, [onClose, currentDialogue, hasResponded, selectedResponseIndex]);
 
   const highlightVocabulary = (text: string, vocabulary: string[] = []) => {
     if (!vocabulary.length) return text;
@@ -438,6 +467,7 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
         setTimeout(() => {
           setCurrentDialogue(nextDialogue);
           setHasResponded(false);
+          setSelectedResponseIndex(0); // Reset selection for new dialogue
         }, 1000);
       }
     } else {
@@ -480,8 +510,10 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
             <SpeakerName>{currentDialogue.speakerName}</SpeakerName>
           </SpeakerInfo>
           <EscapeHint>
+            <EscapeKey>↑↓</EscapeKey>
+            <EscapeKey>ENTER</EscapeKey>
             <EscapeKey>ESC</EscapeKey>
-            to close
+            controls
           </EscapeHint>
           <CloseButton onClick={onClose}>×</CloseButton>
         </DialogueHeader>
@@ -507,6 +539,7 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
               <ResponseButton
                 key={response.id}
                 onClick={() => handleResponseClick(response)}
+                isSelected={index === selectedResponseIndex}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
