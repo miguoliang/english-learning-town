@@ -44,6 +44,27 @@ const LocationLabel = styled.div`
   font-weight: 500;
 `;
 
+const MovementInstructions = styled.div`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const ArrowKey = styled.span`
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+`;
+
 interface GameHUDProps {
   currentLocation: string;
   onReturnToMenu: () => void;
@@ -65,7 +86,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       </TopBar>
       
       <BottomBar>
-        <LocationLabel>📍 {currentLocation}</LocationLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <LocationLabel>📍 {currentLocation}</LocationLabel>
+          <MovementInstructions>
+            Use <ArrowKey>↑</ArrowKey> <ArrowKey>↓</ArrowKey> <ArrowKey>←</ArrowKey> <ArrowKey>→</ArrowKey> to move
+          </MovementInstructions>
+        </div>
         <GameControls 
           onOpenQuestLog={onOpenQuestLog}
           currentQuestTitle={currentQuestTitle}

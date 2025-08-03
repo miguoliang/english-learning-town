@@ -86,10 +86,10 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
   - [x] Educational content integration
 
 - [x] **Modern Game Features**
-  - [x] Click-to-move town exploration
+  - [x] **Arrow key navigation** ⭐ NEW
   - [x] Responsive design for all devices
   - [x] Procedural sound generation
-  - [x] Smooth animations and transitions
+  - [x] Simple, responsive controls
   - [x] Progress tracking and experience system
 
 - [x] **Code Quality & Build**

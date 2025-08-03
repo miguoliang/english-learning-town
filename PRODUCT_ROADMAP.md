@@ -15,9 +15,16 @@ Create an engaging educational RPG that makes English learning natural and enjoy
 ### 🎮 Core Features (ACTIVE)
 - **Quest System**: Visual progress tracking, multi-quest management
 - **Dialogue System**: Interactive NPC conversations with vocabulary highlighting
-- **Town Exploration**: Click-to-move navigation with building interactions
+- **Town Exploration**: Arrow key navigation with building interactions ⭐ NEW
 - **Progress Tracking**: Experience points, level progression, achievement notifications
 - **Audio System**: Procedural sound generation with spatial audio
+
+#### ⭐ Recently Added: Arrow Key Controls
+- **Simple Movement**: 16-pixel grid-based movement using arrow keys
+- **Responsive Controls**: Instant movement response without animation delays
+- **Boundary Detection**: Player movement constrained within map boundaries
+- **Visual Instructions**: Clear on-screen guidance showing arrow key controls
+- **Cross-Platform**: Works consistently across desktop and laptop devices
 
 ## 🗓️ Feature Roadmap
 

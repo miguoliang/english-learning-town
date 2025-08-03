@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Building } from './Building';
 import { NPC } from './NPC';
@@ -24,21 +24,19 @@ interface TownMapProps {
   playerPosition: { x: number; y: number };
   buildings: BuildingData[];
   npcs: NPCData[];
-  onMapClick: (event: React.MouseEvent) => void;
   onBuildingClick?: (building: BuildingData) => void;
   onNPCClick?: (npc: NPCData) => void;
 }
 
-export const TownMap = forwardRef<HTMLDivElement, TownMapProps>(({
+export const TownMap: React.FC<TownMapProps> = ({
   playerPosition,
   buildings,
   npcs,
-  onMapClick,
   onBuildingClick,
   onNPCClick
-}, ref) => {
+}) => {
   return (
-    <MapContainer ref={ref} onClick={onMapClick}>
+    <MapContainer>
       {/* Buildings */}
       {buildings.map(building => (
         <Building
@@ -61,4 +59,4 @@ export const TownMap = forwardRef<HTMLDivElement, TownMapProps>(({
       <Player position={playerPosition} />
     </MapContainer>
   );
-});
+};

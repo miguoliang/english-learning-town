@@ -17,7 +17,15 @@ This document organizes our technical discussions around key areas: programming 
 ```typescript
 // Custom Hook Pattern for Business Logic
 const usePlayerMovement = (buildings: BuildingData[]) => {
-  // Movement logic separated from UI
+  // Arrow key movement logic separated from UI
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    switch (event.code) {
+      case 'ArrowUp': newY = Math.max(24, prevPosition.y - MOVE_STEP); break;
+      case 'ArrowDown': newY = Math.min(HEIGHT - 24, prevPosition.y + MOVE_STEP); break;
+      // ... other directions
+    }
+  }, []);
+  
   return { playerPosition, movePlayer, currentLocation };
 };
 
@@ -32,6 +40,7 @@ interface GameStore extends GameState {
 - **Why React over Godot**: Better text handling, responsive design, faster iteration
 - **Why Zustand over Redux**: Simpler API, better TypeScript support, smaller bundle
 - **Why Styled Components**: Component co-location, theme system, dynamic styling
+- **Why Arrow Keys over Mouse**: Simpler implementation, more predictable movement, better accessibility
 
 #### Areas for Discussion
 - [ ] Performance optimization strategies
