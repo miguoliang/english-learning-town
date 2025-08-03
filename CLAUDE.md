@@ -11,6 +11,34 @@ English Learning Town - Educational RPG built with React + TypeScript that gamif
 - **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Testing methods, quality assurance, educational validation
 - **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Sprint planning, implementation roadmap
 
+## 🎮 Game Architecture
+
+### Simple Grid-Based System (2025-01-03)
+The game follows a simplified, grid-based architecture with three core principles:
+
+1. **Map = Marked Grid Cells** - The game world is a 40x40px grid where cells are marked as:
+   - Walkable/non-walkable (for movement collision)
+   - Interactive/non-interactive (for space bar interactions)
+
+2. **Movement = Check Next Cell** - Player movement simply checks if the target cell is walkable:
+   ```typescript
+   if (gridSystem.isWalkable(newX, newY)) {
+     playerController.setPosition({ x: newX, y: newY });
+   }
+   ```
+
+3. **Interaction = Check Adjacent Cells** - Space bar interactions check current cell for interactive entities:
+   ```typescript
+   const entity = gridSystem.getInteractiveEntity(playerPos.x, playerPos.y);
+   if (entity) { /* interact */ }
+   ```
+
+### Core Game Systems
+- **GridSystem**: Manages cell states (walkable/interactive)
+- **PlayerController**: Handles player position and movement validation
+- **GameRenderer**: Pure visual rendering with styled components
+- **Keyboard-Only Controls**: Arrow keys for movement, Space for interaction
+
 ## 🏗️ React Development Guidelines
 
 ### TypeScript Import Best Practices
@@ -58,7 +86,21 @@ export const usePlayerMovement = (buildings: BuildingData[]) => {
 ```
 
 ### Single Responsibility Principle (SRP) Refactoring
-**DialogueSystem Refactoring Completed** - Example of proper SRP implementation:
+
+**Game System Refactoring Completed** - Latest example of proper SRP implementation:
+
+**Before**: Game.tsx (345+ lines, multiple responsibilities)
+- Grid system logic + player movement + entity management + keyboard handling + UI rendering + data definitions
+
+**After**: Modular architecture with focused components
+- **Game.tsx**: System orchestration only (78 lines)
+- **GridSystem.ts**: Grid cell management (walkable/interactive cells)
+- **PlayerController.ts**: Player movement and interaction logic
+- **GameData.ts**: Static game entity definitions and constants
+- **useKeyboardControls.ts**: Keyboard event handling
+- **GameRenderer.tsx**: Visual rendering and styled components
+
+**DialogueSystem Refactoring Completed** - Previous SRP example:
 
 **Before**: DialogueSystem.tsx (500+ lines, multiple responsibilities)
 - UI rendering + state management + keyboard handling + vocabulary logic + quest integration
