@@ -22,6 +22,7 @@ classDiagram
         +containsPosition(gridX, gridY): boolean
         +getScreenPosition(cellSize): Position
         +getScreenSize(cellSize): Size
+        +getScreenCenter(cellSize): Position
         
         %% CONCERN 2: Walkability
         +isWalkableRange(): boolean
@@ -321,13 +322,41 @@ class RangeFactory {
 }
 ```
 
+## Implementation Status (2025-01-03)
+
+### ✅ **Legacy Architecture Removed (Complete)**
+- Removed `Building.tsx` - Direct React component with mixed concerns
+- Removed `TownMap.tsx` - Legacy map renderer
+- Removed `useGameEntities.ts` - Legacy entity management
+- Migrated all functionality to Range architecture
+
+### ✅ **Range Architecture Fully Deployed**
+- `BuildingRange` - Buildings with entrance system integration
+- `SpriteRange` - Player and NPCs with proper centering
+- `PlantRange` - Simplified decorative vegetation
+- `RangeMap` - Polymorphic rendering of all entities
+- `useRangeEntities` - Range-based entity management
+
+### ✅ **Key Fixes Applied**
+1. **Sprite Centering**: Added `getScreenCenter()` method for pixel-perfect positioning
+2. **Player Movement Integration**: Connected keyboard movement to Range architecture
+3. **Entrance System**: Building entrances with visual indicators and scene transitions
+4. **Dynamic Player**: Real-time position updates from `usePlayerMovement`
+
+### ✅ **Current Features Working**
+- ⬆️⬇️⬅️➡️ Arrow key movement with grid-based navigation
+- 🚪 Building entrances with scene transitions to interiors
+- 🧑👩‍🏫👨‍💼👩‍🎓 Properly centered sprites in grid cells
+- 🏫🏪📚☕ Buildings with collision detection
+- 🌳🌸🌿 Decorative plants with configurable walkability
+
 ## Architecture Benefits
 
 ### 1. **Four Core Concerns Focus**
 Every Range focuses on exactly 4 essential concerns:
-- **Boundary**: Position and size in grid space
+- **Boundary**: Position and size in grid space (with `getScreenCenter()` for precise positioning)
 - **Walkability**: Simple collision detection logic
-- **Interaction**: Clear interaction contracts
+- **Interaction**: Clear interaction contracts (buildings, NPCs)
 - **Rendering**: Strategy pattern for flexible visuals
 
 ### 2. **Strategy Pattern Flexibility** 
@@ -336,19 +365,25 @@ Every Range focuses on exactly 4 essential concerns:
 - Support for different asset types (emoji → image → sprite sheet)
 - Artists can work independently on visual assets
 
-### 3. **Simplified Architecture**
-- No unnecessary type enums (removed `PlantType`)
-- No complex inheritance hierarchies
-- Each Range focuses on essential properties only
-- Clean composition over inheritance
+### 3. **Unified Entity System**
+- All game entities (buildings, NPCs, plants, player) use same Range interface
+- Polymorphic rendering through `RangeMap`
+- No special cases or entity-specific rendering logic
+- Clean separation between game logic and visual representation
 
-### 4. **Game Development Benefits**
+### 4. **Movement Integration**
+- Dynamic player positioning connected to keyboard input
+- Legacy movement system (`usePlayerMovement`) bridges to Range architecture
+- Screen coordinate conversion to grid coordinates for Range positioning
+- Smooth integration between different coordinate systems
+
+### 5. **Game Development Benefits**
 - Easy to prototype with emojis, upgrade to real assets
 - Programmers focus on game logic, not rendering details
 - Supports different art styles for same game objects
-- Modern TypeScript syntax with `private readonly` fields
+- Maintainable codebase with clear responsibilities
 
-### 5. **Clean Separation of Concerns**
+### 6. **Clean Separation of Concerns**
 - **Range Classes**: Handle the 4 core concerns only
 - **Strategy Pattern**: Encapsulates all rendering complexity
 - **Factory Pattern**: Provides sensible defaults

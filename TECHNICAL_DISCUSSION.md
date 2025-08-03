@@ -7,22 +7,52 @@ This document organizes our technical discussions around key areas: programming 
 
 ### 1. Programming Principles & Architecture
 
-#### Current Implementation Status
+#### Current Implementation Status (Updated 2025-01-03)
 - **React Architecture**: TypeScript + React 18 + Vite
 - **State Management**: Zustand with persistence
 - **Component Architecture**: Single Responsibility Principle applied
+- **Range Architecture**: Unified entity system with 4 core concerns
 - **Code Organization**: Modular structure with custom hooks
+- **Game Architecture**: Range-based polymorphic rendering system
 
 #### Key Patterns in Use
+
+**Range Architecture Pattern (New)**
 ```typescript
-// Custom Hook Pattern for Business Logic
-const usePlayerMovement = (buildings: BuildingData[]) => {
-  // Arrow key movement logic separated from UI
+// Unified entity system with 4 core concerns
+abstract class Range {
+  // CONCERN 1: Boundary - position and size in grid space
+  containsPosition(gridX: number, gridY: number): boolean
+  getScreenCenter(cellSize: number): { x: number; y: number }
+  
+  // CONCERN 2: Walkability - collision detection
+  abstract canCollide(): boolean
+  
+  // CONCERN 3: Interaction - behavior on engagement  
+  abstract canInteract(): boolean
+  abstract onInteraction(): void
+  
+  // CONCERN 4: Rendering - Strategy pattern
+  abstract render(): React.ReactNode
+}
+
+// Polymorphic rendering of all entities
+const RangeMap: React.FC = ({ ranges }) => (
+  <MapContainer>
+    {ranges.map(range => range.render())} {/* Polymorphic! */}
+  </MapContainer>
+);
+```
+
+**Custom Hook Pattern for Business Logic**
+```typescript
+const usePlayerMovement = (buildings: LegacyBuildingData[]) => {
+  // Grid-based movement with keyboard input
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
-    switch (event.code) {
-      case 'ArrowUp': newY = Math.max(24, prevPosition.y - MOVE_STEP); break;
-      case 'ArrowDown': newY = Math.min(HEIGHT - 24, prevPosition.y + MOVE_STEP); break;
-      // ... other directions
+    const newGridX = currentGridX + (event.code === 'ArrowRight' ? 1 : -1);
+    const newScreenPosition = gridSystem.gridToScreenCenter(newGridX, newGridY);
+    if (isWalkable(newScreenPosition.x, newScreenPosition.y)) {
+      setPlayerPosition(newScreenPosition);
     }
   }, []);
   
@@ -220,22 +250,25 @@ When we make technical decisions, we'll document:
 
 ## 📝 Quick Reference
 
-### Current Tech Stack
-- **Frontend**: React 18, TypeScript, Vite, Zustand, Styled Components, Framer Motion
+### Current Tech Stack (Updated 2025-01-03)
+- **Frontend**: React 18, TypeScript, Vite, Zustand, Styled Components
+- **Architecture**: Range-based entity system with Strategy pattern
 - **Backend**: Go, Gin, SQLite
 - **Tools**: ESLint, Prettier, Git
 - **Testing**: TypeScript compiler, manual testing
 
-### Key Metrics
-- Bundle size: 134KB gzipped (after refactoring)
-- Build time: ~10 seconds
+### Key Metrics (Updated 2025-01-03)
+- Bundle size: 100.67KB gzipped (after Range architecture migration)
+- Build time: ~8 seconds
 - Type coverage: 100%
 - Performance: 60fps on mobile
-- Component count: 22 components, all under 200 lines
-- SRP compliance: 100% (all components have single responsibility)
+- Architecture: 4 core concerns separation (Boundary, Walkability, Interaction, Rendering)
+- Legacy removal: 3 legacy files removed (Building.tsx, TownMap.tsx, useGameEntities.ts)
+- Code organization: Unified entity system with polymorphic rendering
 
 ### Next Discussion Topics
-1. Performance optimization strategies
-2. Testing framework selection
-3. CI/CD pipeline design
-4. User analytics implementation
+1. **Range Architecture Extensions**: Additional rendering strategies (images, sprite sheets)
+2. **Performance Optimization**: Range pooling and spatial indexing for large maps
+3. **Testing Framework**: Unit tests for Range classes and interaction system
+4. **Asset Pipeline**: Integration with image assets and sprite sheet strategies
+5. **Scene Management**: Extending building interiors with Range-based entities
