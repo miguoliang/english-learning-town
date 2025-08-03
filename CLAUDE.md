@@ -133,6 +133,48 @@ AudioManager.playClick();
 AudioManager.playSuccess();
 ```
 
+### Grid-Based Map System (2025-01-03)
+**Architecture**: CSS Grid-like layout with 40px square cells for structured movement and collision detection.
+
+**Core Components**:
+- **GridSystem** (`utils/gridSystem.ts`): Core grid logic, coordinate conversion, collision map
+- **useGridSystem** (`hooks/useGridSystem.ts`): React hook managing grid state and collision areas
+- **GridOverlay** (`components/game/GridOverlay.tsx`): Visual debugging with dashed grid lines
+
+**Key Features**:
+- **Square Cells**: 40px × 40px grid cells across entire screen
+- **Exact Positioning**: Buildings placed on precise grid coordinates (e.g., School at grid 5,3)
+- **Dynamic Sizing**: Building visuals match their m×n grid footprint exactly
+- **Collision Detection**: Boolean collision map prevents movement through occupied cells
+- **Visual Debugging**: Optional dashed grid overlay with color-coded collision areas
+
+**Building Grid Footprints**:
+```typescript
+School: 4×3 cells (160px × 120px)
+Shop: 4×3 cells (160px × 120px)  
+Library: 3×3 cells (120px × 120px)
+Café: 3×2 cells (120px × 80px)
+NPCs: 1×1 cells (40px × 40px)
+```
+
+**Implementation Pattern**:
+```typescript
+// Grid-aligned positioning
+const cellSize = 40;
+const gridX = 5; // Grid coordinate
+const screenX = gridX * cellSize; // Screen position
+
+// Visual size matches grid footprint
+const visualWidth = gridSize.width * cellSize;
+const visualHeight = gridSize.height * cellSize;
+```
+
+**Benefits**: 
+- Predictable movement patterns
+- Precise collision detection
+- Scalable for level design
+- Clear visual feedback for debugging
+
 ### Build & Testing Protocol
 After making changes:
 1. Run `npm run build` - Verify TypeScript compilation (zero errors)
