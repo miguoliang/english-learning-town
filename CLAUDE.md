@@ -1,6 +1,17 @@
-# Instructions for Claude Code Assistant
+# Technical Collaboration Guide for Claude
 
-## React Development Guidelines
+## 🎯 Project Context
+English Learning Town - Educational RPG built with React + TypeScript that gamifies English language learning through interactive storytelling and quest-based progression.
+
+## 📋 Discussion Framework Reference
+
+### Quick Navigation
+- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Programming principles, architecture decisions, code patterns
+- **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** - Feature planning, user stories, success metrics  
+- **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Testing methods, quality assurance, educational validation
+- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Sprint planning, implementation roadmap
+
+## 🏗️ React Development Guidelines
 
 ### TypeScript Import Best Practices
 **CRITICAL**: Use type-only imports to optimize bundle size and ensure build compliance:
@@ -111,6 +122,37 @@ npm run dev
 - `src/types/index.ts` - TypeScript definitions
 - `src/components/quest/` - Quest UI components
 - `src/services/api.ts` - Backend integration
+
+## 🎯 Communication Patterns
+
+### Decision Documentation
+When making technical decisions:
+1. **Context**: What problem are we solving?
+2. **Options**: What alternatives did we consider? 
+3. **Decision**: What did we choose and why?
+4. **Consequences**: What are the trade-offs?
+
+### Code Discussion Topics
+- Architecture and maintainability focus
+- Educational effectiveness impact
+- Performance implications
+- Accessibility requirements validation
+
+## 📊 Current Status Dashboard
+
+### Technical Health
+- ✅ TypeScript: Strict mode, zero errors
+- ✅ Build: Optimized bundle (133KB gzipped)
+- ✅ Architecture: Clean, modular, SRP-compliant
+- ✅ Performance: 60fps, responsive design
+
+### Feature Status
+- ✅ Quest System: Visual tracking, objectives
+- ✅ NPC Dialogue: Interactive conversations
+- ✅ Progress Tracking: XP, levels, vocabulary
+- ✅ Mobile Support: Touch-friendly interface
+
+This guide serves as our technical collaboration framework for efficient, focused discussions around programming principles, product features, planning, testing methods, and production practices.
 
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.

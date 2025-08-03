@@ -138,6 +138,13 @@ cd react-client && npm run type-check
 
 ## 📖 Documentation
 
+### Core Documentation
+- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Programming principles, architecture decisions, testing strategies
+- **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** - Feature planning, user stories, success metrics
+- **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Quality assurance, educational validation methods
+- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Sprint planning, implementation roadmap
+
+### Additional Resources
 - **[Development Guide](docs/src/development/README.md)**: Setup and contribution guidelines
 - **[API Documentation](docs/src/api/README.md)**: Backend endpoints and data models
 - **[Game Design](docs/src/game-design/README.md)**: Educational methodology and mechanics
@@ -145,7 +152,10 @@ cd react-client && npm run type-check
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Development Plan](DEVELOPMENT_PLAN.md) for current priorities and [CLAUDE.md](CLAUDE.md) for critical coding patterns.
+We welcome contributions! Please see our organized documentation structure:
+- **[CLAUDE.md](CLAUDE.md)** - Technical collaboration guide and coding patterns
+- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Current priorities and implementation roadmap
+- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Architecture principles and best practices
 
 ### Development Setup
 1. Fork the repository
