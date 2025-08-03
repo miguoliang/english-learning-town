@@ -1,12 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const BuildingSprite = styled.div<{ x: number; y: number; color: string }>`
+const BuildingSprite = styled.div<{ 
+  x: number; 
+  y: number; 
+  color: string; 
+  width: number; 
+  height: number; 
+}>`
   position: absolute;
   left: ${props => props.x}px;
   top: ${props => props.y}px;
-  width: 120px;
-  height: 100px;
+  width: ${props => props.width}px;
+  height: ${props => props.height}px;
   background: ${props => props.color};
   border: 2px solid #2d3436;
   border-radius: 8px;
@@ -30,6 +36,10 @@ interface BuildingProps {
   color: string;
   icon: string;
   name: string;
+  gridSize?: {
+    width: number;
+    height: number;
+  };
   onClick?: (building: BuildingData) => void;
 }
 
@@ -40,6 +50,10 @@ export interface BuildingData {
   color: string;
   icon: string;
   name: string;
+  gridSize?: {
+    width: number;
+    height: number;
+  };
 }
 
 export const Building: React.FC<BuildingProps> = ({
@@ -49,15 +63,24 @@ export const Building: React.FC<BuildingProps> = ({
   color,
   icon,
   name,
+  gridSize,
   onClick
 }) => {
-  const buildingData: BuildingData = { id, x, y, color, icon, name };
+  const buildingData: BuildingData = { id, x, y, color, icon, name, gridSize };
+  
+  // Calculate visual size based on grid size (40px per cell)
+  const cellSize = 40;
+  const actualGridSize = gridSize || { width: 4, height: 3 };
+  const visualWidth = actualGridSize.width * cellSize;
+  const visualHeight = actualGridSize.height * cellSize;
 
   return (
     <BuildingSprite
       x={x}
       y={y}
       color={color}
+      width={visualWidth}
+      height={visualHeight}
       onClick={() => onClick?.(buildingData)}
     >
       {icon}

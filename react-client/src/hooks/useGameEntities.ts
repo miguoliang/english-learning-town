@@ -9,25 +9,58 @@ interface UseGameEntitiesReturn {
 
 export const useGameEntities = (): UseGameEntitiesReturn => {
   const buildings = useMemo<BuildingData[]>(() => {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+    const cellSize = 40;
+    const gridWidth = Math.floor(window.innerWidth / cellSize);
     
+    // Position buildings on exact grid coordinates
     return [
-      { id: 'school', x: screenWidth * 0.15, y: screenHeight * 0.2, color: '#e17055', icon: '🏫', name: 'School' },
-      { id: 'shop', x: screenWidth * 0.75, y: screenHeight * 0.25, color: '#00b894', icon: '🏪', name: 'Shop' },
-      { id: 'library', x: screenWidth * 0.3, y: screenHeight * 0.65, color: '#6c5ce7', icon: '📚', name: 'Library' },
-      { id: 'cafe', x: screenWidth * 0.65, y: screenHeight * 0.65, color: '#fdcb6e', icon: '☕', name: 'Café' }
+      { 
+        id: 'school', 
+        x: 5 * cellSize,  // Grid position (5, 3)
+        y: 3 * cellSize, 
+        color: '#e17055', 
+        icon: '🏫', 
+        name: 'School',
+        gridSize: { width: 4, height: 3 }
+      },
+      { 
+        id: 'shop', 
+        x: (gridWidth - 8) * cellSize,  // Grid position (right side - 8, 4)
+        y: 4 * cellSize, 
+        color: '#00b894', 
+        icon: '🏪', 
+        name: 'Shop',
+        gridSize: { width: 4, height: 3 }
+      },
+      { 
+        id: 'library', 
+        x: 8 * cellSize,  // Grid position (8, 12)
+        y: 12 * cellSize, 
+        color: '#6c5ce7', 
+        icon: '📚', 
+        name: 'Library',
+        gridSize: { width: 3, height: 3 }
+      },
+      { 
+        id: 'cafe', 
+        x: (gridWidth - 7) * cellSize,  // Grid position (right side - 7, 14)
+        y: 14 * cellSize, 
+        color: '#fdcb6e', 
+        icon: '☕', 
+        name: 'Café',
+        gridSize: { width: 3, height: 2 }
+      }
     ];
   }, []);
 
   const npcs = useMemo<NPCData[]>(() => {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+    const cellSize = 40;
+    const gridWidth = Math.floor(window.innerWidth / cellSize);
     
     return [
-      { id: 'teacher', x: screenWidth * 0.18, y: screenHeight * 0.3, icon: '👩‍🏫', name: 'Ms. Johnson' },
-      { id: 'shopkeeper', x: screenWidth * 0.78, y: screenHeight * 0.35, icon: '👨‍💼', name: 'Mr. Smith' },
-      { id: 'librarian', x: screenWidth * 0.33, y: screenHeight * 0.75, icon: '👩‍🎓', name: 'Dr. Brown' }
+      { id: 'teacher', x: 6 * cellSize, y: 7 * cellSize, icon: '👩‍🏫', name: 'Ms. Johnson' },
+      { id: 'shopkeeper', x: (gridWidth - 6) * cellSize, y: 8 * cellSize, icon: '👨‍💼', name: 'Mr. Smith' },
+      { id: 'librarian', x: 9 * cellSize, y: 16 * cellSize, icon: '👩‍🎓', name: 'Dr. Brown' }
     ];
   }, []);
 

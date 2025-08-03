@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { BuildingData } from '../components/game/Building';
+import type { NPCData } from '../components/game/NPC';
 import { useQuestStore } from '../stores/questStore';
 import { ObjectiveType } from '../types';
+import { useGridSystem } from './useGridSystem';
 
 interface Position {
   x: number;
@@ -14,48 +16,58 @@ interface UsePlayerMovementReturn {
   movePlayer: (x: number, y: number) => void;
 }
 
-export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementReturn => {
-  const [playerPosition, setPlayerPosition] = useState<Position>({ 
-    x: window.innerWidth / 2, 
-    y: window.innerHeight / 2 
+export const usePlayerMovement = (buildings: BuildingData[], npcs: NPCData[]): UsePlayerMovementReturn => {
+  const { gridSystem, isWalkable, snapToGrid } = useGridSystem({ buildings, npcs });
+  
+  const [playerPosition, setPlayerPosition] = useState<Position>(() => {
+    // Start player at center of screen, snapped to grid
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    return snapToGrid(centerX, centerY);
   });
   const [currentLocation, setCurrentLocation] = useState('Town Center');
   const [visitedLocations, setVisitedLocations] = useState<Set<string>>(new Set());
 
   const { updateQuestObjective } = useQuestStore();
 
-  // Movement configuration
-  const MOVE_STEP = 16; // pixels per step
-  const MAP_WIDTH = window.innerWidth;
-  const MAP_HEIGHT = window.innerHeight;
+  // Movement configuration - now grid-based
+  const CELL_SIZE = gridSystem.cellSize;
 
   const updateLocation = useCallback((x: number, y: number) => {
-    const building = buildings.find(b => 
-      x >= b.x && x <= b.x + 120 && y >= b.y && y <= b.y + 100
-    );
+    // Check if player is on a building using grid collision detection
+    const gridPos = gridSystem.screenToGrid(x, y);
+    const collisionArea = gridSystem.getCollisionAreaAt(gridPos.x, gridPos.y);
     
-    if (building) {
-      setCurrentLocation(building.name);
-      
-      // Update quest objectives for location visits
-      if (!visitedLocations.has(building.id)) {
-        setVisitedLocations(prev => new Set([...prev, building.id]));
-        updateQuestObjective('welcome', ObjectiveType.GO_TO_LOCATION, building.id);
-        updateQuestObjective('first_shopping', ObjectiveType.GO_TO_LOCATION, building.id);
+    if (collisionArea && collisionArea.type === 'building') {
+      const building = buildings.find(b => b.id === collisionArea.id);
+      if (building) {
+        setCurrentLocation(building.name);
+        
+        // Update quest objectives for location visits
+        if (!visitedLocations.has(building.id)) {
+          setVisitedLocations(prev => new Set([...prev, building.id]));
+          updateQuestObjective('welcome', ObjectiveType.GO_TO_LOCATION, building.id);
+          updateQuestObjective('first_shopping', ObjectiveType.GO_TO_LOCATION, building.id);
+        }
+        return;
       }
-    } else {
-      setCurrentLocation('Town Center');
     }
-  }, [buildings, visitedLocations, updateQuestObjective]);
+    
+    setCurrentLocation('Town Center');
+  }, [buildings, visitedLocations, updateQuestObjective, gridSystem]);
 
   const movePlayer = useCallback((x: number, y: number) => {
-    // Ensure movement stays within map boundaries
-    const clampedX = Math.max(16, Math.min(MAP_WIDTH - 16, x));
-    const clampedY = Math.max(24, Math.min(MAP_HEIGHT - 24, y));
+    // Check if the target position is walkable
+    if (!isWalkable(x, y)) {
+      return; // Can't move to blocked position
+    }
+
+    // Snap to grid
+    const snappedPosition = snapToGrid(x, y);
     
-    setPlayerPosition({ x: clampedX, y: clampedY });
-    updateLocation(clampedX + 16, clampedY + 24);
-  }, [updateLocation]);
+    setPlayerPosition(snappedPosition);
+    updateLocation(snappedPosition.x, snappedPosition.y);
+  }, [updateLocation, isWalkable, snapToGrid]);
 
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
     // Only handle arrow keys
@@ -72,25 +84,27 @@ export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementR
 
       switch (event.code) {
         case 'ArrowUp':
-          newY = Math.max(24, prevPosition.y - MOVE_STEP);
+          newY = prevPosition.y - CELL_SIZE;
           break;
         case 'ArrowDown':
-          newY = Math.min(MAP_HEIGHT - 24, prevPosition.y + MOVE_STEP);
+          newY = prevPosition.y + CELL_SIZE;
           break;
         case 'ArrowLeft':
-          newX = Math.max(16, prevPosition.x - MOVE_STEP);
+          newX = prevPosition.x - CELL_SIZE;
           break;
         case 'ArrowRight':
-          newX = Math.min(MAP_WIDTH - 16, prevPosition.x + MOVE_STEP);
+          newX = prevPosition.x + CELL_SIZE;
           break;
       }
 
-      // Only update if position actually changed
-      if (newX !== prevPosition.x || newY !== prevPosition.y) {
-        updateLocation(newX + 16, newY + 24);
-        return { x: newX, y: newY };
+      // Check if new position is walkable
+      if (isWalkable(newX, newY)) {
+        const snappedPosition = snapToGrid(newX, newY);
+        updateLocation(snappedPosition.x, snappedPosition.y);
+        return snappedPosition;
       }
 
+      // Can't move to that position, stay where we are
       return prevPosition;
     });
   }, [updateLocation]);
@@ -103,20 +117,23 @@ export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementR
     };
   }, [handleKeyPress]);
 
-  // Handle window resize to keep player centered
+  // Handle window resize to keep player in bounds
   useEffect(() => {
     const handleResize = () => {
-      setPlayerPosition(prev => ({
-        x: Math.min(prev.x, window.innerWidth - 32),
-        y: Math.min(prev.y, window.innerHeight - 48)
-      }));
+      setPlayerPosition(prev => {
+        const maxX = window.innerWidth - CELL_SIZE;
+        const maxY = window.innerHeight - CELL_SIZE;
+        const clampedX = Math.min(prev.x, maxX);
+        const clampedY = Math.min(prev.y, maxY);
+        return snapToGrid(clampedX, clampedY);
+      });
     };
 
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [CELL_SIZE, snapToGrid]);
 
   return {
     playerPosition,

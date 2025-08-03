@@ -5,6 +5,7 @@ import { NPC } from './NPC';
 import type { BuildingData } from './Building';
 import type { NPCData } from './NPC';
 import { Player } from './Player';
+import { GridOverlay } from './GridOverlay';
 
 const MapContainer = styled.div`
   position: absolute;
@@ -22,6 +23,7 @@ interface TownMapProps {
   npcs: NPCData[];
   onBuildingClick?: (building: BuildingData) => void;
   nearbyNPC?: NPCData | null;
+  showGrid?: boolean;
 }
 
 export const TownMap: React.FC<TownMapProps> = ({
@@ -29,10 +31,48 @@ export const TownMap: React.FC<TownMapProps> = ({
   buildings,
   npcs,
   onBuildingClick,
-  nearbyNPC
+  nearbyNPC,
+  showGrid = true
 }) => {
+  const cellSize = 40;
+  const gridWidth = Math.floor(window.innerWidth / cellSize);
+  const gridHeight = Math.floor(window.innerHeight / cellSize);
+
+  // Convert buildings and NPCs to collision areas for grid visualization
+  const collisionAreas = [
+    ...buildings.map(building => ({
+      id: building.id,
+      position: {
+        x: Math.floor(building.x / cellSize),
+        y: Math.floor(building.y / cellSize)
+      },
+      size: building.gridSize || { width: 4, height: 3 },
+      type: 'building' as const
+    })),
+    ...npcs.map(npc => ({
+      id: npc.id,
+      position: {
+        x: Math.floor(npc.x / cellSize),
+        y: Math.floor(npc.y / cellSize)
+      },
+      size: { width: 1, height: 1 },
+      type: 'npc' as const
+    }))
+  ];
+
   return (
     <MapContainer>
+      {/* Grid Overlay */}
+      {showGrid && (
+        <GridOverlay
+          cellSize={cellSize}
+          gridWidth={gridWidth}
+          gridHeight={gridHeight}
+          showCollisionAreas={true}
+          collisionAreas={collisionAreas}
+        />
+      )}
+
       {/* Buildings */}
       {buildings.map(building => (
         <Building
