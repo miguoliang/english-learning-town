@@ -69,6 +69,8 @@ interface GameHUDProps {
   currentLocation: string;
   onReturnToMenu: () => void;
   onOpenQuestLog: () => void;
+  onToggleQuestTracker: () => void;
+  isQuestTrackerVisible: boolean;
   currentQuestTitle?: string;
 }
 
@@ -76,13 +78,19 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   currentLocation,
   onReturnToMenu,
   onOpenQuestLog,
+  onToggleQuestTracker,
+  isQuestTrackerVisible,
   currentQuestTitle
 }) => {
   return (
     <HUDContainer>
       <TopBar>
         <PlayerInfo />
-        <GameControls onReturnToMenu={onReturnToMenu} />
+        <GameControls 
+          onReturnToMenu={onReturnToMenu}
+          onToggleQuestTracker={onToggleQuestTracker}
+          isQuestTrackerVisible={isQuestTrackerVisible}
+        />
       </TopBar>
       
       <BottomBar>

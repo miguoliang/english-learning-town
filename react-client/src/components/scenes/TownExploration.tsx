@@ -28,6 +28,7 @@ interface TownExplorationProps {
 
 export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu }) => {
   const [isQuestLogOpen, setIsQuestLogOpen] = useState(false);
+  const [isQuestTrackerVisible, setIsQuestTrackerVisible] = useState(false);
   
   const { loadQuests, getCurrentActiveQuest } = useQuestStore();
   const { buildings, npcs } = useGameEntities();
@@ -47,6 +48,8 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
         currentLocation={currentLocation}
         onReturnToMenu={onReturnToMenu}
         onOpenQuestLog={() => setIsQuestLogOpen(true)}
+        onToggleQuestTracker={() => setIsQuestTrackerVisible(!isQuestTrackerVisible)}
+        isQuestTrackerVisible={isQuestTrackerVisible}
         currentQuestTitle={currentQuest?.title}
       />
 
@@ -58,7 +61,7 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
       />
 
       {/* UI Components */}
-      <QuestTracker />
+      {isQuestTrackerVisible && <QuestTracker />}
       
       <QuestLog 
         isOpen={isQuestLogOpen}

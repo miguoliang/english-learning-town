@@ -1,6 +1,6 @@
 // Refactored Quest Tracker Component - Single Responsibility: Quest Display Management
 
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useQuestDisplay } from '../../hooks/useQuestDisplay';
 import { QuestItem } from './QuestItem';
@@ -35,20 +35,6 @@ const Title = styled.h3`
   font-weight: 600;
 `;
 
-const ToggleButton = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-`;
 
 const QuestList = styled.div`
   max-height: 400px;
@@ -81,8 +67,6 @@ interface QuestTrackerProps {
 }
 
 export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  
   const {
     activeQuests,
     currentActiveQuest,
@@ -97,13 +81,9 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
     <TrackerContainer className={className}>
       <Header>
         <Title>Active Quests ({activeQuests.length})</Title>
-        <ToggleButton onClick={() => setIsExpanded(!isExpanded)}>
-          {isExpanded ? '◄' : '►'}
-        </ToggleButton>
       </Header>
 
-      {isExpanded && (
-        <QuestList>
+      <QuestList>
             {displayQuests.length === 0 ? (
               <EmptyState>No active quests</EmptyState>
             ) : (
@@ -126,8 +106,7 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
                 );
               })
             )}
-        </QuestList>
-      )}
+      </QuestList>
     </TrackerContainer>
   );
 };
