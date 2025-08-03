@@ -1,6 +1,6 @@
 // Town Exploration Scene - Main gameplay area
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useQuestStore } from '../../stores/questStore';
 import { usePlayerMovement } from '../../hooks/usePlayerMovement';
@@ -9,6 +9,7 @@ import { useNPCInteraction } from '../../hooks/useNPCInteraction';
 import { useBuildingScenes } from '../../hooks/useBuildingScenes';
 import { RangeMap } from '../game/RangeMap';
 import type { BuildingRange, BuildingEntrance } from '../../ranges/BuildingRange';
+import { SpriteRange } from '../../ranges/SpriteRange';
 import { GameHUD } from '../ui/GameHUD';
 import QuestTracker from '../quest/QuestTracker';
 import QuestLog from '../quest/QuestLog';
@@ -34,7 +35,7 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
   const [isQuestTrackerVisible, setIsQuestTrackerVisible] = useState(false);
   
   const { loadQuests, getCurrentActiveQuest } = useQuestStore();
-  const { ranges, buildings, npcs } = useRangeEntities();
+  const { buildings, npcs } = useRangeEntities();
   const { playerPosition, currentLocation, movePlayer } = usePlayerMovement(
     buildings.map(b => b.toLegacyBuilding()), 
     npcs.map(n => n.toLegacyNPC())
@@ -55,6 +56,22 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
   const handleEntranceInteract = (building: BuildingRange, entrance: BuildingEntrance) => {
     enterBuilding(building.toLegacyBuilding(), entrance);
   };
+
+  // Create dynamic player range based on current position
+  const dynamicPlayer = useMemo(() => {
+    const cellSize = 40;
+    const gridX = Math.round((playerPosition.x - cellSize / 2) / cellSize);
+    const gridY = Math.round((playerPosition.y - cellSize / 2) / cellSize);
+    
+    return SpriteRange.createPlayer({ x: gridX, y: gridY });
+  }, [playerPosition]);
+
+  // Combine all ranges with dynamic player
+  const ranges = useMemo(() => [
+    ...buildings,
+    ...npcs,
+    dynamicPlayer
+  ], [buildings, npcs, dynamicPlayer]);
 
   return (
     <GameContainer>
