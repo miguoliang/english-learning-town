@@ -8,15 +8,11 @@ import { Player } from './Player';
 
 const MapContainer = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 1200px;
-  height: 800px;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: ${({ theme }) => theme.gradients.townMap};
-  border-radius: 20px;
-  border: 3px solid #2d3436;
-  box-shadow: ${({ theme }) => theme.shadows.large};
   transition: transform 0.1s ease;
 `;
 

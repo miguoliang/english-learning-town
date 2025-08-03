@@ -13,13 +13,16 @@ interface UsePlayerMovementReturn {
 }
 
 export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementReturn => {
-  const [playerPosition, setPlayerPosition] = useState<Position>({ x: 600, y: 400 });
+  const [playerPosition, setPlayerPosition] = useState<Position>({ 
+    x: window.innerWidth / 2, 
+    y: window.innerHeight / 2 
+  });
   const [currentLocation, setCurrentLocation] = useState('Town Center');
 
   // Movement configuration
   const MOVE_STEP = 16; // pixels per step
-  const MAP_WIDTH = 1200;
-  const MAP_HEIGHT = 800;
+  const MAP_WIDTH = window.innerWidth;
+  const MAP_HEIGHT = window.innerHeight;
 
   const updateLocation = useCallback((x: number, y: number) => {
     const building = buildings.find(b => 
@@ -87,6 +90,21 @@ export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementR
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  // Handle window resize to keep player centered
+  useEffect(() => {
+    const handleResize = () => {
+      setPlayerPosition(prev => ({
+        x: Math.min(prev.x, window.innerWidth - 32),
+        y: Math.min(prev.y, window.innerHeight - 48)
+      }));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return {
     playerPosition,
