@@ -87,6 +87,7 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
         <>
           <GameHUD
             currentLocation={currentLocation}
+            playerPosition={playerPosition}
             onReturnToMenu={onReturnToMenu}
             onOpenQuestLog={() => setIsQuestLogOpen(true)}
             onToggleQuestTracker={() => setIsQuestTrackerVisible(!isQuestTrackerVisible)}

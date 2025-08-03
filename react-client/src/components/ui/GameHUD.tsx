@@ -67,6 +67,7 @@ const ArrowKey = styled.span`
 
 interface GameHUDProps {
   currentLocation: string;
+  playerPosition?: { x: number; y: number };
   onReturnToMenu: () => void;
   onOpenQuestLog: () => void;
   onToggleQuestTracker: () => void;
@@ -76,6 +77,7 @@ interface GameHUDProps {
 
 export const GameHUD: React.FC<GameHUDProps> = ({
   currentLocation,
+  playerPosition,
   onReturnToMenu,
   onOpenQuestLog,
   onToggleQuestTracker,
@@ -85,7 +87,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   return (
     <HUDContainer>
       <TopBar>
-        <PlayerInfo />
+        <PlayerInfo playerPosition={playerPosition} />
         <GameControls 
           onReturnToMenu={onReturnToMenu}
           onToggleQuestTracker={onToggleQuestTracker}

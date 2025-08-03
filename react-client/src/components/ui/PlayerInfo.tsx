@@ -15,8 +15,18 @@ const InfoItem = styled.div`
   font-weight: 500;
 `;
 
-export const PlayerInfo: React.FC = () => {
+interface PlayerInfoProps {
+  playerPosition?: { x: number; y: number };
+}
+
+export const PlayerInfo: React.FC<PlayerInfoProps> = ({ playerPosition }) => {
   const { player } = useGameStore();
+  
+  // Convert screen coordinates to grid coordinates
+  const gridPosition = playerPosition ? {
+    x: Math.round((playerPosition.x - 20) / 40),
+    y: Math.round((playerPosition.y - 20) / 40)
+  } : null;
 
   return (
     <PlayerInfoContainer>
@@ -36,6 +46,12 @@ export const PlayerInfo: React.FC = () => {
         <span>💰</span>
         <span>${player.money}</span>
       </InfoItem>
+      {gridPosition && (
+        <InfoItem>
+          <span>📍</span>
+          <span>({gridPosition.x}, {gridPosition.y})</span>
+        </InfoItem>
+      )}
     </PlayerInfoContainer>
   );
 };
