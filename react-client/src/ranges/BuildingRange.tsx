@@ -4,7 +4,7 @@ import { Range } from '../types/ranges';
 import type { RangeData } from '../types/ranges';
 import type { RenderingStrategy } from '../types/renderingStrategies';
 import { EmojiStrategy } from '../types/renderingStrategies';
-import { ExactPositionInteraction, AdjacentInteraction } from '../types/interactionConditions';
+import { EntranceInteraction, AdjacentInteraction } from '../types/interactionConditions';
 
 const BuildingSprite = styled.div<{ 
   x: number; 
@@ -124,6 +124,11 @@ export class BuildingRange extends Range {
 
   /**
    * Setup interaction condition based on building entrances
+   * 
+   * Buildings have two interaction modes:
+   * 1. No entrances: Can interact when adjacent to any building edge
+   * 2. Has entrances: Can only interact when standing adjacent to entrance positions
+   *    (since entrance positions are inside the non-walkable building)
    */
   private setupInteractionCondition(): void {
     if (this.entrances.length === 0) {
@@ -132,14 +137,15 @@ export class BuildingRange extends Range {
       return;
     }
 
-    // Calculate absolute entrance positions
+    // Calculate absolute entrance positions (these are inside the building, not walkable)
     const entrancePositions = this.entrances.map(entrance => ({
       x: this.position.x + entrance.position.x,
       y: this.position.y + entrance.position.y
     }));
 
-    // Use exact position interaction for entrance-based interaction
-    this.setInteractionCondition(new ExactPositionInteraction(entrancePositions));
+    // Use entrance interaction: player must be adjacent to entrance positions
+    // This finds walkable cells next to the entrance positions
+    this.setInteractionCondition(new EntranceInteraction(entrancePositions));
   }
 
   /**

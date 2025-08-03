@@ -302,3 +302,62 @@ export class DirectionalInteraction implements InteractionCondition {
     return `From directions: ${this.allowedDirections.join(', ')}`;
   }
 }
+
+/**
+ * Entrance Interaction - Player must be adjacent to entrance positions
+ * Used for: Building entrances where entrance positions are inside non-walkable buildings
+ * This finds the walkable cells adjacent to entrance positions
+ */
+export class EntranceInteraction implements InteractionCondition {
+  constructor(private entrancePositions: GridPosition[]) {}
+
+  canInteractFrom(
+    playerPos: GridPosition, 
+    _targetPos: GridPosition, 
+    _targetSize: { width: number; height: number }
+  ): boolean {
+    // Check if player is adjacent to any entrance position
+    for (const entrance of this.entrancePositions) {
+      // Check all 4 adjacent positions around the entrance
+      const adjacentPositions = [
+        { x: entrance.x - 1, y: entrance.y },     // West
+        { x: entrance.x + 1, y: entrance.y },     // East  
+        { x: entrance.x, y: entrance.y - 1 },     // North
+        { x: entrance.x, y: entrance.y + 1 }      // South
+      ];
+
+      for (const adjPos of adjacentPositions) {
+        if (playerPos.x === adjPos.x && playerPos.y === adjPos.y) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  getValidInteractionPositions(
+    _targetPos: GridPosition, 
+    _targetSize: { width: number; height: number }
+  ): GridPosition[] {
+    const positions: GridPosition[] = [];
+    
+    // For each entrance position, add all 4 adjacent walkable positions
+    for (const entrance of this.entrancePositions) {
+      const adjacentPositions = [
+        { x: entrance.x - 1, y: entrance.y },     // West
+        { x: entrance.x + 1, y: entrance.y },     // East  
+        { x: entrance.x, y: entrance.y - 1 },     // North
+        { x: entrance.x, y: entrance.y + 1 }      // South
+      ];
+
+      positions.push(...adjacentPositions);
+    }
+
+    return positions;
+  }
+
+  getDescription(): string {
+    return `Adjacent to entrances: ${this.entrancePositions.map(p => `(${p.x},${p.y})`).join(', ')}`;
+  }
+}
