@@ -81,6 +81,20 @@ export const usePlayerMovement = (buildings: BuildingData[]) => {
 - Clearer separation of concerns
 - Improved readability and debugging
 
+### UI/UX Improvements (2025-01-03)
+
+**Dialogue System Navigation Enhancement**:
+- **Problem**: Button scaling animations were distracting and shifted dialogue layout
+- **Solution**: Replaced with 👉 finger pointer positioned 30px left of active options
+- **Benefits**: Clear visual indication without layout shifts, better focus on dialogue content
+
+**Vocabulary Highlighting Bug Fix**:
+- **Problem**: Raw HTML classes like `vocabulary-highlight">` appearing in dialogue text
+- **Root Cause**: Fragile regex-based HTML parsing in DialogueText component
+- **Solution**: Modified `vocabularyHighlighter.ts` to generate inline styles directly
+- **Principle**: Avoid regex HTML parsing - generate final styled HTML at source
+- **Result**: Clean vocabulary highlighting without HTML artifacts
+
 ### Theme Usage Patterns
 Always use theme properties from styled-components:
 ```typescript
@@ -137,7 +151,7 @@ npm run dev
 - React frontend connects to existing Go backend
 - All game logic now in TypeScript/React
 - State persisted with Zustand + localStorage
-- Animations handled by Framer Motion
+- Lightweight CSS animations (framer-motion removed for better debugging)
 - Audio generated procedurally with Web Audio API
 
 ## Key Files to Remember
@@ -166,9 +180,10 @@ When making technical decisions:
 
 ### Technical Health
 - ✅ TypeScript: Strict mode, zero errors
-- ✅ Build: Optimized bundle (133KB gzipped)
+- ✅ Build: Optimized bundle (95KB gzipped, reduced from framer-motion removal)
 - ✅ Architecture: Clean, modular, SRP-compliant
 - ✅ Performance: 60fps, responsive design
+- ✅ UI/UX: Finger pointer navigation, clean dialogue highlighting
 
 ### Feature Status
 - ✅ Quest System: Visual tracking, objectives
