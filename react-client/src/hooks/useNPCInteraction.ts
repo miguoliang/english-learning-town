@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import type { NPCData } from '../components/game/NPC';
 
@@ -9,39 +9,65 @@ interface Position {
 
 interface UseNPCInteractionReturn {
   selectedNPC: string | null;
-  handleNPCClick: (npc: NPCData, playerPosition: Position) => void;
+  nearbyNPC: NPCData | null;
   handleDialogueEnd: () => void;
 }
 
-export const useNPCInteraction = (): UseNPCInteractionReturn => {
+export const useNPCInteraction = (
+  playerPosition: Position, 
+  npcs: NPCData[]
+): UseNPCInteractionReturn => {
   const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
+  const [nearbyNPC, setNearbyNPC] = useState<NPCData | null>(null);
   const { isInDialogue, setInDialogue } = useGameStore();
 
-  const handleNPCClick = useCallback((npc: NPCData, playerPosition: Position) => {
+  // Find nearby NPC based on player position
+  const findNearbyNPC = useCallback(() => {
     if (isInDialogue) return;
 
-    // Check if player is close enough
-    const distance = Math.sqrt(
-      Math.pow(playerPosition.x - npc.x, 2) + Math.pow(playerPosition.y - npc.y, 2)
-    );
+    const nearby = npcs.find(npc => {
+      const distance = Math.sqrt(
+        Math.pow(playerPosition.x - npc.x, 2) + Math.pow(playerPosition.y - npc.y, 2)
+      );
+      return distance <= 60; // Interaction range of 60 pixels
+    });
 
-    if (distance > 100) {
-      alert(`You need to move closer to ${npc.name} to start a conversation!`);
-      return;
+    setNearbyNPC(nearby || null);
+  }, [playerPosition, npcs, isInDialogue]);
+
+  // Handle space bar press for interaction
+  const handleSpacePress = useCallback((event: KeyboardEvent) => {
+    if (event.code !== 'Space' || isInDialogue) return;
+    
+    event.preventDefault();
+    
+    if (nearbyNPC) {
+      setSelectedNPC(nearbyNPC.id);
+      setInDialogue(true);
     }
-
-    setSelectedNPC(npc.id);
-    setInDialogue(true);
-  }, [isInDialogue, setInDialogue]);
+  }, [nearbyNPC, isInDialogue, setInDialogue]);
 
   const handleDialogueEnd = useCallback(() => {
     setSelectedNPC(null);
     setInDialogue(false);
   }, [setInDialogue]);
 
+  // Update nearby NPC when player moves
+  useEffect(() => {
+    findNearbyNPC();
+  }, [findNearbyNPC]);
+
+  // Set up space bar event listener
+  useEffect(() => {
+    window.addEventListener('keydown', handleSpacePress);
+    return () => {
+      window.removeEventListener('keydown', handleSpacePress);
+    };
+  }, [handleSpacePress]);
+
   return {
     selectedNPC,
-    handleNPCClick,
+    nearbyNPC,
     handleDialogueEnd
   };
 };

@@ -19,12 +19,13 @@ Create an engaging educational RPG that makes English learning natural and enjoy
 - **Progress Tracking**: Experience points, level progression, achievement notifications
 - **Audio System**: Procedural sound generation with spatial audio
 
-#### ⭐ Recently Added: Arrow Key Controls
-- **Simple Movement**: 16-pixel grid-based movement using arrow keys
-- **Responsive Controls**: Instant movement response without animation delays
-- **Boundary Detection**: Player movement constrained within map boundaries
-- **Visual Instructions**: Clear on-screen guidance showing arrow key controls
-- **Cross-Platform**: Works consistently across desktop and laptop devices
+#### ⭐ Recently Added: Keyboard-Based Controls
+- **Arrow Key Movement**: 16-pixel grid-based movement using arrow keys
+- **Space Bar Interactions**: Press SPACE to talk with nearby NPCs
+- **Proximity Detection**: 60-pixel interaction range for comfortable gameplay
+- **Visual Feedback**: NPCs glow green when within interaction range
+- **Responsive Controls**: Instant response without animation delays
+- **Clear Instructions**: On-screen guidance for all keyboard controls
 
 ## 🗓️ Feature Roadmap
 

@@ -33,16 +33,12 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
   const { loadQuests, getCurrentActiveQuest } = useQuestStore();
   const { buildings, npcs } = useGameEntities();
   const { playerPosition, currentLocation } = usePlayerMovement(buildings);
-  const { selectedNPC, handleNPCClick, handleDialogueEnd } = useNPCInteraction();
+  const { selectedNPC, nearbyNPC, handleDialogueEnd } = useNPCInteraction(playerPosition, npcs);
 
   useEffect(() => {
     // Initialize quest system
     loadQuests();
   }, [loadQuests]);
-
-  const onNPCClick = (npc: any) => {
-    handleNPCClick(npc, playerPosition);
-  };
 
   const currentQuest = getCurrentActiveQuest();
 
@@ -59,7 +55,7 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
         playerPosition={playerPosition}
         buildings={buildings}
         npcs={npcs}
-        onNPCClick={onNPCClick}
+        nearbyNPC={nearbyNPC}
       />
 
       {/* UI Components */}

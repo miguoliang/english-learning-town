@@ -29,6 +29,20 @@ const usePlayerMovement = (buildings: BuildingData[]) => {
   return { playerPosition, movePlayer, currentLocation };
 };
 
+// Proximity-Based Interaction Pattern
+const useNPCInteraction = (playerPosition: Position, npcs: NPCData[]) => {
+  // Space bar interaction with proximity detection
+  const handleSpacePress = useCallback((event: KeyboardEvent) => {
+    if (event.code !== 'Space' || isInDialogue) return;
+    if (nearbyNPC) {
+      setSelectedNPC(nearbyNPC.id);
+      setInDialogue(true);
+    }
+  }, [nearbyNPC, isInDialogue]);
+  
+  return { selectedNPC, nearbyNPC, handleDialogueEnd };
+};
+
 // Typed State Management
 interface GameStore extends GameState {
   updatePlayer: (playerData: Partial<PlayerData>) => void;
@@ -40,7 +54,8 @@ interface GameStore extends GameState {
 - **Why React over Godot**: Better text handling, responsive design, faster iteration
 - **Why Zustand over Redux**: Simpler API, better TypeScript support, smaller bundle
 - **Why Styled Components**: Component co-location, theme system, dynamic styling
-- **Why Arrow Keys over Mouse**: Simpler implementation, more predictable movement, better accessibility
+- **Why Keyboard Controls**: Simpler implementation, more predictable interaction, better accessibility
+- **Why Space Bar over Mouse Click**: Proximity-based interaction feels more natural for RPGs
 
 #### Areas for Discussion
 - [ ] Performance optimization strategies

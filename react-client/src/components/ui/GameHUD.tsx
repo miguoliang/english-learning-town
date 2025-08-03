@@ -89,7 +89,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <LocationLabel>📍 {currentLocation}</LocationLabel>
           <MovementInstructions>
-            Use <ArrowKey>↑</ArrowKey> <ArrowKey>↓</ArrowKey> <ArrowKey>←</ArrowKey> <ArrowKey>→</ArrowKey> to move
+            Use <ArrowKey>↑</ArrowKey> <ArrowKey>↓</ArrowKey> <ArrowKey>←</ArrowKey> <ArrowKey>→</ArrowKey> to move • <ArrowKey>SPACE</ArrowKey> to talk
           </MovementInstructions>
         </div>
         <GameControls 

@@ -25,7 +25,7 @@ interface TownMapProps {
   buildings: BuildingData[];
   npcs: NPCData[];
   onBuildingClick?: (building: BuildingData) => void;
-  onNPCClick?: (npc: NPCData) => void;
+  nearbyNPC?: NPCData | null;
 }
 
 export const TownMap: React.FC<TownMapProps> = ({
@@ -33,7 +33,7 @@ export const TownMap: React.FC<TownMapProps> = ({
   buildings,
   npcs,
   onBuildingClick,
-  onNPCClick
+  nearbyNPC
 }) => {
   return (
     <MapContainer>
@@ -51,7 +51,7 @@ export const TownMap: React.FC<TownMapProps> = ({
         <NPC
           key={npc.id}
           {...npc}
-          onClick={onNPCClick}
+          isNearby={nearbyNPC?.id === npc.id}
         />
       ))}
 
