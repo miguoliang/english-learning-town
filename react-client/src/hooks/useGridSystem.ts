@@ -1,11 +1,17 @@
 import { useMemo, useEffect } from 'react';
 import { GridSystem } from '../utils/gridSystem';
 import type { CollisionArea } from '../utils/gridSystem';
-import type { BuildingData } from '../components/game/Building';
 import type { NPCData } from '../components/game/NPC';
 
+interface LegacyBuildingData {
+  id: string;
+  x: number;
+  y: number;
+  gridSize?: { width: number; height: number };
+}
+
 interface UseGridSystemProps {
-  buildings: BuildingData[];
+  buildings: LegacyBuildingData[];
   npcs: NPCData[];
   cellSize?: number;
 }

@@ -1,6 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { BuildingData } from '../components/game/Building';
 import type { NPCData } from '../components/game/NPC';
+
+interface LegacyBuildingData {
+  id: string;
+  x: number;
+  y: number;
+  name: string;
+  gridSize?: { width: number; height: number };
+}
 import { useQuestStore } from '../stores/questStore';
 import { ObjectiveType } from '../types';
 import { useGridSystem } from './useGridSystem';
@@ -16,7 +23,7 @@ interface UsePlayerMovementReturn {
   movePlayer: (x: number, y: number) => void;
 }
 
-export const usePlayerMovement = (buildings: BuildingData[], npcs: NPCData[]): UsePlayerMovementReturn => {
+export const usePlayerMovement = (buildings: LegacyBuildingData[], npcs: NPCData[]): UsePlayerMovementReturn => {
   const { gridSystem, isWalkable, snapToGrid } = useGridSystem({ buildings, npcs });
   
   const [playerPosition, setPlayerPosition] = useState<Position>(() => {

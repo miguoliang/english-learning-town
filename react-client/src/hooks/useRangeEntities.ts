@@ -28,7 +28,15 @@ export const useRangeEntities = (): UseRangeEntitiesReturn => {
         name: 'School',
         color: '#e17055',
         icon: '🏫',
-        renderingStrategy: new EmojiStrategy('🏫', '#e17055')
+        renderingStrategy: new EmojiStrategy('🏫', '#e17055'),
+        entrances: [
+          {
+            id: 'school-main',
+            position: { x: 2, y: 2 },
+            direction: 'south' as const,
+            sceneId: 'school-interior'
+          }
+        ]
       }),
       new BuildingRange({
         id: 'shop',
@@ -37,7 +45,15 @@ export const useRangeEntities = (): UseRangeEntitiesReturn => {
         name: 'Shop',
         color: '#00b894',
         icon: '🏪',
-        renderingStrategy: new EmojiStrategy('🏪', '#00b894')
+        renderingStrategy: new EmojiStrategy('🏪', '#00b894'),
+        entrances: [
+          {
+            id: 'shop-main',
+            position: { x: 0, y: 1 },
+            direction: 'west' as const,
+            sceneId: 'shop-interior'
+          }
+        ]
       }),
       new BuildingRange({
         id: 'library',
@@ -46,7 +62,15 @@ export const useRangeEntities = (): UseRangeEntitiesReturn => {
         name: 'Library',
         color: '#6c5ce7',
         icon: '📚',
-        renderingStrategy: new EmojiStrategy('📚', '#6c5ce7')
+        renderingStrategy: new EmojiStrategy('📚', '#6c5ce7'),
+        entrances: [
+          {
+            id: 'library-main',
+            position: { x: 1, y: 0 },
+            direction: 'north' as const,
+            sceneId: 'library-interior'
+          }
+        ]
       }),
       new BuildingRange({
         id: 'cafe',
@@ -55,7 +79,15 @@ export const useRangeEntities = (): UseRangeEntitiesReturn => {
         name: 'Café',
         color: '#fdcb6e',
         icon: '☕',
-        renderingStrategy: new EmojiStrategy('☕', '#fdcb6e')
+        renderingStrategy: new EmojiStrategy('☕', '#fdcb6e'),
+        entrances: [
+          {
+            id: 'cafe-main',
+            position: { x: 1, y: 1 },
+            direction: 'south' as const,
+            sceneId: 'cafe-interior'
+          }
+        ]
       })
     ];
   }, []);
