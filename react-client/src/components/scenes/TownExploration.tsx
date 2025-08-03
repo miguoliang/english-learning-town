@@ -37,11 +37,11 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
   const { ranges, buildings, npcs } = useRangeEntities();
   const { playerPosition, currentLocation, movePlayer } = usePlayerMovement(
     buildings.map(b => b.toLegacyBuilding()), 
-    npcs.map(n => ({ id: n.id, x: n.getScreenPosition(40).x, y: n.getScreenPosition(40).y, icon: '👤', name: 'NPC' }))
+    npcs.map(n => n.toLegacyNPC())
   );
   const { selectedNPC, handleDialogueEnd } = useNPCInteraction(
     playerPosition, 
-    npcs.map(n => ({ id: n.id, x: n.getScreenPosition(40).x, y: n.getScreenPosition(40).y, icon: '👤', name: 'NPC' }))
+    npcs.map(n => n.toLegacyNPC())
   );
   const { currentBuildingScene, enterBuilding, exitBuilding, isInBuilding } = useBuildingScenes();
 

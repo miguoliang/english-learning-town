@@ -81,6 +81,16 @@ export abstract class Range {
     };
   }
 
+  /**
+   * Get center coordinates of the range in screen space
+   */
+  getScreenCenter(cellSize: number): { x: number; y: number } {
+    return {
+      x: this.position.x * cellSize + (this.size.width * cellSize) / 2,
+      y: this.position.y * cellSize + (this.size.height * cellSize) / 2
+    };
+  }
+
   // ========== CORE CONCERN 2: WALKABILITY ==========
   
   /**

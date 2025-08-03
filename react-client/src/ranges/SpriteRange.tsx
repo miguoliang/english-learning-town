@@ -8,16 +8,15 @@ import { EmojiStrategy } from '../types/renderingStrategies';
 const SpriteContainer = styled.div<{ 
   x: number; 
   y: number; 
-  width: number; 
-  height: number;
+  size: number;
   isPlayer: boolean;
   isNearby?: boolean;
 }>`
   position: absolute;
-  left: ${props => props.x - props.width / 2}px;   /* Center horizontally */
-  top: ${props => props.y - props.height / 2}px;   /* Center vertically */
-  width: ${props => props.width}px;
-  height: ${props => props.height}px;
+  left: ${props => props.x - props.size / 2}px;   /* Center horizontally */
+  top: ${props => props.y - props.size / 2}px;    /* Center vertically */
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,16 +150,14 @@ export class SpriteRange extends Range {
    */
   render(): React.ReactNode {
     const cellSize = 40; // Should be injected, but using constant for now
-    const screenPos = this.getScreenPosition(cellSize);
-    const screenSize = this.getScreenSize(cellSize);
+    const screenCenter = this.getScreenCenter(cellSize);
 
     return (
       <SpriteContainer
         key={this.id}
-        x={screenPos.x}
-        y={screenPos.y}
-        width={screenSize.width}
-        height={screenSize.height}
+        x={screenCenter.x}
+        y={screenCenter.y}
+        size={cellSize}  // Sprites are always 40x40px (1 cell)
         isPlayer={this.role === SpriteRole.PLAYER}
         isNearby={this.isNearby}
         onClick={() => this.onInteraction()}
@@ -233,12 +230,12 @@ export class SpriteRange extends Range {
    */
   toLegacyNPC() {
     const cellSize = 40;
-    const screenPos = this.getScreenPosition(cellSize);
+    const screenCenter = this.getScreenCenter(cellSize);
     
     return {
       id: this.id,
-      x: screenPos.x,
-      y: screenPos.y,
+      x: screenCenter.x,
+      y: screenCenter.y,
       name: this.name,
       icon: this.icon
     };
