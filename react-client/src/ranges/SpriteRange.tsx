@@ -4,6 +4,7 @@ import { Range } from '../types/ranges';
 import type { GridPosition, RangeData } from '../types/ranges';
 import type { RenderingStrategy } from '../types/renderingStrategies';
 import { EmojiStrategy } from '../types/renderingStrategies';
+import { AdjacentInteraction } from '../types/interactionConditions';
 
 const SpriteContainer = styled.div<{ 
   x: number; 
@@ -198,7 +199,8 @@ export class SpriteRange extends Range {
       size: { width: 1, height: 1 },
       role: SpriteRole.NPC,
       blocksMovement: data.blocksMovement ?? true,
-      renderingStrategy: new EmojiStrategy(data.icon)
+      renderingStrategy: new EmojiStrategy(data.icon),
+      interactionCondition: new AdjacentInteraction() // NPCs can only be talked to when adjacent
     });
   }
 

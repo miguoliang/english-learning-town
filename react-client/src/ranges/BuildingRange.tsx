@@ -4,6 +4,7 @@ import { Range } from '../types/ranges';
 import type { RangeData } from '../types/ranges';
 import type { RenderingStrategy } from '../types/renderingStrategies';
 import { EmojiStrategy } from '../types/renderingStrategies';
+import { ExactPositionInteraction, AdjacentInteraction } from '../types/interactionConditions';
 
 const BuildingSprite = styled.div<{ 
   x: number; 
@@ -116,6 +117,29 @@ export class BuildingRange extends Range {
     this.color = data.color;
     this.icon = data.icon;
     this.entrances = data.entrances || [];
+    
+    // Set up interaction condition based on entrances
+    this.setupInteractionCondition();
+  }
+
+  /**
+   * Setup interaction condition based on building entrances
+   */
+  private setupInteractionCondition(): void {
+    if (this.entrances.length === 0) {
+      // No entrances - use adjacent interaction for general building interaction
+      this.setInteractionCondition(new AdjacentInteraction());
+      return;
+    }
+
+    // Calculate absolute entrance positions
+    const entrancePositions = this.entrances.map(entrance => ({
+      x: this.position.x + entrance.position.x,
+      y: this.position.y + entrance.position.y
+    }));
+
+    // Use exact position interaction for entrance-based interaction
+    this.setInteractionCondition(new ExactPositionInteraction(entrancePositions));
   }
 
   /**

@@ -8,6 +8,7 @@
 
 import type { ReactNode } from 'react';
 import type { RenderingStrategy } from './renderingStrategies';
+import type { InteractionCondition } from './interactionConditions';
 
 export interface GridPosition {
   x: number;
@@ -28,6 +29,7 @@ export interface RangeData {
   size: GridSize;
   renderingStrategy: RenderingStrategy;
   isWalkable?: boolean;
+  interactionCondition?: InteractionCondition;
 }
 
 /**
@@ -39,6 +41,7 @@ export abstract class Range {
   public readonly position: GridPosition;
   public readonly size: GridSize;
   protected renderingStrategy: RenderingStrategy;
+  protected interactionCondition?: InteractionCondition;
   private walkable: boolean;
 
   constructor(data: RangeData) {
@@ -46,6 +49,7 @@ export abstract class Range {
     this.position = data.position;
     this.size = data.size;
     this.renderingStrategy = data.renderingStrategy;
+    this.interactionCondition = data.interactionCondition;
     this.walkable = data.isWalkable ?? false;
   }
 
@@ -132,6 +136,42 @@ export abstract class Range {
    * Check if this range can be interacted with
    */
   abstract canInteract(): boolean;
+
+  /**
+   * Check if interaction is possible from the given player position
+   * @param playerPos - Current player grid position
+   * @returns true if interaction is allowed from this position
+   */
+  canInteractFrom(playerPos: GridPosition): boolean {
+    if (!this.canInteract()) {
+      return false;
+    }
+    
+    if (!this.interactionCondition) {
+      return true; // No spatial restrictions
+    }
+    
+    return this.interactionCondition.canInteractFrom(playerPos, this.position, this.size);
+  }
+
+  /**
+   * Get all valid interaction positions for this range
+   * @returns Array of grid positions where interaction is possible
+   */
+  getValidInteractionPositions(): GridPosition[] {
+    if (!this.canInteract() || !this.interactionCondition) {
+      return [];
+    }
+    
+    return this.interactionCondition.getValidInteractionPositions(this.position, this.size);
+  }
+
+  /**
+   * Set or update the interaction condition for this range
+   */
+  setInteractionCondition(condition: InteractionCondition): void {
+    this.interactionCondition = condition;
+  }
 
   // ========== CORE CONCERN 4: RENDERING ==========
   

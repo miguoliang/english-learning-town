@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useQuestStore } from '../../stores/questStore';
 import { usePlayerMovement } from '../../hooks/usePlayerMovement';
 import { useRangeEntities } from '../../hooks/useRangeEntities';
-import { useNPCInteraction } from '../../hooks/useNPCInteraction';
+import { useRangeInteraction } from '../../hooks/useRangeInteraction';
 import { useBuildingScenes } from '../../hooks/useBuildingScenes';
 import { RangeMap } from '../game/RangeMap';
 import type { BuildingRange, BuildingEntrance } from '../../ranges/BuildingRange';
@@ -40,22 +40,6 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
     buildings.map(b => b.toLegacyBuilding()), 
     npcs.map(n => n.toLegacyNPC())
   );
-  const { selectedNPC, handleDialogueEnd } = useNPCInteraction(
-    playerPosition, 
-    npcs.map(n => n.toLegacyNPC())
-  );
-  const { currentBuildingScene, enterBuilding, exitBuilding, isInBuilding } = useBuildingScenes();
-
-  useEffect(() => {
-    // Initialize quest system
-    loadQuests();
-  }, [loadQuests]);
-
-  const currentQuest = getCurrentActiveQuest();
-
-  const handleEntranceInteract = (building: BuildingRange, entrance: BuildingEntrance) => {
-    enterBuilding(building.toLegacyBuilding(), entrance);
-  };
 
   // Create dynamic player range based on current position
   const dynamicPlayer = useMemo(() => {
@@ -72,6 +56,25 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
     ...npcs,
     dynamicPlayer
   ], [buildings, npcs, dynamicPlayer]);
+
+  // Use Range-based interaction system  
+  const { selectedRange, handleDialogueEnd } = useRangeInteraction(
+    playerPosition,
+    ranges
+  );
+  
+  const { currentBuildingScene, enterBuilding, exitBuilding, isInBuilding } = useBuildingScenes();
+
+  useEffect(() => {
+    // Initialize quest system
+    loadQuests();
+  }, [loadQuests]);
+
+  const currentQuest = getCurrentActiveQuest();
+
+  const handleEntranceInteract = (building: BuildingRange, entrance: BuildingEntrance) => {
+    enterBuilding(building.toLegacyBuilding(), entrance);
+  };
 
   return (
     <GameContainer>
@@ -105,9 +108,9 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
             onClose={() => setIsQuestLogOpen(false)}
           />
 
-          {selectedNPC && (
+          {selectedRange && selectedRange.getTypeName() === 'sprite' && (
             <DialogueSystem
-              npcId={selectedNPC}
+              npcId={selectedRange.id}
               onClose={handleDialogueEnd}
             />
           )}
