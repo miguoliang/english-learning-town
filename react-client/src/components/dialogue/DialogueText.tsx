@@ -22,10 +22,7 @@ export const DialogueText: React.FC<DialogueTextProps> = ({
   return (
     <TextContainer
       dangerouslySetInnerHTML={{
-        __html: highlightVocabulary(text, vocabularyHighlights).replace(
-          /<span class="vocabulary-highlight">/g,
-          '<span style="background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600;">'
-        )
+        __html: highlightVocabulary(text, vocabularyHighlights)
       }}
     />
   );

@@ -9,7 +9,7 @@ export const highlightVocabulary = (text: string, vocabulary: string[] = []): st
     const regex = new RegExp(`\\b${word}\\b`, 'gi');
     highlightedText = highlightedText.replace(
       regex, 
-      `<span class="vocabulary-highlight">${word}</span>`
+      `<span style="background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${word}</span>`
     );
   });
 

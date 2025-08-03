@@ -6,6 +6,7 @@ const OptionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-left: 30px;
 `;
 
 const ResponseButton = styled.button<{ isCorrect?: boolean; isSelected?: boolean }>`
@@ -14,7 +15,7 @@ const ResponseButton = styled.button<{ isCorrect?: boolean; isSelected?: boolean
     if (props.isSelected) return 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)';
     return 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
   }};
-  border: ${props => props.isSelected ? '2px solid #ffffff' : 'none'};
+  border: none;
   border-radius: 8px;
   padding: 12px 16px;
   color: white;
@@ -22,21 +23,30 @@ const ResponseButton = styled.button<{ isCorrect?: boolean; isSelected?: boolean
   cursor: pointer;
   text-align: left;
   transition: all 0.3s ease;
-  transform: ${props => props.isSelected ? 'translateX(8px) scale(1.02)' : 'translateX(0)'};
+  position: relative;
   box-shadow: ${props => props.isSelected 
     ? '0 6px 20px rgba(232, 67, 147, 0.4)' 
     : '0 2px 8px rgba(0, 0, 0, 0.1)'
   };
   
+  &::before {
+    content: '👉';
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: ${props => props.isSelected ? 1 : 0};
+    transition: opacity 0.3s ease;
+  }
+  
   &:hover {
-    transform: ${props => props.isSelected ? 'translateX(8px) scale(1.02)' : 'translateX(4px)'};
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
   
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
   }
 `;
 
