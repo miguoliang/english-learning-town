@@ -110,11 +110,28 @@ Successfully refactored the Range-based grid system to focus on **4 essential co
 4. **Modern TypeScript** - `private readonly` fields improve encapsulation
 5. **Development Progression** - Emoji → Image → Sprite sheet workflow
 
+## 🚀 Recent Updates (2025-01-03)
+
+### ✅ **Fixed Sprite Movement (Cell-by-Cell)**
+- **Problem**: Sprites moved to intersection points instead of cell centers
+- **Solution**: Refactored movement to work in grid coordinates
+- **Initial Position**: Explicitly find closest grid cell to screen center
+- **Keyboard Movement**: Convert to grid coords → move 1 cell → convert back to screen coords
+- **Result**: Perfect cell-by-cell movement, no intersection point issues
+
+### ✅ **Fixed Sprite Visual Sizing**
+- **Problem**: NPCs and sprites were larger than their 1×1 grid cell range
+- **NPCs**: 40×60px → 40×40px (perfect fit for 40px grid cells)
+- **Player**: 32×48px → 40×40px (consistent sizing)
+- **SpriteRange**: Added dynamic center positioning for any size
+- **Positioning**: All sprites now positioned at cell centers, not corners
+- **Result**: All sprites perfectly fit their allocated grid space
+
 ## 🚀 Next Steps
 
-- [ ] Fix sprite movement to be cell-by-cell instead of intersection points
 - [ ] Test click-to-move functionality in development environment
-- [ ] Validate grid alignment and collision detection
+- [ ] Validate grid alignment and collision detection with new sizing
 - [ ] Consider adding more rendering strategies (Video, Canvas, WebGL)
+- [ ] Optimize performance with larger sprite counts
 
-This refactor successfully achieved the goal of simplifying the Range architecture while enabling modern TypeScript features and flexible rendering through the strategy pattern.
+This refactor successfully achieved the goal of simplifying the Range architecture while enabling modern TypeScript features, flexible rendering through the strategy pattern, and precise grid-based movement and sizing.

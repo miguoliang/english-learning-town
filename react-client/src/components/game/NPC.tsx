@@ -3,10 +3,10 @@ import styled from 'styled-components';
 
 const NPCSprite = styled.div<{ x: number; y: number; isNearby: boolean }>`
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
+  left: ${props => props.x - 20}px;  /* Center horizontally (40px / 2) */
+  top: ${props => props.y - 20}px;   /* Center vertically (40px / 2) */
   width: 40px;
-  height: 60px;
+  height: 40px;
   background: #ffeaa7;
   border: 2px solid ${props => props.isNearby ? '#00b894' : '#2d3436'};
   border-radius: 20px 20px 5px 5px;

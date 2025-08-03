@@ -20,10 +20,16 @@ export const usePlayerMovement = (buildings: BuildingData[], npcs: NPCData[]): U
   const { gridSystem, isWalkable, snapToGrid } = useGridSystem({ buildings, npcs });
   
   const [playerPosition, setPlayerPosition] = useState<Position>(() => {
-    // Start player at center of screen, snapped to grid
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    return snapToGrid(centerX, centerY);
+    // Find the grid cell closest to center of screen
+    const screenCenterX = window.innerWidth / 2;
+    const screenCenterY = window.innerHeight / 2;
+    
+    // Convert to grid coordinates to find the closest grid cell
+    const gridX = Math.floor(screenCenterX / gridSystem.cellSize);
+    const gridY = Math.floor(screenCenterY / gridSystem.cellSize);
+    
+    // Return the center position of that grid cell
+    return gridSystem.gridToScreenCenter(gridX, gridY);
   });
   const [currentLocation, setCurrentLocation] = useState('Town Center');
   const [visitedLocations, setVisitedLocations] = useState<Set<string>>(new Set());
@@ -79,29 +85,36 @@ export const usePlayerMovement = (buildings: BuildingData[], npcs: NPCData[]): U
     event.preventDefault();
     
     setPlayerPosition(prevPosition => {
-      let newX = prevPosition.x;
-      let newY = prevPosition.y;
+      // Convert current position to grid coordinates
+      const currentGridX = Math.round((prevPosition.x - CELL_SIZE / 2) / CELL_SIZE);
+      const currentGridY = Math.round((prevPosition.y - CELL_SIZE / 2) / CELL_SIZE);
+      
+      let newGridX = currentGridX;
+      let newGridY = currentGridY;
 
+      // Move in grid coordinates (1 cell at a time)
       switch (event.code) {
         case 'ArrowUp':
-          newY = prevPosition.y - CELL_SIZE;
+          newGridY = currentGridY - 1;
           break;
         case 'ArrowDown':
-          newY = prevPosition.y + CELL_SIZE;
+          newGridY = currentGridY + 1;
           break;
         case 'ArrowLeft':
-          newX = prevPosition.x - CELL_SIZE;
+          newGridX = currentGridX - 1;
           break;
         case 'ArrowRight':
-          newX = prevPosition.x + CELL_SIZE;
+          newGridX = currentGridX + 1;
           break;
       }
 
+      // Convert new grid position to screen coordinates
+      const newScreenPosition = gridSystem.gridToScreenCenter(newGridX, newGridY);
+
       // Check if new position is walkable
-      if (isWalkable(newX, newY)) {
-        const snappedPosition = snapToGrid(newX, newY);
-        updateLocation(snappedPosition.x, snappedPosition.y);
-        return snappedPosition;
+      if (isWalkable(newScreenPosition.x, newScreenPosition.y)) {
+        updateLocation(newScreenPosition.x, newScreenPosition.y);
+        return newScreenPosition;
       }
 
       // Can't move to that position, stay where we are

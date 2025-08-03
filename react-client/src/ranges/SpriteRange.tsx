@@ -14,8 +14,8 @@ const SpriteContainer = styled.div<{
   isNearby?: boolean;
 }>`
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
+  left: ${props => props.x - props.width / 2}px;   /* Center horizontally */
+  top: ${props => props.y - props.height / 2}px;   /* Center vertically */
   width: ${props => props.width}px;
   height: ${props => props.height}px;
   display: flex;

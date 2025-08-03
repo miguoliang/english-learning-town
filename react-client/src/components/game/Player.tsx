@@ -3,10 +3,10 @@ import styled from 'styled-components';
 
 const PlayerSprite = styled.div<{ x: number; y: number }>`
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
-  width: 32px;
-  height: 48px;
+  left: ${props => props.x - 20}px;  /* Center horizontally (40px / 2) */
+  top: ${props => props.y - 20}px;   /* Center vertically (40px / 2) */
+  width: 40px;
+  height: 40px;
   background: ${({ theme }) => theme.colors.primary};
   border: 2px solid #0984e3;
   border-radius: 16px 16px 8px 8px;

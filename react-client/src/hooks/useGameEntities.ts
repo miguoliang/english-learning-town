@@ -57,10 +57,11 @@ export const useGameEntities = (): UseGameEntitiesReturn => {
     const cellSize = 40;
     const gridWidth = Math.floor(window.innerWidth / cellSize);
     
+    // Position NPCs at grid cell centers
     return [
-      { id: 'teacher', x: 6 * cellSize, y: 7 * cellSize, icon: '👩‍🏫', name: 'Ms. Johnson' },
-      { id: 'shopkeeper', x: (gridWidth - 6) * cellSize, y: 8 * cellSize, icon: '👨‍💼', name: 'Mr. Smith' },
-      { id: 'librarian', x: 9 * cellSize, y: 16 * cellSize, icon: '👩‍🎓', name: 'Dr. Brown' }
+      { id: 'teacher', x: 6 * cellSize + cellSize/2, y: 7 * cellSize + cellSize/2, icon: '👩‍🏫', name: 'Ms. Johnson' },
+      { id: 'shopkeeper', x: (gridWidth - 6) * cellSize + cellSize/2, y: 8 * cellSize + cellSize/2, icon: '👨‍💼', name: 'Mr. Smith' },
+      { id: 'librarian', x: 9 * cellSize + cellSize/2, y: 16 * cellSize + cellSize/2, icon: '👩‍🎓', name: 'Dr. Brown' }
     ];
   }, []);
 
