@@ -144,8 +144,12 @@ export class BuildingRange extends Range {
     }));
 
     // Use entrance interaction: player must be adjacent to entrance positions
-    // This finds walkable cells next to the entrance positions
-    this.setInteractionCondition(new EntranceInteraction(entrancePositions));
+    // This finds only walkable cells next to entrance positions (outside building range)
+    this.setInteractionCondition(new EntranceInteraction(
+      entrancePositions, 
+      this.position, 
+      this.size
+    ));
   }
 
   /**

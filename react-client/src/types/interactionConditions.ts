@@ -304,19 +304,30 @@ export class DirectionalInteraction implements InteractionCondition {
 }
 
 /**
- * Entrance Interaction - Player must be adjacent to entrance positions
+ * Entrance Interaction - Player must be adjacent to entrance positions in walkable cells
  * Used for: Building entrances where entrance positions are inside non-walkable buildings
- * This finds the walkable cells adjacent to entrance positions
+ * This finds only the walkable cells adjacent to entrance positions (outside building range)
  */
 export class EntranceInteraction implements InteractionCondition {
-  constructor(private entrancePositions: GridPosition[]) {}
+  constructor(
+    private entrancePositions: GridPosition[],
+    private buildingPos: GridPosition,
+    private buildingSize: { width: number; height: number }
+  ) {}
+
+  private isPositionInBuilding(pos: GridPosition): boolean {
+    return pos.x >= this.buildingPos.x && 
+           pos.x < this.buildingPos.x + this.buildingSize.width &&
+           pos.y >= this.buildingPos.y && 
+           pos.y < this.buildingPos.y + this.buildingSize.height;
+  }
 
   canInteractFrom(
     playerPos: GridPosition, 
     _targetPos: GridPosition, 
     _targetSize: { width: number; height: number }
   ): boolean {
-    // Check if player is adjacent to any entrance position
+    // Check if player is adjacent to any entrance position AND outside building
     for (const entrance of this.entrancePositions) {
       // Check all 4 adjacent positions around the entrance
       const adjacentPositions = [
@@ -327,7 +338,10 @@ export class EntranceInteraction implements InteractionCondition {
       ];
 
       for (const adjPos of adjacentPositions) {
-        if (playerPos.x === adjPos.x && playerPos.y === adjPos.y) {
+        // Position must match player AND be outside building (walkable)
+        if (playerPos.x === adjPos.x && 
+            playerPos.y === adjPos.y && 
+            !this.isPositionInBuilding(adjPos)) {
           return true;
         }
       }
@@ -342,7 +356,7 @@ export class EntranceInteraction implements InteractionCondition {
   ): GridPosition[] {
     const positions: GridPosition[] = [];
     
-    // For each entrance position, add all 4 adjacent walkable positions
+    // For each entrance position, add only adjacent positions that are outside the building
     for (const entrance of this.entrancePositions) {
       const adjacentPositions = [
         { x: entrance.x - 1, y: entrance.y },     // West
@@ -351,13 +365,18 @@ export class EntranceInteraction implements InteractionCondition {
         { x: entrance.x, y: entrance.y + 1 }      // South
       ];
 
-      positions.push(...adjacentPositions);
+      // Only include positions that are outside the building (walkable)
+      for (const adjPos of adjacentPositions) {
+        if (!this.isPositionInBuilding(adjPos)) {
+          positions.push(adjPos);
+        }
+      }
     }
 
     return positions;
   }
 
   getDescription(): string {
-    return `Adjacent to entrances: ${this.entrancePositions.map(p => `(${p.x},${p.y})`).join(', ')}`;
+    return `Adjacent to entrances (outside building): ${this.entrancePositions.map(p => `(${p.x},${p.y})`).join(', ')}`;
   }
 }
