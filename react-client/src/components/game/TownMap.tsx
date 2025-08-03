@@ -22,6 +22,7 @@ interface TownMapProps {
   buildings: BuildingData[];
   npcs: NPCData[];
   onBuildingClick?: (building: BuildingData) => void;
+  onMapClick?: (x: number, y: number) => void;
   nearbyNPC?: NPCData | null;
   showGrid?: boolean;
 }
@@ -31,6 +32,7 @@ export const TownMap: React.FC<TownMapProps> = ({
   buildings,
   npcs,
   onBuildingClick,
+  onMapClick,
   nearbyNPC,
   showGrid = true
 }) => {
@@ -60,8 +62,14 @@ export const TownMap: React.FC<TownMapProps> = ({
     }))
   ];
 
+  const handleMapClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (onMapClick) {
+      onMapClick(event.clientX, event.clientY);
+    }
+  };
+
   return (
-    <MapContainer>
+    <MapContainer onClick={handleMapClick}>
       {/* Grid Overlay */}
       {showGrid && (
         <GridOverlay
