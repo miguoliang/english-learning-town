@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { BuildingData } from '../components/game/Building';
+import { useQuestStore } from '../stores/questStore';
+import { ObjectiveType } from '../types';
 
 interface Position {
   x: number;
@@ -18,6 +20,9 @@ export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementR
     y: window.innerHeight / 2 
   });
   const [currentLocation, setCurrentLocation] = useState('Town Center');
+  const [visitedLocations, setVisitedLocations] = useState<Set<string>>(new Set());
+
+  const { updateQuestObjective } = useQuestStore();
 
   // Movement configuration
   const MOVE_STEP = 16; // pixels per step
@@ -31,10 +36,17 @@ export const usePlayerMovement = (buildings: BuildingData[]): UsePlayerMovementR
     
     if (building) {
       setCurrentLocation(building.name);
+      
+      // Update quest objectives for location visits
+      if (!visitedLocations.has(building.id)) {
+        setVisitedLocations(prev => new Set([...prev, building.id]));
+        updateQuestObjective('welcome', ObjectiveType.GO_TO_LOCATION, building.id);
+        updateQuestObjective('first_shopping', ObjectiveType.GO_TO_LOCATION, building.id);
+      }
     } else {
       setCurrentLocation('Town Center');
     }
-  }, [buildings]);
+  }, [buildings, visitedLocations, updateQuestObjective]);
 
   const movePlayer = useCallback((x: number, y: number) => {
     // Ensure movement stays within map boundaries
