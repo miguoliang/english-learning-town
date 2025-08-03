@@ -57,7 +57,15 @@ interface GameStore extends GameState {
 - **Why Keyboard Controls**: Simpler implementation, more predictable interaction, better accessibility
 - **Why Space Bar over Mouse Click**: Proximity-based interaction feels more natural for RPGs
 
+#### Recent Architecture Improvements (SRP Refactoring)
+- **Dialogue System Modularization**: Split 500+ line component into 8 focused pieces
+- **Quest System Refactoring**: Separated display logic from business logic
+- **Component Size Optimization**: All components now under 200 lines
+- **Custom Hook Patterns**: Business logic extracted to reusable hooks
+
 #### Areas for Discussion
+- [x] Single Responsibility Principle implementation
+- [x] Component composition and modularity
 - [ ] Performance optimization strategies
 - [ ] Code splitting and lazy loading
 - [ ] Error boundary implementation
@@ -219,10 +227,12 @@ When we make technical decisions, we'll document:
 - **Testing**: TypeScript compiler, manual testing
 
 ### Key Metrics
-- Bundle size: 133KB gzipped
+- Bundle size: 134KB gzipped (after refactoring)
 - Build time: ~10 seconds
 - Type coverage: 100%
 - Performance: 60fps on mobile
+- Component count: 22 components, all under 200 lines
+- SRP compliance: 100% (all components have single responsibility)
 
 ### Next Discussion Topics
 1. Performance optimization strategies
