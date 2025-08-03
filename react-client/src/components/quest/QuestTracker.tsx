@@ -1,12 +1,11 @@
 // Refactored Quest Tracker Component - Single Responsibility: Quest Display Management
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { useQuestDisplay } from '../../hooks/useQuestDisplay';
 import { QuestItem } from './QuestItem';
 
-const TrackerContainer = styled(motion.div)`
+const TrackerContainer = styled.div`
   position: fixed;
   top: 80px;
   right: 20px;
@@ -51,7 +50,7 @@ const ToggleButton = styled.button`
   }
 `;
 
-const QuestList = styled(motion.div)`
+const QuestList = styled.div`
   max-height: 400px;
   overflow-y: auto;
   
@@ -95,12 +94,7 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
   } = useQuestDisplay();
 
   return (
-    <TrackerContainer
-      className={className}
-      initial={{ x: 340, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-    >
+    <TrackerContainer className={className}>
       <Header>
         <Title>Active Quests ({activeQuests.length})</Title>
         <ToggleButton onClick={() => setIsExpanded(!isExpanded)}>
@@ -108,14 +102,8 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
         </ToggleButton>
       </Header>
 
-      <AnimatePresence>
-        {isExpanded && (
-          <QuestList
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+      {isExpanded && (
+        <QuestList>
             {displayQuests.length === 0 ? (
               <EmptyState>No active quests</EmptyState>
             ) : (
@@ -138,9 +126,8 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
                 );
               })
             )}
-          </QuestList>
-        )}
-      </AnimatePresence>
+        </QuestList>
+      )}
     </TrackerContainer>
   );
 };

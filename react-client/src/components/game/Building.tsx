@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-const BuildingSprite = styled(motion.div)<{ x: number; y: number; color: string }>`
+const BuildingSprite = styled.div<{ x: number; y: number; color: string }>`
   position: absolute;
   left: ${props => props.x}px;
   top: ${props => props.y}px;
@@ -59,8 +58,6 @@ export const Building: React.FC<BuildingProps> = ({
       x={x}
       y={y}
       color={color}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
       onClick={() => onClick?.(buildingData)}
     >
       {icon}

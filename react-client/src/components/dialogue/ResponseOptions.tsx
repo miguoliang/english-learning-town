@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import type { DialogueResponse } from '../../types';
 
 const OptionsContainer = styled.div`
@@ -9,7 +8,7 @@ const OptionsContainer = styled.div`
   gap: 8px;
 `;
 
-const ResponseButton = styled(motion.button)<{ isCorrect?: boolean; isSelected?: boolean }>`
+const ResponseButton = styled.button<{ isCorrect?: boolean; isSelected?: boolean }>`
   background: ${props => {
     if (props.isCorrect) return 'linear-gradient(135deg, #00b894 0%, #00a085 100%)';
     if (props.isSelected) return 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)';
@@ -59,11 +58,6 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
           key={response.id}
           onClick={() => onResponseClick(response)}
           isSelected={index === selectedIndex}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 + index * 0.1 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
         >
           {response.text}
         </ResponseButton>

@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import type { QuestData } from '../../types';
 
-const Item = styled(motion.div)<{ isPrimary?: boolean }>`
+const Item = styled.div<{ isPrimary?: boolean }>`
   background: ${props => props.isPrimary 
     ? 'linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 140, 0, 0.1))'
     : 'rgba(255, 255, 255, 0.05)'
@@ -65,13 +64,15 @@ const ProgressBar = styled.div<{ isPrimary?: boolean }>`
   margin-bottom: 8px;
 `;
 
-const ProgressFill = styled(motion.div)<{ isPrimary?: boolean }>`
+const ProgressFill = styled.div<{ isPrimary?: boolean; progress: number }>`
   height: 100%;
   background: ${props => props.isPrimary 
     ? 'linear-gradient(90deg, #ffa500, #ff8c00)'
     : 'linear-gradient(90deg, #4a90e2, #357abd)'
   };
   border-radius: 2px;
+  width: ${props => props.progress}%;
+  transition: width 0.3s ease;
 `;
 
 const CurrentObjective = styled.div`
@@ -104,11 +105,6 @@ export const QuestItem: React.FC<QuestItemProps> = ({
     <Item
       isPrimary={isPrimary}
       onClick={onClick}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
     >
       <Header>
         <Icon isPrimary={isPrimary}>
@@ -127,9 +123,7 @@ export const QuestItem: React.FC<QuestItemProps> = ({
       <ProgressBar isPrimary={isPrimary}>
         <ProgressFill
           isPrimary={isPrimary}
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          progress={progress}
         />
       </ProgressBar>
 

@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-const ProgressContainer = styled(motion.div)`
+const ProgressContainer = styled.div`
   background: rgba(116, 185, 255, 0.1);
   border: 1px solid rgba(116, 185, 255, 0.3);
   border-radius: 8px;
@@ -26,11 +25,7 @@ export const VocabularyProgress: React.FC<VocabularyProgressProps> = ({
   if (learnedVocabulary.length === 0) return null;
 
   return (
-    <ProgressContainer
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      transition={{ delay: 1 }}
-    >
+    <ProgressContainer>
       <ProgressText>
         📚 New vocabulary learned: {learnedVocabulary.join(', ')}
       </ProgressText>

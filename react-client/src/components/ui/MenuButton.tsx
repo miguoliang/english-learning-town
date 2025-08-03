@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-const StyledMenuButton = styled(motion.button)<{ variant?: 'primary' | 'secondary' }>`
+const StyledMenuButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
@@ -10,54 +9,59 @@ const StyledMenuButton = styled(motion.button)<{ variant?: 'primary' | 'secondar
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${props => props.variant === 'primary' 
-    ? props.theme.gradients.primary
-    : 'rgba(255, 255, 255, 0.1)'
+  background: ${props => props.variant === 'primary'
+    ? 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)'
+    : 'linear-gradient(135deg, #636e72 0%, #2d3436 100%)'
   };
   color: white;
-  border: 2px solid ${props => props.variant === 'primary' ? 'transparent' : 'rgba(255, 255, 255, 0.3)'};
-  backdrop-filter: blur(10px);
+  min-width: 200px;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    background: ${props => props.variant === 'primary' 
-      ? props.theme.gradients.primary
-      : 'rgba(255, 255, 255, 0.2)'
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    background: ${props => props.variant === 'primary'
+      ? 'linear-gradient(135deg, #0984e3 0%, #74b9ff 100%)'
+      : 'linear-gradient(135deg, #2d3436 0%, #636e72 100%)'
     };
   }
   
   &:active {
     transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-
+  
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
+  }
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    min-width: 160px;
   }
 `;
 
 interface MenuButtonProps {
-  variant?: 'primary' | 'secondary';
-  onClick: () => void;
-  disabled?: boolean;
   children: React.ReactNode;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
 export const MenuButton: React.FC<MenuButtonProps> = ({
-  variant = 'secondary',
+  children,
   onClick,
-  disabled = false,
-  children
+  variant = 'primary',
+  disabled = false
 }) => {
   return (
     <StyledMenuButton
       variant={variant}
       onClick={onClick}
       disabled={disabled}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
     >
       {children}
     </StyledMenuButton>

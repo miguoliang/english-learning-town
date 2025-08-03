@@ -1,7 +1,6 @@
 // Notification System Component
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { useGameStore } from '../../stores/gameStore';
 import type { Notification } from '../../types';
@@ -14,7 +13,7 @@ const NotificationContainer = styled.div`
   pointer-events: none;
 `;
 
-const NotificationItem = styled(motion.div)<{ type?: string }>`
+const NotificationItem = styled.div<{ type?: string }>`
   background: ${props => {
     switch (props.type) {
       case 'quest_started': return 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
@@ -36,6 +35,15 @@ const NotificationItem = styled(motion.div)<{ type?: string }>`
   backdrop-filter: blur(10px);
   pointer-events: auto;
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateX(-5px) scale(1.02);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
 `;
 
 const NotificationHeader = styled.div`
@@ -57,6 +65,11 @@ const NotificationIcon = styled.span<{ type?: string }>`
       default: return '';
     }
   }}
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
 `;
 
 const NotificationTitle = styled.h4`
@@ -98,10 +111,12 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `;
 
-const ProgressFill = styled(motion.div)`
+const ProgressFill = styled.div<{ progress: number }>`
   height: 100%;
+  width: ${props => props.progress}%;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 2px;
+  transition: width 0.8s ease-out;
 `;
 
 const getNotificationIcon = (type: string): string => {
@@ -142,16 +157,6 @@ const NotificationComponent: React.FC<NotificationItemProps> = ({
     <NotificationItem
       type={notification.type}
       onClick={handleClick}
-      initial={{ x: 400, opacity: 0, scale: 0.8 }}
-      animate={{ x: 0, opacity: 1, scale: 1 }}
-      exit={{ x: 400, opacity: 0, scale: 0.8 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 30
-      }}
-      whileHover={{ scale: 1.02, x: -5 }}
-      whileTap={{ scale: 0.98 }}
     >
       <NotificationHeader>
         <NotificationIcon type={notification.type}>
@@ -172,11 +177,7 @@ const NotificationComponent: React.FC<NotificationItemProps> = ({
 
       {notification.progress !== undefined && notification.progress >= 0 && (
         <ProgressBar>
-          <ProgressFill
-            initial={{ width: 0 }}
-            animate={{ width: `${notification.progress}%` }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          />
+          <ProgressFill progress={notification.progress} />
         </ProgressBar>
       )}
     </NotificationItem>
@@ -193,15 +194,13 @@ export const NotificationSystem: React.FC = () => {
 
   return (
     <NotificationContainer>
-      <AnimatePresence mode="popLayout">
-        {displayNotifications.map((notification) => (
-          <NotificationComponent
-            key={notification.id}
-            notification={notification}
-            onClose={removeNotification}
-          />
-        ))}
-      </AnimatePresence>
+      {displayNotifications.map((notification) => (
+        <NotificationComponent
+          key={notification.id}
+          notification={notification}
+          onClose={removeNotification}
+        />
+      ))}
     </NotificationContainer>
   );
 };

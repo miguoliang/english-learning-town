@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { highlightVocabulary } from '../../utils/vocabularyHighlighter';
 
-const TextContainer = styled(motion.div)`
+const TextContainer = styled.div`
   color: white;
   font-size: 1.1rem;
   line-height: 1.6;
@@ -22,9 +21,6 @@ export const DialogueText: React.FC<DialogueTextProps> = ({
 }) => {
   return (
     <TextContainer
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
       dangerouslySetInnerHTML={{
         __html: highlightVocabulary(text, vocabularyHighlights).replace(
           /<span class="vocabulary-highlight">/g,

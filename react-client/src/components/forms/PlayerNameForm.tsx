@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { MenuButton } from '../ui/MenuButton';
 import { useGameStore } from '../../stores/gameStore';
 
@@ -11,7 +10,7 @@ const FormContainer = styled.div`
   min-width: 250px;
 `;
 
-const PlayerNameInput = styled(motion.input)`
+const PlayerNameInput = styled.input`
   padding: 1rem;
   font-size: 1.1rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -20,6 +19,7 @@ const PlayerNameInput = styled(motion.input)`
   color: white;
   backdrop-filter: blur(10px);
   text-align: center;
+  transition: all 0.3s ease;
   
   &::placeholder {
     color: rgba(255, 255, 255, 0.6);
@@ -32,13 +32,19 @@ const PlayerNameInput = styled(motion.input)`
   }
 `;
 
-const LoadingSpinner = styled(motion.div)`
+const LoadingSpinner = styled.div`
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-top: 3px solid white;
   border-radius: 50%;
   margin: 0 auto;
+  animation: spin 1s linear infinite;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 interface PlayerNameFormProps {
@@ -102,10 +108,7 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
   if (isLoading) {
     return (
       <FormContainer>
-        <LoadingSpinner
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-        />
+        <LoadingSpinner />
       </FormContainer>
     );
   }
@@ -116,8 +119,8 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
         type="text"
         placeholder="Enter your name..."
         value={playerName}
-        onChange={(e) => setPlayerName(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && handleStartGame()}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value)}
+        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleStartGame()}
         maxLength={20}
       />
 

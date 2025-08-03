@@ -49,7 +49,10 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
     <MenuContainer>
       <BackgroundAnimation />
 
-      <GameTitle>
+      <GameTitle
+        title="English Learning Town"
+        subtitle="Embark on an adventure to master English through immersive gameplay!"
+      >
         <PlayerNameForm
           onStartGame={onStartGame}
           onLoadGame={handleLoadGame}

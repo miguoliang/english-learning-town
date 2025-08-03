@@ -1,14 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-const TitleContainer = styled(motion.div)`
+const TitleContainer = styled.div`
   text-align: center;
   max-width: 600px;
   padding: 40px;
 `;
 
-const Title = styled(motion.h1)`
+const Title = styled.h1`
   font-size: 4rem;
   font-weight: 800;
   color: white;
@@ -20,7 +19,7 @@ const Title = styled(motion.h1)`
   }
 `;
 
-const Subtitle = styled(motion.p)`
+const Subtitle = styled.p`
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 3rem;
@@ -34,45 +33,21 @@ const Subtitle = styled(motion.p)`
 `;
 
 interface GameTitleProps {
-  title?: string;
-  subtitle?: string;
+  title: string;
+  subtitle: string;
   children?: React.ReactNode;
 }
 
 export const GameTitle: React.FC<GameTitleProps> = ({
-  title = "🎓 English Learning Town",
-  subtitle = "Learn English through adventure and conversation in our friendly virtual town",
+  title,
+  subtitle,
   children
 }) => {
   return (
-    <TitleContainer
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
-    >
-      <Title
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.8, ease: 'easeOut' }}
-      >
-        {title}
-      </Title>
-
-      <Subtitle
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-      >
-        {subtitle}
-      </Subtitle>
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-      >
-        {children}
-      </motion.div>
+    <TitleContainer>
+      <Title>{title}</Title>
+      <Subtitle>{subtitle}</Subtitle>
+      <div>{children}</div>
     </TitleContainer>
   );
 };

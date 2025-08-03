@@ -1,7 +1,6 @@
 // Refactored Dialogue System Component with Single Responsibility Principle
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { useDialogueState } from '../../hooks/useDialogueState';
 import { useDialogueKeyboard } from '../../hooks/useDialogueKeyboard';
@@ -11,7 +10,7 @@ import { ResponseOptions } from './ResponseOptions';
 import { ContinueButton } from './ContinueButton';
 import { VocabularyProgress } from './VocabularyProgress';
 
-const DialogueOverlay = styled(motion.div)`
+const DialogueOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -25,7 +24,7 @@ const DialogueOverlay = styled(motion.div)`
   backdrop-filter: blur(2px);
 `;
 
-const DialogueBox = styled(motion.div)`
+const DialogueBox = styled.div`
   background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
   border: 3px solid #74b9ff;
   border-radius: 16px 16px 0 0;
@@ -70,19 +69,8 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
   const hasResponses = currentDialogue.responses && currentDialogue.responses.length > 0;
 
   return (
-    <DialogueOverlay
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <DialogueBox
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <DialogueOverlay onClick={onClose}>
+      <DialogueBox onClick={(e) => e.stopPropagation()}>
         <DialogueHeader
           npcId={npcId}
           speakerName={currentDialogue.speakerName}

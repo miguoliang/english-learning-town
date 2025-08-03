@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-const Button = styled(motion.button)`
+const Button = styled.button`
   background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
   border: none;
   border-radius: 8px;
@@ -30,14 +29,7 @@ interface ContinueButtonProps {
 export const ContinueButton: React.FC<ContinueButtonProps> = ({ onContinue }) => {
   return (
     <ButtonContainer>
-      <Button
-        onClick={onContinue}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
+      <Button onClick={onContinue}>
         Continue
       </Button>
     </ButtonContainer>

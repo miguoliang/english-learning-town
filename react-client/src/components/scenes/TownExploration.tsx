@@ -1,7 +1,6 @@
 // Town Exploration Scene - Main gameplay area
 
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { useQuestStore } from '../../stores/questStore';
 import { usePlayerMovement } from '../../hooks/usePlayerMovement';
@@ -66,14 +65,12 @@ export const TownExploration: React.FC<TownExplorationProps> = ({ onReturnToMenu
         onClose={() => setIsQuestLogOpen(false)}
       />
 
-      <AnimatePresence>
-        {selectedNPC && (
-          <DialogueSystem
-            npcId={selectedNPC}
-            onClose={handleDialogueEnd}
-          />
-        )}
-      </AnimatePresence>
+      {selectedNPC && (
+        <DialogueSystem
+          npcId={selectedNPC}
+          onClose={handleDialogueEnd}
+        />
+      )}
 
       <NotificationSystem />
     </GameContainer>

@@ -1,13 +1,12 @@
 // Quest Log Modal - Full quest management interface
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { useQuestStore } from '../../stores/questStore';
 import type { QuestData } from '../../types';
 import { QuestType, QuestStatus } from '../../types';
 
-const Overlay = styled(motion.div)`
+const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -21,7 +20,7 @@ const Overlay = styled(motion.div)`
   backdrop-filter: blur(3px);
 `;
 
-const Modal = styled(motion.div)`
+const Modal = styled.div`
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border: 2px solid #4a90e2;
   border-radius: 16px;
@@ -92,7 +91,7 @@ const QuestList = styled.div`
   }
 `;
 
-const QuestListItem = styled(motion.div)<{ isSelected?: boolean; status?: QuestStatus }>`
+const QuestListItem = styled.div<{ isSelected?: boolean; status?: QuestStatus }>`
   background: ${props => {
     if (props.status === QuestStatus.COMPLETED) return 'rgba(34, 139, 34, 0.2)';
     if (props.isSelected) return 'rgba(74, 144, 226, 0.3)';
@@ -338,21 +337,10 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <Overlay
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-        >
-          <Modal
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Overlay onClick={onClose}>
+          <Modal onClick={(e) => e.stopPropagation()}>
             <Sidebar>
               <SidebarHeader>
                 <Title>Quest Log</Title>
@@ -373,8 +361,6 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                         isSelected={selectedQuest?.id === quest.id}
                         status={quest.status}
                         onClick={() => handleQuestSelect(quest)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
                         <QuestItemHeader>
                           <QuestIcon status={quest.status}>
@@ -477,7 +463,7 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
           </Modal>
         </Overlay>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 
