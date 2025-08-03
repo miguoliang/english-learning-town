@@ -1,17 +1,15 @@
 /**
- * Town Scene - Main game scene using Range architecture
- * Single Responsibility: Orchestrate Range-based town gameplay
+ * School Scene - Interior classroom scene using Range architecture
+ * Single Responsibility: Orchestrate Range-based school gameplay
  */
 
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { RangeMap } from '../game/RangeMap';
-import { useRangeEntities } from '../../hooks/useRangeEntities';
+import { useSchoolRanges } from '../../hooks/useSchoolRanges';
 import { useRangePlayerMovement } from '../../hooks/useRangePlayerMovement';
 import { useRangeInteraction } from '../../hooks/useRangeInteraction';
-import { useBuildingScenes } from '../../hooks/useBuildingScenes';
 import { DialogueSystem } from '../dialogue/DialogueSystem';
-import { BuildingInterior } from './BuildingInterior';
 import type { BuildingRange, BuildingEntrance } from '../../ranges/BuildingRange';
 import type { Range } from '../../types/ranges';
 
@@ -35,7 +33,7 @@ const HUD = styled.div`
   pointer-events: none;
 `;
 
-const PlayerInfo = styled.div`
+const SceneInfo = styled.div`
   background: rgba(255, 255, 255, 0.95);
   border: 2px solid #2d3436;
   border-radius: 15px;
@@ -45,7 +43,7 @@ const PlayerInfo = styled.div`
   pointer-events: auto;
 `;
 
-const LocationText = styled.div`
+const SceneTitle = styled.div`
   font-size: 1.1rem;
   font-weight: bold;
   color: #2d3436;
@@ -78,13 +76,13 @@ const ControlText = styled.div`
   }
 `;
 
-interface TownSceneProps {
-  onEnterSchool: () => void;
+interface SchoolSceneProps {
+  onExitToTown: () => void;
 }
 
-export const TownScene: React.FC<TownSceneProps> = ({ onEnterSchool }) => {
-  // Initialize Range entities
-  const { ranges } = useRangeEntities();
+export const SchoolScene: React.FC<SchoolSceneProps> = ({ onExitToTown }) => {
+  // Initialize School ranges
+  const { ranges } = useSchoolRanges();
   
   // Player movement using Range system
   const { playerPosition, movePlayer, ranges: movementRanges } = useRangePlayerMovement(ranges);
@@ -94,18 +92,13 @@ export const TownScene: React.FC<TownSceneProps> = ({ onEnterSchool }) => {
     playerPosition,
     movementRanges
   );
-  
-  // Building scene management
-  const { currentBuildingScene, enterBuilding, exitBuilding, isInBuilding } = useBuildingScenes();
 
-  // Handle building entrance interactions
+  // Handle building entrance interactions (exit door)
   const handleEntranceInteract = useCallback((building: BuildingRange, entrance: BuildingEntrance) => {
-    if (building.id === 'school' && entrance.sceneId === 'school-interior') {
-      onEnterSchool();
-    } else {
-      enterBuilding(building.toLegacyBuilding(), entrance);
+    if (building.id === 'school-exit' && entrance.sceneId === 'town-scene') {
+      onExitToTown();
     }
-  }, [onEnterSchool, enterBuilding]);
+  }, [onExitToTown]);
 
   // Handle map clicks for movement
   const handleMapClick = useCallback((x: number, y: number) => {
@@ -114,39 +107,28 @@ export const TownScene: React.FC<TownSceneProps> = ({ onEnterSchool }) => {
 
   // Handle range interactions
   const handleRangeClick = useCallback((range: Range) => {
-    console.log('Range clicked:', range.id);
+    console.log('Range clicked in school:', range.id);
   }, []);
-
-
-  // If in building, show building interior
-  if (isInBuilding && currentBuildingScene) {
-    return (
-      <BuildingInterior
-        scene={currentBuildingScene}
-        onExit={exitBuilding}
-      />
-    );
-  }
 
   return (
     <SceneContainer>
       {/* HUD */}
       <HUD>
-        <PlayerInfo>
-          <LocationText>English Learning Town</LocationText>
+        <SceneInfo>
+          <SceneTitle>🏫 English Learning Classroom</SceneTitle>
           <PositionText>
             Position: ({Math.round((playerPosition.x - 20) / 40)}, {Math.round((playerPosition.y - 20) / 40)})
           </PositionText>
-        </PlayerInfo>
+        </SceneInfo>
         
         <Controls>
           <ControlText>🎮 Click to move</ControlText>
           <ControlText>💬 Click NPCs to talk</ControlText>
-          <ControlText>🚪 Click building entrances to enter</ControlText>
+          <ControlText>🚪 Click exit door to leave</ControlText>
         </Controls>
       </HUD>
 
-      {/* Range Map - The heart of the Range architecture */}
+      {/* Range Map - School interior ranges */}
       <RangeMap
         ranges={movementRanges}
         showGrid={true}

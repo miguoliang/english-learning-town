@@ -39,15 +39,33 @@ The game follows the **Range architecture** with proper hierarchy:
    building.removeInteractiveCells();                // Remove all doors
    ```
 
+4. **Scene Transitions** - Each scene is a different set of ranges:
+   ```typescript
+   // TownScene = Town ranges (buildings, NPCs, plants)
+   const { ranges } = useRangeEntities();
+   
+   // SchoolScene = School ranges (furniture, school NPCs)
+   const { ranges } = useSchoolRanges();
+   
+   // Scene transition via entrance interaction
+   if (building.id === 'school' && entrance.sceneId === 'school-interior') {
+     onEnterSchool(); // Switch to SchoolScene
+   }
+   ```
+
 ### Core Range Types
 - **BuildingRange**: Buildings with entrances (doors are specific implementation of interactive cells)
 - **SpriteRange**: NPCs and player characters with movement and dialogue
 - **PlantRange**: Decorative elements (trees, bushes, flowers, grass)
 
 ### Architecture Components
-- **TownScene**: Main scene orchestrator using Range architecture
+- **GameApp**: Top-level scene coordinator with transition management
+- **TownScene**: Main town scene with buildings, NPCs, and plants
+- **SchoolScene**: School interior scene with classroom furniture and school NPCs
+- **useSceneManager**: Scene transition state management (town ↔ school)
 - **RangeMap**: Polymorphic rendering of all ranges via `range.render()`
-- **useRangeEntities**: Range entity management and creation
+- **useRangeEntities**: Town scene range management and creation
+- **useSchoolRanges**: School scene range management and creation
 - **useRangePlayerMovement**: Range-based player movement system
 - **useRangeInteraction**: Range-based interaction system
 
@@ -286,17 +304,21 @@ When making technical decisions:
 
 ### Technical Health
 - ✅ TypeScript: Strict mode, zero errors
-- ✅ Build: Optimized bundle (268KB total, 85KB gzipped)
+- ✅ Build: Optimized bundle (273KB total, 86KB gzipped)
 - ✅ Architecture: **Range architecture** - Single source of truth, no parallel systems
 - ✅ Performance: Polymorphic rendering via `range.render()`
 - ✅ Interactive Cells: Configurable doors/entrances for all Ranges
+- ✅ Scene Management: Clean transitions between multiple scenes
 
 ### Feature Status
 - ✅ **Range System**: Scene → Range → Cell hierarchy established
+- ✅ **Scene Transitions**: GameApp manages TownScene ↔ SchoolScene transitions
+- ✅ **SchoolScene**: Complete classroom with furniture, teacher, and students
 - ✅ **BuildingRange**: Configurable interactive cells (doors/entrances)
 - ✅ **SpriteRange**: NPCs and player with Range-based movement
 - ✅ **TownScene**: Range-based scene orchestration
-- ✅ NPC Dialogue: Interactive conversations
+- ✅ **Entrance Interactions**: Press Space at school door to enter classroom
+- ✅ NPC Dialogue: Interactive conversations (works in both scenes)
 - ✅ Quest System: Visual tracking, objectives
 - ✅ Progress Tracking: XP, levels, vocabulary
 
