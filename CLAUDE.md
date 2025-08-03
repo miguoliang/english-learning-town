@@ -57,6 +57,30 @@ export const usePlayerMovement = (buildings: BuildingData[]) => {
 };
 ```
 
+### Single Responsibility Principle (SRP) Refactoring
+**DialogueSystem Refactoring Completed** - Example of proper SRP implementation:
+
+**Before**: DialogueSystem.tsx (500+ lines, multiple responsibilities)
+- UI rendering + state management + keyboard handling + vocabulary logic + quest integration
+
+**After**: Modular architecture with focused components
+- **DialogueSystem.tsx**: UI orchestration only (110 lines)
+- **useDialogueState.ts**: State management, vocabulary learning, quest integration
+- **useDialogueKeyboard.ts**: Keyboard interactions (ESC, arrows, Enter/Space)
+- **DialogueHeader.tsx**: Speaker info and controls hint
+- **DialogueText.tsx**: Vocabulary-highlighted text rendering
+- **ResponseOptions.tsx**: Dialogue response selection
+- **ContinueButton.tsx**: Simple dialogue continuation
+- **VocabularyProgress.tsx**: Learned vocabulary feedback
+- **vocabularyHighlighter.ts**: Text highlighting and NPC avatar utilities
+
+**Benefits Achieved**:
+- Each component/hook has a single, clear responsibility
+- Easier testing and maintenance
+- Better code reusability
+- Clearer separation of concerns
+- Improved readability and debugging
+
 ### Theme Usage Patterns
 Always use theme properties from styled-components:
 ```typescript
