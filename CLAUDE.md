@@ -13,31 +13,43 @@ English Learning Town - Educational RPG built with React + TypeScript that gamif
 
 ## 🎮 Game Architecture
 
-### Simple Grid-Based System (2025-01-03)
-The game follows a simplified, grid-based architecture with three core principles:
+### Range Architecture System (2025-01-03)
+The game follows the **Range architecture** with proper hierarchy:
 
-1. **Map = Marked Grid Cells** - The game world is a 40x40px grid where cells are marked as:
-   - Walkable/non-walkable (for movement collision)
-   - Interactive/non-interactive (for space bar interactions)
+**Game = Scenes → Scene = Ranges → Range = Cells**
 
-2. **Movement = Check Next Cell** - Player movement simply checks if the target cell is walkable:
+1. **Scene Management** - Each scene contains multiple ranges:
    ```typescript
-   if (gridSystem.isWalkable(newX, newY)) {
-     playerController.setPosition({ x: newX, y: newY });
-   }
+   // TownScene orchestrates all ranges in the town
+   const { ranges } = useRangeEntities();
+   const { playerPosition, movePlayer, ranges: movementRanges } = useRangePlayerMovement(ranges);
    ```
 
-3. **Interaction = Check Adjacent Cells** - Space bar interactions check current cell for interactive entities:
+2. **Range System** - Every entity is a Range with 4 core concerns:
+   - **Boundary**: Position and size in grid coordinates
+   - **Walkability**: Whether sprites can pass through
+   - **Interaction**: What happens when engaged (configurable interactive cells)
+   - **Rendering**: Polymorphic `range.render()` method
+
+3. **Interactive Cells** - Ranges can have configurable interactive cells:
    ```typescript
-   const entity = gridSystem.getInteractiveEntity(playerPos.x, playerPos.y);
-   if (entity) { /* interact */ }
+   // Buildings have no interactive cells by default
+   building.setInteractiveCells([{ x: 11, y: 12 }]); // Add door
+   building.addInteractiveCells([{ x: 9, y: 11 }]);  // Add more doors
+   building.removeInteractiveCells();                // Remove all doors
    ```
 
-### Core Game Systems
-- **GridSystem**: Manages cell states (walkable/interactive)
-- **PlayerController**: Handles player position and movement validation
-- **GameRenderer**: Pure visual rendering with styled components
-- **Keyboard-Only Controls**: Arrow keys for movement, Space for interaction
+### Core Range Types
+- **BuildingRange**: Buildings with entrances (doors are specific implementation of interactive cells)
+- **SpriteRange**: NPCs and player characters with movement and dialogue
+- **PlantRange**: Decorative elements (trees, bushes, flowers, grass)
+
+### Architecture Components
+- **TownScene**: Main scene orchestrator using Range architecture
+- **RangeMap**: Polymorphic rendering of all ranges via `range.render()`
+- **useRangeEntities**: Range entity management and creation
+- **useRangePlayerMovement**: Range-based player movement system
+- **useRangeInteraction**: Range-based interaction system
 
 ## 🏗️ React Development Guidelines
 
@@ -87,18 +99,28 @@ export const usePlayerMovement = (buildings: BuildingData[]) => {
 
 ### Single Responsibility Principle (SRP) Refactoring
 
-**Game System Refactoring Completed** - Latest example of proper SRP implementation:
+**Range Architecture Migration Completed** - Major architectural refactoring:
 
-**Before**: Game.tsx (345+ lines, multiple responsibilities)
-- Grid system logic + player movement + entity management + keyboard handling + UI rendering + data definitions
+**Before**: Parallel architecture systems (legacy + Range)
+- Legacy Game.tsx (78 lines) + GridSystem.ts + GameData.ts + GameRenderer.tsx
+- Range architecture (complete but unused) + useRangeEntities + RangeMap + BuildingRange
 
-**After**: Modular architecture with focused components
-- **Game.tsx**: System orchestration only (78 lines)
-- **GridSystem.ts**: Grid cell management (walkable/interactive cells)
-- **PlayerController.ts**: Player movement and interaction logic
-- **GameData.ts**: Static game entity definitions and constants
-- **useKeyboardControls.ts**: Keyboard event handling
-- **GameRenderer.tsx**: Visual rendering and styled components
+**After**: Single Range-based architecture 
+- **TownScene.tsx**: Range-based scene orchestration
+- **RangeMap.tsx**: Polymorphic range rendering via `range.render()`
+- **Range.ts**: Base class with 4 core concerns (Boundary, Walkability, Interaction, Rendering)
+- **BuildingRange.tsx**: Building-specific Range with configurable interactive cells
+- **SpriteRange.ts**: NPC and player Range implementations
+- **useRangeEntities.ts**: Range entity management
+- **useRangePlayerMovement.ts**: Range-based player movement
+- **useRangeInteraction.ts**: Range-based interaction system
+
+**Legacy System Removed**:
+- ❌ `Game.tsx` - Legacy game orchestrator  
+- ❌ `src/game/` - Entire legacy directory (GridSystem, GameData, PlayerController)
+- ❌ `GameRenderer.tsx` - Legacy rendering system
+- ❌ `usePlayerMovement.ts` - Legacy movement system
+- ❌ `useKeyboardControls.ts` - Legacy keyboard controls
 
 **DialogueSystem Refactoring Completed** - Previous SRP example:
 
@@ -175,47 +197,47 @@ AudioManager.playClick();
 AudioManager.playSuccess();
 ```
 
-### Grid-Based Map System (2025-01-03)
-**Architecture**: CSS Grid-like layout with 40px square cells for structured movement and collision detection.
+### Range Implementation Guidelines
 
-**Core Components**:
-- **GridSystem** (`utils/gridSystem.ts`): Core grid logic, coordinate conversion, collision map
-- **useGridSystem** (`hooks/useGridSystem.ts`): React hook managing grid state and collision areas
-- **GridOverlay** (`components/game/GridOverlay.tsx`): Visual debugging with dashed grid lines
-
-**Key Features**:
-- **Square Cells**: 40px × 40px grid cells across entire screen
-- **Exact Positioning**: Buildings placed on precise grid coordinates (e.g., School at grid 5,3)
-- **Dynamic Sizing**: Building visuals match their m×n grid footprint exactly
-- **Collision Detection**: Boolean collision map prevents movement through occupied cells
-- **Visual Debugging**: Optional dashed grid overlay with color-coded collision areas
-
-**Building Grid Footprints**:
+**Interactive Cells Configuration**:
 ```typescript
-School: 4×3 cells (160px × 120px)
-Shop: 4×3 cells (160px × 120px)  
-Library: 3×3 cells (120px × 120px)
-Café: 3×2 cells (120px × 80px)
-NPCs: 1×1 cells (40px × 40px)
+// Buildings have no interactive cells by default
+const warehouse = new BuildingRange({...}); // No doors initially
+
+// Add doors/entrances at any time
+warehouse.setInteractiveCells([
+  { x: 11, y: 12 }, // Main entrance
+  { x: 9, y: 11 }   // Side door
+]);
+
+// Add more doors incrementally
+warehouse.addInteractiveCells([{ x: 13, y: 11 }]); // Additional door
+
+// Remove all doors
+warehouse.removeInteractiveCells();
 ```
 
-**Implementation Pattern**:
+**Range Development Pattern**:
 ```typescript
-// Grid-aligned positioning
-const cellSize = 40;
-const gridX = 5; // Grid coordinate
-const screenX = gridX * cellSize; // Screen position
+// 1. Extend Range base class
+export class CustomRange extends Range {
+  // 2. Implement 4 core concerns
+  canCollide(): boolean { /* Walkability logic */ }
+  canInteract(): boolean { /* Interaction capability */ }
+  getTypeName(): string { /* Range identification */ }
+  render(): ReactNode { /* Visual representation */ }
+}
 
-// Visual size matches grid footprint
-const visualWidth = gridSize.width * cellSize;
-const visualHeight = gridSize.height * cellSize;
+// 3. Use polymorphic rendering
+ranges.map(range => range.render()) // Works for all Range types
 ```
 
-**Benefits**: 
-- Predictable movement patterns
-- Precise collision detection
-- Scalable for level design
-- Clear visual feedback for debugging
+**Benefits of Range Architecture**:
+- Single source of truth for game entities
+- Polymorphic behavior through `range.render()`
+- Configurable interactive cells for any Range
+- Clean separation of concerns (Boundary, Walkability, Interaction, Rendering)
+- Scalable scene management
 
 ### Build & Testing Protocol
 After making changes:
@@ -264,16 +286,24 @@ When making technical decisions:
 
 ### Technical Health
 - ✅ TypeScript: Strict mode, zero errors
-- ✅ Build: Optimized bundle (95KB gzipped, reduced from framer-motion removal)
-- ✅ Architecture: Clean, modular, SRP-compliant
-- ✅ Performance: 60fps, responsive design
-- ✅ UI/UX: Finger pointer navigation, clean dialogue highlighting
+- ✅ Build: Optimized bundle (268KB total, 85KB gzipped)
+- ✅ Architecture: **Range architecture** - Single source of truth, no parallel systems
+- ✅ Performance: Polymorphic rendering via `range.render()`
+- ✅ Interactive Cells: Configurable doors/entrances for all Ranges
 
 ### Feature Status
-- ✅ Quest System: Visual tracking, objectives
+- ✅ **Range System**: Scene → Range → Cell hierarchy established
+- ✅ **BuildingRange**: Configurable interactive cells (doors/entrances)
+- ✅ **SpriteRange**: NPCs and player with Range-based movement
+- ✅ **TownScene**: Range-based scene orchestration
 - ✅ NPC Dialogue: Interactive conversations
+- ✅ Quest System: Visual tracking, objectives
 - ✅ Progress Tracking: XP, levels, vocabulary
-- ✅ Mobile Support: Touch-friendly interface
+
+### Architecture Migration Complete
+- ❌ **Legacy System Removed**: Game.tsx, GridSystem, GameRenderer, usePlayerMovement
+- ✅ **Range Architecture Active**: TownScene → RangeMap → Range.render()
+- ✅ **No Parallel Architectures**: Single coherent system
 
 This guide serves as our technical collaboration framework for efficient, focused discussions around programming principles, product features, planning, testing methods, and production practices.
 

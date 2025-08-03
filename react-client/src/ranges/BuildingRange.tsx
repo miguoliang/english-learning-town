@@ -4,7 +4,7 @@ import { Range } from '../types/ranges';
 import type { RangeData } from '../types/ranges';
 import type { RenderingStrategy } from '../types/renderingStrategies';
 import { EmojiStrategy } from '../types/renderingStrategies';
-import { EntranceInteraction, AdjacentInteraction } from '../types/interactionConditions';
+import { EntranceInteraction } from '../types/interactionConditions';
 
 const BuildingSprite = styled.div<{ 
   x: number; 
@@ -126,14 +126,14 @@ export class BuildingRange extends Range {
    * Setup interaction condition based on building entrances
    * 
    * Buildings have two interaction modes:
-   * 1. No entrances: Can interact when adjacent to any building edge
-   * 2. Has entrances: Can only interact when standing adjacent to entrance positions
-   *    (since entrance positions are inside the non-walkable building)
+   * 1. No entrances: No interactive cells by default
+   * 2. Has entrances: Interactive cells are created based on entrance positions
+   *    (entrances are building-specific implementation of interactive cells)
    */
   private setupInteractionCondition(): void {
     if (this.entrances.length === 0) {
-      // No entrances - use adjacent interaction for general building interaction
-      this.setInteractionCondition(new AdjacentInteraction());
+      // No entrances - no interactive cells by default
+      // Interactive cells can be added later via setInteractiveCells()
       return;
     }
 
@@ -143,13 +143,32 @@ export class BuildingRange extends Range {
       y: this.position.y + entrance.position.y
     }));
 
-    // Use entrance interaction: player must be adjacent to entrance positions
-    // This finds only walkable cells next to entrance positions (outside building range)
+    // Set interactive cells and interaction condition separately
+    this.setInteractiveCells(entrancePositions);
     this.setInteractionCondition(new EntranceInteraction(
-      entrancePositions, 
-      this.position, 
+      entrancePositions,
+      this.position,
       this.size
     ));
+  }
+
+  /**
+   * Override setInteractiveCells to also update the interaction condition for buildings
+   */
+  setInteractiveCells(interactiveCells: Array<{ x: number; y: number }>): void {
+    // First, update the Range's interactive cells list
+    super.setInteractiveCells(interactiveCells);
+
+    // Then, update the building-specific interaction condition
+    if (interactiveCells.length === 0) {
+      this.setInteractionCondition(null);
+    } else {
+      this.setInteractionCondition(new EntranceInteraction(
+        interactiveCells,
+        this.position,
+        this.size
+      ));
+    }
   }
 
   /**
@@ -172,6 +191,7 @@ export class BuildingRange extends Range {
   setEntranceInteractHandler(handler: (building: BuildingRange, entrance: BuildingEntrance) => void): void {
     this.onEntranceInteractHandler = handler;
   }
+
 
   /**
    * Buildings always block movement

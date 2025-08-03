@@ -14,6 +14,7 @@ import type { GridPosition } from '../types/ranges';
 
 interface UseRangeInteractionReturn {
   selectedRange: Range | null;
+  setSelectedRange: (range: Range | null) => void;
   interactableRanges: Range[];
   nearbyRanges: Range[];
   interactionHints: string[];
@@ -67,15 +68,31 @@ export const useRangeInteraction = (
     
     event.preventDefault();
     
+    console.log('🎯 Space pressed at player position:', playerGridPos);
+    console.log('🔍 Available ranges:', ranges.map(r => ({ id: r.id, type: r.getTypeName(), canInteract: r.canInteract() })));
+    
     // Get the closest interactable range
     const closestRange = InteractionManager.getClosestInteractableRange(playerGridPos, ranges);
     
+    console.log('🎲 Closest interactable range:', closestRange?.id || 'none');
+    
     if (closestRange) {
+      console.log('✅ Interacting with:', closestRange.id);
       setSelectedRange(closestRange);
       setInDialogue(true);
       
       // Trigger the range's interaction
       closestRange.onInteraction();
+    } else {
+      console.log('❌ No interactable range found');
+      // Check each range individually for debugging
+      ranges.forEach(range => {
+        if (range.canInteract()) {
+          const canInteractFrom = range.canInteractFrom(playerGridPos);
+          const validPositions = range.getValidInteractionPositions();
+          console.log(`🔎 ${range.id}: canInteractFrom=${canInteractFrom}, validPositions=`, validPositions);
+        }
+      });
     }
   }, [playerGridPos, ranges, isInDialogue, setInDialogue]);
 
@@ -94,6 +111,7 @@ export const useRangeInteraction = (
 
   return {
     selectedRange,
+    setSelectedRange,
     interactableRanges,
     nearbyRanges,
     interactionHints,

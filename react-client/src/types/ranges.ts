@@ -43,6 +43,7 @@ export abstract class Range {
   protected renderingStrategy: RenderingStrategy;
   protected interactionCondition?: InteractionCondition;
   private walkable: boolean;
+  private interactiveCells: Array<{ x: number; y: number }> = [];
 
   constructor(data: RangeData) {
     this.id = data.id;
@@ -169,8 +170,44 @@ export abstract class Range {
   /**
    * Set or update the interaction condition for this range
    */
-  setInteractionCondition(condition: InteractionCondition): void {
-    this.interactionCondition = condition;
+  setInteractionCondition(condition: InteractionCondition | null): void {
+    this.interactionCondition = condition || undefined;
+  }
+
+  /**
+   * Set specific interactive cells for this range
+   * Range only cares about which cells are interactive, not how they work
+   */
+  setInteractiveCells(interactiveCells: Array<{ x: number; y: number }>): void {
+    this.interactiveCells = [...interactiveCells];
+  }
+
+  /**
+   * Add interactive cells to the range (can be called multiple times)
+   */
+  addInteractiveCells(interactiveCells: Array<{ x: number; y: number }>): void {
+    this.interactiveCells.push(...interactiveCells);
+  }
+
+  /**
+   * Remove all interactive cells
+   */
+  removeInteractiveCells(): void {
+    this.interactiveCells = [];
+  }
+
+  /**
+   * Get all interactive cells for this range
+   */
+  getInteractiveCells(): Array<{ x: number; y: number }> {
+    return [...this.interactiveCells];
+  }
+
+  /**
+   * Check if a specific position is an interactive cell
+   */
+  isInteractiveCell(x: number, y: number): boolean {
+    return this.interactiveCells.some(cell => cell.x === x && cell.y === y);
   }
 
   // ========== CORE CONCERN 4: RENDERING ==========

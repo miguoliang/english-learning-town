@@ -88,6 +88,18 @@ export const useRangeEntities = (): UseRangeEntitiesReturn => {
             sceneId: 'cafe-interior'
           }
         ]
+      }),
+      // Example building with no entrances - no interactive cells by default
+      new BuildingRange({
+        id: 'warehouse',
+        position: { x: 2, y: 16 },
+        size: { width: 2, height: 2 },
+        name: 'Warehouse',
+        color: '#636e72',
+        icon: '🏭',
+        renderingStrategy: new EmojiStrategy('🏭', '#636e72')
+        // No entrances defined - building has no interactive cells by default
+        // Interactive cells can be added later via: building.setInteractiveCells([{x: 3, y: 18}])
       })
     ];
   }, []);
