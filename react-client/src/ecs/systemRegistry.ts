@@ -6,7 +6,10 @@
 import {
   CollisionSystem,
   MovementSystem,
-  KeyboardInputSystem,
+  InputStateSystem,
+  InteractionZoneSystem,
+  GridMovementSystem,
+  PlayerInteractionSystem,
   MouseInputSystem,
   InteractionSystem,
   RenderSystem,
@@ -18,7 +21,10 @@ import {
 export const SYSTEM_NAMES = {
   COLLISION: 'CollisionSystem',
   MOVEMENT: 'MovementSystem',
-  KEYBOARD_INPUT: 'KeyboardInputSystem',
+  INPUT_STATE: 'InputStateSystem',
+  INTERACTION_ZONE: 'InteractionZoneSystem',
+  GRID_MOVEMENT: 'GridMovementSystem',
+  PLAYER_INTERACTION: 'PlayerInteractionSystem',
   MOUSE_INPUT: 'MouseInputSystem',
   INTERACTION: 'InteractionSystem',
   RENDER: 'RenderSystem',
@@ -34,13 +40,18 @@ export const EVENT_DRIVEN_SYSTEMS = [
 // System factory with proper dependency injection
 export class SystemFactory {
   static createSystems() {
-    // Create systems with dependencies
+    // Create base systems first
     const collisionSystem = new CollisionSystem();
+    const inputStateSystem = new InputStateSystem();
+    const interactionZoneSystem = new InteractionZoneSystem();
     
     return {
       collision: collisionSystem,
       movement: new MovementSystem(collisionSystem), // Inject collision dependency
-      keyboardInput: new KeyboardInputSystem(collisionSystem), // Inject collision dependency for grid movement
+      inputState: inputStateSystem,
+      interactionZone: interactionZoneSystem,
+      gridMovement: new GridMovementSystem(collisionSystem, inputStateSystem), // Inject collision and input dependencies
+      playerInteraction: new PlayerInteractionSystem(inputStateSystem, interactionZoneSystem), // Inject input and zone dependencies
       mouseInput: new MouseInputSystem(),
       interaction: new InteractionSystem(),
       render: new RenderSystem(),

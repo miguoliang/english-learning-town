@@ -47,6 +47,8 @@ export type ECSEvents = {
   'input:entity-click': { entityId: string };
   'input:key-pressed': { key: string };
   'input:key-released': { key: string };
+  'input:key-down': { key: string };
+  'input:key-up': { key: string };
 
   // Player events
   'player:move-to': { targetX: number; targetY: number };
@@ -123,6 +125,8 @@ export const ECSEventTypes = {
   INPUT_ENTITY_CLICK: 'input:entity-click' as const,
   INPUT_KEY_PRESSED: 'input:key-pressed' as const,
   INPUT_KEY_RELEASED: 'input:key-released' as const,
+  INPUT_KEY_DOWN: 'input:key-down' as const,
+  INPUT_KEY_UP: 'input:key-up' as const,
   PLAYER_MOVE_TO: 'player:move-to' as const,
   PLAYER_INTERACTION: 'player:interaction' as const,
   ENTITY_COLLISION: 'entity:collision' as const,

@@ -148,7 +148,10 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           console.log('🔧 Unified Store: Adding systems to world...');
           world.addSystem(systems.collision);
           world.addSystem(systems.movement);
-          world.addSystem(systems.keyboardInput);
+          world.addSystem(systems.inputState);
+          world.addSystem(systems.interactionZone);
+          world.addSystem(systems.gridMovement);
+          world.addSystem(systems.playerInteraction);
           world.addSystem(systems.mouseInput);
           world.addSystem(systems.interaction);
           world.addSystem(systems.render);

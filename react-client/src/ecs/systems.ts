@@ -155,9 +155,366 @@ export class MovementSystem implements System {
   }
 }
 
-// ========== KEYBOARD INPUT SYSTEM ==========
+// ========== INPUT STATE SYSTEM ==========
 
-export class KeyboardInputSystem implements System {
+export class InputStateSystem implements System {
+  readonly name = 'InputStateSystem';
+  readonly requiredComponents = [] as const; // No specific components required
+
+  private inputState = new Map<string, boolean>();
+  private lastKeyState = new Map<string, boolean>();
+  private isInitialized = false;
+
+  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event listeners once
+    if (!this.isInitialized) {
+      this.setupEventListeners(events);
+      this.isInitialized = true;
+    }
+    
+    // Update last key state for next frame
+    this.lastKeyState.clear();
+    this.inputState.forEach((pressed, key) => {
+      this.lastKeyState.set(key, pressed);
+    });
+  }
+
+  canProcess(_entity: Entity, _components: ComponentManager): boolean {
+    return true; // This system doesn't process specific entities
+  }
+
+  // Event listener setup
+  private setupEventListeners(events: Emitter<ECSEvents>): void {
+    events.on(ECSEventTypes.INPUT_KEY_PRESSED, (data) => {
+      this.setKeyPressed(data.key, true, events);
+    });
+
+    events.on(ECSEventTypes.INPUT_KEY_RELEASED, (data) => {
+      this.setKeyPressed(data.key, false, events);
+    });
+  }
+
+  // Public methods for input handling
+  setKeyPressed(key: string, pressed: boolean, events?: Emitter<ECSEvents>): void {
+    const wasPressed = this.inputState.get(key) === true;
+    this.inputState.set(key, pressed);
+    
+    // Emit state change events for other systems to listen to
+    if (events && pressed && !wasPressed) {
+      events.emit(ECSEventTypes.INPUT_KEY_DOWN, { key });
+    } else if (events && !pressed && wasPressed) {
+      events.emit(ECSEventTypes.INPUT_KEY_UP, { key });
+    }
+  }
+
+  // Utility methods for other systems
+  isKeyPressed(key: string): boolean {
+    return this.inputState.get(key) === true;
+  }
+
+  isNewKeyPress(key: string): boolean {
+    return this.inputState.get(key) === true && this.lastKeyState.get(key) !== true;
+  }
+
+  getInputState(): ReadonlyMap<string, boolean> {
+    return this.inputState;
+  }
+}
+
+// ========== INTERACTION ZONE SYSTEM ==========
+
+export class InteractionZoneSystem implements System {
+  readonly name = 'InteractionZoneSystem';
+  readonly requiredComponents = ['position', 'interactive'] as const;
+
+  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
+    // This system is primarily a utility for other systems
+  }
+
+  canProcess(entity: Entity, components: ComponentManager): boolean {
+    return components.hasAllComponents(entity.id, this.requiredComponents);
+  }
+
+  /**
+   * Check if a player is in an interaction zone for a given entity
+   */
+  isPlayerInInteractionZone(
+    playerPosition: PositionComponent,
+    entityPosition: PositionComponent,
+    interactive: InteractiveComponent
+  ): boolean {
+    // If entity has defined interaction zones, use those
+    if (interactive.interactionZones && interactive.interactionZones.length > 0) {
+      for (const zone of interactive.interactionZones) {
+        const zoneX = zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
+        const zoneY = zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
+        
+        if (playerPosition.x === zoneX && playerPosition.y === zoneY) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Fallback: use adjacency (default behavior for entities without defined zones)
+    const dx = Math.abs(playerPosition.x - entityPosition.x);
+    const dy = Math.abs(playerPosition.y - entityPosition.y);
+    const maxRange = interactive.interactionRange || 1;
+    
+    // Check if player is adjacent (within range)
+    return dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
+  }
+
+  /**
+   * Find all interactive entities that the player can interact with from their current position
+   */
+  findInteractableEntities(
+    playerPosition: PositionComponent,
+    components: ComponentManager
+  ): string[] {
+    const interactableEntities: string[] = [];
+    const interactiveEntityIds = components.getEntitiesWithComponent('interactive');
+    
+    for (const entityId of interactiveEntityIds) {
+      const position = components.getComponent<PositionComponent>(entityId, 'position');
+      const interactive = components.getComponent<InteractiveComponent>(entityId, 'interactive');
+      
+      if (!position || !interactive) continue;
+      
+      if (this.isPlayerInInteractionZone(playerPosition, position, interactive)) {
+        interactableEntities.push(entityId);
+      }
+    }
+    
+    return interactableEntities;
+  }
+}
+
+// ========== GRID MOVEMENT SYSTEM ==========
+
+export class GridMovementSystem implements System {
+  readonly name = 'GridMovementSystem';
+  readonly requiredComponents = ['input', 'position'] as const;
+
+  private isInitialized = false;
+
+  constructor(
+    private collisionSystem: CollisionSystem,
+    private inputStateSystem: InputStateSystem
+  ) {
+    // Validate dependencies
+    if (!this.inputStateSystem) {
+      throw new Error('GridMovementSystem requires InputStateSystem dependency');
+    }
+  }
+
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event listeners once
+    if (!this.isInitialized) {
+      this.setupEventListeners(events, components);
+      this.isInitialized = true;
+    }
+    
+    const controllableEntities = components.getEntitiesWithComponents(this.requiredComponents);
+    
+    for (const entityId of controllableEntities) {
+      const inputComponent = components.getComponent<InputComponent>(entityId, 'input');
+      const position = components.getComponent<PositionComponent>(entityId, 'position');
+      
+      if (!inputComponent || !position || !inputComponent.controllable) continue;
+      
+      // Handle player input - grid-based movement
+      if (inputComponent.inputType === 'player') {
+        this.handleGridMovement(entityId, position, components, events);
+      }
+    }
+  }
+
+  canProcess(entity: Entity, components: ComponentManager): boolean {
+    return components.hasAllComponents(entity.id, this.requiredComponents);
+  }
+
+  private setupEventListeners(events: Emitter<ECSEvents>, components: ComponentManager): void {
+    // Listen for specific movement keys
+    events.on(ECSEventTypes.INPUT_KEY_DOWN, (data) => {
+      this.handleMovementKey(data.key, components, events);
+    });
+  }
+
+  private handleMovementKey(key: string, components: ComponentManager, events: Emitter<ECSEvents>): void {
+    // Only handle movement keys
+    const movementKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'];
+    if (!movementKeys.includes(key)) return;
+
+    // Find the player entity
+    const playerEntities = components.getEntitiesWithComponent('player');
+    if (playerEntities.length === 0) return;
+
+    const playerId = playerEntities[0];
+    const position = components.getComponent<PositionComponent>(playerId, 'position');
+    if (!position) return;
+
+    this.handleGridMovement(playerId, position, components, events);
+  }
+
+  private handleGridMovement(
+    entityId: string, 
+    position: PositionComponent, 
+    components: ComponentManager, 
+    events: Emitter<ECSEvents>
+  ): void {
+    let newX = position.x;
+    let newY = position.y;
+    let moved = false;
+    
+    // Check movement keys using InputStateSystem
+    if (this.inputStateSystem.isNewKeyPress('ArrowUp') || this.inputStateSystem.isNewKeyPress('KeyW')) {
+      newY = position.y - 1;
+      moved = true;
+    } else if (this.inputStateSystem.isNewKeyPress('ArrowDown') || this.inputStateSystem.isNewKeyPress('KeyS')) {
+      newY = position.y + 1;
+      moved = true;
+    } else if (this.inputStateSystem.isNewKeyPress('ArrowLeft') || this.inputStateSystem.isNewKeyPress('KeyA')) {
+      newX = position.x - 1;
+      moved = true;
+    } else if (this.inputStateSystem.isNewKeyPress('ArrowRight') || this.inputStateSystem.isNewKeyPress('KeyD')) {
+      newX = position.x + 1;
+      moved = true;
+    }
+    
+    if (moved) {
+      // Get all entities for collision checking
+      const allEntities = this.getAllEntitiesFromComponentManager(components);
+      
+      // Use injected CollisionSystem to check if movement is valid
+      if (this.collisionSystem.canMoveTo(entityId, newX, newY, allEntities, components)) {
+        // Move directly - no velocity needed for grid movement
+        const oldX = position.x;
+        const oldY = position.y;
+        position.x = newX;
+        position.y = newY;
+        
+        // Emit movement event
+        events.emit(ECSEventTypes.ENTITY_MOVED, { 
+          entityId, 
+          oldPosition: { x: oldX, y: oldY }, 
+          newPosition: { x: newX, y: newY } 
+        });
+        
+        console.log(`🎮 Player moved from (${oldX}, ${oldY}) to (${newX}, ${newY})`);
+      } else {
+        // Emit collision event if movement is blocked
+        events.emit(ECSEventTypes.ENTITY_COLLISION, { 
+          entityId, 
+          blockedPosition: { x: newX, y: newY } 
+        });
+        
+        console.log(`🚫 Movement blocked at (${newX}, ${newY}) - collision detected`);
+      }
+    }
+  }
+
+  private getAllEntitiesFromComponentManager(components: ComponentManager): Entity[] {
+    // Get all entity IDs with any component
+    const allEntityIds = new Set<string>();
+    
+    // Common component types to find all entities
+    const componentTypes = ['position', 'size', 'collision', 'renderable', 'player', 'npc', 'building'];
+    
+    for (const componentType of componentTypes) {
+      const entityIds = components.getEntitiesWithComponent(componentType);
+      entityIds.forEach(id => allEntityIds.add(id));
+    }
+    
+    // Convert to Entity objects
+    return Array.from(allEntityIds).map(id => ({ id }));
+  }
+}
+
+// ========== PLAYER INTERACTION SYSTEM ==========
+
+export class PlayerInteractionSystem implements System {
+  readonly name = 'PlayerInteractionSystem';
+  readonly requiredComponents = ['player', 'position'] as const;
+
+  private isInitialized = false;
+
+  constructor(
+    private inputStateSystem: InputStateSystem,
+    private interactionZoneSystem: InteractionZoneSystem
+  ) {
+    // Validate dependencies
+    if (!this.inputStateSystem || !this.interactionZoneSystem) {
+      throw new Error('PlayerInteractionSystem requires InputStateSystem and InteractionZoneSystem dependencies');
+    }
+  }
+
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event listeners once
+    if (!this.isInitialized) {
+      this.setupEventListeners(events, components);
+      this.isInitialized = true;
+    }
+  }
+
+  canProcess(entity: Entity, components: ComponentManager): boolean {
+    return components.hasAllComponents(entity.id, this.requiredComponents);
+  }
+
+  private setupEventListeners(events: Emitter<ECSEvents>, components: ComponentManager): void {
+    // Listen for spacebar presses
+    events.on(ECSEventTypes.INPUT_KEY_DOWN, (data) => {
+      if (data.key === 'Space') {
+        this.handleInteractionInput(components, events);
+      }
+    });
+  }
+
+  private handleInteractionInput(components: ComponentManager, events: Emitter<ECSEvents>): void {
+    // Find the player entity
+    const playerEntities = components.getEntitiesWithComponent('player');
+    if (playerEntities.length === 0) return;
+
+    const playerId = playerEntities[0];
+    const playerPosition = components.getComponent<PositionComponent>(playerId, 'position');
+    if (!playerPosition) return;
+
+    console.log(`🎮 Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`);
+    
+    // Use InteractionZoneSystem to find interactable entities
+    const interactableEntities = this.interactionZoneSystem.findInteractableEntities(playerPosition, components);
+    
+    if (interactableEntities.length > 0) {
+      // Take the first interactable entity (could be enhanced to prioritize by distance)
+      const targetEntityId = interactableEntities[0];
+      
+      console.log(`✨ Player can interact with ${targetEntityId}`);
+      
+      // Emit interaction event
+      events.emit(ECSEventTypes.PLAYER_INTERACTION, { 
+        initiatorId: playerId,
+        targetEntityId 
+      });
+    } else {
+      console.log(`❌ No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`);
+    }
+  }
+}
+
+
+
+// ========== LEGACY KEYBOARD INPUT SYSTEM (DEPRECATED) ==========
+// This system has been refactored into multiple SRP-compliant systems:
+// - InputStateSystem: Pure key state management
+// - GridMovementSystem: Grid-based movement logic
+// - PlayerInteractionSystem: Spacebar interaction handling
+// - InteractionZoneSystem: Zone detection utility
+//
+// The old system violated SRP by mixing:
+// - Input state management + Movement logic + Collision checking + Interaction detection
+
+// Remove this system completely - it should not be exported or used
+class LegacyKeyboardInputSystem implements System {
   readonly name = 'KeyboardInputSystem';
   readonly requiredComponents = ['input', 'position'] as const;
 
@@ -310,36 +667,24 @@ export class KeyboardInputSystem implements System {
   ): boolean {
     // If entity has defined interaction zones, use those
     if (interactive.interactionZones && interactive.interactionZones.length > 0) {
-      console.log(`🔍 Checking interaction zones for entity at (${entityPosition.x}, ${entityPosition.y})`);
-      console.log(`🎮 Player at (${playerPosition.x}, ${playerPosition.y})`);
-      
       for (const zone of interactive.interactionZones) {
         const zoneX = zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
         const zoneY = zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
         
-        console.log(`⭐ Zone: (${zone.x}, ${zone.y}) → World: (${zoneX}, ${zoneY})`);
-        
         if (playerPosition.x === zoneX && playerPosition.y === zoneY) {
-          console.log(`✅ Player is in interaction zone!`);
           return true;
         }
       }
-      console.log(`❌ Player not in any defined interaction zones`);
       return false;
     }
     
     // Fallback: use adjacency (default behavior for entities without defined zones)
-    console.log(`🔄 Using fallback adjacency check for entity at (${entityPosition.x}, ${entityPosition.y})`);
     const dx = Math.abs(playerPosition.x - entityPosition.x);
     const dy = Math.abs(playerPosition.y - entityPosition.y);
     const maxRange = interactive.interactionRange || 1;
     
-    console.log(`📏 Distance: dx=${dx}, dy=${dy}, maxRange=${maxRange}`);
-    
     // Check if player is adjacent (within range)
-    const isAdjacent = dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
-    console.log(`🎯 Adjacency result: ${isAdjacent}`);
-    return isAdjacent;
+    return dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
   }
 
   private getAllEntitiesFromComponentManager(components: ComponentManager): Entity[] {
