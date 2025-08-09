@@ -363,7 +363,7 @@ export class SceneLoader {
               interactionRange: interactData.interactionRange,
               interactionZones: interactData.interactionZones
             });
-            console.log(`🔧 Creating interactive component for ${entity.id}:`, interactiveComponent);
+
             this.world.addComponent(entity.id, interactiveComponent);
             componentsAdded++;
           }
