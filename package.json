@@ -1,0 +1,35 @@
+{
+  "name": "english-learning-town",
+  "version": "1.0.0",
+  "description": "Educational RPG that gamifies English language learning through interactive storytelling and quest-based progression",
+  "private": true,
+  "scripts": {
+    "start": "./start.sh",
+    "start:backend": "./start.sh --backend-only",
+    "start:frontend": "./start.sh --frontend-only", 
+    "cleanup": "./start.sh --cleanup",
+    "dev": "./start.sh",
+    "install:all": "cd backend-go && go mod download && cd ../react-client && npm install",
+    "build": "cd react-client && npm run build",
+    "test": "cd react-client && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miguoliang/english-learning-town.git"
+  },
+  "keywords": [
+    "education",
+    "english-learning",
+    "rpg",
+    "react",
+    "typescript",
+    "go",
+    "game"
+  ],
+  "author": "English Learning Town Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "go": ">=1.19.0"
+  }
+}

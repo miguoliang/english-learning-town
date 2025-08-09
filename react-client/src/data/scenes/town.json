@@ -1,0 +1,338 @@
+{
+  "id": "town",
+  "name": "English Learning Town",
+  "description": "The main town scene with buildings, NPCs, and decorative plants",
+  "gridSettings": {
+    "cellSize": 40
+  },
+  "entities": [
+    {
+      "id": "school",
+      "components": {
+        "position": { "x": 5, "y": 3 },
+        "size": { "width": 4, "height": 3 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🏫",
+          "backgroundColor": "#e17055"
+        },
+        "building": {
+          "name": "School",
+          "type": "educational"
+        },
+        "interactive": {
+          "type": "building-entrance",
+          "entrances": [
+            {
+              "id": "school-main",
+              "position": { "x": 2, "y": 2 },
+              "direction": "south",
+              "targetScene": "school-interior"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "shop",
+      "components": {
+        "position": { "x": "gridWidth - 8", "y": 4 },
+        "size": { "width": 4, "height": 3 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🏪",
+          "backgroundColor": "#00b894"
+        },
+        "building": {
+          "name": "Shop",
+          "type": "commercial"
+        },
+        "interactive": {
+          "type": "building-entrance",
+          "entrances": [
+            {
+              "id": "shop-main",
+              "position": { "x": 0, "y": 1 },
+              "direction": "west",
+              "targetScene": "shop-interior"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "library",
+      "components": {
+        "position": { "x": 8, "y": 12 },
+        "size": { "width": 3, "height": 3 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📚",
+          "backgroundColor": "#6c5ce7"
+        },
+        "building": {
+          "name": "Library",
+          "type": "educational"
+        },
+        "interactive": {
+          "type": "building-entrance",
+          "entrances": [
+            {
+              "id": "library-main",
+              "position": { "x": 1, "y": 0 },
+              "direction": "north",
+              "targetScene": "library-interior"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cafe",
+      "components": {
+        "position": { "x": "gridWidth - 7", "y": 14 },
+        "size": { "width": 3, "height": 2 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "☕",
+          "backgroundColor": "#fdcb6e"
+        },
+        "building": {
+          "name": "Café",
+          "type": "social"
+        },
+        "interactive": {
+          "type": "building-entrance",
+          "entrances": [
+            {
+              "id": "cafe-main",
+              "position": { "x": 1, "y": 1 },
+              "direction": "south",
+              "targetScene": "cafe-interior"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "warehouse",
+      "components": {
+        "position": { "x": 2, "y": 16 },
+        "size": { "width": 2, "height": 2 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🏭",
+          "backgroundColor": "#636e72"
+        },
+        "building": {
+          "name": "Warehouse",
+          "type": "storage"
+        }
+      }
+    },
+    {
+      "id": "teacher",
+      "components": {
+        "position": { "x": 6, "y": 7 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👩‍🏫",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Ms. Johnson",
+          "role": "teacher"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "teacher-intro"
+        }
+      }
+    },
+    {
+      "id": "shopkeeper",
+      "components": {
+        "position": { "x": "gridWidth - 6", "y": 8 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👨‍💼",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Mr. Smith",
+          "role": "shopkeeper"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "shopkeeper-intro"
+        }
+      }
+    },
+    {
+      "id": "librarian",
+      "components": {
+        "position": { "x": 9, "y": 16 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👩‍🎓",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Dr. Brown",
+          "role": "librarian"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "librarian-intro"
+        }
+      }
+    },
+    {
+      "id": "tree1",
+      "components": {
+        "position": { "x": 2, "y": 8 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌳",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "tree"
+        }
+      }
+    },
+    {
+      "id": "tree2",
+      "components": {
+        "position": { "x": 15, "y": 6 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌳",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "tree"
+        }
+      }
+    },
+    {
+      "id": "bush1",
+      "components": {
+        "position": { "x": 4, "y": 15 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌿",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "bush"
+        }
+      }
+    },
+    {
+      "id": "bush2",
+      "components": {
+        "position": { "x": 12, "y": 18 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌿",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "bush"
+        }
+      }
+    },
+    {
+      "id": "flower1",
+      "components": {
+        "position": { "x": 7, "y": 10 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌸",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "flower"
+        }
+      }
+    },
+    {
+      "id": "flower2",
+      "components": {
+        "position": { "x": 10, "y": 8 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌸",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "flower"
+        }
+      }
+    },
+    {
+      "id": "grass1",
+      "components": {
+        "position": { "x": 3, "y": 12 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": true },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌱",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "grass"
+        }
+      }
+    },
+    {
+      "id": "grass2",
+      "components": {
+        "position": { "x": 14, "y": 11 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": true },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🌱",
+          "backgroundColor": "transparent"
+        },
+        "decoration": {
+          "type": "plant",
+          "category": "grass"
+        }
+      }
+    }
+  ]
+}

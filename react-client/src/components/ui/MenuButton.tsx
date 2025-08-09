@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const StyledMenuButton = styled.button<{ variant?: 'primary' | 'secondary' }>`
+const StyledMenuButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['variant'].includes(prop),
+})<{ variant?: 'primary' | 'secondary' }>`
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;

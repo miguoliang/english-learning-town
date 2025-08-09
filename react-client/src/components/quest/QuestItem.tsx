@@ -2,7 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import type { QuestData } from '../../types';
 
-const Item = styled.div<{ isPrimary?: boolean }>`
+const Item = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isPrimary'].includes(prop),
+})<{ isPrimary?: boolean }>` 
   background: ${props => props.isPrimary 
     ? 'linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 140, 0, 0.1))'
     : 'rgba(255, 255, 255, 0.05)'
@@ -30,7 +32,9 @@ const Header = styled.div`
   margin-bottom: 8px;
 `;
 
-const Icon = styled.span<{ isPrimary?: boolean }>`
+const Icon = styled.span.withConfig({
+  shouldForwardProp: (prop) => !['isPrimary'].includes(prop),
+})<{ isPrimary?: boolean }>` 
   font-size: 16px;
   width: 24px;
   height: 24px;
@@ -41,7 +45,9 @@ const Icon = styled.span<{ isPrimary?: boolean }>`
   border-radius: 50%;
 `;
 
-const Title = styled.h4<{ isPrimary?: boolean }>`
+const Title = styled.h4.withConfig({
+  shouldForwardProp: (prop) => !['isPrimary'].includes(prop),
+})<{ isPrimary?: boolean }>` 
   color: ${props => props.isPrimary ? '#ffa500' : 'white'};
   margin: 0;
   font-size: 14px;
@@ -55,7 +61,9 @@ const ProgressInfo = styled.div`
   margin-bottom: 8px;
 `;
 
-const ProgressBar = styled.div<{ isPrimary?: boolean }>`
+const ProgressBar = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isPrimary'].includes(prop),
+})<{ isPrimary?: boolean }>` 
   width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.1);
@@ -64,7 +72,9 @@ const ProgressBar = styled.div<{ isPrimary?: boolean }>`
   margin-bottom: 8px;
 `;
 
-const ProgressFill = styled.div<{ isPrimary?: boolean; progress: number }>`
+const ProgressFill = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isPrimary', 'progress'].includes(prop),
+})<{ isPrimary?: boolean; progress: number }>` 
   height: 100%;
   background: ${props => props.isPrimary 
     ? 'linear-gradient(90deg, #ffa500, #ff8c00)'

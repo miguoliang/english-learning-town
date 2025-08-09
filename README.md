@@ -28,11 +28,21 @@ English Learning Town transforms language learning into an engaging RPG experien
 - **Git**: Version control
 
 ### Installation
+
+#### Option 1: Quick Start (Recommended)
 ```bash
 # Clone the repository
 git clone https://github.com/miguoliang/english-learning-town.git
 cd english-learning-town
 
+# Start both servers with one command
+./start.sh                # Linux/macOS
+# or
+start.bat                 # Windows
+```
+
+#### Option 2: Manual Setup
+```bash
 # Start the backend server
 cd backend-go && go run cmd/main.go
 
@@ -43,6 +53,24 @@ npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) to play the game!
+
+#### Start Script Options
+```bash
+# Direct script usage
+./start.sh                  # Start both backend and frontend
+./start.sh --backend-only    # Start only Go backend (port 8080)
+./start.sh --frontend-only   # Start only React frontend (port 5173)
+./start.sh --cleanup         # Clean up any running processes
+./start.sh --help            # Show all available options
+
+# Or use npm scripts
+npm start                   # Same as ./start.sh
+npm run start:backend       # Backend only
+npm run start:frontend      # Frontend only
+npm run cleanup             # Clean up processes
+npm run install:all         # Install all dependencies
+npm run build               # Build for production
+```
 
 ## 🏗️ Architecture
 
@@ -139,23 +167,21 @@ cd react-client && npm run type-check
 ## 📖 Documentation
 
 ### Core Documentation
-- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Programming principles, architecture decisions, testing strategies
-- **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** - Feature planning, user stories, success metrics
-- **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Quality assurance, educational validation methods
-- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Sprint planning, implementation roadmap
+- **[CLAUDE.md](CLAUDE.md)** - Technical collaboration guide and coding patterns
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Feature roadmap, sprint planning, and implementation guide
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture, ECS patterns, and best practices
 
 ### Additional Resources
 - **[Development Guide](docs/src/development/README.md)**: Setup and contribution guidelines
 - **[API Documentation](docs/src/api/README.md)**: Backend endpoints and data models
 - **[Game Design](docs/src/game-design/README.md)**: Educational methodology and mechanics
-- **[Technical Architecture](docs/src/technical/README.md)**: System design and patterns
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our organized documentation structure:
+We welcome contributions! Please see our organized documentation:
 - **[CLAUDE.md](CLAUDE.md)** - Technical collaboration guide and coding patterns
-- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Current priorities and implementation roadmap
-- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Architecture principles and best practices
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Current priorities and implementation roadmap
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture principles and best practices
 
 ### Development Setup
 1. Fork the repository

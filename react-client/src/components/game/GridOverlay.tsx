@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const GridContainer = styled.div<{ cellSize: number; gridWidth: number; gridHeight: number }>`
+const GridContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['cellSize', 'gridWidth', 'gridHeight'].includes(prop),
+})<{ cellSize: number; gridWidth: number; gridHeight: number }>`
   position: absolute;
   top: 0;
   left: 0;
@@ -32,7 +34,9 @@ const GridContainer = styled.div<{ cellSize: number; gridWidth: number; gridHeig
   }
 `;
 
-const GridCellHighlight = styled.div<{ x: number; y: number; cellSize: number; width: number; height: number; color: string }>`
+const GridCellHighlight = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['x', 'y', 'cellSize', 'width', 'height', 'color'].includes(prop),
+})<{ x: number; y: number; cellSize: number; width: number; height: number; color: string }>`
   position: absolute;
   left: ${props => props.x * props.cellSize}px;
   top: ${props => props.y * props.cellSize}px;

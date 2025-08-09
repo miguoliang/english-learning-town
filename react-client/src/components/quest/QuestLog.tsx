@@ -91,7 +91,9 @@ const QuestList = styled.div`
   }
 `;
 
-const QuestListItem = styled.div<{ isSelected?: boolean; status?: QuestStatus }>`
+const QuestListItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isSelected', 'status'].includes(prop),
+})<{ isSelected?: boolean; status?: QuestStatus }>`
   background: ${props => {
     if (props.status === QuestStatus.COMPLETED) return 'rgba(34, 139, 34, 0.2)';
     if (props.isSelected) return 'rgba(74, 144, 226, 0.3)';
@@ -124,7 +126,9 @@ const QuestItemHeader = styled.div`
   margin-bottom: 6px;
 `;
 
-const QuestIcon = styled.span<{ status?: QuestStatus }>`
+const QuestIcon = styled.span.withConfig({
+  shouldForwardProp: (prop) => !['status'].includes(prop),
+})<{ status?: QuestStatus }>`
   font-size: 14px;
   color: ${props => {
     if (props.status === QuestStatus.COMPLETED) return '#90EE90';
@@ -132,7 +136,9 @@ const QuestIcon = styled.span<{ status?: QuestStatus }>`
   }};
 `;
 
-const QuestItemTitle = styled.div<{ status?: QuestStatus }>`
+const QuestItemTitle = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['status'].includes(prop),
+})<{ status?: QuestStatus }>`
   color: ${props => {
     if (props.status === QuestStatus.COMPLETED) return '#90EE90';
     return 'white';
@@ -159,7 +165,9 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `;
 
-const ProgressFill = styled.div<{ progress: number; status?: QuestStatus }>`
+const ProgressFill = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['progress', 'status'].includes(prop),
+})<{ progress: number; status?: QuestStatus }>`
   height: 100%;
   width: ${props => props.progress}%;
   background: ${props => 
@@ -221,7 +229,9 @@ const SectionTitle = styled.h3`
   font-weight: 600;
 `;
 
-const ObjectiveItem = styled.div<{ isCompleted?: boolean; isCurrent?: boolean }>`
+const ObjectiveItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isCompleted', 'isCurrent'].includes(prop),
+})<{ isCompleted?: boolean; isCurrent?: boolean }>`
   background: ${props => {
     if (props.isCompleted) return 'rgba(34, 139, 34, 0.2)';
     if (props.isCurrent) return 'rgba(255, 165, 0, 0.2)';
@@ -244,7 +254,9 @@ const ObjectiveHeader = styled.div`
   margin-bottom: 8px;
 `;
 
-const ObjectiveStatus = styled.span<{ isCompleted?: boolean; isCurrent?: boolean }>`
+const ObjectiveStatus = styled.span.withConfig({
+  shouldForwardProp: (prop) => !['isCompleted', 'isCurrent'].includes(prop),
+})<{ isCompleted?: boolean; isCurrent?: boolean }>`
   font-size: 16px;
   color: ${props => {
     if (props.isCompleted) return '#90EE90';
@@ -253,7 +265,9 @@ const ObjectiveStatus = styled.span<{ isCompleted?: boolean; isCurrent?: boolean
   }};
 `;
 
-const ObjectiveText = styled.div<{ isCompleted?: boolean }>`
+const ObjectiveText = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isCompleted'].includes(prop),
+})<{ isCompleted?: boolean }>` 
   color: ${props => props.isCompleted ? '#90EE90' : 'white'};
   font-weight: 500;
   text-decoration: ${props => props.isCompleted ? 'line-through' : 'none'};

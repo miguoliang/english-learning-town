@@ -6,68 +6,89 @@ English Learning Town - Educational RPG built with React + TypeScript that gamif
 ## 📋 Discussion Framework Reference
 
 ### Quick Navigation
-- **[TECHNICAL_DISCUSSION.md](TECHNICAL_DISCUSSION.md)** - Programming principles, architecture decisions, code patterns
-- **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** - Feature planning, user stories, success metrics  
-- **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Testing methods, quality assurance, educational validation
-- **[DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)** - Sprint planning, implementation roadmap
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture, ECS patterns, system design
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Feature planning, roadmap, sprint planning, testing strategy
 
 ## 🎮 Game Architecture
 
-### Range Architecture System (2025-01-03)
-The game follows the **Range architecture** with proper hierarchy:
+### ECS (Entity Component System) Architecture (2025-01-09)
+The game has been fully migrated to **ECS architecture** with Event-Driven and Data-Driven patterns:
 
-**Game = Scenes → Scene = Ranges → Range = Cells**
+**Game = World → Entities → Components + Systems**
 
-1. **Scene Management** - Each scene contains multiple ranges:
+1. **ECS Core Pattern**:
    ```typescript
-   // TownScene orchestrates all ranges in the town
-   const { ranges } = useRangeEntities();
-   const { playerPosition, movePlayer, ranges: movementRanges } = useRangePlayerMovement(ranges);
+   // Entities are just IDs
+   const entity = world.createEntity('player');
+   
+   // Components are pure data
+   world.addComponent(entity.id, createPositionComponent(10, 10));
+   world.addComponent(entity.id, createPlayerComponent('Alex'));
+   
+   // Systems contain all logic
+   world.addSystem(new MovementSystem());
+   world.addSystem(new RenderSystem());
    ```
 
-2. **Range System** - Every entity is a Range with 4 core concerns:
-   - **Boundary**: Position and size in grid coordinates
-   - **Walkability**: Whether sprites can pass through
-   - **Interaction**: What happens when engaged (configurable interactive cells)
-   - **Rendering**: Polymorphic `range.render()` method
-
-3. **Interactive Cells** - Ranges can have configurable interactive cells:
+2. **Event-Driven Communication**:
    ```typescript
-   // Buildings have no interactive cells by default
-   building.setInteractiveCells([{ x: 11, y: 12 }]); // Add door
-   building.addInteractiveCells([{ x: 9, y: 11 }]);  // Add more doors
-   building.removeInteractiveCells();                // Remove all doors
+   // Systems communicate via events, not direct calls
+   eventBus.emit('dialogue:start', { npcId: 'teacher', dialogueId: 'lesson-1' });
+   eventBus.emit('scene:transition', { from: 'town', to: 'school-interior' });
+   eventBus.emit('player:moved', { newPosition: { x: 15, y: 10 } });
    ```
 
-4. **Scene Transitions** - Each scene is a different set of ranges:
-   ```typescript
-   // TownScene = Town ranges (buildings, NPCs, plants)
-   const { ranges } = useRangeEntities();
-   
-   // SchoolScene = School ranges (furniture, school NPCs)
-   const { ranges } = useSchoolRanges();
-   
-   // Scene transition via entrance interaction
-   if (building.id === 'school' && entrance.sceneId === 'school-interior') {
-     onEnterSchool(); // Switch to SchoolScene
+3. **Data-Driven Scene Configuration**:
+   ```json
+   // scenes/town.json - Complete scene definition
+   {
+     "id": "town",
+     "name": "English Learning Town",
+     "entities": [
+       {
+         "id": "school",
+         "components": {
+           "position": { "x": 5, "y": 3 },
+           "size": { "width": 4, "height": 3 },
+           "building": { "name": "School", "type": "educational" },
+           "interactive": { "type": "building-entrance", "entrances": [...] }
+         }
+       }
+     ]
    }
    ```
 
-### Core Range Types
-- **BuildingRange**: Buildings with entrances (doors are specific implementation of interactive cells)
-- **SpriteRange**: NPCs and player characters with movement and dialogue
-- **PlantRange**: Decorative elements (trees, bushes, flowers, grass)
+4. **SRP-Compliant System Architecture** (2025-01-09):
+   - **CollisionSystem**: Collision detection and movement validation
+   - **MovementSystem**: Physics-based entity movement
+   - **KeyboardInputSystem**: WASD/Arrow key input processing
+   - **MouseInputSystem**: Click-to-move and entity interactions
+   - **InteractionSystem**: NPC dialogue, building entrances, scene transitions
+   - **RenderSystem**: Z-index sorted polymorphic rendering
+   - **AnimationSystem**: Frame-based entity animations
+   - **MovementAnimationSystem**: Direction-based movement animations
+
+### ECS Components Available
+- **Spatial**: PositionComponent, SizeComponent, VelocityComponent, CollisionComponent
+- **Visual**: RenderableComponent, AnimationComponent, MovementAnimationComponent
+- **Interactive**: InteractiveComponent, InputComponent
+- **Game-Specific**: PlayerComponent, NPCComponent, BuildingComponent, FurnitureComponent, DecorationComponent
+- **Educational**: LearningComponent, ProgressComponent, QuestGiverComponent
 
 ### Architecture Components
-- **GameApp**: Top-level scene coordinator with transition management
-- **TownScene**: Main town scene with buildings, NPCs, and plants
-- **SchoolScene**: School interior scene with classroom furniture and school NPCs
-- **useSceneManager**: Scene transition state management (town ↔ school)
-- **RangeMap**: Polymorphic rendering of all ranges via `range.render()`
-- **useRangeEntities**: Town scene range management and creation
-- **useSchoolRanges**: School scene range management and creation
-- **useRangePlayerMovement**: Range-based player movement system
-- **useRangeInteraction**: Range-based interaction system
+- **ECSGameApp**: Top-level scene coordinator using ECS
+- **ECSScene**: Universal scene component (replaces TownScene/SchoolScene)
+- **ECSRenderer**: React component that renders ECS world
+- **World**: Core ECS coordinator managing entities/components/systems
+- **SceneLoader**: Data-driven scene creation from JSON
+- **useECSWorld**: React hook for ECS world management
+- **EventBus**: Event system for loose system coupling
+
+### Migration from Range Architecture
+- **Before**: Range-based inheritance hierarchy (BuildingRange, SpriteRange, PlantRange)
+- **After**: Composition-based ECS (entities with mixable components)
+- **Benefit**: More flexible - any entity can have any combination of components
+- **Example**: A building can now be animated, a plant can become interactive, NPCs can have learning components
 
 ## 🏗️ React Development Guidelines
 
@@ -83,15 +104,22 @@ import { QuestData, NPCData, QuestStatus } from '../types';
 ```
 
 ### Single Responsibility Principle Architecture
-Follow the established modular architecture:
+Follow the established modular architecture with ECS integration:
 ```
 src/
 ├── components/
 │   ├── forms/          # Form-specific components
-│   ├── game/           # Game entities (Player, NPC, Building, TownMap)
-│   ├── scenes/         # Main scene containers
+│   ├── scenes/         # Scene containers (ECSScene, MainMenu)
 │   └── ui/             # Reusable UI components
-├── hooks/              # Business logic hooks
+├── ecs/                # ECS architecture core
+│   ├── core.ts         # World, Entity, Component, System base classes
+│   ├── components.ts   # Component definitions
+│   ├── systems.ts      # System implementations
+│   ├── sceneLoader.ts  # Data-driven scene creation
+│   └── ECSRenderer.tsx # React ECS renderer
+├── data/
+│   └── scenes/         # JSON scene configurations
+├── hooks/              # Business logic hooks (including useECSWorld)
 ├── styles/             # Theme and global styles
 ├── utils/              # Utility functions and managers
 └── stores/             # State management
@@ -103,42 +131,50 @@ src/
 - **Extract business logic to custom hooks**
 
 ```typescript
-// CORRECT - Focused component
-export const Player: React.FC<PlayerProps> = ({ position, icon }) => {
-  return <PlayerSprite x={position.x} y={position.y}>{icon}</PlayerSprite>;
+// CORRECT - ECS Scene Component
+export const ECSScene: React.FC<ECSSceneProps> = ({ sceneId, sceneName, sceneDataPath }) => {
+  const { world, loadScene } = useECSWorld();
+  return <ECSRenderer world={world} />;
 };
 
-// CORRECT - Business logic in hook
-export const usePlayerMovement = (buildings: BuildingData[]) => {
-  // Movement logic here
-  return { playerPosition, movePlayer, handleMapClick };
+// CORRECT - ECS World Management Hook
+export const useECSWorld = (options: UseECSWorldOptions = {}) => {
+  const world = useMemo(() => new World(), []);
+  const sceneLoader = useMemo(() => new SceneLoader(world), [world]);
+  return { world, sceneLoader, loadScene, addPlayer };
 };
 ```
 
 ### Single Responsibility Principle (SRP) Refactoring
 
-**Range Architecture Migration Completed** - Major architectural refactoring:
+**ECS Architecture Migration Completed** (2025-01-09) - Major architectural evolution:
 
-**Before**: Parallel architecture systems (legacy + Range)
-- Legacy Game.tsx (78 lines) + GridSystem.ts + GameData.ts + GameRenderer.tsx
-- Range architecture (complete but unused) + useRangeEntities + RangeMap + BuildingRange
+**From Range Architecture to ECS**:
+- **Before**: Inheritance-based Range hierarchy (BuildingRange, SpriteRange, PlantRange)
+- **After**: Composition-based ECS with mixable components
 
-**After**: Single Range-based architecture 
-- **TownScene.tsx**: Range-based scene orchestration
-- **RangeMap.tsx**: Polymorphic range rendering via `range.render()`
-- **Range.ts**: Base class with 4 core concerns (Boundary, Walkability, Interaction, Rendering)
-- **BuildingRange.tsx**: Building-specific Range with configurable interactive cells
-- **SpriteRange.ts**: NPC and player Range implementations
-- **useRangeEntities.ts**: Range entity management
-- **useRangePlayerMovement.ts**: Range-based player movement
-- **useRangeInteraction.ts**: Range-based interaction system
+**ECS Implementation**:
+- **World.ts**: Core ECS coordinator managing entities, components, and systems
+- **components.ts**: 20+ component types for spatial, visual, interactive, and game-specific data
+- **systems.ts**: 6 systems handling movement, input, interaction, rendering, and animation
+- **sceneLoader.ts**: Data-driven scene creation from JSON configurations
+- **ECSRenderer.tsx**: React component that renders ECS world in real-time
+- **useECSWorld.ts**: React hook for ECS world lifecycle management
 
-**Legacy System Removed**:
-- ❌ `Game.tsx` - Legacy game orchestrator  
-- ❌ `src/game/` - Entire legacy directory (GridSystem, GameData, PlayerController)
-- ❌ `GameRenderer.tsx` - Legacy rendering system
-- ❌ `usePlayerMovement.ts` - Legacy movement system
-- ❌ `useKeyboardControls.ts` - Legacy keyboard controls
+**SRP-Refactored Systems** (2025-01-09):
+- **CollisionSystem**: Dedicated collision detection and movement validation
+- **MovementSystem**: Pure physics-based entity movement  
+- **KeyboardInputSystem**: WASD/Arrow key input processing only
+- **MouseInputSystem**: Click-to-move and entity click interactions
+- **InteractionSystem**: Event-driven NPC dialogue, building entrances, scene transitions
+- **RenderSystem**: Z-index sorted rendering with polymorphic entity types
+- **AnimationSystem**: Frame-based animations for dynamic entities
+- **MovementAnimationSystem**: Direction-based movement animations
+
+**Data-Driven Scenes**:
+- **town.json**: Complete town layout with buildings, NPCs, and decorations
+- **school.json**: Classroom interior with furniture and educational NPCs
+- **SceneLoader**: Automatic entity/component creation from JSON data
 
 **DialogueSystem Refactoring Completed** - Previous SRP example:
 
@@ -156,12 +192,14 @@ export const usePlayerMovement = (buildings: BuildingData[]) => {
 - **VocabularyProgress.tsx**: Learned vocabulary feedback
 - **vocabularyHighlighter.ts**: Text highlighting and NPC avatar utilities
 
-**Benefits Achieved**:
-- Each component/hook has a single, clear responsibility
-- Easier testing and maintenance
-- Better code reusability
-- Clearer separation of concerns
-- Improved readability and debugging
+**ECS Architecture Benefits**:
+- **Scalability**: Easy to add new entity types and behaviors via composition
+- **Maintainability**: Clear separation of data (components) and logic (systems)  
+- **Flexibility**: Systems can be enabled/disabled, components mixed and matched
+- **Performance**: Efficient component filtering and batch processing
+- **Extensibility**: Add new systems without modifying existing code
+- **Event-Driven**: Loose coupling between systems via EventBus
+- **Data-Driven**: JSON scene configurations enable rapid level design
 
 ### UI/UX Improvements (2025-01-03)
 
@@ -215,47 +253,85 @@ AudioManager.playClick();
 AudioManager.playSuccess();
 ```
 
-### Range Implementation Guidelines
+### ECS Implementation Guidelines
 
-**Interactive Cells Configuration**:
+**Entity Creation Pattern**:
 ```typescript
-// Buildings have no interactive cells by default
-const warehouse = new BuildingRange({...}); // No doors initially
+// 1. Create entity
+const entity = world.createEntity('unique-id');
 
-// Add doors/entrances at any time
-warehouse.setInteractiveCells([
-  { x: 11, y: 12 }, // Main entrance
-  { x: 9, y: 11 }   // Side door
-]);
+// 2. Add components
+world.addComponent(entity.id, createPositionComponent(10, 5));
+world.addComponent(entity.id, createRenderableComponent('emoji', { icon: '🏫' }));
+world.addComponent(entity.id, createBuildingComponent('School', 'educational'));
 
-// Add more doors incrementally
-warehouse.addInteractiveCells([{ x: 13, y: 11 }]); // Additional door
-
-// Remove all doors
-warehouse.removeInteractiveCells();
+// 3. Systems automatically process entities with required components
+// No manual registration needed - systems discover entities by components
 ```
 
-**Range Development Pattern**:
+**Component Development Pattern**:
 ```typescript
-// 1. Extend Range base class
-export class CustomRange extends Range {
-  // 2. Implement 4 core concerns
-  canCollide(): boolean { /* Walkability logic */ }
-  canInteract(): boolean { /* Interaction capability */ }
-  getTypeName(): string { /* Range identification */ }
-  render(): ReactNode { /* Visual representation */ }
+// Components are pure data interfaces
+export interface CustomComponent extends Component {
+  readonly type: 'custom';
+  customProperty: string;
+  customData: number;
 }
 
-// 3. Use polymorphic rendering
-ranges.map(range => range.render()) // Works for all Range types
+// Factory function for creation
+export const createCustomComponent = (prop: string, data: number): CustomComponent => ({
+  type: 'custom',
+  customProperty: prop,
+  customData: data
+});
 ```
 
-**Benefits of Range Architecture**:
-- Single source of truth for game entities
-- Polymorphic behavior through `range.render()`
-- Configurable interactive cells for any Range
-- Clean separation of concerns (Boundary, Walkability, Interaction, Rendering)
-- Scalable scene management
+**System Development Pattern**:
+```typescript
+export class CustomSystem implements System {
+  readonly name = 'CustomSystem';
+  readonly requiredComponents = ['position', 'custom'] as const;
+
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: EventBus): void {
+    const customEntities = components.getEntitiesWithComponents(this.requiredComponents);
+    
+    for (const entityId of customEntities) {
+      const position = components.getComponent<PositionComponent>(entityId, 'position');
+      const custom = components.getComponent<CustomComponent>(entityId, 'custom');
+      // Process entity logic here
+    }
+  }
+
+  canProcess(entity: Entity, components: ComponentManager): boolean {
+    return components.hasAllComponents(entity.id, this.requiredComponents);
+  }
+}
+```
+
+**Event-Driven Communication**:
+```typescript
+// Systems emit events instead of direct method calls
+events.emit('dialogue:start', { npcId: 'teacher', playerId: 'player' });
+
+// Other systems listen for events
+events.subscribe('dialogue:start', (event) => {
+  // Handle dialogue start logic
+});
+```
+
+**Data-Driven Scene Creation**:
+```json
+// Add new entities via JSON - no code changes needed
+{
+  "id": "new-building",
+  "components": {
+    "position": { "x": 15, "y": 8 },
+    "renderable": { "type": "emoji", "icon": "🏪" },
+    "building": { "name": "New Shop", "type": "commercial" },
+    "interactive": { "type": "building-entrance", "entrances": [...] }
+  }
+}
+```
 
 ### Build & Testing Protocol
 After making changes:
@@ -279,10 +355,16 @@ npm run dev
 - Audio generated procedurally with Web Audio API
 
 ## Key Files to Remember
+- `src/ecs/core.ts` - ECS World, Entity, Component, System base classes
+- `src/ecs/components.ts` - All component type definitions
+- `src/ecs/systems.ts` - All system implementations
+- `src/ecs/sceneLoader.ts` - Data-driven scene creation
+- `src/data/scenes/` - JSON scene configurations
+- `src/hooks/useECSWorld.ts` - ECS world management hook
+- `src/components/ECSGameApp.tsx` - Main ECS game coordinator
+- `src/components/scenes/ECSScene.tsx` - Universal scene component
 - `src/stores/gameStore.ts` - Main game state
 - `src/stores/questStore.ts` - Quest management
-- `src/types/index.ts` - TypeScript definitions
-- `src/components/quest/` - Quest UI components
 - `src/services/api.ts` - Backend integration
 
 ## 🎯 Communication Patterns
@@ -304,28 +386,36 @@ When making technical decisions:
 
 ### Technical Health
 - ✅ TypeScript: Strict mode, zero errors
-- ✅ Build: Optimized bundle (273KB total, 86KB gzipped)
-- ✅ Architecture: **Range architecture** - Single source of truth, no parallel systems
-- ✅ Performance: Polymorphic rendering via `range.render()`
-- ✅ Interactive Cells: Configurable doors/entrances for all Ranges
-- ✅ Scene Management: Clean transitions between multiple scenes
+- ✅ Build: Optimized bundle (265KB total, 84KB gzipped)
+- ✅ Architecture: **ECS architecture** - Entity Component System with event-driven communication
+- ✅ **SRP Compliance**: All systems follow Single Responsibility Principle (2025-01-09)
+- ✅ Performance: Efficient component filtering and batch processing
+- ✅ Data-Driven: JSON scene configurations for rapid development
+- ✅ Event System: Loose coupling between systems via EventBus
+- ✅ Codebase: Clean - all legacy Range architecture code removed
 
 ### Feature Status
-- ✅ **Range System**: Scene → Range → Cell hierarchy established
-- ✅ **Scene Transitions**: GameApp manages TownScene ↔ SchoolScene transitions
-- ✅ **SchoolScene**: Complete classroom with furniture, teacher, and students
-- ✅ **BuildingRange**: Configurable interactive cells (doors/entrances)
-- ✅ **SpriteRange**: NPCs and player with Range-based movement
-- ✅ **TownScene**: Range-based scene orchestration
-- ✅ **Entrance Interactions**: Press Space at school door to enter classroom
-- ✅ NPC Dialogue: Interactive conversations (works in both scenes)
+- ✅ **ECS Core**: World → Entities → Components + Systems architecture
+- ✅ **Scene Management**: Universal ECSScene component with data-driven loading
+- ✅ **Collision System**: Dedicated collision detection and movement validation
+- ✅ **Movement System**: Pure physics-based entity movement
+- ✅ **Input Systems**: Separated keyboard and mouse input processing (SRP-compliant)
+- ✅ **Interaction System**: Event-driven NPC dialogue, building entrances, scene transitions
+- ✅ **Render System**: Z-index sorted rendering with polymorphic entities
+- ✅ **Animation Systems**: Frame-based and movement animations
+- ✅ **Data-Driven Scenes**: Town and school JSON configurations
+- ✅ NPC Dialogue: Interactive conversations (event-driven)
 - ✅ Quest System: Visual tracking, objectives
 - ✅ Progress Tracking: XP, levels, vocabulary
 
 ### Architecture Migration Complete
-- ❌ **Legacy System Removed**: Game.tsx, GridSystem, GameRenderer, usePlayerMovement
-- ✅ **Range Architecture Active**: TownScene → RangeMap → Range.render()
-- ✅ **No Parallel Architectures**: Single coherent system
+- ❌ **Legacy System Completely Removed**: All Range architecture files deleted
+- ❌ **Legacy Components Removed**: TownScene, SchoolScene, GameApp, RangeMap, BuildingRange, SpriteRange, PlantRange
+- ❌ **Legacy Hooks Removed**: useRangeEntities, useRangePlayerMovement, useRangeInteraction, useSceneManager, useBuildingScenes, useNPCInteraction
+- ❌ **Legacy Utils Removed**: interactionManager, rangeGridSystem, renderingStrategies, interactionConditions
+- ✅ **ECS Architecture Active**: ECSGameApp → ECSScene → ECSRenderer → World
+- ✅ **Single Coherent System**: Composition-based ECS with mixable components
+- ✅ **Clean Codebase**: No commented code, no debug logs, no legacy imports
 
 This guide serves as our technical collaboration framework for efficient, focused discussions around programming principles, product features, planning, testing methods, and production practices.
 

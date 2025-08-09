@@ -13,7 +13,9 @@ const NotificationContainer = styled.div`
   pointer-events: none;
 `;
 
-const NotificationItem = styled.div<{ type?: string }>`
+const NotificationItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['type'].includes(prop),
+})<{ type?: string }>`
   background: ${props => {
     switch (props.type) {
       case 'quest_started': return 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
@@ -53,7 +55,9 @@ const NotificationHeader = styled.div`
   margin-bottom: 8px;
 `;
 
-const NotificationIcon = styled.span<{ type?: string }>`
+const NotificationIcon = styled.span.withConfig({
+  shouldForwardProp: (prop) => !['type'].includes(prop),
+})<{ type?: string }>`
   font-size: 20px;
   ${props => {
     switch (props.type) {
@@ -111,7 +115,9 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `;
 
-const ProgressFill = styled.div<{ progress: number }>`
+const ProgressFill = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['progress'].includes(prop),
+})<{ progress: number }>`
   height: 100%;
   width: ${props => props.progress}%;
   background: rgba(255, 255, 255, 0.8);

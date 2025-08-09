@@ -44,7 +44,9 @@ const MenuButton = styled(ActionButton)`
   }
 `;
 
-const QuestToggleButton = styled.button<{ isActive: boolean }>`
+const QuestToggleButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['isActive'].includes(prop),
+})<{ isActive: boolean }>`
   width: 48px;
   height: 48px;
   border-radius: 50%;

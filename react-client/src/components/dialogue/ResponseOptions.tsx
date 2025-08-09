@@ -9,7 +9,9 @@ const OptionsContainer = styled.div`
   margin-left: 30px;
 `;
 
-const ResponseButton = styled.button<{ isCorrect?: boolean; isSelected?: boolean }>`
+const ResponseButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['isCorrect', 'isSelected'].includes(prop),
+})<{ isCorrect?: boolean; isSelected?: boolean }>`
   background: ${props => {
     if (props.isCorrect) return 'linear-gradient(135deg, #00b894 0%, #00a085 100%)';
     if (props.isSelected) return 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)';

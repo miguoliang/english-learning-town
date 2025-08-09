@@ -1,0 +1,222 @@
+{
+  "id": "school-interior",
+  "name": "School Classroom",
+  "description": "Inside the school classroom with furniture and educational NPCs",
+  "gridSettings": {
+    "cellSize": 40
+  },
+  "entities": [
+    {
+      "id": "teacher-desk",
+      "components": {
+        "position": { "x": 12, "y": 8 },
+        "size": { "width": 2, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🏫",
+          "backgroundColor": "#8b4513"
+        },
+        "furniture": {
+          "name": "Teacher's Desk",
+          "type": "desk"
+        }
+      }
+    },
+    {
+      "id": "student-desk-1",
+      "components": {
+        "position": { "x": 8, "y": 12 },
+        "size": { "width": 2, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📚",
+          "backgroundColor": "#d4a574"
+        },
+        "furniture": {
+          "name": "Student Desk 1",
+          "type": "desk"
+        }
+      }
+    },
+    {
+      "id": "student-desk-2",
+      "components": {
+        "position": { "x": 12, "y": 12 },
+        "size": { "width": 2, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📚",
+          "backgroundColor": "#d4a574"
+        },
+        "furniture": {
+          "name": "Student Desk 2",
+          "type": "desk"
+        }
+      }
+    },
+    {
+      "id": "student-desk-3",
+      "components": {
+        "position": { "x": 16, "y": 12 },
+        "size": { "width": 2, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📚",
+          "backgroundColor": "#d4a574"
+        },
+        "furniture": {
+          "name": "Student Desk 3",
+          "type": "desk"
+        }
+      }
+    },
+    {
+      "id": "blackboard",
+      "components": {
+        "position": { "x": 10, "y": 6 },
+        "size": { "width": 4, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📋",
+          "backgroundColor": "#2c3e50"
+        },
+        "furniture": {
+          "name": "Blackboard",
+          "type": "teaching-aid"
+        },
+        "interactive": {
+          "type": "learning",
+          "activityId": "grammar-lesson"
+        }
+      }
+    },
+    {
+      "id": "bookshelf",
+      "components": {
+        "position": { "x": 6, "y": 8 },
+        "size": { "width": 1, "height": 2 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "📚",
+          "backgroundColor": "#8b4513"
+        },
+        "furniture": {
+          "name": "Bookshelf",
+          "type": "storage"
+        },
+        "interactive": {
+          "type": "learning",
+          "activityId": "vocabulary-study"
+        }
+      }
+    },
+    {
+      "id": "school-teacher",
+      "components": {
+        "position": { "x": 13, "y": 9 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👩‍🏫",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Ms. Johnson",
+          "role": "teacher"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "school-teacher-lesson"
+        }
+      }
+    },
+    {
+      "id": "student-1",
+      "components": {
+        "position": { "x": 8, "y": 13 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👧",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Emily",
+          "role": "student"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "student-emily"
+        }
+      }
+    },
+    {
+      "id": "student-2",
+      "components": {
+        "position": { "x": 12, "y": 13 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👦",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Alex",
+          "role": "student"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "student-alex"
+        }
+      }
+    },
+    {
+      "id": "student-3",
+      "components": {
+        "position": { "x": 16, "y": 13 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": false },
+        "renderable": {
+          "type": "emoji",
+          "icon": "👧",
+          "backgroundColor": "transparent"
+        },
+        "npc": {
+          "name": "Sarah",
+          "role": "student"
+        },
+        "interactive": {
+          "type": "dialogue",
+          "dialogueId": "student-sarah"
+        }
+      }
+    },
+    {
+      "id": "exit-door",
+      "components": {
+        "position": { "x": 20, "y": 10 },
+        "size": { "width": 1, "height": 1 },
+        "collision": { "isWalkable": true },
+        "renderable": {
+          "type": "emoji",
+          "icon": "🚪",
+          "backgroundColor": "transparent"
+        },
+        "interactive": {
+          "type": "scene-transition",
+          "targetScene": "town",
+          "targetPosition": { "x": 6, "y": 6 }
+        }
+      }
+    }
+  ]
+}
