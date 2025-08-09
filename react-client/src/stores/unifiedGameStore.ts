@@ -233,7 +233,8 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           world.addComponent(player.id, {
             type: 'velocity',
             x: 0,
-            y: 0
+            y: 0,
+            maxSpeed: 5
           });
           
           world.addComponent(player.id, {
@@ -245,6 +246,12 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           world.addComponent(player.id, {
             type: 'controllable',
             isControllable: true
+          });
+
+          world.addComponent(player.id, {
+            type: 'input',
+            inputType: 'player',
+            controllable: true
           });
 
           set({ 

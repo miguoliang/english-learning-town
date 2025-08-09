@@ -153,47 +153,112 @@ export class MovementSystem implements System {
 
 export class KeyboardInputSystem implements System {
   readonly name = 'KeyboardInputSystem';
-  readonly requiredComponents = ['input', 'velocity'] as const;
+  readonly requiredComponents = ['input', 'position'] as const;
 
   private inputState = new Map<string, boolean>();
+  private lastKeyState = new Map<string, boolean>();
+  private isInitialized = false;
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
+  constructor(private collisionSystem: CollisionSystem) {}
+
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event listeners once
+    if (!this.isInitialized) {
+      this.setupEventListeners(events);
+      this.isInitialized = true;
+    }
+    
     const controllableEntities = components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of controllableEntities) {
       const inputComponent = components.getComponent<InputComponent>(entityId, 'input');
-      const velocity = components.getComponent<VelocityComponent>(entityId, 'velocity');
+      const position = components.getComponent<PositionComponent>(entityId, 'position');
       
-      if (!inputComponent || !velocity || !inputComponent.controllable) continue;
+      if (!inputComponent || !position || !inputComponent.controllable) continue;
       
-      // Handle player input
+      // Handle player input - grid-based movement
       if (inputComponent.inputType === 'player') {
-        this.handlePlayerInput(velocity);
+        this.handleGridMovement(entityId, position, components, events);
       }
     }
+    
+    // Update last key state for next frame
+    this.lastKeyState.clear();
+    this.inputState.forEach((pressed, key) => {
+      this.lastKeyState.set(key, pressed);
+    });
   }
 
   canProcess(entity: Entity, components: ComponentManager): boolean {
     return components.hasAllComponents(entity.id, this.requiredComponents);
   }
 
-  private handlePlayerInput(velocity: VelocityComponent): void {
-    const speed = velocity.maxSpeed || getPlayerSpeed();
-    velocity.x = 0;
-    velocity.y = 0;
+  private handleGridMovement(
+    entityId: string, 
+    position: PositionComponent, 
+    components: ComponentManager, 
+    events: Emitter<ECSEvents>
+  ): void {
+    // Check for key press (not held) to move one cell at a time
+    const isNewKeyPress = (key: string): boolean => {
+      return this.inputState.get(key) === true && this.lastKeyState.get(key) !== true;
+    };
     
-    if (this.inputState.get('ArrowUp') || this.inputState.get('KeyW')) {
-      velocity.y = -speed;
+    let newX = position.x;
+    let newY = position.y;
+    let moved = false;
+    
+    // Only move on new key press, not while held
+    if (isNewKeyPress('ArrowUp') || isNewKeyPress('KeyW')) {
+      newY = position.y - 1;
+      moved = true;
+    } else if (isNewKeyPress('ArrowDown') || isNewKeyPress('KeyS')) {
+      newY = position.y + 1;
+      moved = true;
+    } else if (isNewKeyPress('ArrowLeft') || isNewKeyPress('KeyA')) {
+      newX = position.x - 1;
+      moved = true;
+    } else if (isNewKeyPress('ArrowRight') || isNewKeyPress('KeyD')) {
+      newX = position.x + 1;
+      moved = true;
     }
-    if (this.inputState.get('ArrowDown') || this.inputState.get('KeyS')) {
-      velocity.y = speed;
+    
+    if (moved) {
+      // Use injected CollisionSystem to check if movement is valid
+      if (this.collisionSystem.canMoveTo(entityId, newX, newY, [], components)) {
+        // Move directly - no velocity needed for grid movement
+        const oldX = position.x;
+        const oldY = position.y;
+        position.x = newX;
+        position.y = newY;
+        
+        // Emit movement event
+        events.emit(ECSEventTypes.ENTITY_MOVED, { 
+          entityId, 
+          oldPosition: { x: oldX, y: oldY }, 
+          newPosition: { x: newX, y: newY } 
+        });
+      } else {
+        // Emit collision event if movement is blocked
+        events.emit(ECSEventTypes.ENTITY_COLLISION, { 
+          entityId, 
+          blockedPosition: { x: newX, y: newY } 
+        });
+      }
     }
-    if (this.inputState.get('ArrowLeft') || this.inputState.get('KeyA')) {
-      velocity.x = -speed;
-    }
-    if (this.inputState.get('ArrowRight') || this.inputState.get('KeyD')) {
-      velocity.x = speed;
-    }
+  }
+  
+
+
+  // Event listener setup
+  private setupEventListeners(events: Emitter<ECSEvents>): void {
+    events.on(ECSEventTypes.INPUT_KEY_PRESSED, (data) => {
+      this.setKeyPressed(data.key, true);
+    });
+
+    events.on(ECSEventTypes.INPUT_KEY_RELEASED, (data) => {
+      this.setKeyPressed(data.key, false);
+    });
   }
 
   // Public methods for input handling

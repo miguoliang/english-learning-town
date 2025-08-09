@@ -40,7 +40,7 @@ export class SystemFactory {
     return {
       collision: collisionSystem,
       movement: new MovementSystem(collisionSystem), // Inject collision dependency
-      keyboardInput: new KeyboardInputSystem(),
+      keyboardInput: new KeyboardInputSystem(collisionSystem), // Inject collision dependency for grid movement
       mouseInput: new MouseInputSystem(),
       interaction: new InteractionSystem(),
       render: new RenderSystem(),
