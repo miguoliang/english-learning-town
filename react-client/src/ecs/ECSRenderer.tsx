@@ -154,14 +154,16 @@ export const ECSRenderer: React.FC<ECSRendererProps> = ({
   }, [world]);
 
   return (
-    <GameCanvas className={className} onClick={handleCanvasClick}>
+    <GameCanvas className={className} onClick={handleCanvasClick} data-testid="game-canvas">
       {/* Grid overlay */}
-      <GridOverlay cellSize={cellSize} showGrid={showGrid} />
+      <GridOverlay cellSize={cellSize} showGrid={showGrid} data-testid="grid-overlay" />
       
       {/* Render entities */}
       {renderableEntities.map(({ id, position, size, renderable }) => (
         <EntityElement
           key={id}
+          data-testid={`entity-${id}`}
+          data-entity-type={id.includes('player') ? 'player' : id.includes('teacher') || id.includes('shopkeeper') || id.includes('librarian') ? 'npc' : id.includes('school') || id.includes('shop') || id.includes('library') || id.includes('cafe') || id.includes('warehouse') ? 'building' : 'decoration'}
           x={position.x}
           y={position.y}
           width={size.width}

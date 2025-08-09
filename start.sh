@@ -43,9 +43,9 @@ port_in_use() {
 cleanup_ports() {
     print_status "Cleaning up any existing processes..."
     
-    if port_in_use 8080; then
-        print_warning "Killing process on port 8080 (Go backend)"
-        lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+    if port_in_use 3000; then
+        print_warning "Killing process on port 3000 (Go backend)"
+        lsof -ti:3000 | xargs kill -9 2>/dev/null || true
     fi
     
     if port_in_use 5173; then
@@ -73,15 +73,15 @@ start_backend() {
     print_status "Installing Go dependencies..."
     go mod download
     
-    print_status "Starting Go server on port 8080..."
+    print_status "Starting Go server on port 3000..."
     go run cmd/main.go &
     BACKEND_PID=$!
     
     # Wait a moment for the backend to start
     sleep 3
     
-    if port_in_use 8080; then
-        print_success "Go backend started successfully on http://localhost:8080"
+    if port_in_use 3000; then
+        print_success "Go backend started successfully on http://localhost:3000"
     else
         print_error "Failed to start Go backend"
         exit 1
@@ -198,7 +198,7 @@ main() {
             echo ""
             print_success "🚀 Both servers are running!"
             echo "🌐 Frontend: http://localhost:5173"
-            echo "🔧 Backend:  http://localhost:8080"
+            echo "🔧 Backend:  http://localhost:3000"
             echo ""
             print_status "Press Ctrl+C to stop both servers"
             

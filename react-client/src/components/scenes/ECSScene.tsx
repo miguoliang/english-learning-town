@@ -225,7 +225,7 @@ export const ECSScene: React.FC<ECSSceneProps> = ({
       <ECSRenderer
         world={world}
         cellSize={cellSize}
-        showGrid={true}
+        showGrid={showGrid}
       />
 
       {/* Dialogue System */}

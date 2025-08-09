@@ -92,8 +92,8 @@ if not exist "go.mod" (
 echo [34m[INFO] Installing Go dependencies...[0m
 go mod download
 
-echo [34m[INFO] Starting Go server on port 8080...[0m
-echo [32m[SUCCESS] Go backend started successfully on http://localhost:8080[0m
+echo [34m[INFO] Starting Go server on port 3000...[0m
+echo [32m[SUCCESS] Go backend started successfully on http://localhost:3000[0m
 go run cmd/main.go
 cd ..
 pause
@@ -139,7 +139,7 @@ if not exist "go.mod" (
 echo [34m[INFO] Installing Go dependencies...[0m
 go mod download
 
-start "English Learning Town - Go Backend" cmd /k "echo [32m[SUCCESS] Go backend started on http://localhost:8080[0m && go run cmd/main.go"
+start "English Learning Town - Go Backend" cmd /k "echo [32m[SUCCESS] Go backend started on http://localhost:3000[0m && go run cmd/main.go"
 cd ..
 
 REM Wait a moment for backend to start
@@ -163,7 +163,7 @@ cd ..
 echo.
 echo [32m🚀 Both servers are starting in separate windows![0m
 echo 🌐 Frontend: http://localhost:5173
-echo 🔧 Backend:  http://localhost:8080
+echo 🔧 Backend:  http://localhost:3000
 echo.
 echo [34m[INFO] Close the terminal windows to stop the servers[0m
 pause

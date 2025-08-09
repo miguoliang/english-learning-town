@@ -28,6 +28,9 @@ func main() {
 	// Initialize Gin router
 	r := gin.Default()
 
+	// Security: Don't trust all proxies - disable proxy trust for direct client IP
+	r.SetTrustedProxies(nil)
+
 	// CORS middleware
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
