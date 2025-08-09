@@ -1,11 +1,16 @@
 /**
- * RenderSystem Playwright Tests
- * Tests the ECS RenderSystem logic using Playwright
+ * Legacy RenderSystem Tests (Deprecated)
+ * 
+ * NOTE: These tests are deprecated in favor of the new comprehensive
+ * system tests in tests/systems/RenderSystem.spec.ts
+ * 
+ * This file is kept for backward compatibility but should be migrated
+ * to use the new test structure.
  */
 
 import { test, expect } from '@playwright/test';
 
-test.describe('RenderSystem', () => {
+test.describe('RenderSystem (Legacy)', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the game
     await page.goto('/');
