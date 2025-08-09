@@ -2,7 +2,8 @@
  * ECS Systems - Logic that operates on entities with specific components
  */
 
-import type { System, Entity, ComponentManager, EventBus } from './core';
+import type { System, Entity, ComponentManager } from './core';
+import type { Emitter, ECSEvents } from './events';
 import type {
   PositionComponent,
   SizeComponent,
@@ -14,6 +15,8 @@ import type {
   AnimationComponent,
   MovementAnimationComponent
 } from './components';
+import { gameConfig, getPlayerSpeed } from '../config/gameConfig';
+import { ECSEventTypes } from './events';
 
 // ========== COLLISION SYSTEM ==========
 
@@ -21,7 +24,7 @@ export class CollisionSystem implements System {
   readonly name = 'CollisionSystem';
   readonly requiredComponents = ['position', 'size', 'collision'] as const;
 
-  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: EventBus): void {
+  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
     // Collision system is primarily used by other systems for collision queries
   }
 
@@ -73,9 +76,9 @@ export class MovementSystem implements System {
   readonly name = 'MovementSystem';
   readonly requiredComponents = ['position', 'velocity'] as const;
 
-  private collisionSystem = new CollisionSystem();
+  constructor(private collisionSystem: CollisionSystem) {}
 
-  update(entities: Entity[], components: ComponentManager, deltaTime: number, events: EventBus): void {
+  update(entities: Entity[], components: ComponentManager, deltaTime: number, events: Emitter<ECSEvents>): void {
     const movingEntities = components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of movingEntities) {
@@ -84,25 +87,61 @@ export class MovementSystem implements System {
       
       if (!position || !velocity) continue;
       
-      // Apply velocity to position
-      const deltaSeconds = deltaTime / 1000;
-      const newX = position.x + velocity.x * deltaSeconds;
-      const newY = position.y + velocity.y * deltaSeconds;
-      
-      // Check collision before moving
-      if (this.collisionSystem.canMoveTo(entityId, newX, newY, entities, components)) {
-        position.x = newX;
-        position.y = newY;
-        
-        // Emit movement event
-        events.emit('entity:moved', { entityId, newPosition: { x: newX, y: newY } });
-      } else {
-        // Stop velocity if collision detected
-        velocity.x = 0;
-        velocity.y = 0;
-        events.emit('entity:collision', { entityId, blockedPosition: { x: newX, y: newY } });
-      }
+      this.updateEntityPosition(entityId, position, velocity, deltaTime, entities, components, events);
     }
+  }
+
+  private updateEntityPosition(
+    entityId: string,
+    position: PositionComponent,
+    velocity: VelocityComponent,
+    deltaTime: number,
+    entities: Entity[],
+    components: ComponentManager,
+    events: Emitter<ECSEvents>
+  ): void {
+    // Calculate new position
+    const deltaSeconds = deltaTime / 1000;
+    const newX = position.x + velocity.x * deltaSeconds;
+    const newY = position.y + velocity.y * deltaSeconds;
+    
+    // Check collision before moving
+    if (this.collisionSystem.canMoveTo(entityId, newX, newY, entities, components)) {
+      this.moveEntity(entityId, position, newX, newY, events);
+    } else {
+      this.handleCollision(entityId, velocity, newX, newY, events);
+    }
+  }
+
+  private moveEntity(
+    entityId: string,
+    position: PositionComponent,
+    newX: number,
+    newY: number,
+    events: Emitter<ECSEvents>
+  ): void {
+    const oldX = position.x;
+    const oldY = position.y;
+    position.x = newX;
+    position.y = newY;
+    
+    // Only emit if position actually changed
+    if (oldX !== newX || oldY !== newY) {
+              events.emit(ECSEventTypes.ENTITY_MOVED, { entityId, oldPosition: { x: oldX, y: oldY }, newPosition: { x: newX, y: newY } });
+    }
+  }
+
+  private handleCollision(
+    entityId: string,
+    velocity: VelocityComponent,
+    blockedX: number,
+    blockedY: number,
+    events: Emitter<ECSEvents>
+  ): void {
+    // Stop velocity if collision detected
+    velocity.x = 0;
+    velocity.y = 0;
+    events.emit(ECSEventTypes.ENTITY_COLLISION, { entityId, blockedPosition: { x: blockedX, y: blockedY } });
   }
 
   canProcess(entity: Entity, components: ComponentManager): boolean {
@@ -118,7 +157,7 @@ export class KeyboardInputSystem implements System {
 
   private inputState = new Map<string, boolean>();
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, _events: EventBus): void {
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
     const controllableEntities = components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of controllableEntities) {
@@ -139,7 +178,7 @@ export class KeyboardInputSystem implements System {
   }
 
   private handlePlayerInput(velocity: VelocityComponent): void {
-    const speed = velocity.maxSpeed || 5;
+    const speed = velocity.maxSpeed || getPlayerSpeed();
     velocity.x = 0;
     velocity.y = 0;
     
@@ -169,7 +208,7 @@ export class MouseInputSystem implements System {
   readonly name = 'MouseInputSystem';
   readonly requiredComponents = ['player', 'position', 'velocity'] as const;
 
-  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: EventBus): void {
+  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
     // Mouse input system is event-driven, no regular update needed
   }
 
@@ -177,7 +216,7 @@ export class MouseInputSystem implements System {
     return components.hasAllComponents(entity.id, this.requiredComponents);
   }
 
-  handleMouseClick(x: number, y: number, _entities: Entity[], components: ComponentManager, events: EventBus): void {
+  handleMouseClick(x: number, y: number, _entities: Entity[], components: ComponentManager, events: Emitter<ECSEvents>): void {
     // Find player entity
     const playerEntities = components.getEntitiesWithComponent('player');
     if (playerEntities.length === 0) return;
@@ -194,7 +233,7 @@ export class MouseInputSystem implements System {
     if (distance > 0) {
       const velocity = components.getComponent<VelocityComponent>(playerId, 'velocity');
       if (velocity) {
-        const speed = velocity.maxSpeed || 5;
+        const speed = velocity.maxSpeed || getPlayerSpeed();
         velocity.x = (dx / distance) * speed;
         velocity.y = (dy / distance) * speed;
         
@@ -210,7 +249,7 @@ export class InteractionSystem implements System {
   readonly name = 'InteractionSystem';
   readonly requiredComponents = ['position', 'interactive'] as const;
 
-  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: EventBus): void {
+  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
     // This system is primarily event-driven, so update does minimal work
     // Most interaction logic happens in response to input events
   }
@@ -220,7 +259,7 @@ export class InteractionSystem implements System {
   }
 
   // Handle interaction attempts
-  handleInteraction(initiatorId: string, targetId: string, components: ComponentManager, events: EventBus): void {
+  handleInteraction(initiatorId: string, targetId: string, components: ComponentManager, events: Emitter<ECSEvents>): void {
     const initiatorPos = components.getComponent<PositionComponent>(initiatorId, 'position');
     const targetPos = components.getComponent<PositionComponent>(targetId, 'position');
     const targetInteractive = components.getComponent<InteractiveComponent>(targetId, 'interactive');
@@ -339,17 +378,90 @@ export class RenderSystem implements System {
     size: SizeComponent;
     renderable: RenderableComponent;
   }> = [];
+  
+  private isInitialized = false;
+  private components: ComponentManager | null = null;
+  private eventBus: Emitter<ECSEvents> | null = null;
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: EventBus): void {
-    // Collect renderable entities and sort by z-index
-    this.renderableEntities = [];
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event-driven system only once
+    if (!this.isInitialized) {
+      this.components = components;
+      this.eventBus = events;
+      this.setupEventListeners(events);
+      this.isInitialized = true;
+      
+      // Initial render
+      this.triggerRender('initial-load');
+    }
     
-    const renderableEntityIds = components.getEntitiesWithComponents(this.requiredComponents);
+    // RenderSystem is now purely event-driven - no regular updates needed
+  }
+
+  private setupEventListeners(events: Emitter<ECSEvents>): void {
+    // Use type-safe mitt emitter directly
+
+    // Listen for events that should trigger re-rendering
+    events.on(ECSEventTypes.ENTITY_MOVED, (_data) => {
+      if (gameConfig.debug.showSystemLogs) {
+        console.log('🎨 RenderSystem: Entity moved, triggering render');
+      }
+      this.triggerRender('entity-moved');
+    });
+
+    events.on(ECSEventTypes.ENTITY_ADDED, (_data) => {
+      if (gameConfig.debug.showSystemLogs) {
+        console.log('🎨 RenderSystem: Entity added, triggering render');
+      }
+      this.triggerRender('entity-added');
+    });
+
+    events.on(ECSEventTypes.ENTITY_REMOVED, (_data) => {
+      if (gameConfig.debug.showSystemLogs) {
+        console.log('🎨 RenderSystem: Entity removed, triggering render');
+      }
+      this.triggerRender('entity-removed');
+    });
+
+    events.on(ECSEventTypes.COMPONENT_ADDED, (data) => {
+      // Only re-render if it's a visual component
+      if (['position', 'size', 'renderable'].includes(data.componentType)) {
+        if (gameConfig.debug.showSystemLogs) {
+          console.log('🎨 RenderSystem: Visual component added, triggering render');
+        }
+        this.triggerRender('component-added');
+      }
+    });
+
+    events.on(ECSEventTypes.COMPONENT_REMOVED, (data) => {
+      // Only re-render if it's a visual component
+      if (['position', 'size', 'renderable'].includes(data.componentType)) {
+        if (gameConfig.debug.showSystemLogs) {
+          console.log('🎨 RenderSystem: Visual component removed, triggering render');
+        }
+        this.triggerRender('component-removed');
+      }
+    });
+
+    events.on(ECSEventTypes.SCENE_LOADED, (_data) => {
+      if (gameConfig.debug.showSystemLogs) {
+        console.log('🎨 RenderSystem: Scene loaded, triggering render');
+      }
+      this.triggerRender('scene-loaded');
+    });
+  }
+
+  private triggerRender(reason: string): void {
+    if (!this.components || !this.eventBus) return;
+
+    // Collect renderable entities
+    this.renderableEntities = [];
+    const renderableEntityIds = this.components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of renderableEntityIds) {
-      const position = components.getComponent<PositionComponent>(entityId, 'position');
-      const size = components.getComponent<SizeComponent>(entityId, 'size');
-      const renderable = components.getComponent<RenderableComponent>(entityId, 'renderable');
+      const position = this.components.getComponent<PositionComponent>(entityId, 'position');
+      const size = this.components.getComponent<SizeComponent>(entityId, 'size');
+      const renderable = this.components.getComponent<RenderableComponent>(entityId, 'renderable');
       
       if (position && size && renderable && renderable.visible !== false) {
         this.renderableEntities.push({
@@ -364,7 +476,14 @@ export class RenderSystem implements System {
     // Sort by z-index
     this.renderableEntities.sort((a, b) => (a.renderable.zIndex || 0) - (b.renderable.zIndex || 0));
     
-    events.emit('render:frame-ready', { entities: this.renderableEntities });
+    if (gameConfig.debug.showSystemLogs) {
+      console.log(`🎨 RenderSystem: Rendering ${this.renderableEntities.length} entities (reason: ${reason})`);
+    }
+    
+    this.eventBus.emit(ECSEventTypes.RENDER_FRAME_READY, { 
+      entities: this.renderableEntities,
+      reason 
+    });
   }
 
   canProcess(entity: Entity, components: ComponentManager): boolean {
@@ -382,7 +501,7 @@ export class AnimationSystem implements System {
   readonly name = 'AnimationSystem';
   readonly requiredComponents = ['renderable', 'animation'] as const;
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: EventBus): void {
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
     const animatedEntities = components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of animatedEntities) {
@@ -427,7 +546,7 @@ export class MovementAnimationSystem implements System {
   readonly name = 'MovementAnimationSystem';
   readonly requiredComponents = ['velocity', 'movement-animation', 'renderable'] as const;
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: EventBus): void {
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
     const animatedEntities = components.getEntitiesWithComponents(this.requiredComponents);
     
     for (const entityId of animatedEntities) {

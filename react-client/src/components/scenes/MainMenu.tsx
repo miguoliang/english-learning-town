@@ -2,7 +2,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundAnimation } from '../ui/BackgroundAnimation';
+// BackgroundAnimation removed for cleaner architecture
 import { GameTitle } from '../ui/GameTitle';
 import { PlayerNameForm } from '../forms/PlayerNameForm';
 
@@ -47,7 +47,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
 
   return (
     <MenuContainer>
-      <BackgroundAnimation />
+      {/* BackgroundAnimation removed for cleaner architecture */}
 
       <GameTitle
         title="English Learning Town"

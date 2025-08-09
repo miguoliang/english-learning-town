@@ -3,12 +3,14 @@
  * Replaces the Range-based GameApp with event-driven, data-driven ECS approach
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { theme } from '../styles/theme';
-import { ECSScene } from './scenes/ECSScene';
+import { ECSSceneZustand } from './scenes/ECSSceneZustand';
 import { MainMenu } from './scenes/MainMenu';
 import { LoadingScreen } from './ui/LoadingScreen';
+import { gameConfig } from '../config/gameConfig';
+import { useGameStore } from '../stores/unifiedGameStore';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -65,6 +67,17 @@ export const ECSGameApp: React.FC = () => {
   const [currentScene, setCurrentScene] = useState<string>('town');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Initialize ECS on app start
+  const initializeECS = useGameStore(state => state.initializeECS);
+  const isECSInitialized = useGameStore(state => state.isECSInitialized);
+
+  useEffect(() => {
+    if (!isECSInitialized) {
+      console.log('🚀 ECSGameApp: Initializing ECS...');
+      initializeECS();
+    }
+  }, [initializeECS, isECSInitialized]);
+
   // Handle game start from main menu
   const handleStartGame = useCallback(() => {
     setIsLoading(true);
@@ -78,21 +91,22 @@ export const ECSGameApp: React.FC = () => {
 
 
   // Handle scene transitions
-  const handleSceneTransition = useCallback((targetScene: string, _transitionData?: any) => {
-    
-    // Handle special scene transitions
-    if (targetScene === 'town' && currentScene !== 'town') {
-      // Return to town from any interior
-      setCurrentScene('town');
-      setGameState('town');
-    } else if (SCENES[targetScene]) {
-      // Transition to a known scene
-      setCurrentScene(targetScene);
-      setGameState(targetScene as GameState);
-    } else {
-      console.warn('Unknown scene:', targetScene);
-    }
-  }, [currentScene]);
+  // TODO: Wire this up to scene transition events from ECS
+  // const handleSceneTransition = useCallback((targetScene: string, _transitionData?: any) => {
+  //   
+  //   // Handle special scene transitions
+  //   if (targetScene === 'town' && currentScene !== 'town') {
+  //     // Return to town from any interior
+  //     setCurrentScene('town');
+  //     setGameState('town');
+  //   } else if (SCENES[targetScene]) {
+  //     // Transition to a known scene
+  //     setCurrentScene(targetScene);
+  //     setGameState(targetScene as GameState);
+  //   } else {
+  //     console.warn('Unknown scene:', targetScene);
+  //   }
+  // }, [currentScene]);
 
   // Render current game state
   const renderCurrentState = () => {
@@ -119,14 +133,11 @@ export const ECSGameApp: React.FC = () => {
         }
         
         return (
-          <ECSScene
-            sceneId={sceneConfig.id}
-            sceneName={sceneConfig.name}
-            sceneDataPath={sceneConfig.dataPath}
-            playerStartPosition={sceneConfig.playerStartPosition}
-            onSceneTransition={handleSceneTransition}
-            showGrid={false}
-            cellSize={40}
+          <ECSSceneZustand
+            playerName="Player" // TODO: Get from player state
+            scenePath={sceneConfig.dataPath}
+            showGrid={gameConfig.display.showGrid}
+            cellSize={gameConfig.display.cellSize}
           />
         );
         

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { MenuButton } from '../ui/MenuButton';
-import { useGameStore } from '../../stores/gameStore';
+import { useGameStore } from '../../stores/unifiedGameStore';
 
 const FormContainer = styled.div`
   display: flex;
@@ -90,7 +90,7 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
       // Simulate loading time
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      setCurrentScene('TownExploration');
+      setCurrentScene('town');
       onStartGame();
     } catch (error) {
       console.error('Failed to start game:', error);
@@ -101,7 +101,7 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
   };
 
   const handleLoadGame = () => {
-    setCurrentScene('TownExploration');
+    setCurrentScene('town');
     onLoadGame();
   };
 

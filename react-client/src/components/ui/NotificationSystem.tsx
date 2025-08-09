@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useGameStore } from '../../stores/gameStore';
+import { useGameStore } from '../../stores/unifiedGameStore';
 import type { Notification } from '../../types';
 
 const NotificationContainer = styled.div`

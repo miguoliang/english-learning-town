@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuestStore } from '../stores/questStore';
-import { useGameStore } from '../stores/gameStore';
+import { useGameStore } from '../stores/unifiedGameStore';
 import type { DialogueEntry, DialogueResponse } from '../types';
 import { ObjectiveType } from '../types';
 

@@ -13,6 +13,8 @@ import {
   createNPCComponent,
   createBuildingComponent
 } from './components';
+import { ecsEventBus, ECSEventTypes } from './events';
+import { getCellSize } from '../config/gameConfig';
 import type {
   PositionComponent,
   SizeComponent,
@@ -105,35 +107,141 @@ export class SceneLoader {
    * Load a scene from JSON configuration
    */
   async loadScene(sceneData: SceneData): Promise<void> {
+    // Validate scene data structure
+    this.validateSceneData(sceneData);
+
     // Clear existing entities (optional - you might want to keep some)
     const existingEntities = this.world.getAllEntities();
     for (const entity of existingEntities) {
       this.world.removeEntity(entity.id);
     }
 
+    let successfullyLoadedEntities = 0;
+    const failedEntities: { id: string; error: string }[] = [];
+
     // Create entities from scene data
     for (const entityData of sceneData.entities) {
-      await this.createEntityFromData(entityData);
+      try {
+        await this.createEntityFromData(entityData);
+        successfullyLoadedEntities++;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        failedEntities.push({ id: entityData.id, error: errorMessage });
+        console.error(`Failed to create entity ${entityData.id}:`, error);
+      }
     }
 
-    this.world.getEventBus().emit('scene:loaded', { sceneId: sceneData.id, sceneName: sceneData.name });
+    // Validate that scene loaded properly
+    if (successfullyLoadedEntities === 0) {
+      throw new Error(`Scene loading failed: No entities were successfully created from scene '${sceneData.id}'`);
+    }
+
+    if (failedEntities.length > 0) {
+      console.warn(`Scene '${sceneData.id}' loaded with ${failedEntities.length} failed entities:`, failedEntities);
+    }
+
+    // Verify essential entities exist (at least one renderable entity)
+    const renderableEntities = this.world.getComponentManager().getEntitiesWithComponents(['position', 'size', 'renderable']);
+    if (renderableEntities.length === 0) {
+      throw new Error(`Scene loading validation failed: No renderable entities found in scene '${sceneData.id}'`);
+    }
+
+    console.log(`Scene '${sceneData.id}' loaded successfully: ${successfullyLoadedEntities} entities created, ${renderableEntities.length} renderable`);
+    ecsEventBus.emit(ECSEventTypes.SCENE_LOADED, { 
+      scenePath: `Scene: ${sceneData.id}`, 
+      entityCount: successfullyLoadedEntities
+    });
   }
 
   /**
    * Load a scene from JSON file
    */
   async loadSceneFromFile(scenePath: string): Promise<void> {
+    // Validate input
+    if (!scenePath || typeof scenePath !== 'string') {
+      throw new Error('Invalid scene path: Path must be a non-empty string');
+    }
+
+    if (!scenePath.endsWith('.json')) {
+      throw new Error(`Invalid scene file: Expected .json file, got '${scenePath}'`);
+    }
+
     try {
+      console.log(`Loading scene from: ${scenePath}`);
       const response = await fetch(scenePath);
+      
       if (!response.ok) {
-        throw new Error(`Failed to load scene: ${response.statusText}`);
+        if (response.status === 404) {
+          throw new Error(`Scene file not found: ${scenePath}`);
+        }
+        throw new Error(`Failed to load scene file '${scenePath}': ${response.status} ${response.statusText}`);
       }
       
-      const sceneData: SceneData = await response.json();
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Invalid scene file format: Expected JSON, got '${contentType}' for '${scenePath}'`);
+      }
+
+      let sceneData: SceneData;
+      try {
+        sceneData = await response.json();
+      } catch (parseError) {
+        throw new Error(`Invalid JSON in scene file '${scenePath}': ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
+      }
+      
       await this.loadScene(sceneData);
+      console.log(`Scene loaded successfully from: ${scenePath}`);
     } catch (error) {
-      console.error('Error loading scene:', error);
-      throw error;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Error loading scene from '${scenePath}':`, error);
+      throw new Error(`Scene loading failed: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Validate scene data structure
+   */
+  private validateSceneData(sceneData: SceneData): void {
+    if (!sceneData) {
+      throw new Error('Scene data is null or undefined');
+    }
+
+    if (!sceneData.id || typeof sceneData.id !== 'string') {
+      throw new Error('Scene must have a valid id (non-empty string)');
+    }
+
+    if (!sceneData.name || typeof sceneData.name !== 'string') {
+      throw new Error('Scene must have a valid name (non-empty string)');
+    }
+
+    if (!sceneData.entities || !Array.isArray(sceneData.entities)) {
+      throw new Error('Scene must have an entities array');
+    }
+
+    if (sceneData.entities.length === 0) {
+      throw new Error('Scene must contain at least one entity');
+    }
+
+    if (!sceneData.gridSettings || typeof sceneData.gridSettings.cellSize !== 'number' || sceneData.gridSettings.cellSize <= 0) {
+      throw new Error('Scene must have valid gridSettings with positive cellSize');
+    }
+
+    // Validate entity structure
+    const entityIds = new Set<string>();
+    for (let i = 0; i < sceneData.entities.length; i++) {
+      const entity = sceneData.entities[i];
+      if (!entity.id || typeof entity.id !== 'string') {
+        throw new Error(`Entity at index ${i} must have a valid id (non-empty string)`);
+      }
+
+      if (entityIds.has(entity.id)) {
+        throw new Error(`Duplicate entity id found: '${entity.id}'`);
+      }
+      entityIds.add(entity.id);
+
+      if (!entity.components || typeof entity.components !== 'object') {
+        throw new Error(`Entity '${entity.id}' must have a components object`);
+      }
     }
   }
 
@@ -141,24 +249,58 @@ export class SceneLoader {
    * Create an entity from JSON data
    */
   private async createEntityFromData(entityData: SceneEntityData): Promise<void> {
+    // Validate entity data
+    if (!entityData.id) {
+      throw new Error('Entity must have an id');
+    }
+
+    if (!entityData.components) {
+      throw new Error(`Entity '${entityData.id}' must have components`);
+    }
+
+    // Check if entity already exists
+    if (this.world.getEntity(entityData.id)) {
+      throw new Error(`Entity with id '${entityData.id}' already exists`);
+    }
+
     const entity = this.world.createEntity(entityData.id);
+    let componentsAdded = 0;
 
     // Create components based on entity data
     for (const [componentType, componentData] of Object.entries(entityData.components)) {
-      switch (componentType) {
+      try {
+        switch (componentType) {
         case 'position':
           if (componentData) {
             const posData = componentData as NonNullable<SceneEntityData['components']['position']>;
+            if (posData.x === undefined || posData.y === undefined) {
+              throw new Error('Position component must have x and y values');
+            }
             const x = this.evaluatePosition(posData.x);
             const y = this.evaluatePosition(posData.y);
-            this.world.addComponent(entity.id, createPositionComponent(x, y));
+            if (x < 0 || y < 0) {
+              throw new Error(`Invalid position: x=${x}, y=${y}. Positions must be non-negative`);
+            }
+            const positionComponent = createPositionComponent(x, y);
+            console.log(`🔧 Creating position component for ${entity.id}:`, positionComponent);
+            this.world.addComponent(entity.id, positionComponent);
+            componentsAdded++;
           }
           break;
 
         case 'size':
           if (componentData) {
             const sizeData = componentData as NonNullable<SceneEntityData['components']['size']>;
-            this.world.addComponent(entity.id, createSizeComponent(sizeData.width, sizeData.height));
+            if (typeof sizeData.width !== 'number' || typeof sizeData.height !== 'number') {
+              throw new Error('Size component must have numeric width and height');
+            }
+            if (sizeData.width <= 0 || sizeData.height <= 0) {
+              throw new Error(`Invalid size: width=${sizeData.width}, height=${sizeData.height}. Size must be positive`);
+            }
+            const sizeComponent = createSizeComponent(sizeData.width, sizeData.height);
+            console.log(`🔧 Creating size component for ${entity.id}:`, sizeComponent);
+            this.world.addComponent(entity.id, sizeComponent);
+            componentsAdded++;
           }
           break;
 
@@ -169,19 +311,36 @@ export class SceneLoader {
               collisionData.isWalkable,
               collisionData.blocksMovement
             ));
+            componentsAdded++;
           }
           break;
 
         case 'renderable':
           if (componentData) {
             const renderData = componentData as NonNullable<SceneEntityData['components']['renderable']>;
-            this.world.addComponent(entity.id, createRenderableComponent(renderData.type, {
+            if (!renderData.type) {
+              throw new Error('Renderable component must have a type');
+            }
+            const validTypes = ['emoji', 'sprite', 'shape', 'custom'];
+            if (!validTypes.includes(renderData.type)) {
+              throw new Error(`Invalid render type '${renderData.type}'. Must be one of: ${validTypes.join(', ')}`);
+            }
+            if (renderData.type === 'emoji' && !renderData.icon) {
+              throw new Error('Emoji render type requires an icon');
+            }
+            if (renderData.type === 'sprite' && !renderData.sprite) {
+              throw new Error('Sprite render type requires a sprite path');
+            }
+            const renderableComponent = createRenderableComponent(renderData.type, {
               icon: renderData.icon,
               sprite: renderData.sprite,
               backgroundColor: renderData.backgroundColor,
               zIndex: renderData.zIndex,
               visible: renderData.visible
-            }));
+            });
+            console.log(`🔧 Creating renderable component for ${entity.id}:`, renderableComponent);
+            this.world.addComponent(entity.id, renderableComponent);
+            componentsAdded++;
           }
           break;
 
@@ -198,6 +357,7 @@ export class SceneLoader {
               requiresAdjacency: interactData.requiresAdjacency,
               interactionRange: interactData.interactionRange
             }));
+            componentsAdded++;
           }
           break;
 
@@ -257,8 +417,33 @@ export class SceneLoader {
               category: decorationData.category,
               seasonal: decorationData.seasonal
             } as DecorationComponent);
+            componentsAdded++;
           }
           break;
+
+        default:
+          // Handle other component types
+          componentsAdded++;
+          break;
+        }
+      } catch (componentError) {
+        const errorMessage = componentError instanceof Error ? componentError.message : 'Unknown component error';
+        throw new Error(`Failed to create ${componentType} component for entity '${entityData.id}': ${errorMessage}`);
+      }
+    }
+
+    // Validate that entity has essential components
+    if (componentsAdded === 0) {
+      throw new Error(`Entity '${entityData.id}' has no valid components`);
+    }
+
+    // Verify that renderable entities have required components
+    const hasRenderable = this.world.getComponentManager().hasComponent(entity.id, 'renderable');
+    if (hasRenderable) {
+      const hasPosition = this.world.getComponentManager().hasComponent(entity.id, 'position');
+      const hasSize = this.world.getComponentManager().hasComponent(entity.id, 'size');
+      if (!hasPosition || !hasSize) {
+        throw new Error(`Renderable entity '${entityData.id}' must have both position and size components`);
       }
     }
   }
@@ -269,37 +454,53 @@ export class SceneLoader {
    */
   private evaluatePosition(position: number | string): number {
     if (typeof position === 'number') {
+      if (!isFinite(position)) {
+        throw new Error(`Position must be a finite number, got: ${position}`);
+      }
       return position;
     }
 
+    if (typeof position !== 'string') {
+      throw new Error(`Position must be a number or string, got: ${typeof position}`);
+    }
+
     // Handle dynamic positioning expressions
-    const cellSize = 40; // Should come from scene config
+    const cellSize = getCellSize();
     const gridWidth = Math.floor(window.innerWidth / cellSize);
     const gridHeight = Math.floor(window.innerHeight / cellSize);
 
+    if (gridWidth <= 0 || gridHeight <= 0) {
+      throw new Error(`Invalid grid dimensions: width=${gridWidth}, height=${gridHeight}`);
+    }
+
     try {
       // Simple expression evaluator for basic math operations
+      let result: number;
       if (position === 'gridWidth - 8') {
-        return gridWidth - 8;
+        result = gridWidth - 8;
       } else if (position === 'gridWidth - 7') {
-        return gridWidth - 7;
+        result = gridWidth - 7;
       } else if (position === 'gridWidth - 6') {
-        return gridWidth - 6;
+        result = gridWidth - 6;
       } else if (position === 'gridHeight - 4') {
-        return gridHeight - 4;
+        result = gridHeight - 4;
+      } else {
+        // Fallback: try to parse as number
+        const numValue = parseInt(position.toString(), 10);
+        if (isNaN(numValue)) {
+          throw new Error(`Unsupported position expression: '${position}'`);
+        }
+        result = numValue;
       }
       
-      // Fallback: try to parse as number
-      const numValue = parseInt(position.toString(), 10);
-      if (!isNaN(numValue)) {
-        return numValue;
+      if (!isFinite(result)) {
+        throw new Error(`Position evaluation resulted in non-finite value: ${result}`);
       }
       
-      console.warn(`Unsupported position expression: ${position}, using 0`);
-      return 0;
+      return result;
     } catch (error) {
-      console.warn(`Error evaluating position expression: ${position}, using 0`, error);
-      return 0;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Error evaluating position expression '${position}': ${errorMessage}`);
     }
   }
 

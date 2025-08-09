@@ -211,9 +211,11 @@ export const createRenderableComponent = (
 ): RenderableComponent => ({
   type: 'renderable',
   renderType,
-  visible: true,
-  zIndex: 1,
-  ...options
+  visible: options.visible !== false, // Default to true unless explicitly false
+  zIndex: options.zIndex || 1,
+  icon: options.icon,
+  sprite: options.sprite,
+  backgroundColor: options.backgroundColor
 });
 
 export const createInteractiveComponent = (

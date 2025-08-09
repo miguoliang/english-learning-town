@@ -7,6 +7,10 @@
  * - System: Logic that operates on entities with specific components
  */
 
+import { gameConfig } from '../config/gameConfig';
+import { ecsEventBus, ECSEventTypes, type Emitter, type ECSEvents } from './events';
+import { SystemFactory } from './systemRegistry';
+
 export type EntityId = string;
 
 /**
@@ -38,9 +42,9 @@ export interface System {
    * @param entities - All entities in the world
    * @param components - Component manager for accessing component data
    * @param deltaTime - Time since last update
-   * @param events - Event bus for system communication
+   * @param events - Event emitter for system communication
    */
-  update(entities: Entity[], components: ComponentManager, deltaTime: number, events: EventBus): void;
+  update(entities: Entity[], components: ComponentManager, deltaTime: number, events: Emitter<ECSEvents>): void;
   
   /**
    * Check if this system should process the given entity
@@ -135,63 +139,7 @@ export class ComponentManager {
   }
 }
 
-/**
- * Event system for loosely coupled system communication
- */
-export interface GameEvent {
-  readonly type: string;
-  readonly data?: any;
-  readonly timestamp: number;
-}
-
-export class EventBus {
-  private listeners = new Map<string, Array<(event: GameEvent) => void>>();
-
-  /**
-   * Subscribe to an event type
-   */
-  subscribe(eventType: string, callback: (event: GameEvent) => void): () => void {
-    if (!this.listeners.has(eventType)) {
-      this.listeners.set(eventType, []);
-    }
-    
-    this.listeners.get(eventType)!.push(callback);
-    
-    // Return unsubscribe function
-    return () => {
-      const callbacks = this.listeners.get(eventType);
-      if (callbacks) {
-        const index = callbacks.indexOf(callback);
-        if (index > -1) {
-          callbacks.splice(index, 1);
-        }
-      }
-    };
-  }
-
-  /**
-   * Emit an event
-   */
-  emit(eventType: string, data?: any): void {
-    const event: GameEvent = {
-      type: eventType,
-      data,
-      timestamp: Date.now()
-    };
-
-    const callbacks = this.listeners.get(eventType);
-    if (callbacks) {
-      callbacks.forEach(callback => callback(event));
-    }
-  }
-
-  /**
-   * Clear all listeners (cleanup)
-   */
-  clear(): void {
-    this.listeners.clear();
-  }
-}
+// Legacy EventBus removed - use ecsEventBus directly for type safety
 
 /**
  * ECS World - Main coordinator of entities, components, and systems
@@ -200,7 +148,7 @@ export class World {
   private entities = new Map<EntityId, Entity>();
   private components = new ComponentManager();
   private systems: System[] = [];
-  private events = new EventBus();
+  private events = ecsEventBus;
   private lastUpdateTime = 0;
 
   /**
@@ -209,6 +157,7 @@ export class World {
   createEntity(id: EntityId): Entity {
     const entity: Entity = { id };
     this.entities.set(id, entity);
+    this.events.emit(ECSEventTypes.ENTITY_ADDED, { entityId: id });
     return entity;
   }
 
@@ -218,7 +167,7 @@ export class World {
   removeEntity(entityId: EntityId): void {
     this.entities.delete(entityId);
     this.components.removeEntity(entityId);
-    this.events.emit('entity:removed', { entityId });
+    this.events.emit(ECSEventTypes.ENTITY_REMOVED, { entityId });
   }
 
   /**
@@ -239,8 +188,14 @@ export class World {
    * Add a component to an entity
    */
   addComponent<T extends Component>(entityId: EntityId, component: T): void {
+    console.log(`🔧 World.addComponent: Adding ${component.type} component to entity ${entityId}`, component);
     this.components.addComponent(entityId, component);
-    this.events.emit('component:added', { entityId, componentType: component.type });
+    
+    // Verify the component was added
+    const hasComponent = this.components.hasComponent(entityId, component.type);
+    console.log(`✅ Component ${component.type} added to ${entityId}: ${hasComponent}`);
+    
+    this.events.emit(ECSEventTypes.COMPONENT_ADDED, { entityId, componentType: component.type });
   }
 
   /**
@@ -248,7 +203,7 @@ export class World {
    */
   removeComponent(entityId: EntityId, componentType: string): void {
     this.components.removeComponent(entityId, componentType);
-    this.events.emit('component:removed', { entityId, componentType });
+    this.events.emit(ECSEventTypes.COMPONENT_REMOVED, { entityId, componentType });
   }
 
   /**
@@ -262,7 +217,16 @@ export class World {
    * Add a system to the world
    */
   addSystem(system: System): void {
+    console.log(`🔧 World.addSystem: Adding system "${system.name}" to world. Total systems: ${this.systems.length} -> ${this.systems.length + 1}`);
     this.systems.push(system);
+    
+    // Initialize event-driven systems immediately
+    if (SystemFactory.isEventDrivenSystem(system.name)) {
+      console.log(`🔧 World.addSystem: Initializing event-driven system "${system.name}"...`);
+      system.update(this.getAllEntities(), this.components, 0, this.events);
+    }
+    
+    console.log(`✅ World.addSystem: System "${system.name}" added. Total systems now: ${this.systems.length}`);
   }
 
   /**
@@ -273,9 +237,9 @@ export class World {
   }
 
   /**
-   * Get event bus for external subscriptions
+   * Get event emitter for external subscriptions
    */
-  getEventBus(): EventBus {
+  getEventBus(): Emitter<ECSEvents> {
     return this.events;
   }
 
@@ -287,7 +251,7 @@ export class World {
   }
 
   /**
-   * Update all systems
+   * Update all systems (excluding event-driven systems)
    */
   update(): void {
     const currentTime = Date.now();
@@ -296,10 +260,25 @@ export class World {
 
     const entities = this.getAllEntities();
     
-    for (const system of this.systems) {
+    // Only log based on config frequency
+    if (!this.frameCounter) this.frameCounter = 0;
+    this.frameCounter++;
+    
+    // Filter out event-driven systems that don't need regular updates
+    const gameLoopSystems = this.systems.filter(system => 
+      !SystemFactory.isEventDrivenSystem(system.name)
+    );
+    
+    if (gameConfig.debug.showSystemLogs && this.frameCounter % gameConfig.performance.logFrequency === 0) {
+      console.log('🌍 World.update: Running', gameLoopSystems.length, 'game loop systems for', entities.length, 'entities');
+    }
+    
+    for (const system of gameLoopSystems) {
       system.update(entities, this.components, deltaTime, this.events);
     }
   }
+
+  private frameCounter = 0;
 
   /**
    * Clean up world resources
@@ -308,6 +287,6 @@ export class World {
     this.entities.clear();
     this.components = new ComponentManager();
     this.systems = [];
-    this.events.clear();
+    this.events.all.clear();
   }
 }

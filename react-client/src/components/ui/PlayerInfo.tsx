@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useGameStore } from '../../stores/gameStore';
+import { useGameStore } from '../../stores/unifiedGameStore';
 
 const PlayerInfoContainer = styled.div`
   display: flex;
