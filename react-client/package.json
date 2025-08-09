@@ -10,7 +10,6 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:systems": "playwright test tests/systems/",
-    "test:rendering": "playwright test tests/rendering/",
     "test:ui": "playwright test --ui",
     "test:systems:ui": "playwright test tests/systems/ --ui"
   },
