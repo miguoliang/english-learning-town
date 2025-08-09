@@ -677,4 +677,3 @@ export class MovementAnimationSystem implements System {
     return components.hasAllComponents(entity.id, this.requiredComponents);
   }
 }
-}
