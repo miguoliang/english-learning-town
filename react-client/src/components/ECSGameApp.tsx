@@ -31,31 +31,31 @@ const SCENES: Record<string, SceneConfig> = {
   town: {
     id: 'town',
     name: 'English Learning Town',
-    dataPath: '/src/data/scenes/town.json',
+    dataPath: '/data/scenes/town.json',
     playerStartPosition: { x: 10, y: 10 }
   },
   'school-interior': {
     id: 'school-interior', 
     name: 'School Classroom',
-    dataPath: '/src/data/scenes/school.json',
+    dataPath: '/data/scenes/school.json',
     playerStartPosition: { x: 15, y: 15 }
   },
   'shop-interior': {
     id: 'shop-interior',
     name: 'Village Shop',
-    dataPath: '/src/data/scenes/shop.json', // We'd need to create this
+    dataPath: '/data/scenes/shop.json', // We'd need to create this
     playerStartPosition: { x: 8, y: 8 }
   },
   'library-interior': {
     id: 'library-interior',
     name: 'Town Library', 
-    dataPath: '/src/data/scenes/library.json', // We'd need to create this
+    dataPath: '/data/scenes/library.json', // We'd need to create this
     playerStartPosition: { x: 6, y: 8 }
   },
   'cafe-interior': {
     id: 'cafe-interior',
     name: 'Village Café',
-    dataPath: '/src/data/scenes/cafe.json', // We'd need to create this
+    dataPath: '/data/scenes/cafe.json', // We'd need to create this
     playerStartPosition: { x: 5, y: 6 }
   }
 };

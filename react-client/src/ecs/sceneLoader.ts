@@ -105,6 +105,8 @@ export class SceneLoader {
    * Load a scene from JSON configuration
    */
   async loadScene(sceneData: SceneData): Promise<void> {
+    console.log('🗺️ Loading scene:', sceneData.name, 'with', sceneData.entities.length, 'entities');
+    
     // Clear existing entities (optional - you might want to keep some)
     const existingEntities = this.world.getAllEntities();
     for (const entity of existingEntities) {
@@ -114,8 +116,10 @@ export class SceneLoader {
     // Create entities from scene data
     for (const entityData of sceneData.entities) {
       await this.createEntityFromData(entityData);
+      console.log('✨ Created entity:', entityData.id);
     }
 
+    console.log('🌍 Scene loaded with', this.world.getAllEntities().length, 'total entities');
     this.world.getEventBus().emit('scene:loaded', { sceneId: sceneData.id, sceneName: sceneData.name });
   }
 

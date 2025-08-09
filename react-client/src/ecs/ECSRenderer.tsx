@@ -117,6 +117,7 @@ export const ECSRenderer: React.FC<ECSRendererProps> = ({
   // Set up render system listener
   useEffect(() => {
     const unsubscribe = world.getEventBus().subscribe('render:frame-ready', (event) => {
+      console.log('🎨 Render frame ready, entities:', event.data.entities.length);
       setRenderableEntities(event.data.entities);
     });
 

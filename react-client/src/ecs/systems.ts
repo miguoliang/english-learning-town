@@ -345,6 +345,7 @@ export class RenderSystem implements System {
     this.renderableEntities = [];
     
     const renderableEntityIds = components.getEntitiesWithComponents(this.requiredComponents);
+    console.log('🔍 RenderSystem found', renderableEntityIds.length, 'renderable entities');
     
     for (const entityId of renderableEntityIds) {
       const position = components.getComponent<PositionComponent>(entityId, 'position');
@@ -358,6 +359,7 @@ export class RenderSystem implements System {
           size,
           renderable
         });
+        console.log('🎯 Added entity to render:', entityId, 'at', position.x, position.y, 'icon:', renderable.icon);
       }
     }
     
