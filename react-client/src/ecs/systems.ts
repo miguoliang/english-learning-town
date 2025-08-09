@@ -37,7 +37,10 @@ export class CollisionSystem implements System {
    */
   canMoveTo(entityId: string, x: number, y: number, entities: Entity[], components: ComponentManager): boolean {
     const entitySize = components.getComponent<SizeComponent>(entityId, 'size');
-    if (!entitySize) return false;
+    if (!entitySize) {
+      console.warn(`🚫 CollisionSystem: Entity ${entityId} has no size component`);
+      return false;
+    }
 
     // Check collision with all other entities
     for (const otherEntity of entities) {
@@ -48,6 +51,8 @@ export class CollisionSystem implements System {
       const otherCollision = components.getComponent<CollisionComponent>(otherEntity.id, 'collision');
       
       if (!otherPosition || !otherSize || !otherCollision) continue;
+      
+      // Skip walkable entities
       if (otherCollision.isWalkable) continue;
       
       // Check for overlap
@@ -55,6 +60,7 @@ export class CollisionSystem implements System {
         { x, y, width: entitySize.width, height: entitySize.height },
         { x: otherPosition.x, y: otherPosition.y, width: otherSize.width, height: otherSize.height }
       )) {
+        console.log(`🚫 Collision detected: ${entityId} cannot move to (${x}, ${y}) - blocked by ${otherEntity.id} at (${otherPosition.x}, ${otherPosition.y})`);
         return false;
       }
     }
@@ -224,8 +230,11 @@ export class KeyboardInputSystem implements System {
     }
     
     if (moved) {
+      // Get all entities for collision checking
+      const allEntities = this.getAllEntitiesFromComponentManager(components);
+      
       // Use injected CollisionSystem to check if movement is valid
-      if (this.collisionSystem.canMoveTo(entityId, newX, newY, [], components)) {
+      if (this.collisionSystem.canMoveTo(entityId, newX, newY, allEntities, components)) {
         // Move directly - no velocity needed for grid movement
         const oldX = position.x;
         const oldY = position.y;
@@ -238,14 +247,34 @@ export class KeyboardInputSystem implements System {
           oldPosition: { x: oldX, y: oldY }, 
           newPosition: { x: newX, y: newY } 
         });
+        
+        console.log(`🎮 Player moved from (${oldX}, ${oldY}) to (${newX}, ${newY})`);
       } else {
         // Emit collision event if movement is blocked
         events.emit(ECSEventTypes.ENTITY_COLLISION, { 
           entityId, 
           blockedPosition: { x: newX, y: newY } 
         });
+        
+        console.log(`🚫 Movement blocked at (${newX}, ${newY}) - collision detected`);
       }
     }
+  }
+
+  private getAllEntitiesFromComponentManager(components: ComponentManager): Entity[] {
+    // Get all entity IDs with any component
+    const allEntityIds = new Set<string>();
+    
+    // Common component types to find all entities
+    const componentTypes = ['position', 'size', 'collision', 'renderable', 'player', 'npc', 'building'];
+    
+    for (const componentType of componentTypes) {
+      const entityIds = components.getEntitiesWithComponent(componentType);
+      entityIds.forEach(id => allEntityIds.add(id));
+    }
+    
+    // Convert to Entity objects
+    return Array.from(allEntityIds).map(id => ({ id }));
   }
   
 
@@ -647,4 +676,5 @@ export class MovementAnimationSystem implements System {
   canProcess(entity: Entity, components: ComponentManager): boolean {
     return components.hasAllComponents(entity.id, this.requiredComponents);
   }
+}
 }
