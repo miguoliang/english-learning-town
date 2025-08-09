@@ -9,7 +9,7 @@ import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { World } from '../ecs/core';
 import { SceneLoader } from '../ecs/sceneLoader';
 import { SystemFactory, type SystemRegistry } from '../ecs/systemRegistry';
-import type { PositionComponent, SizeComponent, RenderableComponent } from '../ecs/components';
+import type { PositionComponent, SizeComponent, RenderableComponent, PlayerComponent } from '../ecs/components';
 import { ecsEventBus, ECSEventTypes } from '../ecs/events';
 import type { 
   PlayerData, 
@@ -256,6 +256,16 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             inputType: 'player',
             controllable: true
           });
+
+          // Add the 'player' component that systems use to identify player entities
+          world.addComponent(player.id, {
+            type: 'player',
+            name: name || get().player.name,
+            level: get().player.level,
+            experience: get().player.experience,
+            health: 100, // Default health
+            maxHealth: 100 // Default max health
+          } as PlayerComponent);
 
           set({ 
             playerPosition: position,

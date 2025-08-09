@@ -50,7 +50,7 @@ export class SystemFactory {
       movement: new MovementSystem(collisionSystem), // Inject collision dependency
       inputState: inputStateSystem,
       interactionZone: interactionZoneSystem,
-      gridMovement: new GridMovementSystem(collisionSystem, inputStateSystem), // Inject collision and input dependencies
+      gridMovement: new GridMovementSystem(collisionSystem), // Inject collision dependency
       playerInteraction: new PlayerInteractionSystem(inputStateSystem, interactionZoneSystem), // Inject input and zone dependencies
       mouseInput: new MouseInputSystem(),
       interaction: new InteractionSystem(),
