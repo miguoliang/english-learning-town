@@ -30,6 +30,11 @@
               "direction": "south",
               "targetScene": "school-interior"
             }
+          ],
+          "interactionZones": [
+            { "x": 2, "y": 3, "isRelative": true },
+            { "x": 1, "y": 3, "isRelative": true },
+            { "x": 3, "y": 3, "isRelative": true }
           ]
         }
       }
@@ -152,7 +157,13 @@
         },
         "interactive": {
           "type": "dialogue",
-          "dialogueId": "teacher-intro"
+          "dialogueId": "teacher-intro",
+          "interactionZones": [
+            { "x": -1, "y": 0, "isRelative": true },
+            { "x": 1, "y": 0, "isRelative": true },
+            { "x": 0, "y": -1, "isRelative": true },
+            { "x": 0, "y": 1, "isRelative": true }
+          ]
         }
       }
     },
@@ -173,7 +184,13 @@
         },
         "interactive": {
           "type": "dialogue",
-          "dialogueId": "shopkeeper-intro"
+          "dialogueId": "shopkeeper-intro",
+          "interactionZones": [
+            { "x": -1, "y": 0, "isRelative": true },
+            { "x": 1, "y": 0, "isRelative": true },
+            { "x": 0, "y": -1, "isRelative": true },
+            { "x": 0, "y": 1, "isRelative": true }
+          ]
         }
       }
     },
@@ -194,7 +211,13 @@
         },
         "interactive": {
           "type": "dialogue",
-          "dialogueId": "librarian-intro"
+          "dialogueId": "librarian-intro",
+          "interactionZones": [
+            { "x": -1, "y": 0, "isRelative": true },
+            { "x": 1, "y": 0, "isRelative": true },
+            { "x": 0, "y": -1, "isRelative": true },
+            { "x": 0, "y": 1, "isRelative": true }
+          ]
         }
       }
     },

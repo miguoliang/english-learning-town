@@ -214,6 +214,12 @@ export class KeyboardInputSystem implements System {
     let newY = position.y;
     let moved = false;
     
+    // Check for interaction input (spacebar)
+    if (isNewKeyPress('Space')) {
+      this.handleInteractionInput(entityId, position, components, events);
+      return; // Don't process movement if interaction was attempted
+    }
+    
     // Only move on new key press, not while held
     if (isNewKeyPress('ArrowUp') || isNewKeyPress('KeyW')) {
       newY = position.y - 1;
@@ -259,6 +265,69 @@ export class KeyboardInputSystem implements System {
         console.log(`🚫 Movement blocked at (${newX}, ${newY}) - collision detected`);
       }
     }
+  }
+
+  private handleInteractionInput(
+    playerId: string,
+    playerPosition: PositionComponent,
+    components: ComponentManager,
+    events: Emitter<ECSEvents>
+  ): void {
+    console.log(`🎮 Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`);
+    
+    // Find all interactive entities
+    const interactiveEntityIds = components.getEntitiesWithComponent('interactive');
+    
+    for (const entityId of interactiveEntityIds) {
+      const position = components.getComponent<PositionComponent>(entityId, 'position');
+      const interactive = components.getComponent<InteractiveComponent>(entityId, 'interactive');
+      
+      if (!position || !interactive) continue;
+      
+      // Check if player is in any interaction zone for this entity
+      if (this.isPlayerInInteractionZone(playerPosition, position, interactive)) {
+        console.log(`✨ Player can interact with ${entityId}`);
+        
+        // Emit interaction event
+        events.emit(ECSEventTypes.PLAYER_INTERACTION, { 
+          initiatorId: playerId,
+          targetEntityId: entityId 
+        });
+        
+        // Handle the specific interaction through InteractionSystem
+        // The InteractionSystem will process the actual interaction logic
+        return; // Only allow one interaction at a time
+      }
+    }
+    
+    console.log(`❌ No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`);
+  }
+
+  private isPlayerInInteractionZone(
+    playerPosition: PositionComponent,
+    entityPosition: PositionComponent,
+    interactive: InteractiveComponent
+  ): boolean {
+    // If entity has defined interaction zones, use those
+    if (interactive.interactionZones && interactive.interactionZones.length > 0) {
+      for (const zone of interactive.interactionZones) {
+        const zoneX = zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
+        const zoneY = zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
+        
+        if (playerPosition.x === zoneX && playerPosition.y === zoneY) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Fallback: use adjacency (default behavior for entities without defined zones)
+    const dx = Math.abs(playerPosition.x - entityPosition.x);
+    const dy = Math.abs(playerPosition.y - entityPosition.y);
+    const maxRange = interactive.interactionRange || 1;
+    
+    // Check if player is adjacent (within range)
+    return dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
   }
 
   private getAllEntitiesFromComponentManager(components: ComponentManager): Entity[] {
@@ -342,10 +411,25 @@ export class MouseInputSystem implements System {
 export class InteractionSystem implements System {
   readonly name = 'InteractionSystem';
   readonly requiredComponents = ['position', 'interactive'] as const;
+  
+  private isInitialized = false;
 
-  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
+  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+    // Initialize event listeners once
+    if (!this.isInitialized) {
+      this.setupEventListeners(events, components);
+      this.isInitialized = true;
+    }
+    
     // This system is primarily event-driven, so update does minimal work
     // Most interaction logic happens in response to input events
+  }
+  
+  private setupEventListeners(events: Emitter<ECSEvents>, components: ComponentManager): void {
+    // Listen for player interaction events
+    events.on(ECSEventTypes.PLAYER_INTERACTION, (data) => {
+      this.handleInteraction(data.initiatorId, data.targetEntityId, components, events);
+    });
   }
 
   canProcess(entity: Entity, components: ComponentManager): boolean {

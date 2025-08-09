@@ -76,6 +76,14 @@ export interface InteractiveComponent extends Component {
   // Interaction conditions
   requiresAdjacency?: boolean;
   interactionRange?: number;
+  
+  // Interaction zones - cells where player can stand to interact
+  interactionZones?: Array<{
+    x: number;
+    y: number;
+    // Relative to the entity's position
+    isRelative?: boolean;
+  }>;
 }
 
 export interface InputComponent extends Component {

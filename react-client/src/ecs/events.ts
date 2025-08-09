@@ -50,7 +50,7 @@ export type ECSEvents = {
 
   // Player events
   'player:move-to': { targetX: number; targetY: number };
-  'player:interaction': { targetEntityId: string };
+  'player:interaction': { initiatorId: string; targetEntityId: string };
 
   // Collision events
   'entity:collision': { entityId: string; blockedPosition: { x: number; y: number } };
