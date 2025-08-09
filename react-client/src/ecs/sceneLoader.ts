@@ -54,6 +54,11 @@ export interface SceneEntityData {
       questId?: string;
       requiresAdjacency?: boolean;
       interactionRange?: number;
+      interactionZones?: Array<{
+        x: number;
+        y: number;
+        isRelative?: boolean;
+      }>;
     };
     player?: {
       name: string;
@@ -347,7 +352,7 @@ export class SceneLoader {
         case 'interactive':
           if (componentData) {
             const interactData = componentData as NonNullable<SceneEntityData['components']['interactive']>;
-            this.world.addComponent(entity.id, createInteractiveComponent(interactData.type, {
+            const interactiveComponent = createInteractiveComponent(interactData.type, {
               dialogueId: interactData.dialogueId,
               entrances: interactData.entrances,
               targetScene: interactData.targetScene,
@@ -355,8 +360,11 @@ export class SceneLoader {
               activityId: interactData.activityId,
               questId: interactData.questId,
               requiresAdjacency: interactData.requiresAdjacency,
-              interactionRange: interactData.interactionRange
-            }));
+              interactionRange: interactData.interactionRange,
+              interactionZones: interactData.interactionZones
+            });
+            console.log(`🔧 Creating interactive component for ${entity.id}:`, interactiveComponent);
+            this.world.addComponent(entity.id, interactiveComponent);
             componentsAdded++;
           }
           break;

@@ -310,24 +310,36 @@ export class KeyboardInputSystem implements System {
   ): boolean {
     // If entity has defined interaction zones, use those
     if (interactive.interactionZones && interactive.interactionZones.length > 0) {
+      console.log(`🔍 Checking interaction zones for entity at (${entityPosition.x}, ${entityPosition.y})`);
+      console.log(`🎮 Player at (${playerPosition.x}, ${playerPosition.y})`);
+      
       for (const zone of interactive.interactionZones) {
         const zoneX = zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
         const zoneY = zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
         
+        console.log(`⭐ Zone: (${zone.x}, ${zone.y}) → World: (${zoneX}, ${zoneY})`);
+        
         if (playerPosition.x === zoneX && playerPosition.y === zoneY) {
+          console.log(`✅ Player is in interaction zone!`);
           return true;
         }
       }
+      console.log(`❌ Player not in any defined interaction zones`);
       return false;
     }
     
     // Fallback: use adjacency (default behavior for entities without defined zones)
+    console.log(`🔄 Using fallback adjacency check for entity at (${entityPosition.x}, ${entityPosition.y})`);
     const dx = Math.abs(playerPosition.x - entityPosition.x);
     const dy = Math.abs(playerPosition.y - entityPosition.y);
     const maxRange = interactive.interactionRange || 1;
     
+    console.log(`📏 Distance: dx=${dx}, dy=${dy}, maxRange=${maxRange}`);
+    
     // Check if player is adjacent (within range)
-    return dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
+    const isAdjacent = dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
+    console.log(`🎯 Adjacency result: ${isAdjacent}`);
+    return isAdjacent;
   }
 
   private getAllEntitiesFromComponentManager(components: ComponentManager): Entity[] {
