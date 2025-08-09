@@ -120,23 +120,19 @@ export const ECSScene: React.FC<ECSSceneProps> = ({
   useEffect(() => {
     const loadSceneData = async () => {
       try {
-        console.log('🔄 Loading scene:', sceneDataPath);
         setIsLoading(true);
         setError(null);
         
         await loadScene(sceneDataPath);
-        console.log('✅ Scene loaded successfully');
         
         // Add player to scene
         const centerX = Math.floor(window.innerWidth / 2 / cellSize);
         const centerY = Math.floor(window.innerHeight / 2 / cellSize);
         const playerPos = playerStartPosition.x !== undefined ? playerStartPosition : { x: centerX, y: centerY };
-        console.log('🚶 Adding player at position:', playerPos);
         addPlayer('player', playerPos);
         
         setIsLoading(false);
       } catch (err) {
-        console.error('❌ Error loading scene:', err);
         setError(`Failed to load scene: ${err}`);
         setIsLoading(false);
       }
@@ -229,7 +225,7 @@ export const ECSScene: React.FC<ECSSceneProps> = ({
       <ECSRenderer
         world={world}
         cellSize={cellSize}
-        showGrid={showGrid}
+        showGrid={true}
       />
 
       {/* Dialogue System */}
