@@ -1,0 +1,7 @@
+---
+description: When you are writing e2e tests
+globs:
+alwaysApply: false
+---
+
+- **DON'T** rely on console logs.

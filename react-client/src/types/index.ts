@@ -139,7 +139,7 @@ export interface DialogueCondition {
 export interface DialogueEffect {
   type: 'complete_objective' | 'start_quest' | 'add_item' | 'add_experience' | 'learn_vocabulary';
   value: string | number;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export interface ShopItem {

@@ -368,7 +368,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
                 duration: 5000,
                 timestamp: Date.now()
               });
-              (result as any).notifications = notifications;
+              (result as typeof result & { notifications: typeof notifications }).notifications = notifications;
             }
 
             return result;

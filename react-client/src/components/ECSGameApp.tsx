@@ -125,7 +125,7 @@ export const ECSGameApp: React.FC = () => {
       case 'school':
       case 'shop': 
       case 'library':
-      case 'cafe':
+      case 'cafe': {
         const sceneConfig = SCENES[currentScene];
         if (!sceneConfig) {
           console.error('Scene config not found for:', currentScene);
@@ -140,6 +140,7 @@ export const ECSGameApp: React.FC = () => {
             cellSize={gameConfig.display.cellSize}
           />
         );
+      }
         
       default:
         return <div>Unknown game state: {gameState}</div>;

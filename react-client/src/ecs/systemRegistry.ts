@@ -61,7 +61,7 @@ export class SystemFactory {
   }
 
   static isEventDrivenSystem(systemName: string): boolean {
-    return EVENT_DRIVEN_SYSTEMS.includes(systemName as any);
+    return EVENT_DRIVEN_SYSTEMS.includes(systemName as typeof EVENT_DRIVEN_SYSTEMS[number]);
   }
 }
 

@@ -78,7 +78,7 @@ export type ECSEvents = {
   'scene:transition': { 
     from: string;
     to: string;
-    entrance?: any;
+    entrance?: { x: number; y: number; width: number; height: number };
     targetPosition?: { x: number; y: number } 
   };
 

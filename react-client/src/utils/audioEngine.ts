@@ -11,7 +11,7 @@ export const createAudioContextManager = (): AudioContextManager => {
 
   const getContext = (): AudioContext => {
     if (!context) {
-      context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      context = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
     return context;
   };
@@ -47,7 +47,7 @@ export const generateTone = (options: ToneOptions): void => {
     fadeOut = true
   } = options;
 
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
   

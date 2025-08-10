@@ -66,7 +66,6 @@ test.describe('PlayerInteractionSystem', () => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
     // Find player and an NPC entity
-    const playerEntity = await page.locator('[data-entity-type="player"]').first();
     const npcEntity = await page.locator('[data-entity-type="npc"]').first();
     
     if (await npcEntity.count() > 0) {

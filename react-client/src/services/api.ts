@@ -68,14 +68,14 @@ export class APIClient {
   }
 
   // Quest progress
-  async saveQuestProgress(playerId: string, questData: any): Promise<void> {
+  async saveQuestProgress(playerId: string, questData: { questId: string; progress: number; completed: boolean; objectives?: Record<string, boolean> }): Promise<void> {
     return this.request(`/api/players/${playerId}/quests`, {
       method: 'POST',
       body: JSON.stringify(questData),
     });
   }
 
-  async getQuestProgress(playerId: string): Promise<any> {
+  async getQuestProgress(playerId: string): Promise<{ questId: string; progress: number; completed: boolean; objectives?: Record<string, boolean> }[]> {
     return this.request(`/api/players/${playerId}/quests`);
   }
 
@@ -93,7 +93,7 @@ export class APIClient {
   }
 
   // Questions/Vocabulary
-  async getQuestions(): Promise<any[]> {
+  async getQuestions(): Promise<{ id: string; text: string; options?: string[]; correctAnswer?: string; difficulty?: string }[]> {
     return this.request('/api/questions');
   }
 
