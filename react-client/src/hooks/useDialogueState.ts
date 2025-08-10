@@ -6,7 +6,7 @@ import { ObjectiveType } from '../types';
 
 // Mock dialogue data - in a real app, this would come from a data store or API
 const npcDialogues: Record<string, DialogueEntry[]> = {
-  teacher: [
+  'teacher-intro': [
     {
       id: 'teacher_greeting',
       speakerName: 'Ms. Johnson',
@@ -78,7 +78,7 @@ const npcDialogues: Record<string, DialogueEntry[]> = {
       ]
     }
   ],
-  shopkeeper: [
+  'shopkeeper-intro': [
     {
       id: 'shopkeeper_greeting',
       speakerName: 'Mr. Smith',
@@ -148,7 +148,7 @@ const npcDialogues: Record<string, DialogueEntry[]> = {
       responses: []
     }
   ],
-  librarian: [
+  'librarian-intro': [
     {
       id: 'librarian_greeting',
       speakerName: 'Dr. Brown',
@@ -179,6 +179,141 @@ const npcDialogues: Record<string, DialogueEntry[]> = {
       speakerName: 'Dr. Brown',
       text: "We have many English books for different levels. Check the beginner section over there. Happy reading!",
       vocabularyHighlights: ['levels', 'beginner', 'section'],
+      responses: []
+    }
+  ],
+  'school-teacher-lesson': [
+    {
+      id: 'lesson_greeting',
+      speakerName: 'Ms. Johnson',
+      text: "Welcome to our classroom! Today we'll learn about grammar and sentence structure. Are you ready to begin the lesson?",
+      vocabularyHighlights: ['classroom', 'grammar', 'sentence structure'],
+      responses: [
+        {
+          id: 'ready_to_learn',
+          text: "Yes, I'm ready to learn!",
+          nextDialogueId: 'lesson_start'
+        },
+        {
+          id: 'need_help',
+          text: "Can you explain it slowly please?",
+          nextDialogueId: 'lesson_help'
+        }
+      ]
+    },
+    {
+      id: 'lesson_start',
+      speakerName: 'Ms. Johnson',
+      text: "Great! Let's start with simple sentences. A sentence needs a subject and a verb. For example: 'I study English.'",
+      vocabularyHighlights: ['subject', 'verb', 'sentence'],
+      responses: []
+    },
+    {
+      id: 'lesson_help',
+      speakerName: 'Ms. Johnson',
+      text: "Of course! We'll take it step by step. Grammar is the foundation of good English. Don't worry, we have plenty of time.",
+      vocabularyHighlights: ['step by step', 'foundation'],
+      responses: []
+    }
+  ],
+  'student-emily': [
+    {
+      id: 'emily_greeting',
+      speakerName: 'Emily',
+      text: "Hi! I'm Emily. I love learning English! Do you want to study together? We can help each other!",
+      vocabularyHighlights: ['study together', 'help each other'],
+      responses: [
+        {
+          id: 'study_yes',
+          text: "Yes, let's study together!",
+          nextDialogueId: 'emily_excited'
+        },
+        {
+          id: 'study_maybe',
+          text: "Maybe later, thanks!",
+          nextDialogueId: 'emily_understanding'
+        }
+      ]
+    },
+    {
+      id: 'emily_excited',
+      speakerName: 'Emily',
+      text: "Wonderful! We can practice conversations and share vocabulary. Learning is more fun with friends!",
+      vocabularyHighlights: ['conversations', 'vocabulary', 'friends'],
+      responses: []
+    },
+    {
+      id: 'emily_understanding',
+      speakerName: 'Emily',
+      text: "That's okay! I'll be here when you're ready. Good luck with your studies!",
+      responses: []
+    }
+  ],
+  'student-alex': [
+    {
+      id: 'alex_greeting',
+      speakerName: 'Alex',
+      text: "Hey there! I'm Alex. English is challenging, but I'm getting better every day. What's your favorite part about learning English?",
+      vocabularyHighlights: ['challenging', 'getting better', 'favorite'],
+      responses: [
+        {
+          id: 'like_speaking',
+          text: "I like speaking practice.",
+          nextDialogueId: 'alex_speaking'
+        },
+        {
+          id: 'like_reading',
+          text: "I enjoy reading books.",
+          nextDialogueId: 'alex_reading'
+        }
+      ]
+    },
+    {
+      id: 'alex_speaking',
+      speakerName: 'Alex',
+      text: "Speaking is great! The more you practice, the more confident you become. Keep talking!",
+      vocabularyHighlights: ['confident', 'practice'],
+      responses: []
+    },
+    {
+      id: 'alex_reading',
+      speakerName: 'Alex',
+      text: "Reading is awesome! It helps you learn new words and understand different writing styles.",
+      vocabularyHighlights: ['writing styles'],
+      responses: []
+    }
+  ],
+  'student-sarah': [
+    {
+      id: 'sarah_greeting',
+      speakerName: 'Sarah',
+      text: "Hello! I'm Sarah. I've been studying English for two years now. The key is daily practice and never giving up!",
+      vocabularyHighlights: ['daily practice', 'never giving up'],
+      responses: [
+        {
+          id: 'ask_tips',
+          text: "Can you give me some tips?",
+          nextDialogueId: 'sarah_tips'
+        },
+        {
+          id: 'share_experience',
+          text: "How did you improve so much?",
+          nextDialogueId: 'sarah_experience'
+        }
+      ]
+    },
+    {
+      id: 'sarah_tips',
+      speakerName: 'Sarah',
+      text: "Sure! Read for 30 minutes daily, practice speaking with classmates, and don't be afraid to make mistakes!",
+      vocabularyHighlights: ['mistakes', 'classmates'],
+      responses: []
+    },
+    {
+      id: 'sarah_experience',
+      speakerName: 'Sarah',
+      text: "I watched English movies with subtitles and kept a vocabulary journal. Consistency is everything!",
+      vocabularyHighlights: ['subtitles', 'vocabulary journal', 'consistency'],
       responses: []
     }
   ]

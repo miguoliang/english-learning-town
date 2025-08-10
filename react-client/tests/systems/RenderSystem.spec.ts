@@ -7,11 +7,19 @@ import { test, expect } from '@playwright/test';
 
 test.describe('RenderSystem', () => {
   test.beforeEach(async ({ page }) => {
+    // Navigate to the root
     await page.goto('/');
+    
+    // Fill name
+    await page.fill('input[placeholder*="name"]', 'TestPlayer');
+    
+    // Click start new adventure
+    await page.click('button:has-text("Start New Adventure")');
+    
+    // Wait for the game canvas
     await page.waitForSelector('[data-testid="game-canvas"]', { timeout: 10000 });
     
-    await page.fill('input[placeholder*="name"]', 'TestPlayer');
-    await page.click('button:has-text("Start New Adventure")');
+    // Wait for game scene to load
     await page.waitForTimeout(2000);
   });
 
@@ -174,7 +182,13 @@ test.describe('RenderSystem', () => {
     );
     
     expect(hoverTransform).not.toBe(initialTransform);
-    expect(hoverTransform).toContain('scale');
+    
+    // Check for scaling effect - could be "scale" or matrix representation
+    const hasScaleEffect = hoverTransform.includes('scale') || 
+                          (hoverTransform.includes('matrix') && 
+                           (hoverTransform.includes('1.05') || hoverTransform.includes('1.1')));
+    
+    expect(hasScaleEffect).toBe(true);
   });
 
   test('should be event-driven (not updating continuously)', async ({ page }) => {

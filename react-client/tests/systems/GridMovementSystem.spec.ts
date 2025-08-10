@@ -7,13 +7,17 @@ import { test, expect } from '@playwright/test';
 
 test.describe('GridMovementSystem', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the game and wait for initialization
+    // Navigate to the root
     await page.goto('/');
-    await page.waitForSelector('[data-testid="game-canvas"]', { timeout: 10000 });
     
-    // Enter player name and start game
+    // Fill name
     await page.fill('input[placeholder*="name"]', 'TestPlayer');
+    
+    // Click start new adventure
     await page.click('button:has-text("Start New Adventure")');
+    
+    // Wait for the game canvas
+    await page.waitForSelector('[data-testid="game-canvas"]', { timeout: 10000 });
     
     // Wait for game scene to load
     await page.waitForTimeout(2000);
@@ -23,55 +27,163 @@ test.describe('GridMovementSystem', () => {
     // Wait for player to be rendered
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    // Track console logs for movement
-    const movementLogs: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('Player moved') || msg.text().includes('Movement blocked')) {
-        movementLogs.push(msg.text());
-      }
+    // Find the player entity
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
+    
+    // Get initial position
+    const initialPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
     
-    // Test arrow key movement
+    const positions: { left: number; top: number }[] = [initialPosition];
+    const cellSize = 40; // Default cell size
+    
+    // Test arrow key movement - up, right, down, left
     await page.keyboard.press('ArrowUp');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('ArrowDown');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
     
-    // Should have movement events (at least some successful movements)
-    expect(movementLogs.length).toBeGreaterThan(0);
+    const finalPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(finalPosition);
+    
+    // Verify movement occurred and is grid-based
+    const uniquePositions = new Set(positions.map(p => `${p.left},${p.top}`));
+    expect(uniquePositions.size).toBeGreaterThan(1); // At least some movement
+    
+    // Verify all positions are grid-aligned
+    for (const pos of positions) {
+      expect(pos.left % cellSize).toBe(0);
+      expect(pos.top % cellSize).toBe(0);
+    }
+    
+    console.log(`Arrow key movement path: ${Array.from(uniquePositions).join(' -> ')}`);
   });
 
   test('should move player one cell at a time with WASD keys', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const movementLogs: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('Player moved') || msg.text().includes('Movement blocked')) {
-        movementLogs.push(msg.text());
-      }
+    // Find the player entity
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
+    
+    // Get initial position
+    const initialPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
     
-    // Test WASD movement
+    const positions: { left: number; top: number }[] = [initialPosition];
+    const cellSize = 40; // Default cell size
+    
+    // Test WASD movement - W(up), D(right), S(down), A(left)
     await page.keyboard.press('KeyW'); // Up
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('KeyD'); // Right
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('KeyS'); // Down
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.keyboard.press('KeyA'); // Left
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
     
-    expect(movementLogs.length).toBeGreaterThan(0);
+    const finalPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(finalPosition);
+    
+    // Verify movement occurred and is grid-based
+    const uniquePositions = new Set(positions.map(p => `${p.left},${p.top}`));
+    expect(uniquePositions.size).toBeGreaterThan(1); // At least some movement
+    
+    // Verify all positions are grid-aligned
+    for (const pos of positions) {
+      expect(pos.left % cellSize).toBe(0);
+      expect(pos.top % cellSize).toBe(0);
+    }
+    
+    console.log(`WASD movement path: ${Array.from(uniquePositions).join(' -> ')}`);
   });
 
   test('should not move on key hold (discrete movement only)', async ({ page }) => {
@@ -140,25 +252,104 @@ test.describe('GridMovementSystem', () => {
   test('should handle rapid key presses correctly', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const movementLogs: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('Player moved')) {
-        movementLogs.push(msg.text());
-      }
+    // Find the player entity
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
+    
+    // Get initial position
+    const initialPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
     
-    // Rapid key presses
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('ArrowLeft');
-    await page.keyboard.press('ArrowLeft');
+    const positions: { left: number; top: number }[] = [initialPosition];
     
-    await page.waitForTimeout(200);
+    // Rapid key presses - move right 3 times, then left 2 times
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(10);
     
-    // Should handle each key press as a discrete movement
-    expect(movementLogs.length).toBeGreaterThan(0);
-    expect(movementLogs.length).toBeLessThanOrEqual(5); // Max 5 movements
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(10);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(10);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(10);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(10);
+    
+    const finalPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(finalPosition);
+    
+    // Check discrete movement behavior
+    // Should have at least some position changes (not all movements may succeed due to collisions)
+    const uniquePositions = new Set(positions.map(p => `${p.left},${p.top}`));
+    expect(uniquePositions.size).toBeGreaterThan(1);
+    
+    // Grid movement should be discrete (each movement by exactly cellSize pixels)
+    // Check that movements are in grid increments (40px by default)
+    const cellSize = 40;
+    const xPositions = positions.map(p => p.left);
+    const yPositions = positions.map(p => p.top);
+    
+    // All x positions should be multiples of cellSize
+    for (const x of xPositions) {
+      expect(x % cellSize).toBe(0);
+    }
+    
+    // All y positions should be multiples of cellSize (should not change in this test)
+    for (const y of yPositions) {
+      expect(y % cellSize).toBe(0);
+    }
+    
+    console.log(`Rapid key movement path: ${Array.from(uniquePositions).join(' -> ')}`);
   });
 
   test('should emit proper movement events', async ({ page }) => {

@@ -3,13 +3,12 @@
  * Avoids React lifecycle issues with direct store usage
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ECSRendererZustand } from '../../ecs/ECSRendererZustand';
 import { useGameStore } from '../../stores/unifiedGameStore';
 import { getDefaultPlayerPosition, getDefaultScenePath, getCellSize } from '../../config/gameConfig';
-// TODO: Re-enable when dialogue system is wired up
-// import { DialogueSystem } from '../dialogue/DialogueSystem';
+import { DialogueSystem } from '../dialogue/DialogueSystem';
 
 const SceneContainer = styled.div`
   width: 100vw;
@@ -91,10 +90,17 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
   const isECSInitialized = useGameStore(state => state.isECSInitialized);
   // Removed unused currentScene - consolidated in unified store
   const playerPosition = useGameStore(state => state.playerPosition);
+  const world = useGameStore(state => state.world);
   const loadScene = useGameStore(state => state.loadScene);
   const addPlayer = useGameStore(state => state.addPlayer);
   const startGameLoop = useGameStore(state => state.startGameLoop);
   const stopGameLoop = useGameStore(state => state.stopGameLoop);
+
+  // Local state for dialogue management
+  const [activeDialogue, setActiveDialogue] = useState<{
+    npcId: string;
+    targetId: string;
+  } | null>(null);
 
   // Load scene and start game when component mounts
   useEffect(() => {
@@ -132,6 +138,27 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
     };
   }, [isECSInitialized, scenePath, playerName, loadScene, addPlayer, startGameLoop, stopGameLoop]);
 
+  // Set up dialogue event listener
+  useEffect(() => {
+    if (!world) return;
+
+    const eventBus = world.getEventBus();
+    
+    const handleDialogueStart = (data: { initiatorId: string; targetId: string; dialogueId: string }) => {
+      // Use the dialogueId as the npcId for the dialogue system
+      setActiveDialogue({
+        npcId: data.dialogueId,
+        targetId: data.targetId
+      });
+    };
+
+    eventBus.on('dialogue:start', handleDialogueStart);
+
+    return () => {
+      eventBus.off('dialogue:start', handleDialogueStart);
+    };
+  }, [world]);
+
   return (
     <SceneContainer>
       {/* Game Renderer */}
@@ -152,14 +179,18 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
         <Controls>
           <div>🎮 WASD/Arrow keys to move</div>
           <div>🖱️ Click to move</div>
-          <div>💬 Click NPCs to talk</div>
+          <div>💬 Press SPACEBAR near NPCs to talk</div>
           <div>🚪 Click entrances to enter</div>
         </Controls>
       </HUD>
       
       {/* Dialogue System */}
-      {/* TODO: Wire up DialogueSystem to dialogue interactions from ECS */}
-      {/* <DialogueSystem npcId="" onClose={() => {}} /> */}
+      {activeDialogue && (
+        <DialogueSystem 
+          npcId={activeDialogue.npcId} 
+          onClose={() => setActiveDialogue(null)} 
+        />
+      )}
     </SceneContainer>
   );
 };

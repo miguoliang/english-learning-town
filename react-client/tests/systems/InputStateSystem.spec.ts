@@ -7,35 +7,113 @@ import { test, expect } from '@playwright/test';
 
 test.describe('InputStateSystem', () => {
   test.beforeEach(async ({ page }) => {
+    // Navigate to the root
     await page.goto('/');
+    
+    // Fill name
+    await page.fill('input[placeholder*="name"]', 'TestPlayer');
+    
+    // Click start new adventure
+    await page.click('button:has-text("Start New Adventure")');
+    
+    // Wait for the game canvas
     await page.waitForSelector('[data-testid="game-canvas"]', { timeout: 10000 });
     
-    await page.fill('input[placeholder*="name"]', 'TestPlayer');
-    await page.click('button:has-text("Start New Adventure")');
+    // Wait for game scene to load
     await page.waitForTimeout(2000);
   });
 
   test('should detect keyboard input events', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const inputEvents: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('INPUT_KEY') || msg.text().includes('KeyDown') || msg.text().includes('KeyUp')) {
-        inputEvents.push(msg.text());
-      }
+    // Find the player entity to observe effects of input
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
+    
+    // Get initial position
+    const initialPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
     
-    // Test various keys
+    const positions: { left: number; top: number }[] = [initialPosition];
+    
+    // Test various input keys and check for their effects
+    // Movement keys should cause position changes
     await page.keyboard.press('ArrowUp');
+    await page.waitForTimeout(50);
+    
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
     await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
     await page.keyboard.press('KeyW');
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
     await page.keyboard.press('KeyS');
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    // Test non-movement key (Space) - should not cause position change but is still input
+    const beforeSpacePosition = currentPosition;
     await page.keyboard.press('Space');
+    await page.waitForTimeout(50);
     
-    await page.waitForTimeout(100);
+    const afterSpacePosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
     
-    // Should capture input events
-    expect(inputEvents.length).toBeGreaterThan(0);
+    // Verify that input detection is working by checking for movement responses
+    const uniquePositions = new Set(positions.map(p => `${p.left},${p.top}`));
+    expect(uniquePositions.size).toBeGreaterThan(1); // Movement keys should cause position changes
+    
+    // Space key should not cause movement (position should be same)
+    expect(afterSpacePosition.left).toBe(beforeSpacePosition.left);
+    expect(afterSpacePosition.top).toBe(beforeSpacePosition.top);
+    
+    console.log(`Input detection verified through movement: ${Array.from(uniquePositions).join(' -> ')}`);
+    console.log(`Space key correctly did not cause movement`);
   });
 
   test('should distinguish between key press and key release', async ({ page }) => {
@@ -67,52 +145,145 @@ test.describe('InputStateSystem', () => {
   test('should handle multiple simultaneous key presses', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const inputEvents: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('INPUT_KEY') || msg.text().includes('Key')) {
-        inputEvents.push(msg.text());
-      }
-    });
+    // Find the player entity to track movement effects
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
     
-    // Press multiple keys rapidly
+    const positions: { left: number; top: number }[] = [];
+    
+    // Get initial position
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    // Press multiple keys rapidly (mix of movement and interaction keys)
     await page.keyboard.press('ArrowUp');
+    await page.waitForTimeout(30);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
     await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('Space');
+    await page.waitForTimeout(30);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
+    
+    await page.keyboard.press('Space'); // Should not cause movement
+    await page.waitForTimeout(30);
+    
     await page.keyboard.press('KeyW');
+    await page.waitForTimeout(30);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push(currentPosition);
     
     await page.waitForTimeout(100);
     
-    // Should handle all input events
-    expect(inputEvents.length).toBeGreaterThan(0);
+    // Verify system handled multiple input types correctly
+    const uniquePositions = new Set(positions.map(p => `${p.left},${p.top}`));
+    expect(uniquePositions.size).toBeGreaterThan(1); // Movement keys worked
+    
+    // Verify the game canvas remains functional after multiple inputs
+    const gameCanvas = await page.locator('[data-testid="game-canvas"]');
+    await expect(gameCanvas).toBeVisible();
+    
+    console.log(`Multiple key presses handled: ${uniquePositions.size} unique positions from ${positions.length} inputs`);
   });
 
   test('should emit proper event types for different keys', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const arrowEvents: string[] = [];
-    const wasdEvents: string[] = [];
-    const spaceEvents: string[] = [];
+    // Find the player entity to track effects of different key types
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
     
-    page.on('console', msg => {
-      if (msg.text().includes('Arrow')) {
-        arrowEvents.push(msg.text());
-      }
-      if (msg.text().includes('Key')) {
-        wasdEvents.push(msg.text());
-      }
-      if (msg.text().includes('Space')) {
-        spaceEvents.push(msg.text());
-      }
+    const positions: { left: number; top: number; keyType: string }[] = [];
+    
+    // Get initial position
+    let currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
+    positions.push({ ...currentPosition, keyType: 'initial' });
     
-    // Test different key types
+    // Test different key types - Arrow keys (should move)
     await page.keyboard.press('ArrowUp');
-    await page.keyboard.press('KeyW');
-    await page.keyboard.press('Space');
+    await page.waitForTimeout(50);
     
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push({ ...currentPosition, keyType: 'arrow' });
+    
+    // Test WASD keys (should move)
+    await page.keyboard.press('KeyW');
+    await page.waitForTimeout(50);
+    
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push({ ...currentPosition, keyType: 'wasd' });
+    
+    // Test Space key (should not move, but should be handled)
+    await page.keyboard.press('Space');
     await page.waitForTimeout(100);
     
-    console.log(`Arrow: ${arrowEvents.length}, WASD: ${wasdEvents.length}, Space: ${spaceEvents.length}`);
+    currentPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    positions.push({ ...currentPosition, keyType: 'space' });
+    
+    // Verify different key types had appropriate effects
+    const movementPositions = positions.filter(p => p.keyType === 'arrow' || p.keyType === 'wasd');
+    const uniqueMovementPositions = new Set(movementPositions.map(p => `${p.left},${p.top}`));
+    expect(uniqueMovementPositions.size).toBeGreaterThan(1); // Movement keys worked
+    
+    // Space key should not change position from WASD position
+    const wasdPos = positions.find(p => p.keyType === 'wasd')!;
+    const spacePos = positions.find(p => p.keyType === 'space')!;
+    expect(spacePos.left).toBe(wasdPos.left);
+    expect(spacePos.top).toBe(wasdPos.top);
+    
+    console.log(`Key types tested: Arrow (moved), WASD (moved), Space (no movement)`);
   });
 
   test('should not interfere with other input handling', async ({ page }) => {
@@ -145,23 +316,50 @@ test.describe('InputStateSystem', () => {
   test('should maintain state consistency during rapid input', async ({ page }) => {
     await page.waitForSelector('[data-testid^="entity-"]', { timeout: 5000 });
     
-    const stateEvents: string[] = [];
-    page.on('console', msg => {
-      if (msg.text().includes('state') || msg.text().includes('INPUT_KEY')) {
-        stateEvents.push(msg.text());
-      }
+    // Find the player entity to track state consistency
+    const playerEntity = await page.locator('[data-entity-type="player"]').first();
+    await expect(playerEntity).toBeVisible();
+    
+    // Get initial position
+    const initialPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
     });
     
-    // Rapid input sequence
+    let rapidInputsProcessed = 0;
+    
+    // Rapid input sequence - alternating right/left should return to near original position
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press('ArrowRight');
+      rapidInputsProcessed++;
       await page.keyboard.press('ArrowLeft');
+      rapidInputsProcessed++;
       await page.waitForTimeout(10);
     }
     
     await page.waitForTimeout(100);
     
+    // Get final position after rapid alternating input
+    const finalPosition = await playerEntity.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        left: parseInt(style.left, 10),
+        top: parseInt(style.top, 10)
+      };
+    });
+    
     // System should handle rapid input without state corruption
-    console.log(`State-related events: ${stateEvents.length}`);
+    // After alternating right/left moves, position should be close to original
+    const positionDifference = Math.abs(finalPosition.left - initialPosition.left);
+    expect(positionDifference).toBeLessThanOrEqual(40); // Within one cell size
+    
+    // Verify system remained functional
+    const gameCanvas = await page.locator('[data-testid="game-canvas"]');
+    await expect(gameCanvas).toBeVisible();
+    
+    console.log(`Rapid input test: ${rapidInputsProcessed} inputs processed, position consistency maintained`);
   });
 });
