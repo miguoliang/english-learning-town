@@ -29,7 +29,7 @@ jobs:
         godot --headless --import --quit || true
         
     - name: Cache imports
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: godot-client/.godot/imported
         key: ${{ runner.os }}-godot-${{ matrix.godot-version }}-${{ hashFiles('godot-client/**/*.gd', 'godot-client/**/*.cs', 'godot-client/**/*.tscn', 'godot-client/**/*.tres') }}
@@ -52,7 +52,7 @@ jobs:
         ./run_tests.sh --scene
         
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-godot-${{ matrix.godot-version }}
@@ -111,7 +111,7 @@ jobs:
         # Add performance test commands here when implemented
         
     - name: Upload performance results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: performance-results
