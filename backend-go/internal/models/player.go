@@ -29,8 +29,8 @@ type UpdatePlayerRequest struct {
 }
 
 type PlayerStats struct {
-	TotalInteractions int     `json:"total_interactions"`
-	CorrectAnswers    int     `json:"correct_answers"`
-	TotalMoneyEarned  int     `json:"total_money_earned"`
+	TotalInteractions  int     `json:"total_interactions"`
+	CorrectAnswers     int     `json:"correct_answers"`
+	TotalMoneyEarned   int     `json:"total_money_earned"`
 	AccuracyPercentage float64 `json:"accuracy_percentage"`
 }

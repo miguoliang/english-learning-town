@@ -23,7 +23,7 @@ func NewDatabase(dbPath string) (*Database, error) {
 	}
 
 	database := &Database{DB: db}
-	
+
 	if err := database.createTables(); err != nil {
 		return nil, fmt.Errorf("failed to create tables: %w", err)
 	}
@@ -114,7 +114,7 @@ func (d *Database) seedQuestions() error {
 			INSERT INTO questions (id, question, option_a, option_b, option_c, option_d, correct_answer, difficulty, category, reward)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`, q.id, q.question, q.a, q.b, q.c, q.d, q.correct, q.difficulty, q.category, q.reward)
-		
+
 		if err != nil {
 			return fmt.Errorf("failed to insert question %s: %w", q.id, err)
 		}

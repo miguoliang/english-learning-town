@@ -43,7 +43,7 @@ func (h *PlayerHandler) CreatePlayer(c *gin.Context) {
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
-	_, err := h.db.Exec(query, player.ID, player.Name, player.Gender, player.Money, 
+	_, err := h.db.Exec(query, player.ID, player.Name, player.Gender, player.Money,
 		player.Level, player.Experience, player.CurrentScenario, player.CreatedAt, player.UpdatedAt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create player"})

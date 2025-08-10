@@ -47,7 +47,7 @@ func (h *InteractionHandler) CreateInteraction(c *gin.Context) {
 	// Check if answer is correct
 	isCorrect := req.SelectedAnswer == question.CorrectAnswer
 	moneyChange := 0
-	
+
 	if isCorrect {
 		moneyChange = question.Reward
 	} else {
@@ -69,7 +69,7 @@ func (h *InteractionHandler) CreateInteraction(c *gin.Context) {
 		INSERT INTO interactions (id, player_id, question_id, selected_answer, is_correct, money_change, created_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
-	
+
 	_, err = h.db.Exec(insertQuery, interaction.ID, interaction.PlayerID, interaction.QuestionID,
 		interaction.SelectedAnswer, interaction.IsCorrect, interaction.MoneyChange, interaction.CreatedAt)
 	if err != nil {
@@ -85,12 +85,12 @@ func (h *InteractionHandler) CreateInteraction(c *gin.Context) {
 		    updated_at = CURRENT_TIMESTAMP
 		WHERE id = ?
 	`
-	
+
 	experienceGain := 5 // Base experience
 	if isCorrect {
 		experienceGain = 10
 	}
-	
+
 	_, err = h.db.Exec(updatePlayerQuery, moneyChange, experienceGain, req.PlayerID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update player"})
@@ -111,7 +111,7 @@ func (h *InteractionHandler) CreateInteraction(c *gin.Context) {
 
 func (h *InteractionHandler) GetPlayerInteractions(c *gin.Context) {
 	playerID := c.Param("playerID")
-	
+
 	query := `
 		SELECT i.id, i.player_id, i.question_id, i.selected_answer, i.is_correct, i.money_change, i.created_at,
 		       q.question, q.correct_answer, q.difficulty, q.category
