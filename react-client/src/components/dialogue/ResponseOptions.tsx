@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import type { DialogueResponse } from '../../types';
 import { VoiceInput } from './VoiceInput';
 import { AudioManager } from '../../utils/audioManager';
+import { AnimatedEmoji } from '../ui/AnimatedEmoji';
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -16,22 +17,87 @@ const VoiceSection = styled.div`
 `;
 
 const SectionTitle = styled.h4`
-  color: #d4904a;
+  color: ${({ theme }) => theme.colors.primary};
   margin: 0 0 12px 0;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.2rem;
+  font-weight: 600;
   letter-spacing: 0.025em;
   line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(255, 107, 107, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const celebrationPop = keyframes`
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+`;
+
+const sparkleAnimation = keyframes`
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 10px rgba(150, 206, 180, 0.6);
+  }
+  25% {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: 0 0 20px rgba(150, 206, 180, 0.8);
+  }
+  50% {
+    transform: scale(1.1) rotate(0deg);
+    box-shadow: 0 0 15px rgba(150, 206, 180, 0.7);
+  }
+  75% {
+    transform: scale(1.05) rotate(-5deg);
+    box-shadow: 0 0 20px rgba(150, 206, 180, 0.8);
+  }
 `;
 
 const MatchedResponse = styled.div`
-  padding: 12px;
-  background: rgba(0, 184, 148, 0.2);
-  border: 1px solid #00b894;
-  border-radius: 8px;
-  color: #00b894;
-  font-weight: 500;
-  margin-bottom: 12px;
+  padding: 16px 20px;
+  background: ${({ theme }) => theme.gradients.success};
+  border: 3px solid ${({ theme }) => theme.colors.surface};
+  border-radius: 16px;
+  color: ${({ theme }) => theme.colors.surface};
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  animation: ${celebrationPop} 0.6s ease-out, ${sparkleAnimation} 2s ease-in-out 0.6s;
+  box-shadow: 
+    ${({ theme }) => theme.shadows.fun},
+    0 6px 20px rgba(150, 206, 180, 0.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s ease-in-out 0.8s;
+  }
+  
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
 `;
 
 const VoicePrompts = styled.div`
@@ -44,12 +110,16 @@ const VoicePrompts = styled.div`
 `;
 
 const PromptsTitle = styled.h4`
-  color: #d4904a;
+  color: ${({ theme }) => theme.colors.secondary};
   margin: 0 0 16px 0;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.2rem;
+  font-weight: 600;
   letter-spacing: 0.025em;
   line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(78, 205, 196, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const PromptList = styled.div`
@@ -233,20 +303,37 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
   return (
     <OptionsContainer>
       <VoiceSection>
-        <SectionTitle>🎤 Voice Response</SectionTitle>
+        <SectionTitle>
+          <AnimatedEmoji emoji="🎤" mood="floating" size="1.3rem" />
+          Speak Your Answer!
+        </SectionTitle>
         <VoiceInput 
           onTranscript={handleVoiceTranscript}
           placeholder="Say your response... (e.g., 'Yes, I'm excited' or 'I need help')"
         />
         {matchedResponse && (
           <MatchedResponse>
-            ✅ Matched: "{matchedResponse.text}"
+            <AnimatedEmoji 
+              emoji="🎉" 
+              mood="excited" 
+              size="1.5rem"
+              autoAnimate={true}
+            />
+            <span>Great choice! You said: "{matchedResponse.text}"</span>
+            <AnimatedEmoji 
+              emoji="⭐" 
+              mood="floating" 
+              size="1.3rem"
+            />
           </MatchedResponse>
         )}
       </VoiceSection>
       
       <VoicePrompts>
-        <PromptsTitle>💭 You can say:</PromptsTitle>
+        <PromptsTitle>
+          <AnimatedEmoji emoji="💭" mood="thinking" size="1.3rem" />
+          Try saying these words:
+        </PromptsTitle>
         <PromptList>
           {responses.map((response) => (
             <PromptItem 

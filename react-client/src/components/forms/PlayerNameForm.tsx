@@ -11,24 +11,43 @@ const FormContainer = styled.div`
 `;
 
 const PlayerNameInput = styled.input`
-  padding: 1rem;
-  font-size: 1.1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  padding: 1.5rem 2rem;
+  font-size: 1.3rem;
+  font-family: 'Comic Neue', 'Fredoka One', sans-serif;
+  font-weight: 600;
+  border: 4px solid ${({ theme }) => theme.colors.surface};
+  border-radius: 16px;
+  background: ${({ theme }) => theme.gradients.accent};
+  color: ${({ theme }) => theme.colors.surface};
   backdrop-filter: blur(10px);
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 
+    ${({ theme }) => theme.shadows.fun},
+    0 4px 16px rgba(69, 183, 209, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  min-height: 60px;
   
   &::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
   }
   
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+    background: ${({ theme }) => theme.gradients.magical};
+    box-shadow: 
+      ${({ theme }) => theme.shadows.glow},
+      0 6px 20px rgba(255, 107, 107, 0.4);
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  &:hover:not(:focus) {
+    transform: translateY(-1px);
+    box-shadow: 
+      ${({ theme }) => theme.shadows.fun},
+      0 6px 18px rgba(69, 183, 209, 0.4);
   }
 `;
 
@@ -117,7 +136,7 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
     <FormContainer>
       <PlayerNameInput
         type="text"
-        placeholder="Enter your name..."
+        placeholder="What's your name, adventurer? ✨"
         value={playerName}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value)}
         onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleStartGame()}

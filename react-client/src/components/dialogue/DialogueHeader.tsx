@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { getNPCAvatar } from '../../utils/vocabularyHighlighter';
+import { AnimatedEmoji } from '../ui/AnimatedEmoji';
 
 const Header = styled.div`
   display: flex;
@@ -28,105 +29,147 @@ const SpeakerInfo = styled.div`
   gap: 16px;
 `;
 
-const SpeakerAvatar = styled.div`
-  width: 52px;
-  height: 52px;
+const SpeakerAvatar = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isSpeaking'].includes(prop),
+})<{ isSpeaking?: boolean }>`
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d4904a 0%, #b8783a 100%);
+  background: ${({ theme }) => theme.gradients.celebration};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  border: 2px solid rgba(212, 144, 74, 0.6);
+  border: 4px solid ${({ theme }) => theme.colors.primary};
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    0 2px 4px rgba(212, 144, 74, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    ${({ theme }) => theme.shadows.glow},
+    0 6px 16px rgba(255, 107, 107, 0.2);
   position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  ${props => props.isSpeaking && `
+    animation: celebration 1s ease-in-out infinite;
+    box-shadow: 
+      0 0 25px rgba(255, 107, 107, 0.6),
+      0 6px 16px rgba(255, 107, 107, 0.3);
+  `}
   
   &::before {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: -4px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(212, 144, 74, 0.3), transparent);
+    background: ${({ theme }) => theme.gradients.rainbow};
     z-index: -1;
+    opacity: 0.4;
+    animation: rainbow 3s linear infinite;
+  }
+  
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 30px rgba(78, 205, 196, 0.7),
+      0 8px 20px rgba(78, 205, 196, 0.3);
   }
 `;
 
 const SpeakerName = styled.h3`
-  color: #d4904a;
+  color: ${({ theme }) => theme.colors.primary};
   margin: 0;
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   letter-spacing: 0.025em;
   line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(255, 107, 107, 0.2);
+  
+  &:hover {
+    color: ${({ theme }) => theme.colors.secondary};
+    transition: color 0.3s ease;
+  }
 `;
 
 const ControlsHint = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(232, 212, 184, 0.6);
+  color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
 `;
 
 const VoiceModeIndicator = styled.div`
-  background: #00b894;
-  border: 2px solid #0a0906;
+  background: ${({ theme }) => theme.colors.success};
+  border: 2px solid ${({ theme }) => theme.colors.surface};
   border-radius: 50%;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   margin-right: 8px;
   animation: pulse 2s infinite;
-  box-shadow: 0 0 8px rgba(0, 184, 148, 0.4);
+  box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
   
   @keyframes pulse {
     0% { 
       transform: scale(1); 
       opacity: 1; 
-      box-shadow: 0 0 8px rgba(0, 184, 148, 0.4);
+      box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
     }
     50% { 
-      transform: scale(1.2); 
+      transform: scale(1.3); 
       opacity: 0.8; 
-      box-shadow: 0 0 16px rgba(0, 184, 148, 0.6);
+      box-shadow: 0 0 20px rgba(150, 206, 180, 0.8);
     }
     100% { 
       transform: scale(1); 
       opacity: 1; 
-      box-shadow: 0 0 8px rgba(0, 184, 148, 0.4);
+      box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
     }
   }
 `;
 
 const KeyHint = styled.span`
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border: 1px solid rgba(212, 144, 74, 0.3);
+  background: ${({ theme }) => theme.gradients.accent};
+  color: ${({ theme }) => theme.colors.surface};
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-family: 'Comic Neue', 'Fredoka One', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid ${({ theme }) => theme.colors.surface};
   letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(69, 183, 209, 0.3);
 `;
 
 const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: rgba(232, 212, 184, 0.8);
-  font-size: 1.5rem;
+  background: ${({ theme }) => theme.gradients.warning};
+  border: 3px solid ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 1.8rem;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 234, 167, 0.4);
   
   &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    color: rgba(232, 212, 184, 1);
+    background: ${({ theme }) => theme.gradients.magical};
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 16px rgba(162, 155, 254, 0.5);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+    animation: wiggle 0.3s ease;
   }
 `;
 
@@ -137,21 +180,22 @@ const AudioControls = styled.div`
 `;
 
 const AudioButton = styled.button`
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(212, 144, 74, 0.6);
-  color: #d4904a;
-  padding: 10px 16px;
-  border-radius: 8px;
+  background: ${({ theme }) => theme.gradients.primary};
+  border: 3px solid ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.surface};
+  padding: 12px 20px;
+  border-radius: 16px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.3s ease;
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(212, 144, 74, 0.1);
+    ${({ theme }) => theme.shadows.fun},
+    0 4px 12px rgba(255, 107, 107, 0.3);
   position: relative;
   overflow: hidden;
+  min-height: 48px;
   
   &::before {
     content: '';
@@ -160,17 +204,16 @@ const AudioButton = styled.button`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 144, 74, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.6s;
   }
   
   &:hover {
-    background: rgba(212, 144, 74, 0.2);
-    border-color: rgba(212, 144, 74, 0.8);
-    transform: translateY(-1px);
+    background: ${({ theme }) => theme.gradients.secondary};
+    transform: translateY(-2px) scale(1.05);
     box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.4),
-      0 2px 4px rgba(212, 144, 74, 0.2);
+      ${({ theme }) => theme.shadows.glow},
+      0 6px 16px rgba(78, 205, 196, 0.4);
       
     &::before {
       left: 100%;
@@ -178,13 +221,15 @@ const AudioButton = styled.button`
   }
   
   &:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(1.02);
+    animation: bounce 0.3s ease;
   }
   
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    background: ${({ theme }) => theme.colors.textLight};
   }
 `;
 
@@ -205,24 +250,40 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
   onStopSpeech,
   isSpeaking = false,
 }) => {
+  const [avatarMood, setAvatarMood] = useState<'normal' | 'happy' | 'excited' | 'thinking'>('normal');
+
   const handleSpeakClick = () => {
     if (onSpeak) {
       const message = `Hello, I am ${speakerName}. Nice to meet you!`;
       onSpeak(message);
+      setAvatarMood('excited');
+      setTimeout(() => setAvatarMood('normal'), 2000);
     }
   };
 
   const handleStopClick = () => {
     if (onStopSpeech) {
       onStopSpeech();
+      setAvatarMood('normal');
     }
+  };
+
+  const handleAvatarClick = () => {
+    setAvatarMood('happy');
+    setTimeout(() => setAvatarMood('normal'), 1000);
   };
 
   return (
     <Header>
       <SpeakerInfo>
-        <SpeakerAvatar>
-          {getNPCAvatar(npcId)}
+        <SpeakerAvatar isSpeaking={isSpeaking} onClick={handleAvatarClick}>
+          <AnimatedEmoji 
+            emoji={getNPCAvatar(npcId)}
+            mood={isSpeaking ? 'excited' : avatarMood}
+            size="2.2rem"
+            autoAnimate={isSpeaking}
+            triggerAnimation={avatarMood !== 'normal'}
+          />
         </SpeakerAvatar>
         <SpeakerName>{speakerName}</SpeakerName>
       </SpeakerInfo>
