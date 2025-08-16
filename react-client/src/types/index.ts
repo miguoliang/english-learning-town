@@ -88,6 +88,68 @@ export interface QuestData {
   dialoguePractice: string[];
 }
 
+// Achievement & Gamification Types
+export const AchievementType = {
+  VOCABULARY: 'VOCABULARY',
+  QUEST: 'QUEST', 
+  CONVERSATION: 'CONVERSATION',
+  STREAK: 'STREAK',
+  EXPLORATION: 'EXPLORATION',
+  LEARNING: 'LEARNING',
+  SOCIAL: 'SOCIAL',
+  MILESTONE: 'MILESTONE'
+} as const;
+
+export type AchievementType = typeof AchievementType[keyof typeof AchievementType];
+
+export const AchievementRarity = {
+  COMMON: 'COMMON',
+  UNCOMMON: 'UNCOMMON', 
+  RARE: 'RARE',
+  EPIC: 'EPIC',
+  LEGENDARY: 'LEGENDARY'
+} as const;
+
+export type AchievementRarity = typeof AchievementRarity[keyof typeof AchievementRarity];
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  type: AchievementType;
+  rarity: AchievementRarity;
+  icon: string; // emoji or icon name
+  xpReward: number;
+  requirement: {
+    type: string; // 'vocabulary_count', 'quest_complete', 'dialogue_count', etc.
+    target: number;
+    data?: Record<string, unknown>;
+  };
+  isSecret: boolean; // hidden until unlocked
+  unlockedAt?: Date;
+}
+
+export interface PlayerProgress {
+  totalXP: number;
+  xpToNextLevel: number;
+  currentLevelXP: number;
+  vocabularyLearned: number;
+  questsCompleted: number;
+  dialoguesCompleted: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate?: Date;
+  skillLevels: {
+    vocabulary: number;
+    grammar: number;
+    speaking: number;
+    listening: number;
+    reading: number;
+    writing: number;
+    pronunciation: number;
+  };
+}
+
 export interface PlayerData {
   id: string;
   name: string;
@@ -99,6 +161,16 @@ export interface PlayerData {
   activeQuests: string[];
   knownVocabulary: string[];
   unlockedAreas: string[];
+  
+  // Gamification additions
+  achievements: Achievement[];
+  unlockedAchievements: string[];
+  progress: PlayerProgress;
+  preferences: {
+    celebrationsEnabled: boolean;
+    soundEffectsEnabled: boolean;
+    animationsEnabled: boolean;
+  };
 }
 
 export interface NPCData {
@@ -162,7 +234,7 @@ export interface GameState {
 
 export interface Notification {
   id: string;
-  type: 'quest_started' | 'quest_completed' | 'objective_completed' | 'experience_gained' | 'level_up';
+  type: 'quest_started' | 'quest_completed' | 'objective_completed' | 'experience_gained' | 'level_up' | 'xp_gained' | 'vocabulary_learned' | 'achievement_unlocked';
   title: string;
   message: string;
   duration: number;

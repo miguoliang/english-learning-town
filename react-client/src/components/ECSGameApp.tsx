@@ -11,6 +11,7 @@ import { MainMenu } from './scenes/MainMenu';
 import { LoadingScreen } from './ui/LoadingScreen';
 import { gameConfig } from '../config/gameConfig';
 import { useGameStore } from '../stores/unifiedGameStore';
+import { CelebrationManager } from './celebration/CelebrationManager';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -168,6 +169,8 @@ export const ECSGameApp: React.FC = () => {
     <ThemeProvider theme={theme}>
       <AppContainer>
         {renderCurrentState()}
+        {/* Global celebration manager - shows across all scenes */}
+        <CelebrationManager />
       </AppContainer>
     </ThemeProvider>
   );
