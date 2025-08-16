@@ -7,6 +7,7 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useGameStore } from '../stores/unifiedGameStore';
 import { getCellSize } from '../config/gameConfig';
+import { logger } from '../utils/logger';
 
 const GameCanvas = styled.div`
   position: relative;
@@ -102,7 +103,7 @@ export const ECSRendererZustand: React.FC<ECSRendererZustandProps> = ({
 
   // Only log occasionally to avoid spam
   if (Math.random() < 0.01) { // Log roughly 1% of renders
-    console.log('🖼️ ECSRendererZustand rendering', renderableEntities.length, 'entities');
+    logger.ecs('ECSRendererZustand rendering', renderableEntities.length, 'entities');
   }
 
   return (

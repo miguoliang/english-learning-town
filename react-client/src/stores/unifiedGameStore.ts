@@ -18,6 +18,7 @@ import type {
   PlayerProgress
 } from '../types';
 import { ACHIEVEMENTS, calculateLevel, calculateXPToNextLevel, XP_CURVE } from '../data/achievements';
+import { logger } from '../utils/logger';
 
 // Types for the unified store
 interface RenderableEntity {
@@ -172,7 +173,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
         // =============================================================================
         
         initializeECS: () => {
-          console.log('🌍 Unified Store: Initializing ECS world and systems...');
+          logger.ecs('Initializing ECS world and systems...');
           
           const world = new World();
           const sceneLoader = new SceneLoader(world);
@@ -181,7 +182,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           const systems = SystemFactory.createSystems();
 
           // Add systems to world
-          console.log('🔧 Unified Store: Adding systems to world...');
+          logger.ecs('Adding systems to world...');
           world.addSystem(systems.collision);
           world.addSystem(systems.movement);
           world.addSystem(systems.inputState);
@@ -219,7 +220,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             isECSInitialized: true
           });
 
-          console.log('✅ Unified Store: ECS initialized successfully');
+          logger.ecs('ECS initialized successfully');
         },
 
         // Load a scene
@@ -229,12 +230,12 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             throw new Error('ECS not initialized');
           }
 
-          console.log(`🏙️ Unified Store: Loading scene: ${scenePath}`);
+          logger.scene(`Loading scene: ${scenePath}`);
           await sceneLoader.loadSceneFromFile(scenePath);
           
           // Update both ECS current scene and persistent game scene
           set({ currentScene: scenePath });
-          console.log(`✅ Unified Store: Scene loaded: ${scenePath}`);
+          logger.scene(`Scene loaded: ${scenePath}`);
         },
 
         // Add player to ECS world
@@ -244,7 +245,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             throw new Error('ECS not initialized');
           }
 
-          console.log(`🧑 Unified Store: Adding player ${playerId} at position (${position.x}, ${position.y})`);
+          logger.player(`Adding player ${playerId} at position (${position.x}, ${position.y})`);
           
           const player = world.createEntity(playerId);
           
@@ -308,7 +309,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             player: { ...get().player, name: name || get().player.name }
           });
           
-          console.log(`✅ Unified Store: Player added: ${playerId}`);
+          logger.player(`Player added: ${playerId}`);
         },
 
         // Update renderable entities
@@ -321,7 +322,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           const { world } = get();
           if (!world || gameLoopId !== null) return;
 
-          console.log('🔄 Unified Store: Starting game loop...');
+          logger.ecs('Starting game loop...');
           
           const gameLoop = () => {
             world.update();
@@ -333,7 +334,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
 
         stopGameLoop: () => {
           if (gameLoopId !== null) {
-            console.log('⏹️ Unified Store: Stopping game loop...');
+            logger.ecs('Stopping game loop...');
             cancelAnimationFrame(gameLoopId);
             gameLoopId = null;
           }
@@ -359,7 +360,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             playerPosition: null
           });
           
-          console.log('🧹 Unified Store: ECS cleanup completed');
+          logger.ecs('ECS cleanup completed');
         },
 
         // =============================================================================
@@ -398,7 +399,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               progress: updatedProgress
             };
 
-            let notifications = [...state.notifications];
+            const notifications = [...state.notifications];
 
             // Add XP gain notification for kids
             notifications.push({
@@ -633,7 +634,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
 
             const achievement = state.player.achievements.find(a => a.id === achievementId);
             if (!achievement) {
-              console.warn(`Achievement ${achievementId} not found`);
+              logger.warn(`Achievement ${achievementId} not found`);
               return state;
             }
 
@@ -658,7 +659,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             const newLevel = calculateLevel(newTotalXP);
             const leveledUp = newLevel > state.player.level;
 
-            let updatedProgress = {
+            const updatedProgress = {
               ...state.player.progress,
               totalXP: newTotalXP,
               xpToNextLevel: calculateXPToNextLevel(newTotalXP),
@@ -718,7 +719,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               case 'streak_count':
                 shouldUnlock = player.progress.currentStreak >= achievement.requirement.target;
                 break;
-              case 'learning_time':
+              case 'learning_time': {
                 const currentHour = new Date().getHours();
                 const targetHour = achievement.requirement.target;
                 const condition = achievement.requirement.data?.timeCondition;
@@ -728,6 +729,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
                   shouldUnlock = currentHour <= targetHour;
                 }
                 break;
+              }
             }
 
             if (shouldUnlock) {

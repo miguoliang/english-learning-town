@@ -11,6 +11,7 @@ import type {
 } from '../components';
 import { ECSEventTypes } from '../events';
 import { gameConfig } from '../../config/gameConfig';
+import { logger } from '../../utils/logger';
 
 export class RenderSystem implements System {
   readonly name = 'RenderSystem';
@@ -48,21 +49,21 @@ export class RenderSystem implements System {
     // Listen for events that should trigger re-rendering
     events.on(ECSEventTypes.ENTITY_MOVED, (_data) => {
       if (gameConfig.debug.showSystemLogs) {
-        console.log('🎨 RenderSystem: Entity moved, triggering render');
+        logger.ecs('RenderSystem: Entity moved, triggering render');
       }
       this.triggerRender('entity-moved');
     });
 
     events.on(ECSEventTypes.ENTITY_ADDED, (_data) => {
       if (gameConfig.debug.showSystemLogs) {
-        console.log('🎨 RenderSystem: Entity added, triggering render');
+        logger.ecs('RenderSystem: Entity added, triggering render');
       }
       this.triggerRender('entity-added');
     });
 
     events.on(ECSEventTypes.ENTITY_REMOVED, (_data) => {
       if (gameConfig.debug.showSystemLogs) {
-        console.log('🎨 RenderSystem: Entity removed, triggering render');
+        logger.ecs('RenderSystem: Entity removed, triggering render');
       }
       this.triggerRender('entity-removed');
     });
@@ -71,7 +72,7 @@ export class RenderSystem implements System {
       // Only re-render if it's a visual component
       if (['position', 'size', 'renderable'].includes(data.componentType)) {
         if (gameConfig.debug.showSystemLogs) {
-          console.log('🎨 RenderSystem: Visual component added, triggering render');
+          logger.ecs('RenderSystem: Visual component added, triggering render');
         }
         this.triggerRender('component-added');
       }
@@ -81,7 +82,7 @@ export class RenderSystem implements System {
       // Only re-render if it's a visual component
       if (['position', 'size', 'renderable'].includes(data.componentType)) {
         if (gameConfig.debug.showSystemLogs) {
-          console.log('🎨 RenderSystem: Visual component removed, triggering render');
+          logger.ecs('RenderSystem: Visual component removed, triggering render');
         }
         this.triggerRender('component-removed');
       }
@@ -89,7 +90,7 @@ export class RenderSystem implements System {
 
     events.on(ECSEventTypes.SCENE_LOADED, (_data) => {
       if (gameConfig.debug.showSystemLogs) {
-        console.log('🎨 RenderSystem: Scene loaded, triggering render');
+        logger.ecs('RenderSystem: Scene loaded, triggering render');
       }
       this.triggerRender('scene-loaded');
     });
@@ -121,7 +122,7 @@ export class RenderSystem implements System {
     this.renderableEntities.sort((a, b) => (a.renderable.zIndex || 0) - (b.renderable.zIndex || 0));
     
     if (gameConfig.debug.showSystemLogs) {
-      console.log(`🎨 RenderSystem: Rendering ${this.renderableEntities.length} entities (reason: ${reason})`);
+      logger.ecs(`RenderSystem: Rendering ${this.renderableEntities.length} entities (reason: ${reason})`);
     }
     
     this.eventBus.emit(ECSEventTypes.RENDER_FRAME_READY, { 

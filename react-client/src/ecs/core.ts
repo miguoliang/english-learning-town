@@ -10,6 +10,7 @@
 import { gameConfig } from '../config/gameConfig';
 import { ecsEventBus, ECSEventTypes, type Emitter, type ECSEvents } from './events';
 import { SystemFactory } from './systemRegistry';
+import { logger } from '../utils/logger';
 
 export type EntityId = string;
 
@@ -188,12 +189,12 @@ export class World {
    * Add a component to an entity
    */
   addComponent<T extends Component>(entityId: EntityId, component: T): void {
-    console.log(`🔧 World.addComponent: Adding ${component.type} component to entity ${entityId}`, component);
+    logger.ecs(`Adding ${component.type} component to entity ${entityId}`, component);
     this.components.addComponent(entityId, component);
     
     // Verify the component was added
     const hasComponent = this.components.hasComponent(entityId, component.type);
-    console.log(`✅ Component ${component.type} added to ${entityId}: ${hasComponent}`);
+    logger.ecs(`Component ${component.type} added to ${entityId}: ${hasComponent}`);
     
     this.events.emit(ECSEventTypes.COMPONENT_ADDED, { entityId, componentType: component.type });
   }
@@ -217,16 +218,16 @@ export class World {
    * Add a system to the world
    */
   addSystem(system: System): void {
-    console.log(`🔧 World.addSystem: Adding system "${system.name}" to world. Total systems: ${this.systems.length} -> ${this.systems.length + 1}`);
+    logger.ecs(`Adding system "${system.name}" to world. Total systems: ${this.systems.length} -> ${this.systems.length + 1}`);
     this.systems.push(system);
     
     // Initialize event-driven systems immediately
     if (SystemFactory.isEventDrivenSystem(system.name)) {
-      console.log(`🔧 World.addSystem: Initializing event-driven system "${system.name}"...`);
+      logger.ecs(`Initializing event-driven system "${system.name}"...`);
       system.update(this.getAllEntities(), this.components, 0, this.events);
     }
     
-    console.log(`✅ World.addSystem: System "${system.name}" added. Total systems now: ${this.systems.length}`);
+    logger.ecs(`System "${system.name}" added. Total systems now: ${this.systems.length}`);
   }
 
   /**
@@ -270,7 +271,7 @@ export class World {
     );
     
     if (gameConfig.debug.showSystemLogs && this.frameCounter % gameConfig.performance.logFrequency === 0) {
-      console.log('🌍 World.update: Running', gameLoopSystems.length, 'game loop systems for', entities.length, 'entities');
+      logger.ecs('Running', gameLoopSystems.length, 'game loop systems for', entities.length, 'entities');
     }
     
     for (const system of gameLoopSystems) {

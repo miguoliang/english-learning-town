@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
+/// <reference path="../../types/speech.ts" />
 import { AudioManager } from '../../utils/audioManager';
 
 const VoiceContainer = styled.div`
@@ -137,7 +138,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [status, setStatus] = useState('');
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<unknown | null>(null);
 
   const startListening = async () => {
     if (isListening) {
@@ -186,7 +187,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
 
   const stopListening = () => {
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      (recognitionRef.current as { stop: () => void }).stop();
     }
     setIsListening(false);
     setStatus('Stopped listening');

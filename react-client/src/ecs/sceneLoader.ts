@@ -15,6 +15,7 @@ import {
 } from './components';
 import { ecsEventBus, ECSEventTypes } from './events';
 import { getCellSize } from '../config/gameConfig';
+import { logger } from '../utils/logger';
 import type {
   PositionComponent,
   SizeComponent,
@@ -132,7 +133,7 @@ export class SceneLoader {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         failedEntities.push({ id: entityData.id, error: errorMessage });
-        console.error(`Failed to create entity ${entityData.id}:`, error);
+        logger.error(`Failed to create entity ${entityData.id}:`, error);
       }
     }
 
@@ -142,7 +143,7 @@ export class SceneLoader {
     }
 
     if (failedEntities.length > 0) {
-      console.warn(`Scene '${sceneData.id}' loaded with ${failedEntities.length} failed entities:`, failedEntities);
+      logger.warn(`Scene '${sceneData.id}' loaded with ${failedEntities.length} failed entities:`, failedEntities);
     }
 
     // Verify essential entities exist (at least one renderable entity)
@@ -151,7 +152,7 @@ export class SceneLoader {
       throw new Error(`Scene loading validation failed: No renderable entities found in scene '${sceneData.id}'`);
     }
 
-    console.log(`Scene '${sceneData.id}' loaded successfully: ${successfullyLoadedEntities} entities created, ${renderableEntities.length} renderable`);
+    logger.scene(`Scene '${sceneData.id}' loaded successfully: ${successfullyLoadedEntities} entities created, ${renderableEntities.length} renderable`);
     ecsEventBus.emit(ECSEventTypes.SCENE_LOADED, { 
       scenePath: `Scene: ${sceneData.id}`, 
       entityCount: successfullyLoadedEntities
@@ -172,7 +173,7 @@ export class SceneLoader {
     }
 
     try {
-      console.log(`Loading scene from: ${scenePath}`);
+      logger.scene(`Loading scene from: ${scenePath}`);
       const response = await fetch(scenePath);
       
       if (!response.ok) {
@@ -195,10 +196,10 @@ export class SceneLoader {
       }
       
       await this.loadScene(sceneData);
-      console.log(`Scene loaded successfully from: ${scenePath}`);
+      logger.scene(`Scene loaded successfully from: ${scenePath}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Error loading scene from '${scenePath}':`, error);
+      logger.error(`Error loading scene from '${scenePath}':`, error);
       throw new Error(`Scene loading failed: ${errorMessage}`);
     }
   }
@@ -287,7 +288,7 @@ export class SceneLoader {
               throw new Error(`Invalid position: x=${x}, y=${y}. Positions must be non-negative`);
             }
             const positionComponent = createPositionComponent(x, y);
-            console.log(`🔧 Creating position component for ${entity.id}:`, positionComponent);
+            logger.ecs(`Creating position component for ${entity.id}:`, positionComponent);
             this.world.addComponent(entity.id, positionComponent);
             componentsAdded++;
           }
@@ -303,7 +304,7 @@ export class SceneLoader {
               throw new Error(`Invalid size: width=${sizeData.width}, height=${sizeData.height}. Size must be positive`);
             }
             const sizeComponent = createSizeComponent(sizeData.width, sizeData.height);
-            console.log(`🔧 Creating size component for ${entity.id}:`, sizeComponent);
+            logger.ecs(`Creating size component for ${entity.id}:`, sizeComponent);
             this.world.addComponent(entity.id, sizeComponent);
             componentsAdded++;
           }
@@ -343,7 +344,7 @@ export class SceneLoader {
               zIndex: renderData.zIndex,
               visible: renderData.visible
             });
-            console.log(`🔧 Creating renderable component for ${entity.id}:`, renderableComponent);
+            logger.ecs(`Creating renderable component for ${entity.id}:`, renderableComponent);
             this.world.addComponent(entity.id, renderableComponent);
             componentsAdded++;
           }

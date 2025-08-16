@@ -10,6 +10,7 @@ import type {
 import { ECSEventTypes } from '../events';
 import { InputStateSystem } from './InputStateSystem';
 import { InteractionZoneSystem } from './InteractionZoneSystem';
+import { logger } from '../../utils/logger';
 
 export class PlayerInteractionSystem implements System {
   readonly name = 'PlayerInteractionSystem';
@@ -57,7 +58,7 @@ export class PlayerInteractionSystem implements System {
     const playerPosition = components.getComponent<PositionComponent>(playerId, 'position');
     if (!playerPosition) return;
 
-    console.log(`🎮 Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`);
+    logger.ecs(`Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`);
     
     // Use InteractionZoneSystem to find interactable entities
     const interactableEntities = this.interactionZoneSystem.findInteractableEntities(playerPosition, components);
@@ -66,7 +67,7 @@ export class PlayerInteractionSystem implements System {
       // Take the first interactable entity (could be enhanced to prioritize by distance)
       const targetEntityId = interactableEntities[0];
       
-      console.log(`✨ Player can interact with ${targetEntityId}`);
+      logger.ecs(`Player can interact with ${targetEntityId}`);
       
       // Emit interaction event
       events.emit(ECSEventTypes.PLAYER_INTERACTION, { 
@@ -74,7 +75,7 @@ export class PlayerInteractionSystem implements System {
         targetEntityId 
       });
     } else {
-      console.log(`❌ No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`);
+      logger.ecs(`No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`);
     }
   }
 }

@@ -2,6 +2,8 @@
 
 import { generateTone, SOUND_FREQUENCIES } from './audioEngine';
 import type { SoundType } from './audioEngine';
+import type { SpeechRecognitionEvent, SpeechRecognitionErrorEvent } from '../types/speech';
+import { logger } from './logger';
 
 class AudioManagerClass {
   private masterVolume: number = 0.7;
@@ -94,7 +96,7 @@ class AudioManagerClass {
       }
 
       if (!('speechSynthesis' in window)) {
-        console.warn('Speech synthesis not supported');
+        logger.warn('Speech synthesis not supported');
         resolve();
         return;
       }
@@ -147,14 +149,17 @@ class AudioManagerClass {
     return new Promise((resolve, reject) => {
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         const error = 'Speech recognition not supported';
-        console.warn(error);
+        logger.warn(error);
         if (options?.onError) options.onError(error);
         reject(new Error(error));
         return;
       }
 
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+      const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionClass) {
+        throw new Error('SpeechRecognition not supported');
+      }
+      const recognition = new SpeechRecognitionClass();
 
       recognition.lang = options?.language || 'en-US';
       recognition.continuous = options?.continuous ?? false;
@@ -163,7 +168,7 @@ class AudioManagerClass {
 
       let finalTranscript = '';
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -188,9 +193,9 @@ class AudioManagerClass {
         resolve(finalTranscript.trim());
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         const error = `Speech recognition error: ${event.error}`;
-        console.error(error);
+        logger.error(error);
         if (options?.onError) options.onError(error);
         reject(new Error(error));
       };

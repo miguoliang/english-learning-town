@@ -4,6 +4,7 @@ import { useGameStore } from '../stores/unifiedGameStore';
 import { AudioManager } from '../utils/audioManager';
 import type { DialogueEntry, DialogueResponse } from '../types';
 import { ObjectiveType } from '../types';
+import { logger } from '../utils/logger';
 
 // Mock dialogue data - in a real app, this would come from a data store or API
 const npcDialogues: Record<string, DialogueEntry[]> = {
@@ -392,7 +393,7 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
         voice: 'en-US'
       });
     } catch (error) {
-      console.error('Speech synthesis failed:', error);
+      logger.error('Speech synthesis failed:', error);
     } finally {
       setIsSpeaking(false);
     }

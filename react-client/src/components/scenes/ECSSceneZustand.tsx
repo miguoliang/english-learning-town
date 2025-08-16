@@ -12,6 +12,7 @@ import { DialogueSystem } from '../dialogue/DialogueSystem';
 import { XPProgressBar } from '../progress/XPProgressBar';
 import { GameStats } from '../progress/GameStats';
 import { AchievementGrid } from '../achievement/AchievementGrid';
+import { logger } from '../../utils/logger';
 
 const SceneContainer = styled.div`
   width: 100vw;
@@ -207,7 +208,7 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
   // Initialize player progress if it doesn't exist
   useEffect(() => {
     if (!player.progress) {
-      console.log('🎯 Initializing player progress...');
+      logger.player('Initializing player progress...');
       initializePlayerProgress();
     }
   }, [player.progress, initializePlayerProgress]);
@@ -227,11 +228,11 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
     const initializeGame = async () => {
       try {
         if (!isECSInitialized) {
-          console.log('⚠️ ECS not initialized yet, waiting...');
+          logger.warn('ECS not initialized yet, waiting...');
           return;
         }
 
-        console.log('🎮 ECSSceneZustand: Initializing game...');
+        logger.info('ECSSceneZustand: Initializing game...');
         
         // Load the scene
         await loadScene(scenePath);
@@ -243,9 +244,9 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
         // Start the game loop
         startGameLoop();
         
-        console.log('✅ ECSSceneZustand: Game initialized successfully');
+        logger.info('ECSSceneZustand: Game initialized successfully');
       } catch (error) {
-        console.error('❌ ECSSceneZustand: Failed to initialize game:', error);
+        logger.error('ECSSceneZustand: Failed to initialize game:', error);
       }
     };
 
@@ -253,7 +254,7 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
 
     // Cleanup on unmount
     return () => {
-      console.log('🧹 ECSSceneZustand: Component unmounting, stopping game loop');
+      logger.info('🧹 ECSSceneZustand: Component unmounting, stopping game loop');
       stopGameLoop();
     };
   }, [isECSInitialized, scenePath, playerName, loadScene, addPlayer, startGameLoop, stopGameLoop]);

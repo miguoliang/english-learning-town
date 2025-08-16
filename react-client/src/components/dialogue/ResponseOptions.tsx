@@ -4,6 +4,7 @@ import type { DialogueResponse } from '../../types';
 import { VoiceInput } from './VoiceInput';
 import { AudioManager } from '../../utils/audioManager';
 import { AnimatedEmoji } from '../ui/AnimatedEmoji';
+import { logger } from '../../utils/logger';
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -272,7 +273,7 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
         await AudioManager.speakText(response.text);
         setCurrentlyReading(null);
       } catch (error) {
-        console.error('Error reading response:', error);
+        logger.error('Error reading response:', error);
         setCurrentlyReading(null);
       }
     }

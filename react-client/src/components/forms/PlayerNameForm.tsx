@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { MenuButton } from '../ui/MenuButton';
 import { useGameStore } from '../../stores/unifiedGameStore';
+import { logger } from '../../utils/logger';
 
 const FormContainer = styled.div`
   display: flex;
@@ -112,7 +113,7 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
       setCurrentScene('town');
       onStartGame();
     } catch (error) {
-      console.error('Failed to start game:', error);
+      logger.error('Failed to start game:', error);
       alert('Failed to start game. Please try again.');
     } finally {
       setIsLoading(false);

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { highlightVocabulary } from '../../utils/vocabularyHighlighter';
 
 const TextContainer = styled.div`
   color: rgba(232, 212, 184, 0.95);
@@ -13,20 +12,54 @@ const TextContainer = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 `;
 
+const VocabularyHighlight = styled.span`
+  background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+`;
+
 interface DialogueTextProps {
   text: string;
   vocabularyHighlights?: string[];
 }
 
+// Safe vocabulary highlighting using React components instead of dangerouslySetInnerHTML
+const highlightVocabularyWords = (text: string, vocabulary: string[] = []): React.ReactNode[] => {
+  if (!vocabulary.length) return [text];
+
+  // Create a regex that matches all vocabulary words
+  const vocabularyRegex = new RegExp(`\\b(${vocabulary.join('|')})\\b`, 'gi');
+  const parts = text.split(vocabularyRegex);
+
+  return parts.map((part, index) => {
+    // Check if this part is a vocabulary word
+    const isVocabulary = vocabulary.some(word => 
+      word.toLowerCase() === part.toLowerCase()
+    );
+
+    if (isVocabulary) {
+      return (
+        <VocabularyHighlight key={index}>
+          {part}
+        </VocabularyHighlight>
+      );
+    }
+
+    return part;
+  });
+};
+
 export const DialogueText: React.FC<DialogueTextProps> = ({
   text,
   vocabularyHighlights = [],
 }) => {
+  const highlightedContent = highlightVocabularyWords(text, vocabularyHighlights);
+
   return (
-    <TextContainer
-      dangerouslySetInnerHTML={{
-        __html: highlightVocabulary(text, vocabularyHighlights)
-      }}
-    />
+    <TextContainer>
+      {highlightedContent}
+    </TextContainer>
   );
 };

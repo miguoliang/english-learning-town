@@ -9,6 +9,7 @@ import type {
   SizeComponent,
   CollisionComponent
 } from '../components';
+import { logger } from '../../utils/logger';
 
 export class CollisionSystem implements System {
   readonly name = 'CollisionSystem';
@@ -28,7 +29,7 @@ export class CollisionSystem implements System {
   canMoveTo(entityId: string, x: number, y: number, entities: Entity[], components: ComponentManager): boolean {
     const entitySize = components.getComponent<SizeComponent>(entityId, 'size');
     if (!entitySize) {
-      console.warn(`🚫 CollisionSystem: Entity ${entityId} has no size component`);
+      logger.warn(`CollisionSystem: Entity ${entityId} has no size component`);
       return false;
     }
 
@@ -48,7 +49,7 @@ export class CollisionSystem implements System {
       // Check if the proposed position would overlap with this entity
       if (this.wouldCollide(x, y, entitySize.width, entitySize.height, 
                            otherPosition.x, otherPosition.y, otherSize.width, otherSize.height)) {
-        console.log(`🚫 Collision detected: ${entityId} cannot move to (${x}, ${y}) - blocked by ${otherEntity.id}`);
+        logger.ecs(`Collision detected: ${entityId} cannot move to (${x}, ${y}) - blocked by ${otherEntity.id}`);
         return false;
       }
     }

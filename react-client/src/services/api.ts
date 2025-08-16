@@ -1,6 +1,7 @@
 // API Client for Go Backend
 
 import type { PlayerData } from '../types';
+import { logger } from '../utils/logger';
 
 export class APIClient {
   private baseUrl: string;
@@ -32,7 +33,7 @@ export class APIClient {
       
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
+      logger.error('API request failed:', error);
       throw error;
     }
   }

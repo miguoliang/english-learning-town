@@ -12,6 +12,7 @@ import { LoadingScreen } from './ui/LoadingScreen';
 import { gameConfig } from '../config/gameConfig';
 import { useGameStore } from '../stores/unifiedGameStore';
 import { CelebrationManager } from './celebration/CelebrationManager';
+import { logger } from '../utils/logger';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -79,7 +80,7 @@ export const ECSGameApp: React.FC = () => {
 
   useEffect(() => {
     if (!isECSInitialized) {
-      console.log('🚀 ECSGameApp: Initializing ECS...');
+      logger.ecs('ECSGameApp: Initializing ECS...');
       initializeECS();
     }
   }, [initializeECS, isECSInitialized]);
@@ -134,7 +135,7 @@ export const ECSGameApp: React.FC = () => {
       case 'cafe': {
         const sceneConfig = SCENES[currentScene];
         if (!sceneConfig) {
-          console.error('Scene config not found for:', currentScene);
+          logger.error('Scene config not found for:', currentScene);
           return <div>Error: Scene not found</div>;
         }
         
