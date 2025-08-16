@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { getNPCAvatar } from '../../utils/vocabularyHighlighter';
-import { AudioManager } from '../../utils/audioManager';
 
 const Header = styled.div`
   display: flex;
