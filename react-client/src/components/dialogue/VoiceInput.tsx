@@ -5,73 +5,121 @@ import { AudioManager } from '../../utils/audioManager';
 const VoiceContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 16px;
-  background: rgba(116, 185, 255, 0.1);
-  border: 1px solid rgba(116, 185, 255, 0.3);
-  border-radius: 8px;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 144, 74, 0.2);
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(212, 144, 74, 0.1);
+  backdrop-filter: blur(4px);
 `;
 
 const VoiceControls = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 `;
 
 const VoiceButton = styled.button<{ isListening?: boolean }>`
   background: ${props => props.isListening 
-    ? 'rgba(231, 76, 60, 0.8)' 
-    : 'rgba(116, 185, 255, 0.8)'};
-  border: 1px solid ${props => props.isListening ? '#e74c3c' : '#74b9ff'};
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
+    ? 'rgba(169, 50, 38, 0.9)' 
+    : 'rgba(0, 0, 0, 0.6)'};
+  border: 1px solid ${props => props.isListening ? '#a93226' : 'rgba(212, 144, 74, 0.6)'};
+  color: ${props => props.isListening ? '#ffffff' : '#d4904a'};
+  padding: 14px 20px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  transition: all 0.3s;
+  letter-spacing: 0.02em;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(212, 144, 74, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 144, 74, 0.1), transparent);
+    transition: left 0.6s;
+  }
   
   &:hover {
     background: ${props => props.isListening 
-      ? 'rgba(231, 76, 60, 1)' 
-      : 'rgba(116, 185, 255, 1)'};
+      ? 'rgba(169, 50, 38, 1)' 
+      : 'rgba(212, 144, 74, 0.2)'};
+    border-color: ${props => props.isListening ? '#a93226' : 'rgba(212, 144, 74, 0.8)'};
+    transform: translateY(-2px);
+    box-shadow: 
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      0 3px 6px rgba(212, 144, 74, 0.2);
+      
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
   
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    transform: none;
   }
 `;
 
 const TranscriptDisplay = styled.div`
-  min-height: 40px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #ddd;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  min-height: 60px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 144, 74, 0.15);
+  border-radius: 10px;
+  color: rgba(232, 212, 184, 0.9);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(212, 144, 74, 0.05);
+  transition: border-color 0.3s;
+  
+  &:focus-within {
+    border-color: rgba(212, 144, 74, 0.3);
+  }
 `;
 
 const InterimText = styled.span`
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(232, 212, 184, 0.5);
   font-style: italic;
 `;
 
 const FinalText = styled.span`
-  color: #74b9ff;
+  color: #d4904a;
   font-weight: 500;
 `;
 
 const StatusText = styled.div`
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(232, 212, 184, 0.8);
   text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 `;
 
 interface VoiceInputProps {

@@ -10,22 +10,24 @@ const TextWithAudio = styled.div`
 `;
 
 const AudioButton = styled.button`
-  background: rgba(116, 185, 255, 0.2);
-  border: 1px solid #74b9ff;
-  color: #74b9ff;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 144, 74, 0.6);
+  color: #d4904a;
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
   transition: all 0.3s;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   
   &:hover {
-    background: rgba(116, 185, 255, 0.3);
+    background: rgba(212, 144, 74, 0.2);
+    border-color: rgba(212, 144, 74, 0.8);
   }
   
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
   }
 `;

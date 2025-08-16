@@ -19,6 +19,11 @@ const AppContainer = styled.div`
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 `;
 
+const GameContainer = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
 type GameState = 'menu' | 'loading' | 'town' | 'school' | 'shop' | 'library' | 'cafe';
 
 interface SceneConfig {
@@ -133,12 +138,14 @@ export const ECSGameApp: React.FC = () => {
         }
         
         return (
-          <ECSSceneZustand
-            playerName="Player" // TODO: Get from player state
-            scenePath={sceneConfig.dataPath}
-            showGrid={gameConfig.display.showGrid}
-            cellSize={gameConfig.display.cellSize}
-          />
+          <GameContainer className="ecs-game-container">
+            <ECSSceneZustand
+              playerName="Player" // TODO: Get from player state
+              scenePath={sceneConfig.dataPath}
+              showGrid={gameConfig.display.showGrid}
+              cellSize={gameConfig.display.cellSize}
+            />
+          </GameContainer>
         );
       }
         

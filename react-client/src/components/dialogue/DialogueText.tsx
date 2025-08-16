@@ -3,11 +3,14 @@ import styled from 'styled-components';
 import { highlightVocabulary } from '../../utils/vocabularyHighlighter';
 
 const TextContainer = styled.div`
-  color: white;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  min-height: 60px;
+  color: rgba(232, 212, 184, 0.95);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  margin-bottom: 24px;
+  min-height: 70px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 `;
 
 interface DialogueTextProps {
