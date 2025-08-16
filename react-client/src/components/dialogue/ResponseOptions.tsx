@@ -124,7 +124,6 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
   onResponseClick,
 }) => {
   const [matchedResponse, setMatchedResponse] = useState<DialogueResponse | null>(null);
-  const [voiceTranscript, setVoiceTranscript] = useState('');
   const [currentlyReading, setCurrentlyReading] = useState<string | null>(null);
 
   const findBestMatch = (transcript: string): DialogueResponse | null => {
@@ -170,7 +169,6 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
   };
 
   const handleVoiceTranscript = (transcript: string) => {
-    setVoiceTranscript(transcript);
     const match = findBestMatch(transcript);
     setMatchedResponse(match);
     
@@ -229,7 +227,6 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
 
   useEffect(() => {
     setMatchedResponse(null);
-    setVoiceTranscript('');
     setCurrentlyReading(null);
   }, [responses]);
 
@@ -251,7 +248,7 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
       <VoicePrompts>
         <PromptsTitle>💭 You can say:</PromptsTitle>
         <PromptList>
-          {responses.map((response, index) => (
+          {responses.map((response) => (
             <PromptItem 
               key={response.id}
               isHighlighted={currentlyReading === response.id}

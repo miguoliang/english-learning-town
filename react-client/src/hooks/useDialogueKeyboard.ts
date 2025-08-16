@@ -1,15 +1,10 @@
 import { useEffect } from 'react';
-import type { DialogueEntry, DialogueResponse } from '../types';
 
 interface UseDialogueKeyboardProps {
-  currentDialogue: DialogueEntry | null;
-  hasResponded: boolean;
   onClose: () => void;
 }
 
 export const useDialogueKeyboard = ({
-  currentDialogue,
-  hasResponded,
   onClose,
 }: UseDialogueKeyboardProps) => {
   useEffect(() => {

@@ -329,7 +329,6 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
   const [currentDialogue, setCurrentDialogue] = useState<DialogueEntry | null>(null);
   const [hasResponded, setHasResponded] = useState(false);
   const [learnedVocabulary, setLearnedVocabulary] = useState<string[]>([]);
-  const [selectedResponseIndex, setSelectedResponseIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
   const { updateQuestObjective } = useQuestStore();
@@ -340,7 +339,6 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
     const dialogues = npcDialogues[npcId];
     if (dialogues && dialogues.length > 0) {
       setCurrentDialogue(dialogues[0]);
-      setSelectedResponseIndex(0);
     }
   }, [npcId]);
 
@@ -372,7 +370,6 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
         setTimeout(() => {
           setCurrentDialogue(nextDialogue);
           setHasResponded(false);
-          setSelectedResponseIndex(0);
         }, 1000);
       }
     } else {
@@ -382,18 +379,6 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
       }, 1500);
     }
   }, [hasResponded, learnedVocabulary, updateQuestObjective, addVocabulary, npcId, onClose]);
-
-  const navigateUp = useCallback(() => {
-    if (!currentDialogue?.responses) return;
-    const maxIndex = currentDialogue.responses.length - 1;
-    setSelectedResponseIndex(prev => prev > 0 ? prev - 1 : maxIndex);
-  }, [currentDialogue]);
-
-  const navigateDown = useCallback(() => {
-    if (!currentDialogue?.responses) return;
-    const maxIndex = currentDialogue.responses.length - 1;
-    setSelectedResponseIndex(prev => prev < maxIndex ? prev + 1 : 0);
-  }, [currentDialogue]);
 
   const handleSpeak = useCallback(async (text: string) => {
     if (isSpeaking) return;

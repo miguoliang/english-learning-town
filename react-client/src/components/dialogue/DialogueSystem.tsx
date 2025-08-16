@@ -76,8 +76,6 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
   } = useDialogueState({ npcId, onClose });
 
   useDialogueKeyboard({
-    currentDialogue,
-    hasResponded,
     onClose,
   });
 
