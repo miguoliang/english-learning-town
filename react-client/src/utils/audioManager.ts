@@ -119,7 +119,6 @@ class AudioManagerClass {
       utterance.onend = () => resolve();
       utterance.onerror = () => reject(new Error('Speech synthesis failed'));
 
-      speechSynthesis.cancel();
       speechSynthesis.speak(utterance);
     });
   }

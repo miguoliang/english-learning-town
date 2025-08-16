@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { getNPCAvatar } from '../../utils/vocabularyHighlighter';
+import { AudioManager } from '../../utils/audioManager';
 
 const Header = styled.div`
   display: flex;
@@ -205,6 +206,19 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
   onStopSpeech,
   isSpeaking = false,
 }) => {
+  const handleSpeakClick = () => {
+    if (onSpeak) {
+      const message = `Hello, I am ${speakerName}. Nice to meet you!`;
+      onSpeak(message);
+    }
+  };
+
+  const handleStopClick = () => {
+    if (onStopSpeech) {
+      onStopSpeech();
+    }
+  };
+
   return (
     <Header>
       <SpeakerInfo>
@@ -216,7 +230,7 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
       <AudioControls>
         {onSpeak && (
           <AudioButton 
-            onClick={() => onSpeak(`Hello, I am ${speakerName}. Nice to meet you!`)} 
+            onClick={handleSpeakClick}
             disabled={isSpeaking}
             title="Hear the speaker's voice"
           >
@@ -225,7 +239,7 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
         )}
         {onStopSpeech && (
           <AudioButton 
-            onClick={onStopSpeech}
+            onClick={handleStopClick}
             disabled={!isSpeaking}
           >
             🔇 Stop
