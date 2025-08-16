@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useDialogueState } from '../../hooks/useDialogueState';
 import { useDialogueKeyboard } from '../../hooks/useDialogueKeyboard';
 import { DialogueHeader } from './DialogueHeader';
-import { DialogueText } from './DialogueText';
+import { DialogueTextAudio } from './DialogueTextAudio';
 import { ResponseOptions } from './ResponseOptions';
 import { ContinueButton } from './ContinueButton';
 import { VocabularyProgress } from './VocabularyProgress';
@@ -46,20 +46,16 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
     currentDialogue,
     hasResponded,
     learnedVocabulary,
-    selectedResponseIndex,
+    isSpeaking,
     handleResponseClick,
-    navigateUp,
-    navigateDown,
+    handleSpeak,
+    handleStopSpeech,
   } = useDialogueState({ npcId, onClose });
 
   useDialogueKeyboard({
     currentDialogue,
     hasResponded,
-    selectedResponseIndex,
     onClose,
-    onNavigateUp: navigateUp,
-    onNavigateDown: navigateDown,
-    onSelectResponse: handleResponseClick,
   });
 
   if (!currentDialogue) {
@@ -75,17 +71,21 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
           npcId={npcId}
           speakerName={currentDialogue.speakerName}
           onClose={onClose}
+          onSpeak={handleSpeak}
+          onStopSpeech={handleStopSpeech}
+          isSpeaking={isSpeaking}
         />
 
-        <DialogueText
+        <DialogueTextAudio
           text={currentDialogue.text}
           vocabularyHighlights={currentDialogue.vocabularyHighlights}
+          onSpeak={handleSpeak}
+          isSpeaking={isSpeaking}
         />
 
         {hasResponses && !hasResponded ? (
           <ResponseOptions
             responses={currentDialogue.responses!}
-            selectedIndex={selectedResponseIndex}
             onResponseClick={handleResponseClick}
           />
         ) : (

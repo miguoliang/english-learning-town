@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuestStore } from '../stores/questStore';
 import { useGameStore } from '../stores/unifiedGameStore';
+import { AudioManager } from '../utils/audioManager';
 import type { DialogueEntry, DialogueResponse } from '../types';
 import { ObjectiveType } from '../types';
 
@@ -329,6 +330,7 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
   const [hasResponded, setHasResponded] = useState(false);
   const [learnedVocabulary, setLearnedVocabulary] = useState<string[]>([]);
   const [selectedResponseIndex, setSelectedResponseIndex] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const { updateQuestObjective } = useQuestStore();
   const { addVocabulary } = useGameStore();
@@ -393,13 +395,36 @@ export const useDialogueState = ({ npcId, onClose }: UseDialogueStateProps) => {
     setSelectedResponseIndex(prev => prev < maxIndex ? prev + 1 : 0);
   }, [currentDialogue]);
 
+  const handleSpeak = useCallback(async (text: string) => {
+    if (isSpeaking) return;
+    
+    setIsSpeaking(true);
+    try {
+      await AudioManager.speakText(text, { 
+        rate: 0.8, 
+        pitch: 1.0, 
+        volume: 0.9,
+        voice: 'en-US'
+      });
+    } catch (error) {
+      console.error('Speech synthesis failed:', error);
+    } finally {
+      setIsSpeaking(false);
+    }
+  }, [isSpeaking]);
+
+  const handleStopSpeech = useCallback(() => {
+    AudioManager.stopSpeech();
+    setIsSpeaking(false);
+  }, []);
+
   return {
     currentDialogue,
     hasResponded,
     learnedVocabulary,
-    selectedResponseIndex,
+    isSpeaking,
     handleResponseClick,
-    navigateUp,
-    navigateDown,
+    handleSpeak,
+    handleStopSpeech,
   };
 };

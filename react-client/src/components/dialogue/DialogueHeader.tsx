@@ -68,16 +68,48 @@ const CloseButton = styled.button`
   }
 `;
 
+const AudioControls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const AudioButton = styled.button`
+  background: rgba(116, 185, 255, 0.2);
+  border: 1px solid #74b9ff;
+  color: #74b9ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  
+  &:hover {
+    background: rgba(116, 185, 255, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 interface DialogueHeaderProps {
   npcId: string;
   speakerName: string;
   onClose: () => void;
+  onSpeak?: (text: string) => void;
+  onStopSpeech?: () => void;
+  isSpeaking?: boolean;
 }
 
 export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
   npcId,
   speakerName,
   onClose,
+  onSpeak,
+  onStopSpeech,
+  isSpeaking = false,
 }) => {
   return (
     <Header>
@@ -87,11 +119,29 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
         </SpeakerAvatar>
         <SpeakerName>{speakerName}</SpeakerName>
       </SpeakerInfo>
+      <AudioControls>
+        {onSpeak && (
+          <AudioButton 
+            onClick={() => onSpeak(`Hello, I am ${speakerName}. Nice to meet you!`)} 
+            disabled={isSpeaking}
+            title="Hear the speaker's voice"
+          >
+            🔊 Speak
+          </AudioButton>
+        )}
+        {onStopSpeech && (
+          <AudioButton 
+            onClick={onStopSpeech}
+            disabled={!isSpeaking}
+          >
+            🔇 Stop
+          </AudioButton>
+        )}
+      </AudioControls>
       <ControlsHint>
-        <KeyHint>↑↓</KeyHint>
-        <KeyHint>ENTER</KeyHint>
+        <KeyHint>🎤</KeyHint>
         <KeyHint>ESC</KeyHint>
-        controls
+        voice controls
       </ControlsHint>
       <CloseButton onClick={onClose}>×</CloseButton>
     </Header>

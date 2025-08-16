@@ -85,6 +85,124 @@ class AudioManagerClass {
   playDialogueClose(): void {
     this.playSound('dialogue_close', { volume: 0.3, duration: 0.2 });
   }
+
+  speakText(text: string, options?: { rate?: number; pitch?: number; volume?: number; voice?: string }): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.isMuted) {
+        resolve();
+        return;
+      }
+
+      if (!('speechSynthesis' in window)) {
+        console.warn('Speech synthesis not supported');
+        resolve();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      utterance.rate = options?.rate ?? 0.9;
+      utterance.pitch = options?.pitch ?? 1.0;
+      utterance.volume = (options?.volume ?? 0.8) * this.masterVolume;
+
+      if (options?.voice) {
+        const voices = speechSynthesis.getVoices();
+        const selectedVoice = voices.find(voice => 
+          voice.name.toLowerCase().includes(options.voice!.toLowerCase()) ||
+          voice.lang.toLowerCase().includes(options.voice!.toLowerCase())
+        );
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+      }
+
+      utterance.onend = () => resolve();
+      utterance.onerror = () => reject(new Error('Speech synthesis failed'));
+
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    });
+  }
+
+  stopSpeech(): void {
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+    }
+  }
+
+  getAvailableVoices(): SpeechSynthesisVoice[] {
+    if ('speechSynthesis' in window) {
+      return speechSynthesis.getVoices();
+    }
+    return [];
+  }
+
+  startListening(options?: { 
+    language?: string; 
+    continuous?: boolean; 
+    interimResults?: boolean;
+    onResult?: (transcript: string, isFinal: boolean) => void;
+    onError?: (error: string) => void;
+    onEnd?: () => void;
+  }): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        const error = 'Speech recognition not supported';
+        console.warn(error);
+        if (options?.onError) options.onError(error);
+        reject(new Error(error));
+        return;
+      }
+
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.lang = options?.language || 'en-US';
+      recognition.continuous = options?.continuous ?? false;
+      recognition.interimResults = options?.interimResults ?? true;
+      recognition.maxAlternatives = 1;
+
+      let finalTranscript = '';
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+            if (options?.onResult) {
+              options.onResult(finalTranscript.trim(), true);
+            }
+          } else {
+            interimTranscript += transcript;
+            if (options?.onResult) {
+              options.onResult(interimTranscript.trim(), false);
+            }
+          }
+        }
+      };
+
+      recognition.onend = () => {
+        if (options?.onEnd) options.onEnd();
+        resolve(finalTranscript.trim());
+      };
+
+      recognition.onerror = (event: any) => {
+        const error = `Speech recognition error: ${event.error}`;
+        console.error(error);
+        if (options?.onError) options.onError(error);
+        reject(new Error(error));
+      };
+
+      recognition.start();
+    });
+  }
+
+  stopListening(): void {
+    // This will be handled by the recognition instance in the component
+  }
 }
 
 // Export singleton instance
