@@ -13,54 +13,216 @@ english-learning-town/
 ├── packages/
 │   ├── core/                   # @elt/core - ECS engine (157 tests)
 │   ├── ui/                     # @elt/ui - Reusable React components  
-│   └── game-client/            # @elt/game-client - Game-specific UI
+│   ├── game-client/            # @elt/game-client - Game-specific UI
+│   ├── learning-algorithms/    # @elt/learning-algorithms - Educational algorithms
+│   ├── learning-analytics/     # @elt/learning-analytics - Progress tracking
+│   └── learning-assessment/    # @elt/learning-assessment - Content quality
+├── backend-go/                 # Go REST API and database
+├── docs/                       # mdBook documentation
 ├── pnpm-workspace.yaml         # Workspace configuration
 ├── turbo.json                  # Build system configuration
 └── tsconfig.base.json          # Shared TypeScript config
 ```
 
+```mermaid
+classDiagram
+    class ReactClient {
+        +ECS Engine
+        +React Components
+        +State Management
+        +Audio System
+        +Game Logic
+        +sendRequest(data) JSON
+        +receiveResponse() JSON
+    }
+    
+    class GoBackend {
+        +REST API Handlers
+        +Player Management
+        +Interaction Logging
+        +Question Management
+        +handleRequest(endpoint) Response
+        +queryDatabase(sql) Result
+    }
+    
+    class SQLiteDatabase {
+        +players table
+        +interactions table
+        +questions table
+        +insert(data)
+        +select(query) Results
+        +update(data)
+    }
+    
+    ReactClient --> GoBackend : HTTP/JSON
+    GoBackend --> SQLiteDatabase : SQL Queries
+    
+    note for ReactClient "Monorepo: apps/client\nwith @elt/* packages"
+    note for GoBackend "backend-go/\nREST API endpoints"
+    note for SQLiteDatabase "Persistent storage\nfor game state"
 ```
-┌─────────────────┐    HTTP/JSON    ┌──────────────────┐
-│   React Client  │ ←──────────────→ │   Go Backend     │
-│   (ECS + React) │                  │   (REST API)     │
-└─────────────────┘                  └──────────────────┘
-                                                │
-                                                ▼
-                                     ┌──────────────────┐
-                                     │    Database      │
-                                     │     (SQLite)     │
-                                     └──────────────────┘
+
+## 🏗️ Layered Architecture (Bottom to Top)
+
+The system follows a clean layered architecture where each layer depends only on layers below it, ensuring clear separation of concerns and maintainable dependencies.
+
+### Layer 1: Core Foundation (`@elt/core`)
+**Foundation ECS Engine - Zero Dependencies**
+- **Purpose**: Pure ECS engine implementation with no external dependencies
+- **Components**: World, Entity, Component, System base classes
+- **Features**: Event bus, component management, system orchestration
+- **Technologies**: Pure TypeScript, 157 comprehensive unit tests
+- **Dependencies**: None (foundation layer)
+
+```typescript
+// Core ECS functionality
+import { World, createPositionComponent, MovementSystem } from '@elt/core';
 ```
 
-## 📦 Package Architecture
+### Layer 2: Specialized Learning Systems
+**Domain-Specific Learning Algorithms**
 
-### Package Separation Strategy
+#### `@elt/learning-algorithms`
+- **Purpose**: Educational algorithms and learning mechanics
+- **Features**: Spaced repetition, difficulty calibration, review sessions
+- **Technologies**: TypeScript, Vitest testing
+- **Dependencies**: `@elt/core`
 
-**@elt/core** (packages/core/)
-- Core ECS engine implementation
-- Event bus and type-safe event definitions  
-- World, Entity, Component, System base classes
-- Pure TypeScript with zero React dependencies
-- 157 comprehensive unit tests
+#### `@elt/learning-analytics` 
+- **Purpose**: Learning progress tracking and analytics
+- **Features**: Learning analytics, goal setting, motivation systems
+- **Technologies**: TypeScript, Vitest testing
+- **Dependencies**: `@elt/core`
 
-**@elt/ui** (packages/ui/)
-- Reusable React components for any app
-- Basic UI: Button, Input, AnimatedEmoji
-- Error boundaries and loading states
-- Shared theme and styling utilities
-- Zero game-specific dependencies
+#### `@elt/learning-assessment`
+- **Purpose**: Content quality and curriculum alignment
+- **Features**: Content quality metrics, CEFR-IELTS curriculum alignment
+- **Technologies**: TypeScript, Vitest testing
+- **Dependencies**: `@elt/core`
 
-**@elt/game-client** (packages/game-client/)
-- Game-specific React components
-- Progress tracking: XPProgressBar
-- Quest system: QuestTracker
-- Depends on @elt/ui for basic components
+```typescript
+// Learning system integration
+import { SpacedRepetitionSystem } from '@elt/learning-algorithms';
+import { LearningAnalytics } from '@elt/learning-analytics';
+import { ContentQualityMetrics } from '@elt/learning-assessment';
+```
 
-**Main Application** (apps/client/)
-- Game logic and business rules
-- Scene management and ECS integration
-- Zustand state management
-- Depends on all @elt/* packages
+### Layer 3: UI Foundation (`@elt/ui`)
+**Reusable React Components - Zero Game Logic**
+- **Purpose**: Reusable React components for any application
+- **Components**: Button, Input, AnimatedEmoji, Error boundaries, Loading screens
+- **Features**: Theme system, animations, emoji parsing, error handling
+- **Technologies**: React, TypeScript, Styled Components
+- **Dependencies**: React only (no game-specific logic)
+
+```typescript
+// Pure UI components
+import { Button, Input, LoadingScreen, ErrorBoundary } from '@elt/ui';
+```
+
+### Layer 4: Game-Specific UI (`@elt/game-client`)
+**Game-Specific React Components**
+- **Purpose**: Game-specific React components that combine UI foundation with game logic
+- **Components**: XPProgressBar, QuestTracker, Achievement dashboards
+- **Features**: Progress visualization, quest management UI, learning dashboards
+- **Technologies**: React, TypeScript
+- **Dependencies**: `@elt/ui`, `@elt/core`
+
+```typescript
+// Game-specific UI components
+import { XPProgressBar, QuestTracker, AchievementDashboard } from '@elt/game-client';
+```
+
+### Layer 5: Application Layer (`apps/client`)
+**Complete Game Application with Business Logic**
+- **Purpose**: Complete game application orchestrating all lower layers
+- **Components**: Scene management, dialogue system, game state, ECS integration
+- **Features**: Game loop, audio management, state management, complete user experience
+- **Technologies**: React, TypeScript, Zustand, Vite
+- **Dependencies**: All `@elt/*` packages
+
+```typescript
+// Application-level integration
+import { World } from '@elt/core';
+import { SpacedRepetitionSystem } from '@elt/learning-algorithms';
+import { Button } from '@elt/ui';
+import { XPProgressBar } from '@elt/game-client';
+```
+
+### Layer 6: Backend Services (`backend-go`)
+**Data Persistence and API Services**
+- **Purpose**: Server-side data management and API endpoints
+- **Components**: REST API, database management, player data persistence
+- **Features**: Player progress tracking, interaction logging, question management
+- **Technologies**: Go, SQLite, REST API
+- **Dependencies**: Database, external services
+
+```go
+// Backend API endpoints
+GET  /api/players/{id}
+POST /api/interactions
+GET  /api/questions
+```
+
+## 📦 Layer Dependencies & Data Flow
+
+### Dependency Flow (Bottom-Up)
+```mermaid
+graph TD
+    A[Backend Services<br/>Go + SQLite] --> B[HTTP/JSON API]
+    B --> C[Application Layer<br/>apps/client]
+    C --> D[Game UI Layer<br/>@elt/game-client]
+    C --> E[Learning Systems<br/>algorithms + analytics + assessment]
+    D --> F[UI Foundation<br/>@elt/ui]
+    E --> G[Core ECS<br/>@elt/core]
+    F --> H[React + TypeScript]
+    G --> I[Pure TypeScript]
+    
+    style I fill:#e1f5fe
+    style G fill:#f3e5f5
+    style E fill:#fff3e0
+    style F fill:#e8f5e8
+    style D fill:#fff8e1
+    style C fill:#fce4ec
+    style A fill:#f1f8e9
+```
+
+### Data Flow (Top-Down)
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Application Layer
+    participant G as Game UI Layer  
+    participant L as Learning Systems
+    participant C as Core ECS
+    participant B as Backend Services
+    
+    U->>A: User Interaction
+    A->>G: Update Game UI
+    A->>L: Process Learning Logic
+    L->>C: Update ECS Components
+    C->>C: System Processing
+    A->>B: Persist Game State
+    B-->>A: Confirmation
+    A->>G: Update Progress Display
+    G-->>U: Visual Feedback
+```
+
+### Package Import Rules
+1. **Upward Dependencies Only**: Packages can only import from layers below
+2. **No Circular Dependencies**: Strict layer separation prevents circular imports
+3. **Interface Boundaries**: Clear contracts between layers
+4. **Technology Isolation**: Each layer can choose appropriate technologies
+
+```typescript
+// ✅ Allowed: Higher layer importing lower layer
+import { World } from '@elt/core';                    // Layer 5 → Layer 1
+import { Button } from '@elt/ui';                     // Layer 5 → Layer 3
+import { XPProgressBar } from '@elt/game-client';     // Layer 5 → Layer 4
+
+// ❌ Forbidden: Lower layer importing higher layer  
+// import { GameApp } from '../../../apps/client';    // Layer 1 → Layer 5 (WRONG)
+```
 
 ## 🎮 ECS Architecture (2025-01-09)
 
@@ -553,57 +715,98 @@ const performanceThresholds = {
 - **Target**: 100-150 lines for complex components
 - **Extract**: Business logic to custom hooks when over 150 lines
 
-### Monorepo File Organization
-```
-# @elt/core package (packages/core/)
-├── src/
-│   ├── core.ts         # World, Entity, Component, System base classes
-│   ├── components.ts   # ECS component definitions
-│   ├── systems.ts      # System implementations  
-│   ├── events.ts       # Event bus and type definitions
-│   ├── utils.ts        # ECS utilities and helpers
-│   ├── index.ts        # Package exports
-│   └── __tests__/      # 157 comprehensive tests
+### Monorepo Package Structure
 
-# @elt/ui package (packages/ui/)
-├── src/
-│   ├── components/
-│   │   ├── basic/      # Button, AnimatedEmoji
-│   │   ├── forms/      # Input components
-│   │   ├── feedback/   # LoadingScreen, Spinner
-│   │   └── error/      # ErrorBoundary, ErrorFallback
-│   ├── styles/         # Theme and animations
-│   ├── utils/          # Emoji parser, error helpers
-│   ├── index.ts        # Package exports
-│   └── __tests__/      # Component tests
-
-# @elt/game-client package (packages/game-client/)
-├── src/
-│   ├── components/
-│   │   ├── progress/   # XPProgressBar
-│   │   └── quest/      # QuestTracker
-│   ├── index.ts        # Package exports
-│   └── __tests__/      # Game component tests
-
-# Main Application (apps/client/)
-├── src/
-│   ├── components/
-│   │   ├── scenes/     # MainMenu, ECSSceneZustand
-│   │   ├── dialogue/   # Dialogue system components
-│   │   ├── settings/   # SettingsModal
-│   │   ├── help/       # HelpModal
-│   │   ├── achievement/# Achievement system components
-│   │   └── celebration/# Level-up celebrations
-│   ├── ecs/            # Client-specific ECS extensions
-│   ├── data/
-│   │   ├── scenes/     # JSON scene configurations
-│   │   └── achievements.ts # Gamification data and XP curves
-│   ├── stores/         # Zustand state management
-│   ├── hooks/          # Business logic hooks
-│   ├── utils/          # Client utilities
-│   │   ├── logger.ts   # Development-only logging
-│   │   └── audioManager.ts # Audio and speech synthesis
-│   └── types/          # App-specific TypeScript definitions
+```mermaid
+classDiagram
+    namespace CoreFoundation {
+        class Core["@elt/core"] {
+            +core/ World, Entity, System
+            +components/ Spatial, Visual, Game
+            +systems/ AI, Physics, Audio
+            +events/ EventBus, Types
+            +utils/ Performance, Archetypes
+            +__tests__/ 157 unit tests
+        }
+    }
+    
+    namespace LearningLayer {
+        class Algorithms["@elt/learning-algorithms"] {
+            +spacedRepetition.ts
+            +difficultyCalibration.ts
+            +reviewSession.ts
+            +shared/ validation, types
+            +__tests__/ algorithm tests
+        }
+        
+        class Analytics["@elt/learning-analytics"] {
+            +analytics.ts
+            +goalSetting.ts
+            +motivationSystem.ts
+            +achievements.ts
+            +shared/ validation, types
+            +__tests__/ analytics tests
+        }
+        
+        class Assessment["@elt/learning-assessment"] {
+            +contentQualityMetrics.ts
+            +curriculumAlignment.ts
+            +shared/ validation, types
+            +__tests__/ assessment tests
+        }
+    }
+    
+    namespace UILayer {
+        class UI["@elt/ui"] {
+            +components/ basic, forms, error
+            +styles/ theme, animations
+            +utils/ emoji, error helpers
+            +__tests__/ component tests
+        }
+        
+        class GameClient["@elt/game-client"] {
+            +components/ progress, quest
+            +AchievementDashboard.tsx
+            +LearningAnalyticsDashboard.tsx
+            +VocabularyReviewSession.tsx
+            +__tests__/ game UI tests
+        }
+    }
+    
+    namespace ApplicationLayer {
+        class ClientApp["apps/client"] {
+            +components/ scenes, dialogue, ui
+            +ecs/ systems, renderer, loader
+            +stores/ game state, quests
+            +hooks/ audio, dialogue, quest
+            +utils/ logger, audio manager
+            +data/ scenes, achievements
+            +types/ app-specific types
+        }
+    }
+    
+    namespace BackendLayer {
+        class Backend["backend-go"] {
+            +cmd/ main.go
+            +internal/ handlers, models, db
+            +pkg/ shared utilities
+            +english_learning_town.db
+        }
+    }
+    
+    %% Dependencies
+    Algorithms --> Core : depends on
+    Analytics --> Core : depends on  
+    Assessment --> Core : depends on
+    GameClient --> UI : depends on
+    GameClient --> Core : depends on
+    ClientApp --> GameClient : depends on
+    ClientApp --> UI : depends on
+    ClientApp --> Algorithms : depends on
+    ClientApp --> Analytics : depends on
+    ClientApp --> Assessment : depends on
+    ClientApp --> Core : depends on
+    ClientApp --> Backend : HTTP/JSON API
 ```
 
 ### Monorepo Development Workflow
@@ -611,6 +814,9 @@ const performanceThresholds = {
 #### Pre-Development Checklist
 1. **Package Placement**: Which package should contain this code?
    - Core ECS logic → @elt/core
+   - Educational algorithms → @elt/learning-algorithms
+   - Learning analytics → @elt/learning-analytics  
+   - Content assessment → @elt/learning-assessment
    - Reusable UI components → @elt/ui  
    - Game-specific UI → @elt/game-client
    - Application logic → apps/client
