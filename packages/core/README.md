@@ -47,6 +47,148 @@ const gameLoop = () => {
 gameLoop();
 ```
 
+## 🎯 ECS Basic Concepts
+
+Before diving into the architecture, let's understand the core ECS concepts:
+
+### What is an Entity?
+An **Entity** is just a **unique ID** - nothing more! Think of it as a name tag or barcode for a game object.
+
+```typescript
+// Entities are just string IDs
+const playerId = "player-alex";
+const npcId = "teacher-mr-smith"; 
+const buildingId = "school-main";
+
+// An entity by itself has no data or behavior - it's just an identifier
+```
+
+**Real-world analogy**: Like a person's social security number - it identifies them, but doesn't contain their address, age, or skills.
+
+### What is a Component?
+A **Component** is **pure data** attached to an entity. Components have no logic - they're just data containers.
+
+```typescript
+// Components are pure data structures
+interface PositionComponent {
+  type: 'position';
+  x: number;      // Where the entity is
+  y: number;
+}
+
+interface HealthComponent {
+  type: 'health';
+  current: number;  // Current health points
+  max: number;      // Maximum health points
+}
+
+interface NPCComponent {
+  type: 'npc';
+  name: string;     // "Mr. Smith"
+  role: string;     // "Teacher"
+}
+
+// Example: Teacher NPC has these components attached
+// Entity "teacher-mr-smith" has:
+// - PositionComponent { x: 5, y: 3 }
+// - HealthComponent { current: 100, max: 100 }
+// - NPCComponent { name: "Mr. Smith", role: "Teacher" }
+```
+
+**Real-world analogy**: Like attributes on a person's profile - their location, health status, job title. The person (entity) has these attributes (components), but the attributes don't do anything by themselves.
+
+### What is a System?
+A **System** contains **all the logic**. Systems find entities with specific components and process them.
+
+```typescript
+// Systems contain logic and operate on entities with required components
+class MovementSystem {
+  requiredComponents = ['position', 'velocity'];  // I need these components
+  
+  update() {
+    // Find all entities that have BOTH position AND velocity components
+    const movingEntities = world.getEntitiesWithComponents(['position', 'velocity']);
+    
+    for (const entityId of movingEntities) {
+      const position = world.getComponent(entityId, 'position');
+      const velocity = world.getComponent(entityId, 'velocity');
+      
+      // Apply the logic: move the entity
+      position.x += velocity.x;
+      position.y += velocity.y;
+    }
+  }
+}
+```
+
+**Real-world analogy**: Like a teacher who works with all students (entities) who have both "enrolled" and "present" status (components). The teacher (system) applies lessons (logic) to qualifying students.
+
+### What is the World?
+The **World** is the **central coordinator** that manages everything. It's like a database + orchestrator.
+
+```typescript
+// World manages the entire ECS ecosystem
+const world = new World();
+
+// 1. Create entities (just IDs)
+const player = world.createEntity('player');
+const teacher = world.createEntity('teacher');
+
+// 2. Attach components (data) to entities
+world.addComponent(player.id, { type: 'position', x: 10, y: 10 });
+world.addComponent(player.id, { type: 'health', current: 100, max: 100 });
+
+world.addComponent(teacher.id, { type: 'position', x: 5, y: 3 });
+world.addComponent(teacher.id, { type: 'npc', name: 'Mr. Smith', role: 'Teacher' });
+
+// 3. Add systems (logic processors)
+world.addSystem(new MovementSystem());
+world.addSystem(new HealthSystem());
+world.addSystem(new AISystem());
+
+// 4. Run the game loop - systems process entities every frame
+function gameLoop() {
+  world.update();  // All systems process their relevant entities
+  requestAnimationFrame(gameLoop);
+}
+```
+
+**Real-world analogy**: Like a school administration system that manages student IDs, tracks their attributes (grades, attendance), and coordinates different departments (teachers/systems) who work with students.
+
+### How They Work Together - Simple Example
+
+```typescript
+// 1. SETUP: Create a player entity
+const player = world.createEntity('player');
+
+// 2. COMPONENTS: Give the player data
+world.addComponent(player.id, createPositionComponent(10, 10));  // Where they are
+world.addComponent(player.id, createVelocityComponent(0, 0));    // How fast they move
+world.addComponent(player.id, createHealthComponent(100, 100));  // Health points
+
+// 3. SYSTEMS: Add logic processors
+world.addSystem(new MovementSystem());   // Moves entities with position + velocity
+world.addSystem(new HealthSystem());     // Handles entities with health
+world.addSystem(new RenderSystem());     // Draws entities with position + renderable
+
+// 4. GAME LOOP: Systems automatically find and process relevant entities
+world.update(); 
+// - MovementSystem finds player (has position + velocity) → moves them
+// - HealthSystem finds player (has health) → applies regeneration  
+// - RenderSystem finds player (has position + renderable) → draws them
+```
+
+### 🎯 Key ECS Principles
+
+1. **Entities = Identity**: Just unique IDs, no data or logic
+2. **Components = Data**: Pure data containers, no logic
+3. **Systems = Logic**: All behavior, operates on entities with specific components
+4. **World = Coordinator**: Manages entities, components, and systems
+5. **Composition**: Mix and match components to create any type of game object
+6. **Separation**: Data (components) is completely separate from logic (systems)
+
+This is the foundation of ECS - everything else builds on these core concepts!
+
 ## 🏗️ Modular Architecture
 
 The core package follows **SRP (Single Responsibility Principle)** with clean modular organization:
