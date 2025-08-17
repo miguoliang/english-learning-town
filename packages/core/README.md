@@ -9,7 +9,7 @@ Pure TypeScript ECS implementation following **Single Responsibility Principle (
 ## Features
 
 - **Modular SRP Architecture**: Clean separation of concerns across focused modules
-- **ECS Pattern**: World → Entities → Components + Systems
+- **ECS Pattern**: World contains Entities (with Components) processed by Systems
 - **Event-Driven**: Type-safe event bus for loose system coupling
 - **Performance Optimized**: Entity pooling, component caching, spatial indexing
 - **Tree-Shakeable**: Import only what you need for optimal bundle size
