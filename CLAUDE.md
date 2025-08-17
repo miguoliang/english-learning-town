@@ -1,7 +1,23 @@
 # Technical Collaboration Guide for Claude
 
 ## 🎯 Project Context
-English Learning Town - Educational RPG built with React + TypeScript that gamifies English language learning through interactive storytelling and quest-based progression.
+English Learning Town - Educational RPG built with React + TypeScript in a **monorepo architecture** that gamifies English language learning through interactive storytelling and quest-based progression.
+
+### 🏗️ Monorepo Structure (2025-01-17)
+Modern monorepo architecture with pnpm workspaces and Turbo build system:
+
+```
+english-learning-town/
+├── apps/
+│   └── client/                 # Main React application
+├── packages/
+│   ├── core/                   # @elt/core - ECS engine (157 tests)
+│   ├── ui/                     # @elt/ui - Reusable React components
+│   └── game-client/            # @elt/game-client - Game-specific components
+├── pnpm-workspace.yaml         # Workspace configuration
+├── turbo.json                  # Build system configuration
+└── tsconfig.base.json          # Shared TypeScript config
+```
 
 ## 📋 Discussion Framework Reference
 
@@ -103,26 +119,47 @@ import { QuestStatus, ObjectiveType } from '../types';
 import { QuestData, NPCData, QuestStatus } from '../types';
 ```
 
-### Single Responsibility Principle Architecture
-Follow the established modular architecture with ECS integration:
+### Monorepo Package Architecture
+Modern modular architecture with dedicated packages:
+
 ```
-src/
-├── components/
-│   ├── forms/          # Form-specific components
-│   ├── scenes/         # Scene containers (ECSScene, MainMenu)
-│   └── ui/             # Reusable UI components
-├── ecs/                # ECS architecture core
+# @elt/core package (packages/core/)
+├── src/
 │   ├── core.ts         # World, Entity, Component, System base classes
-│   ├── components.ts   # Component definitions
+│   ├── components.ts   # ECS component definitions
 │   ├── systems.ts      # System implementations
-│   ├── sceneLoader.ts  # Data-driven scene creation
-│   └── ECSRenderer.tsx # React ECS renderer
-├── data/
-│   └── scenes/         # JSON scene configurations
-├── hooks/              # Business logic hooks (including useECSWorld)
-├── styles/             # Theme and global styles
-├── utils/              # Utility functions and managers
-└── stores/             # State management
+│   ├── events.ts       # Event bus and type definitions
+│   ├── utils.ts        # ECS utilities and helpers
+│   └── __tests__/      # 157 comprehensive tests
+
+# @elt/ui package (packages/ui/)
+├── src/
+│   ├── components/
+│   │   ├── basic/      # Button, AnimatedEmoji
+│   │   ├── forms/      # Input components
+│   │   ├── feedback/   # LoadingScreen, Spinner
+│   │   └── error/      # ErrorBoundary, ErrorFallback
+│   ├── styles/         # Theme and animations
+│   └── utils/          # Emoji parser, error helpers
+
+# @elt/game-client package (packages/game-client/)
+├── src/
+│   └── components/
+│       ├── progress/   # XPProgressBar
+│       └── quest/      # QuestTracker
+
+# Main Application (apps/client/)
+├── src/
+│   ├── components/
+│   │   ├── scenes/     # MainMenu, ECSSceneZustand
+│   │   ├── dialogue/   # Dialogue system components
+│   │   ├── settings/   # SettingsModal
+│   │   ├── help/       # HelpModal
+│   │   └── ui/         # Game-specific UI components
+│   ├── ecs/            # Client-specific ECS extensions
+│   ├── stores/         # Zustand state management
+│   ├── hooks/          # Business logic hooks
+│   └── utils/          # Client utilities
 ```
 
 ### Component Development Patterns
@@ -334,17 +371,30 @@ events.subscribe('dialogue:start', (event) => {
 ```
 
 ### Build & Testing Protocol
-After making changes:
-1. Run `npm run build` - Verify TypeScript compilation (zero errors)
-2. Run `npm run dev` - Test development server
-3. Check bundle size optimization (target: <150KB gzipped)
-4. Verify all functionality works end-to-end
+Monorepo development workflow using pnpm and Turbo:
+
+1. **Install dependencies**: `pnpm install` (from root)
+2. **Build all packages**: `pnpm build` (uses Turbo for optimal caching)
+3. **Run tests**: `pnpm test` (all packages: 200+ tests total)
+4. **Development server**: `pnpm dev` (from root or `cd apps/client && pnpm dev`)
+5. **Individual package builds**: `pnpm build --filter=@elt/core`
 
 ## Development Setup
 ```bash
-cd react-client
-npm install
-npm run dev
+# Clone and setup monorepo
+git clone <repository>
+cd english-learning-town
+pnpm install
+
+# Development workflow
+pnpm dev          # Start client development server
+pnpm build        # Build all packages with Turbo
+pnpm test         # Run all tests across packages
+pnpm lint         # Lint all packages
+
+# Individual package development
+cd packages/core && pnpm test --watch
+cd packages/ui && pnpm build --watch
 ```
 
 ## Architecture Notes
@@ -355,17 +405,32 @@ npm run dev
 - Audio generated procedurally with Web Audio API
 
 ## Key Files to Remember
-- `src/ecs/core.ts` - ECS World, Entity, Component, System base classes
-- `src/ecs/components.ts` - All component type definitions
-- `src/ecs/systems.ts` - All system implementations
-- `src/ecs/sceneLoader.ts` - Data-driven scene creation
-- `src/data/scenes/` - JSON scene configurations
-- `src/hooks/useECSWorld.ts` - ECS world management hook
-- `src/components/ECSGameApp.tsx` - Main ECS game coordinator
-- `src/components/scenes/ECSScene.tsx` - Universal scene component
-- `src/stores/gameStore.ts` - Main game state
-- `src/stores/questStore.ts` - Quest management
-- `src/services/api.ts` - Backend integration
+
+### Core ECS Package (@elt/core)
+- `packages/core/src/core.ts` - ECS World, Entity, Component, System base classes
+- `packages/core/src/components.ts` - All component type definitions  
+- `packages/core/src/systems.ts` - All system implementations
+- `packages/core/src/events.ts` - Event bus and type-safe event definitions
+- `packages/core/src/utils.ts` - ECS utilities and component archetypes
+
+### UI Package (@elt/ui)
+- `packages/ui/src/components/basic/Button.tsx` - Reusable Button component
+- `packages/ui/src/components/basic/AnimatedEmoji.tsx` - Animated emoji component
+- `packages/ui/src/components/error/ErrorBoundary.tsx` - Error handling
+- `packages/ui/src/styles/theme.ts` - Shared theme configuration
+
+### Game Client Package (@elt/game-client)
+- `packages/game-client/src/components/progress/XPProgressBar.tsx` - XP display
+- `packages/game-client/src/components/quest/QuestTracker.tsx` - Quest UI
+
+### Main Application (apps/client)
+- `apps/client/src/components/ECSGameApp.tsx` - Main ECS game coordinator
+- `apps/client/src/components/scenes/MainMenu.tsx` - Main menu with settings/help
+- `apps/client/src/components/settings/SettingsModal.tsx` - Game settings
+- `apps/client/src/components/help/HelpModal.tsx` - Tutorial and help
+- `apps/client/src/stores/unifiedGameStore.ts` - Main game state (Zustand)
+- `apps/client/src/ecs/sceneLoader.ts` - Data-driven scene creation
+- `apps/client/public/data/scenes/` - JSON scene configurations
 
 ## 🎯 Communication Patterns
 
@@ -385,8 +450,11 @@ When making technical decisions:
 ## 📊 Current Status Dashboard
 
 ### Technical Health
-- ✅ TypeScript: Strict mode, zero errors
-- ✅ Build: Optimized bundle (265KB total, 84KB gzipped)
+- ✅ **Monorepo**: pnpm workspaces + Turbo build system
+- ✅ **Package Architecture**: 3 focused packages (@elt/core, @elt/ui, @elt/game-client)
+- ✅ TypeScript: Strict mode, zero errors across all packages
+- ✅ **Testing**: 200+ tests total (157 in @elt/core alone)
+- ✅ Build: Optimized bundle with package separation
 - ✅ Architecture: **ECS architecture** - Entity Component System with event-driven communication
 - ✅ **SRP Compliance**: All systems follow Single Responsibility Principle (2025-01-09)
 - ✅ Performance: Efficient component filtering and batch processing
@@ -407,15 +475,21 @@ When making technical decisions:
 - ✅ NPC Dialogue: Interactive conversations (event-driven)
 - ✅ Quest System: Visual tracking, objectives
 - ✅ Progress Tracking: XP, levels, vocabulary
+- ✅ **Settings System**: Audio controls, player preferences, modal UI
+- ✅ **Help System**: Interactive tutorial with tabbed interface (Controls, Gameplay, Features)
+- ✅ **Package System**: Reusable components across @elt/* packages
 
-### Architecture Migration Complete
-- ❌ **Legacy System Completely Removed**: All Range architecture files deleted
-- ❌ **Legacy Components Removed**: TownScene, SchoolScene, GameApp, RangeMap, BuildingRange, SpriteRange, PlantRange
-- ❌ **Legacy Hooks Removed**: useRangeEntities, useRangePlayerMovement, useRangeInteraction, useSceneManager, useBuildingScenes, useNPCInteraction
-- ❌ **Legacy Utils Removed**: interactionManager, rangeGridSystem, renderingStrategies, interactionConditions
-- ✅ **ECS Architecture Active**: ECSGameApp → ECSScene → ECSRenderer → World
-- ✅ **Single Coherent System**: Composition-based ECS with mixable components
-- ✅ **Clean Codebase**: No commented code, no debug logs, no legacy imports
+### Monorepo Migration Complete (Week 2 - 2025-01-17)
+- ✅ **Monorepo Structure**: Complete migration from single package to modular monorepo
+- ✅ **Package Extraction**: @elt/core (ECS engine), @elt/ui (components), @elt/game-client (game UI)
+- ✅ **Build System**: Turbo + pnpm workspaces for optimized builds and dependency management
+- ✅ **Testing Coverage**: 200+ tests across all packages with comprehensive coverage
+- ✅ **Clean Architecture**: All legacy Range architecture files removed
+- ✅ **Package Dependencies**: Proper @elt/* imports, zero legacy relative imports
+- ✅ **Codebase Cleanup**: Removed empty directories, redundant files, build artifacts
+- ✅ **Documentation**: Updated to reflect monorepo structure and new features
+- ✅ **Settings & Help**: Complete UI for game configuration and tutorial system
+- ✅ **Event Integration**: Scene transitions wired from ECS to React state management
 
 This guide serves as our technical collaboration framework for efficient, focused discussions around programming principles, product features, planning, testing methods, and production practices.
 

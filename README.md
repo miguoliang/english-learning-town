@@ -1,6 +1,6 @@
 # 🎓 English Learning Town
 
-**A modern educational RPG that gamifies English language learning through interactive storytelling, character dialogue, and quest-based progression. Built with React and TypeScript for a superior web-based learning experience.**
+**A modern educational RPG built with React + TypeScript in a monorepo architecture that gamifies English language learning through interactive storytelling, character dialogue, and quest-based progression.**
 
 [![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6.svg)](https://www.typescriptlang.org/)
@@ -9,50 +9,73 @@
 
 ## 🌟 Overview
 
-English Learning Town transforms language learning into an engaging RPG experience where players explore a vibrant town, interact with NPCs through natural conversations, and complete quests that reinforce vocabulary and grammar skills. The modern React implementation provides superior text handling, responsive design, and enhanced user experience perfect for educational content.
+English Learning Town transforms language learning into an engaging RPG experience where players explore a vibrant town, interact with NPCs through natural conversations, and complete quests that reinforce vocabulary and grammar skills. Built with a modern monorepo architecture featuring dedicated packages for maximum code reusability and maintainability.
+
+## 🏗️ Monorepo Structure
+
+```
+english-learning-town/
+├── apps/
+│   └── client/                 # Main React application
+├── packages/
+│   ├── core/                   # @elt/core - ECS engine (157 tests)
+│   ├── ui/                     # @elt/ui - Reusable React components
+│   └── game-client/            # @elt/game-client - Game-specific UI
+├── pnpm-workspace.yaml         # Workspace configuration
+├── turbo.json                  # Build system configuration
+└── tsconfig.base.json          # Shared TypeScript config
+```
 
 ## ✨ Key Features
 
+### 🏗️ Architecture & Development
+- **📦 Monorepo Structure**: Clean package separation with @elt/* namespaced packages
+- **⚡ Turbo Build System**: Optimized builds with intelligent caching
+- **🧪 200+ Tests**: Comprehensive test coverage across all packages (157 in @elt/core alone)
+- **🔒 Type Safety**: Strict TypeScript across all packages with zero compilation errors
+
+### 🎮 Game Features  
 - **🎯 Enhanced Quest System**: Visual progress tracking with real-time indicators and multi-quest management
 - **💬 Rich Dialogue System**: Interactive conversations with vocabulary highlighting and learning feedback
+- **⚙️ Settings & Help**: Complete configuration UI and interactive tutorial system
+- **🏛️ ECS Architecture**: Entity Component System with event-driven communication
 - **📱 Responsive Design**: Seamless experience across desktop, tablet, and mobile devices
 - **🎨 Modern UI/UX**: Smooth animations, intuitive interface, and beautiful visual design
-- **🔊 Audio Feedback**: Procedural sound generation for immersive gameplay
-- **📊 Advanced Progress Tracking**: Detailed quest logs, experience points, and learning analytics
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js 16+**: For React development
+- **Node.js 18+**: For React development
+- **pnpm**: Package manager for monorepo
 - **Go 1.19+**: Backend API server
 - **Git**: Version control
 
 ### Installation
 
-#### Option 1: Quick Start (Recommended)
 ```bash
 # Clone the repository
 git clone https://github.com/miguoliang/english-learning-town.git
 cd english-learning-town
 
-# Start both servers with one command
-./start.sh                # Linux/macOS
-# or
-start.bat                 # Windows
-```
+# Install all dependencies
+pnpm install
 
-#### Option 2: Manual Setup
-```bash
-# Start the backend server
-cd backend-go && go run cmd/main.go
-
-# In a new terminal, start the React client
-cd react-client
-npm install
-npm run dev
+# Start development
+pnpm dev          # Start client development server
+pnpm build        # Build all packages with Turbo  
+pnpm test         # Run all tests (200+ tests)
 ```
 
 Open [http://localhost:5173](http://localhost:5173) to play the game!
+
+### Package Development
+
+```bash
+# Individual package development
+cd packages/core && pnpm test --watch    # ECS engine tests
+cd packages/ui && pnpm build --watch     # UI components  
+cd apps/client && pnpm dev               # Main application
+```
 
 #### Start Script Options
 ```bash

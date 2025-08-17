@@ -5,22 +5,89 @@ Create an engaging educational RPG that makes English learning natural and enjoy
 
 ## 📊 Current Status
 
+### ✅ Monorepo Migration (COMPLETED - 2025-01-17)
+- **Monorepo Structure**: Complete pnpm workspaces + Turbo build system
+- **Package Architecture**: 3 focused packages (@elt/core, @elt/ui, @elt/game-client)
+- **Testing Coverage**: 200+ tests across all packages (157 in @elt/core alone)
+- **Clean Dependencies**: Proper @elt/* imports, zero legacy references
+- **Settings & Help**: Complete UI for game configuration and tutorial system
+
 ### ✅ ECS Implementation (COMPLETED - 2025-01-09)
 - **Modern ECS Architecture**: Entity Component System with event-driven communication
 - **Data-Driven Scenes**: JSON-based scene configurations for rapid development
 - **SRP-Compliant Systems**: 8 focused systems following Single Responsibility Principle
-- **Performance Optimized**: 265KB bundle, 84KB gzipped
-- **Type-Safe**: Strict TypeScript with zero compilation errors
+- **Package Separation**: ECS engine cleanly extracted to @elt/core
+- **Type-Safe**: Strict TypeScript with zero compilation errors across all packages
 
 ### 🎮 Core Features (ACTIVE)
-- **ECS World Management**: Polymorphic entity rendering with component composition
+- **ECS World Management**: Polymorphic entity rendering with component composition (@elt/core)
 - **Scene System**: Universal ECSScene with town/school transitions
-- **Movement System**: Physics-based movement with collision detection
-- **Input Systems**: Separated keyboard and mouse input processing
-- **Interaction System**: Event-driven NPC dialogue, building entrances, scene transitions
+- **Movement System**: Physics-based movement with collision detection (@elt/core)
+- **Input Systems**: Separated keyboard and mouse input processing (@elt/core)
+- **Interaction System**: Event-driven NPC dialogue, building entrances, scene transitions (@elt/core)
+- **UI Component Library**: Reusable React components (@elt/ui)
+- **Game UI Components**: Progress bars, quest trackers (@elt/game-client)
+- **Settings System**: Audio controls, player preferences, modal UI
+- **Help System**: Interactive tutorial with tabbed interface
 - **Dialogue System**: Interactive conversations with vocabulary highlighting
 - **Quest System**: Visual progress tracking, multi-quest management
 - **Progress Tracking**: Experience points, level progression, achievement notifications
+
+## 🏗️ Monorepo Development Workflow
+
+### Development Setup
+```bash
+# Clone and setup monorepo
+git clone <repository>
+cd english-learning-town
+pnpm install
+
+# Development workflow
+pnpm dev          # Start client development server
+pnpm build        # Build all packages with Turbo
+pnpm test         # Run all tests across packages (200+ tests)
+pnpm lint         # Lint all packages
+
+# Individual package development  
+cd packages/core && pnpm test --watch
+cd packages/ui && pnpm build --watch
+cd apps/client && pnpm dev
+```
+
+### Package Development Guidelines
+
+**@elt/core** (packages/core/)
+- Core ECS engine implementation
+- Zero React dependencies - pure TypeScript
+- Comprehensive test coverage (157 tests)
+- Event bus and type-safe event definitions
+- Systems, components, and world management
+
+**@elt/ui** (packages/ui/)
+- Reusable React components for any application
+- Basic UI: Button, Input, AnimatedEmoji, LoadingScreen
+- Error boundaries and feedback components  
+- Shared theme and styling utilities
+- Zero game-specific dependencies
+
+**@elt/game-client** (packages/game-client/)
+- Game-specific React components
+- Progress tracking: XPProgressBar
+- Quest system: QuestTracker
+- Depends on @elt/ui for basic components
+
+**Main Application** (apps/client/)
+- Game logic and business rules
+- Scene management and ECS integration
+- Zustand state management
+- Settings and help systems
+- Depends on all @elt/* packages
+
+### Turbo Build System
+- **Optimized Builds**: Automatic caching and parallel execution
+- **Incremental Builds**: Only rebuild changed packages
+- **Task Dependency**: Proper build order management
+- **Development Performance**: Fast iteration cycles
 
 ## 🗓️ Feature Roadmap
 

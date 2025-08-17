@@ -2,7 +2,22 @@
 
 ## 🏗️ System Overview
 
-English Learning Town is built using modern ECS (Entity Component System) architecture with React + TypeScript, providing a scalable, maintainable foundation for educational gaming.
+English Learning Town is built using modern **ECS (Entity Component System) architecture** with **React + TypeScript** in a **monorepo structure**, providing a scalable, maintainable foundation for educational gaming.
+
+### 🏗️ Monorepo Architecture (2025-01-17)
+
+```
+english-learning-town/
+├── apps/
+│   └── client/                 # Main React application
+├── packages/
+│   ├── core/                   # @elt/core - ECS engine (157 tests)
+│   ├── ui/                     # @elt/ui - Reusable React components  
+│   └── game-client/            # @elt/game-client - Game-specific UI
+├── pnpm-workspace.yaml         # Workspace configuration
+├── turbo.json                  # Build system configuration
+└── tsconfig.base.json          # Shared TypeScript config
+```
 
 ```
 ┌─────────────────┐    HTTP/JSON    ┌──────────────────┐
@@ -17,9 +32,39 @@ English Learning Town is built using modern ECS (Entity Component System) archit
                                      └──────────────────┘
 ```
 
+## 📦 Package Architecture
+
+### Package Separation Strategy
+
+**@elt/core** (packages/core/)
+- Core ECS engine implementation
+- Event bus and type-safe event definitions  
+- World, Entity, Component, System base classes
+- Pure TypeScript with zero React dependencies
+- 157 comprehensive unit tests
+
+**@elt/ui** (packages/ui/)
+- Reusable React components for any app
+- Basic UI: Button, Input, AnimatedEmoji
+- Error boundaries and loading states
+- Shared theme and styling utilities
+- Zero game-specific dependencies
+
+**@elt/game-client** (packages/game-client/)
+- Game-specific React components
+- Progress tracking: XPProgressBar
+- Quest system: QuestTracker
+- Depends on @elt/ui for basic components
+
+**Main Application** (apps/client/)
+- Game logic and business rules
+- Scene management and ECS integration
+- Zustand state management
+- Depends on all @elt/* packages
+
 ## 🎮 ECS Architecture (2025-01-09)
 
-The game uses a pure **Entity Component System** architecture with **Event-Driven** communication and **Data-Driven** scene configuration.
+The game uses a pure **Entity Component System** architecture with **Event-Driven** communication and **Data-Driven** scene configuration, now cleanly separated into the @elt/core package.
 
 ### Core ECS Pattern
 
@@ -508,75 +553,128 @@ const performanceThresholds = {
 - **Target**: 100-150 lines for complex components
 - **Extract**: Business logic to custom hooks when over 150 lines
 
-### File Organization
+### Monorepo File Organization
 ```
-src/
-├── ecs/                  # ECS architecture core
-│   ├── core.ts          # World, Entity, Component, System base classes
-│   ├── components.ts    # Component definitions
-│   ├── systems.ts       # System implementations
-│   ├── sceneLoader.ts   # Data-driven scene creation
-│   └── ECSRenderer.tsx  # React ECS renderer
-├── data/
-│   ├── scenes/          # JSON scene configurations
-│   └── achievements.ts  # Gamification data and XP curves
-├── components/
-│   ├── scenes/          # Scene containers (ECSScene, MainMenu)
-│   ├── ui/              # Reusable UI components
-│   ├── progress/        # XP bars, level indicators, stats panels
-│   ├── achievement/     # Achievement system components
-│   ├── dialogue/        # Dialogue system with voice support
-│   └── celebration/     # Level-up and achievement celebrations
-├── hooks/               # Business logic hooks (including useECSWorld)
-├── stores/              # State management (Zustand stores)
-├── utils/               # Utility functions
-│   ├── logger.ts        # Development-only logging utility
-│   └── audioManager.ts  # Audio and speech synthesis
-└── types/               # TypeScript definitions
-    └── speech.ts        # Web Speech API type definitions
+# @elt/core package (packages/core/)
+├── src/
+│   ├── core.ts         # World, Entity, Component, System base classes
+│   ├── components.ts   # ECS component definitions
+│   ├── systems.ts      # System implementations  
+│   ├── events.ts       # Event bus and type definitions
+│   ├── utils.ts        # ECS utilities and helpers
+│   ├── index.ts        # Package exports
+│   └── __tests__/      # 157 comprehensive tests
+
+# @elt/ui package (packages/ui/)
+├── src/
+│   ├── components/
+│   │   ├── basic/      # Button, AnimatedEmoji
+│   │   ├── forms/      # Input components
+│   │   ├── feedback/   # LoadingScreen, Spinner
+│   │   └── error/      # ErrorBoundary, ErrorFallback
+│   ├── styles/         # Theme and animations
+│   ├── utils/          # Emoji parser, error helpers
+│   ├── index.ts        # Package exports
+│   └── __tests__/      # Component tests
+
+# @elt/game-client package (packages/game-client/)
+├── src/
+│   ├── components/
+│   │   ├── progress/   # XPProgressBar
+│   │   └── quest/      # QuestTracker
+│   ├── index.ts        # Package exports
+│   └── __tests__/      # Game component tests
+
+# Main Application (apps/client/)
+├── src/
+│   ├── components/
+│   │   ├── scenes/     # MainMenu, ECSSceneZustand
+│   │   ├── dialogue/   # Dialogue system components
+│   │   ├── settings/   # SettingsModal
+│   │   ├── help/       # HelpModal
+│   │   ├── achievement/# Achievement system components
+│   │   └── celebration/# Level-up celebrations
+│   ├── ecs/            # Client-specific ECS extensions
+│   ├── data/
+│   │   ├── scenes/     # JSON scene configurations
+│   │   └── achievements.ts # Gamification data and XP curves
+│   ├── stores/         # Zustand state management
+│   ├── hooks/          # Business logic hooks
+│   ├── utils/          # Client utilities
+│   │   ├── logger.ts   # Development-only logging
+│   │   └── audioManager.ts # Audio and speech synthesis
+│   └── types/          # App-specific TypeScript definitions
 ```
 
-### Development Workflow
+### Monorepo Development Workflow
 
 #### Pre-Development Checklist
-1. **Identify Responsibilities**: What does this component/system do?
-2. **Extract Business Logic**: Can logic be moved to a hook/system?
-3. **Check Dependencies**: Minimize coupling between components
-4. **Plan Composition**: How will this integrate with ECS?
+1. **Package Placement**: Which package should contain this code?
+   - Core ECS logic → @elt/core
+   - Reusable UI components → @elt/ui  
+   - Game-specific UI → @elt/game-client
+   - Application logic → apps/client
+2. **Dependencies**: Minimize cross-package dependencies
+3. **Identify Responsibilities**: What does this component/system do?
+4. **Extract Business Logic**: Can logic be moved to a hook/system?
+5. **Plan Composition**: How will this integrate with ECS?
+
+#### Monorepo Commands
+```bash
+# Development workflow
+pnpm install                    # Install all dependencies
+pnpm build                      # Build all packages with Turbo
+pnpm test                       # Run all tests (200+ tests)
+pnpm dev                        # Start client development server
+pnpm build --filter=@elt/core   # Build specific package
+
+# Package-specific development
+cd packages/core && pnpm test --watch
+cd packages/ui && pnpm build --watch
+cd apps/client && pnpm dev
+```
 
 #### Post-Development Review
-1. **SRP Compliance**: Does it have a single, clear responsibility?
-2. **Size Check**: Is it under 200 lines?
-3. **Type Safety**: Are all props and state properly typed?
-4. **ECS Integration**: Does it follow ECS patterns correctly?
-5. **Testability**: Can it be easily unit tested?
+1. **Package Boundaries**: Is code in the correct package?
+2. **SRP Compliance**: Does it have a single, clear responsibility?
+3. **Size Check**: Is it under 200 lines?
+4. **Type Safety**: Are all props and state properly typed?
+5. **Dependencies**: Are @elt/* imports used correctly?
+6. **Testability**: Can it be easily unit tested?
 
 ## 📊 Architecture Metrics Dashboard
 
 ### Current Status ✅
-- **ECS Compliance**: 100% (pure ECS architecture)
+- **Monorepo Structure**: Complete pnpm workspaces + Turbo build system
+- **Package Architecture**: 3 focused packages (@elt/core, @elt/ui, @elt/game-client) 
+- **Testing Coverage**: 200+ tests across all packages (157 in @elt/core alone)
+- **ECS Compliance**: 100% (pure ECS architecture in @elt/core)
 - **SRP Compliance**: 100% (all systems follow Single Responsibility Principle)
 - **Component Size**: All components under 200 lines
-- **Bundle Size**: 368KB total, 110KB gzipped (includes comprehensive gamification)
-- **Type Coverage**: 100% (strict TypeScript)
-- **Build Time**: ~10 seconds (fast iteration)
+- **Bundle Optimization**: Package separation for optimal builds
+- **Type Coverage**: 100% (strict TypeScript across all packages)
+- **Build Time**: ~15 seconds with Turbo caching (monorepo optimized)
 - **Performance**: 60fps on mobile devices
 - **Security**: Zero vulnerabilities (XSS prevention, safe components)
 - **Code Quality**: Zero console statements in production
 - **Gamification**: Comprehensive system for kids aged 7-12
+- **Package Dependencies**: Proper @elt/* imports, zero legacy references
 
 ### Quality Gates
-- ✅ Zero TypeScript compilation errors
-- ✅ Zero ESLint warnings
+- ✅ Zero TypeScript compilation errors across all packages
+- ✅ Zero ESLint warnings  
 - ✅ Zero security vulnerabilities
 - ✅ Zero production console statements
 - ✅ All systems follow SRP
 - ✅ All business logic in systems/hooks
-- ✅ Bundle size optimized for features
+- ✅ Package boundaries properly maintained
+- ✅ @elt/* imports used correctly (zero relative imports)
+- ✅ 200+ tests passing across all packages
 - ✅ Event-driven system communication
 - ✅ Data-driven scene configuration
 - ✅ Comprehensive gamification system
 - ✅ Kid-friendly UI/UX design
+- ✅ Monorepo build system optimized with Turbo
 
 ## 🔄 Architecture Evolution
 
@@ -586,12 +684,20 @@ src/
 - Inheritance-based entity hierarchy
 - Direct method calls between components
 - Hardcoded entity creation
+- Single package structure
 
-**Phase 2**: ECS Architecture (Current - 2025-01-09)
+**Phase 2**: ECS Architecture (2025-01-09)
 - Composition-based entity system
 - Event-driven communication via EventBus
 - Data-driven scene loading from JSON
 - SRP-compliant system design
+
+**Phase 3**: Monorepo Architecture (2025-01-17)
+- Complete package separation (@elt/core, @elt/ui, @elt/game-client)
+- Turbo build system with optimal caching
+- 200+ tests across all packages
+- Clean package boundaries and dependencies
+- Settings and help system implementation
 
 ### Benefits Achieved
 
