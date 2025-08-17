@@ -226,50 +226,85 @@ export class MovementSystem implements System {
 }
 ```
 
-### Data Flow Architecture
+### ECS Data Flow Architecture
 
-```mermaid
-graph TD
-    A[World] --> B[Entity Creation]
-    B --> C[Component Assignment]
-    C --> D[System Processing]
-    D --> E[Event Emission]
-    E --> F[Cross-System Communication]
-    F --> G[Component Updates]
-    G --> D
-    
-    H[User Input] --> I[InputSystem]
-    I --> E
-    
-    J[AI Logic] --> K[AISystem]
-    K --> E
-    
-    L[Physics] --> M[PhysicsSystem]
-    M --> E
+Instead of confusing arrows, here's how the ECS system actually works:
+
+```
+🌍 WORLD (Central Coordinator)
+├── 📦 ENTITIES (Just IDs: "player", "npc-teacher", "building-school")
+├── 🧩 COMPONENTS (Pure Data)
+│   ├── position: { x: 10, y: 5 }
+│   ├── health: { current: 80, max: 100 }
+│   └── renderable: { icon: "🧑", zIndex: 10 }
+└── ⚙️ SYSTEMS (Logic Processors)
+    ├── MovementSystem → reads position+velocity → updates position
+    ├── HealthSystem → reads health → applies regeneration
+    └── RenderSystem → reads position+renderable → draws on screen
+
+📡 EVENT BUS (Communication Layer)
+    MovementSystem emits "player:moved" 
+    → CollisionSystem listens → checks collisions
+    → RenderSystem listens → updates display
 ```
 
-### Collaboration Examples
+#### Real Example Flow:
+```
+1. 🎮 Player presses "W" key
+2. ⚙️ InputSystem detects keypress → emits "input:movement" event
+3. ⚙️ MovementSystem hears event → updates player's VelocityComponent  
+4. ⚙️ PhysicsSystem processes velocity → updates PositionComponent
+5. ⚙️ CollisionSystem checks new position → emits "collision:detected" if needed
+6. ⚙️ RenderSystem reads new position → updates visual display
+7. 📡 All done through events - no system directly calls another!
+```
 
-#### Player Movement Chain
-1. **InputSystem** detects WASD keys → emits `input:movement`
-2. **MovementSystem** processes input → updates `VelocityComponent`
-3. **PhysicsSystem** applies velocity → updates `PositionComponent`
-4. **CollisionSystem** checks new position → emits `collision:detected` if needed
-5. **RenderSystem** reads position → updates visual representation
+### System Collaboration Examples
 
-#### NPC Interaction Chain
-1. **InteractionSystem** detects player near NPC → emits `interaction:possible`
-2. **Player clicks** → **MouseInputSystem** emits `interaction:start`
-3. **DialogueSystem** starts conversation → emits `dialogue:begin`
-4. **AISystem** switches NPC to dialogue state → updates `StateComponent`
-5. **RenderSystem** shows dialogue UI → visual feedback
+#### 🎮 Player Movement (Step-by-Step)
+```
+User Input: Player presses "W" key
+├── 1. InputSystem detects keypress
+├── 2. InputSystem emits event: "input:movement" { direction: "north" }
+├── 3. MovementSystem listens to event
+├── 4. MovementSystem updates VelocityComponent: { x: 0, y: -2 }
+├── 5. PhysicsSystem reads velocity, updates PositionComponent: { x: 10, y: 8 }
+├── 6. CollisionSystem checks new position against walls/NPCs
+├── 7. RenderSystem reads new position, moves player sprite on screen
+└── 8. All systems work independently through events! 🎯
+```
 
-#### Combat System Chain
-1. **AISystem** detects player in range → emits `combat:start`
-2. **HealthSystem** processes damage → updates `HealthComponent`
-3. **AnimationSystem** plays damage animation → visual feedback
-4. **AudioSystem** plays damage sound → audio feedback
-5. **If health ≤ 0** → emits `entity:death` → cleanup systems respond
+#### 💬 NPC Dialogue (Event Chain)
+```
+Player Interaction: Player clicks on NPC
+├── 1. MouseInputSystem detects click on NPC entity
+├── 2. MouseInputSystem emits: "interaction:start" { npcId: "teacher", playerId: "player" }
+├── 3. DialogueSystem listens, starts conversation
+├── 4. DialogueSystem emits: "dialogue:begin" { npcId: "teacher", dialogueId: "greeting" }
+├── 5. AISystem switches NPC StateComponent: "dialogue" mode
+├── 6. RenderSystem shows dialogue bubble UI
+└── 7. AudioSystem plays dialogue sound effect 🔊
+```
+
+#### ⚔️ Combat System (Damage Flow)
+```
+Combat Scenario: Enemy attacks player
+├── 1. AISystem detects player in attack range
+├── 2. AISystem emits: "combat:attack" { attackerId: "goblin", targetId: "player", damage: 25 }
+├── 3. HealthSystem reduces player HealthComponent: 75/100
+├── 4. HealthSystem emits: "entity:damaged" { entityId: "player", newHealth: 75 }
+├── 5. AnimationSystem plays damage animation (red flash)
+├── 6. AudioSystem plays damage sound effect
+├── 7. If health ≤ 0: HealthSystem emits "entity:death" → game over logic
+└── 8. UI System updates health bar display ❤️
+```
+
+#### 🏃 Why Event-Driven Architecture Works
+- **No Direct Dependencies**: Systems never call each other directly
+- **Easy to Add Features**: Want damage numbers? Just listen to "entity:damaged" events
+- **Easy to Debug**: Log all events to see exactly what happened
+- **Easy to Test**: Mock events to test individual systems
+- **Scalable**: Add new systems without changing existing code
 
 ## 🚀 Performance Utilities
 
