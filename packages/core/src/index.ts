@@ -124,7 +124,7 @@ export {
   LearningStage,
   ReviewResult,
   type VocabularyCard
-} from './learning/spacedRepetition';
+} from './learning/algorithms';
 
 export {
   ReviewSessionManager,
@@ -132,7 +132,7 @@ export {
   type ReviewSession,
   type SessionQuestion,
   type ReviewSessionConfig
-} from './learning/reviewSession';
+} from './learning/algorithms';
 
 export {
   LearningAnalyticsEngine,
@@ -149,7 +149,7 @@ export {
   RequirementType,
   type EducationalAchievement,
   type AchievementRequirement
-} from './learning/achievements';
+} from './learning/analytics';
 
 export {
   LearningGoalEngine,
@@ -163,7 +163,7 @@ export {
   type GoalProgress,
   type GoalMilestone,
   type ProgressEntry
-} from './learning/goalSetting';
+} from './learning/analytics';
 
 export {
   MotivationEngine,
@@ -180,9 +180,9 @@ export {
   type RewardCondition,
   type MotivationalMessage,
   type StreakBonus
-} from './learning/motivationSystem';
+} from './learning/analytics';
 
 export {
   LearningValidation,
   ValidationError
-} from './learning/validation';
+} from './learning/shared';
