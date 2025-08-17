@@ -11,6 +11,7 @@ export const theme = {
     
     // Neutral colors
     surface: '#FFFFFF',
+    surfaceLight: '#F1F3F4',
     background: '#F8F9FA',
     backgroundDark: '#1A1A1A',
     
@@ -18,6 +19,7 @@ export const theme = {
     text: '#2C3E50',
     textLight: '#6C757D',
     textDark: '#495057',
+    textSecondary: '#6C757D',
     
     // Status colors
     success: '#52C41A',
@@ -41,6 +43,8 @@ export const theme = {
     success: 'linear-gradient(135deg, #52C41A 0%, #389E0D 100%)',
     warning: 'linear-gradient(135deg, #FAAD14 0%, #D48806 100%)',
     error: 'linear-gradient(135deg, #FF4D4F 0%, #CF1322 100%)',
+    background: 'linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%)',
+    celebration: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 33%, #45B7D1 66%, #52C41A 100%)',
   },
   
   shadows: {

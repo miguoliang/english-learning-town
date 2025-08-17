@@ -117,3 +117,72 @@ export {
   MathUtils,
   ComponentUtils
 } from './utils';
+
+// Learning systems
+export {
+  SpacedRepetitionEngine,
+  LearningStage,
+  ReviewResult,
+  type VocabularyCard
+} from './learning/spacedRepetition';
+
+export {
+  ReviewSessionManager,
+  QuestionType,
+  type ReviewSession,
+  type SessionQuestion,
+  type ReviewSessionConfig
+} from './learning/reviewSession';
+
+export {
+  LearningAnalyticsEngine,
+  InsightType,
+  type LearningAnalytics,
+  type LearningInsight,
+  type Achievement
+} from './learning/analytics';
+
+export {
+  AchievementEngine,
+  AchievementCategory,
+  AchievementRarity,
+  RequirementType,
+  type EducationalAchievement,
+  type AchievementRequirement
+} from './learning/achievements';
+
+export {
+  LearningGoalEngine,
+  GoalCategory,
+  GoalType,
+  GoalTimeframe,
+  GoalPriority,
+  GoalMetric,
+  type LearningGoal,
+  type GoalRecommendation,
+  type GoalProgress,
+  type GoalMilestone,
+  type ProgressEntry
+} from './learning/goalSetting';
+
+export {
+  MotivationEngine,
+  MotivationStyle,
+  EncouragementLevel,
+  RewardType,
+  RewardRarity,
+  MessageType,
+  MessageContext,
+  MessagePriority,
+  ConditionType,
+  type MotivationProfile,
+  type Reward,
+  type RewardCondition,
+  type MotivationalMessage,
+  type StreakBonus
+} from './learning/motivationSystem';
+
+export {
+  LearningValidation,
+  ValidationError
+} from './learning/validation';

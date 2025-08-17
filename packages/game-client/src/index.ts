@@ -12,5 +12,13 @@
 // Export all components
 export * from './components';
 
+// Export error boundary components
+export {
+  ErrorBoundary,
+  LearningErrorBoundary,
+  DashboardErrorBoundary,
+  useErrorHandler
+} from './components/ErrorBoundary';
+
 // Re-export commonly used UI components for convenience
 export { AnimatedEmoji, Button, Input, LoadingScreen, Spinner } from '@elt/ui';
