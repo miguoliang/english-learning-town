@@ -3,8 +3,7 @@
  * Handles review sessions, progress tracking, and session analytics
  */
 
-import type { VocabularyCard, LearningStage } from './spacedRepetition';
-import { ReviewResult } from './spacedRepetition';
+import type { SpacedRepetition } from '../shared/types';
 
 export interface ReviewSessionConfig {
   maxCards: number;

@@ -3,8 +3,12 @@
  * Tracks learning progress, identifies patterns, and provides insights
  */
 
-import type { VocabularyCard, ReviewSession } from './spacedRepetition';
-import { LearningValidation, ValidationError } from './validation';
+import type { SpacedRepetition } from '../shared/types';
+
+// For backward compatibility during transition
+type VocabularyCard = SpacedRepetition.VocabularyCard;
+type ReviewSession = SpacedRepetition.ReviewSession;
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export interface LearningAnalytics {
   // Overall progress

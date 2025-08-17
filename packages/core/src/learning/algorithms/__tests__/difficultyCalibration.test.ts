@@ -11,7 +11,7 @@ import {
   ContentDifficulty,
   AdaptationStrategy
 } from '../difficultyCalibration';
-import { CEFRLevel, LanguageSkill } from '../curriculumAlignment';
+import type { CEFRLevel, LanguageSkill } from '../../shared/types';
 
 describe('DifficultyCalibrationEngine', () => {
   
@@ -41,7 +41,7 @@ describe('DifficultyCalibrationEngine', () => {
     comprehensionLevel: 6,
     taskComplexity: 6,
     overallDifficulty: 6,
-    targetCEFRLevel: CEFRLevel.B2,
+    targetCEFRLevel: 'B2',
     estimatedSuccessRate: 75,
     adaptationReason: 'Initial calibration'
   };
@@ -80,10 +80,10 @@ describe('DifficultyCalibrationEngine', () => {
 
   describe('Performance Metrics Calculation', () => {
     const sampleAttempts = [
-      { correct: true, responseTime: 2000, skill: LanguageSkill.VOCABULARY, timestamp: new Date() },
-      { correct: false, responseTime: 4000, skill: LanguageSkill.GRAMMAR, timestamp: new Date() },
-      { correct: true, responseTime: 3000, skill: LanguageSkill.READING, timestamp: new Date() },
-      { correct: true, responseTime: 2500, skill: LanguageSkill.VOCABULARY, timestamp: new Date() },
+      { correct: true, responseTime: 2000, skill: 'VOCABULARY', timestamp: new Date() },
+      { correct: false, responseTime: 4000, skill: 'GRAMMAR', timestamp: new Date() },
+      { correct: true, responseTime: 3000, skill: 'READING', timestamp: new Date() },
+      { correct: true, responseTime: 2500, skill: 'VOCABULARY', timestamp: new Date() },
       { correct: false, responseTime: 5000, skill: LanguageSkill.WRITING, timestamp: new Date() }
     ];
 
@@ -120,11 +120,11 @@ describe('DifficultyCalibrationEngine', () => {
       
       const timedAttempts = [
         // Previous week (2 weeks ago)
-        { correct: false, responseTime: 3000, skill: LanguageSkill.VOCABULARY, timestamp: twoWeeksAgo },
-        { correct: false, responseTime: 3000, skill: LanguageSkill.VOCABULARY, timestamp: twoWeeksAgo },
+        { correct: false, responseTime: 3000, skill: 'VOCABULARY', timestamp: twoWeeksAgo },
+        { correct: false, responseTime: 3000, skill: 'VOCABULARY', timestamp: twoWeeksAgo },
         // Recent week
-        { correct: true, responseTime: 2000, skill: LanguageSkill.VOCABULARY, timestamp: new Date() },
-        { correct: true, responseTime: 2000, skill: LanguageSkill.VOCABULARY, timestamp: new Date() }
+        { correct: true, responseTime: 2000, skill: 'VOCABULARY', timestamp: new Date() },
+        { correct: true, responseTime: 2000, skill: 'VOCABULARY', timestamp: new Date() }
       ];
       
       const metrics = DifficultyCalibrationEngine.calculatePerformanceMetrics(timedAttempts);
@@ -144,7 +144,7 @@ describe('DifficultyCalibrationEngine', () => {
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
         sampleContentDifficulty, 
         frustrationMetrics, 
-        CEFRLevel.B2
+        'B2'
       );
       
       expect(strategy.direction).toBe('DECREASE');
@@ -158,7 +158,7 @@ describe('DifficultyCalibrationEngine', () => {
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
         sampleContentDifficulty, 
         masteryMetrics, 
-        CEFRLevel.B2
+        'B2'
       );
       
       expect(strategy.direction).toBe('INCREASE');
@@ -171,7 +171,7 @@ describe('DifficultyCalibrationEngine', () => {
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
         sampleContentDifficulty, 
         challengeMetrics, 
-        CEFRLevel.B2
+        'B2'
       );
       
       expect(strategy.direction).toBe('MAINTAIN');
@@ -193,7 +193,7 @@ describe('DifficultyCalibrationEngine', () => {
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
         sampleContentDifficulty, 
         weakWritingMetrics, 
-        CEFRLevel.B2
+        'B2'
       );
       
       expect(strategy.focusAreas).toContain(LanguageSkill.WRITING);
@@ -212,7 +212,7 @@ describe('DifficultyCalibrationEngine', () => {
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
         sampleContentDifficulty, 
         writingFocusMetrics, 
-        CEFRLevel.B2
+        'B2'
       );
       
       expect(strategy.recommendedTaskTypes).toContain('TASK_2_ESSAY');
@@ -332,9 +332,9 @@ describe('DifficultyCalibrationEngine', () => {
 
   describe('Initial Difficulty Creation', () => {
     it('should create appropriate difficulty for B2 level', () => {
-      const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(CEFRLevel.B2);
+      const difficulty = DifficultyCalibrationEngine.createInitialDifficulty('B2');
       
-      expect(difficulty.targetCEFRLevel).toBe(CEFRLevel.B2);
+      expect(difficulty.targetCEFRLevel).toBe('B2');
       expect(difficulty.overallDifficulty).toBe(7); // B2 base difficulty
       expect(difficulty.estimatedSuccessRate).toBe(75);
       expect(difficulty.adaptationReason).toContain('Initial difficulty calibration');
@@ -343,7 +343,7 @@ describe('DifficultyCalibrationEngine', () => {
     it('should adjust difficulty for strong skills', () => {
       const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(
         CEFRLevel.B1, 
-        [LanguageSkill.VOCABULARY, LanguageSkill.GRAMMAR]
+        ['VOCABULARY', 'GRAMMAR']
       );
       
       expect(difficulty.vocabularyComplexity).toBe(6); // 5 + 1 for strength
@@ -364,7 +364,7 @@ describe('DifficultyCalibrationEngine', () => {
       const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(
         CEFRLevel.A1, 
         [], 
-        [LanguageSkill.VOCABULARY, LanguageSkill.GRAMMAR, LanguageSkill.WRITING, LanguageSkill.READING]
+        ['VOCABULARY', 'GRAMMAR', LanguageSkill.WRITING, 'READING']
       );
       
       expect(difficulty.vocabularyComplexity).toBeGreaterThanOrEqual(1);
@@ -468,7 +468,7 @@ describe('DifficultyCalibrationEngine', () => {
         const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
           currentDifficulty, 
           metrics, 
-          CEFRLevel.B2
+          'B2'
         );
         currentDifficulty = DifficultyCalibrationEngine.applyDifficultyAdaptation(
           currentDifficulty, 

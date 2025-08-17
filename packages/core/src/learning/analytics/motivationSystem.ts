@@ -6,7 +6,7 @@
 import type { EducationalAchievement } from './achievements';
 import type { LearningGoal } from './goalSetting';
 import type { LearningAnalytics } from './analytics';
-import { LearningValidation, ValidationError } from './validation';
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export interface MotivationProfile {
   id: string;

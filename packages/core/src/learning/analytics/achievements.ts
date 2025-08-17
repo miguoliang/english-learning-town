@@ -3,7 +3,11 @@
  * Tracks learning milestones and motivational rewards
  */
 
-import type { VocabularyCard, ReviewSession } from './spacedRepetition';
+import type { SpacedRepetition } from '../shared/types';
+
+// For backward compatibility during transition
+type VocabularyCard = SpacedRepetition.VocabularyCard;
+type ReviewSession = SpacedRepetition.ReviewSession;
 
 export interface EducationalAchievement {
   id: string;

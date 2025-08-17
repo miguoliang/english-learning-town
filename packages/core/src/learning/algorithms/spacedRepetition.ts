@@ -3,7 +3,7 @@
  * Based on the SM-2 algorithm with adaptations for gamified learning
  */
 
-import { LearningValidation, ValidationError } from './validation';
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export interface VocabularyCard {
   id: string;

@@ -3,9 +3,13 @@
  * Provides personalized goal management with progress tracking
  */
 
-import type { VocabularyCard, ReviewSession } from './spacedRepetition';
+import type { SpacedRepetition } from '../shared/types';
+
+// For backward compatibility during transition
+type VocabularyCard = SpacedRepetition.VocabularyCard;
+type ReviewSession = SpacedRepetition.ReviewSession;
 import type { LearningAnalytics } from './analytics';
-import { LearningValidation, ValidationError } from './validation';
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export interface LearningGoal {
   id: string;

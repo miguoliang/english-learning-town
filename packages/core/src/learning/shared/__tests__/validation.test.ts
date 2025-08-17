@@ -4,9 +4,7 @@
  */
 
 import { LearningValidation, ValidationError } from '../validation';
-import { LearningStage } from '../spacedRepetition';
-import { GoalCategory, GoalType, GoalTimeframe, GoalPriority, GoalMetric } from '../goalSetting';
-import { MotivationStyle, EncouragementLevel } from '../motivationSystem';
+import type { SpacedRepetition, Analytics, Motivation } from '../types';
 
 describe('LearningValidation', () => {
   describe('Card Creation Validation', () => {
@@ -116,7 +114,7 @@ describe('LearningValidation', () => {
       context: 'test context',
       examples: ['example'],
       tags: ['tag'],
-      learningStage: LearningStage.NEW,
+      learningStage: 'NEW',
       masteryLevel: 0,
       nextReviewDate: new Date(),
       reviewInterval: 0,
@@ -183,7 +181,7 @@ describe('LearningValidation', () => {
         context: 'test context',
         examples: ['example'],
         tags: ['tag'],
-        learningStage: LearningStage.NEW,
+        learningStage: 'NEW',
         masteryLevel: 0,
         nextReviewDate: new Date(),
         reviewInterval: 0,
@@ -253,12 +251,12 @@ describe('LearningValidation', () => {
     const validGoalTemplate = {
       title: 'Learn 25 Words',
       description: 'Learn 25 new vocabulary words',
-      category: GoalCategory.VOCABULARY,
-      type: GoalType.ACHIEVEMENT,
+      category: 'VOCABULARY',
+      type: 'ACHIEVEMENT',
       target: 25,
-      timeframe: GoalTimeframe.MONTHLY,
-      targetMetric: GoalMetric.WORDS_LEARNED,
-      priority: GoalPriority.HIGH
+      timeframe: 'MONTHLY',
+      targetMetric: 'WORDS_LEARNED',
+      priority: 'HIGH'
     };
 
     it('should pass validation for valid goal template', () => {
@@ -339,8 +337,8 @@ describe('LearningValidation', () => {
       id: 'profile-1',
       userId: 'user-1',
       preferredRewardTypes: ['XP_BONUS', 'BADGE'],
-      motivationStyle: MotivationStyle.ACHIEVER,
-      encouragementLevel: EncouragementLevel.MODERATE,
+      motivationStyle: 'ACHIEVER',
+      encouragementLevel: 'MODERATE',
       currentStreak: 5,
       totalXP: 1000,
       level: 3,

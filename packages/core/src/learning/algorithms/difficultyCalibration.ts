@@ -5,7 +5,7 @@
  */
 
 import type { CEFRLevel, IELTSTaskType, LanguageSkill } from './curriculumAlignment';
-import { LearningValidation, ValidationError } from './validation';
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export const DifficultyLevel = {
   VERY_EASY: 'VERY_EASY',     // 1-2: Basic foundation

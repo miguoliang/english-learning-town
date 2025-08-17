@@ -3,66 +3,51 @@
  * Tests analytics generation, insights creation, and statistical calculations
  */
 
-import { LearningAnalyticsEngine, InsightType } from '../analytics';
-import { LearningStage } from '../spacedRepetition';
-import type { VocabularyCard, ReviewSession, LearningAnalytics } from '../analytics';
+import { LearningAnalyticsEngine } from '../analytics';
+import type { Analytics, SpacedRepetition } from '../../shared/types';
+import { TestFactories } from '../../shared/__tests__/testDataFactories';
 
 describe('LearningAnalyticsEngine', () => {
-  const sampleCards: VocabularyCard[] = [
-    {
+  const sampleCards: SpacedRepetition.VocabularyCard[] = [
+    TestFactories.SpacedRepetition.createVocabularyCard({
       id: 'card-1',
       word: 'serendipity',
       definition: 'A pleasant surprise',
       context: 'Example context',
       examples: ['Example 1'],
       tags: ['advanced', 'nouns'],
-      learningStage: LearningStage.MASTERED,
-      masteryLevel: 0,
-      nextReviewDate: new Date(),
-      reviewInterval: 30,
-      easinessFactor: 2.5,
+      learningStage: 'MASTERED',
       correctReviews: 10,
       totalReviews: 12,
-      mastery: 95,
-      lastReviewDate: new Date()
-    },
-    {
+      mastery: 95
+    }),
+    TestFactories.SpacedRepetition.createVocabularyCard({
       id: 'card-2',
       word: 'ephemeral',
       definition: 'Lasting for a short time',
       context: 'Another context',
       examples: ['Example 2'],
       tags: ['intermediate', 'adjectives'],
-      learningStage: LearningStage.LEARNING,
-      masteryLevel: 0,
-      nextReviewDate: new Date(),
-      reviewInterval: 3,
-      easinessFactor: 2.3,
+      learningStage: 'LEARNING',
       correctReviews: 5,
       totalReviews: 8,
-      mastery: 65,
-      lastReviewDate: new Date(Date.now() - 24 * 60 * 60 * 1000)
-    },
-    {
+      mastery: 65
+    }),
+    TestFactories.SpacedRepetition.createVocabularyCard({
       id: 'card-3',
       word: 'ubiquitous',
       definition: 'Present everywhere',
       context: 'Third context',
       examples: [],
       tags: ['advanced', 'adjectives'],
-      learningStage: LearningStage.NEW,
-      masteryLevel: 0,
-      nextReviewDate: new Date(),
-      reviewInterval: 0,
-      easinessFactor: 2.5,
+      learningStage: 'NEW',
       correctReviews: 0,
       totalReviews: 0,
-      mastery: 0,
-      lastReviewDate: new Date()
-    }
+      mastery: 0
+    })
   ];
 
-  const sampleSessions: ReviewSession[] = [
+  const sampleSessions: SpacedRepetition.ReviewSession[] = [
     {
       id: 'session-1',
       userId: 'user-1',
@@ -192,7 +177,7 @@ describe('LearningAnalyticsEngine', () => {
         expect(insight).toHaveProperty('priority');
         
         expect(['low', 'medium', 'high']).toContain(insight.priority);
-        expect(Object.values(InsightType)).toContain(insight.type);
+        expect(['CELEBRATION', 'RECOMMENDATION', 'TIP', 'WARNING']).toContain(insight.type);
       });
     });
 
@@ -216,7 +201,7 @@ describe('LearningAnalyticsEngine', () => {
       };
       
       const celebrationInsights = LearningAnalyticsEngine.generateInsights(highPerformanceAnalytics);
-      const celebrations = celebrationInsights.filter(i => i.type === InsightType.CELEBRATION);
+      const celebrations = celebrationInsights.filter(i => i.type === 'CELEBRATION');
       
       expect(celebrations.length).toBeGreaterThan(0);
     });
@@ -230,7 +215,7 @@ describe('LearningAnalyticsEngine', () => {
       };
       
       const improvementInsights = LearningAnalyticsEngine.generateInsights(lowPerformanceAnalytics);
-      const recommendations = improvementInsights.filter(i => i.type === InsightType.RECOMMENDATION);
+      const recommendations = improvementInsights.filter(i => i.type === 'RECOMMENDATION');
       
       expect(recommendations.length).toBeGreaterThan(0);
     });
@@ -243,7 +228,7 @@ describe('LearningAnalyticsEngine', () => {
       };
       
       const tipInsights = LearningAnalyticsEngine.generateInsights(analyticsWithAreas);
-      const tips = tipInsights.filter(i => i.type === InsightType.TIP);
+      const tips = tipInsights.filter(i => i.type === 'TIP');
       
       expect(tips.length).toBeGreaterThan(0);
     });

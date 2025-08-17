@@ -11,7 +11,7 @@ import {
   GoalPriority, 
   GoalMetric 
 } from '../goalSetting';
-import { LearningStage } from '../spacedRepetition';
+import type { SpacedRepetition } from '../../shared/types';
 import type { LearningGoal, LearningAnalytics, VocabularyCard, ReviewSession } from '../goalSetting';
 
 describe('LearningGoalEngine', () => {
@@ -48,7 +48,7 @@ describe('LearningGoalEngine', () => {
       context: 'Example context',
       examples: ['Example 1'],
       tags: ['advanced', 'nouns'],
-      learningStage: LearningStage.MASTERED,
+      learningStage: 'MASTERED',
       masteryLevel: 0,
       nextReviewDate: new Date(),
       reviewInterval: 30,
@@ -65,7 +65,7 @@ describe('LearningGoalEngine', () => {
       context: 'Another context',
       examples: ['Example 2'],
       tags: ['intermediate', 'adjectives'],
-      learningStage: LearningStage.LEARNING,
+      learningStage: 'LEARNING',
       masteryLevel: 0,
       nextReviewDate: new Date(),
       reviewInterval: 3,

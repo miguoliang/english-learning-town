@@ -3,11 +3,12 @@
  * Tests learning algorithms, card progression, and mastery calculations
  */
 
-import { SpacedRepetitionEngine, LearningStage, ReviewResult } from '../spacedRepetition';
-import type { VocabularyCard } from '../spacedRepetition';
+import { SpacedRepetitionEngine } from '../spacedRepetition';
+import type { SpacedRepetition } from '../../shared/types';
+import { TestFactories } from '../../shared/__tests__/testDataFactories';
 
 describe('SpacedRepetitionEngine', () => {
-  const sampleCard: VocabularyCard = {
+  const sampleCard: SpacedRepetition.VocabularyCard = TestFactories.SpacedRepetition.createVocabularyCard({
     id: 'test-card-1',
     word: 'serendipity',
     definition: 'A pleasant surprise; a fortunate discovery',
@@ -17,20 +18,8 @@ describe('SpacedRepetitionEngine', () => {
       'Their serendipitous encounter changed everything.'
     ],
     tags: ['advanced', 'nouns'],
-    difficulty: 3,
-    easeFactor: 2.5,
-    repetitions: 0,
-    interval: 0,
-    nextReviewDate: new Date(),
-    lastReviewDate: new Date(),
-    totalReviews: 0,
-    correctReviews: 0,
-    streakCount: 0,
-    averageResponseTime: 0,
-    learningStage: LearningStage.NEW,
-    mastery: 0,
-    isBookmarked: false
-  };
+    difficulty: 3
+  });
 
   describe('Card Creation', () => {
     it('should create a new vocabulary card with correct defaults', () => {
@@ -45,7 +34,7 @@ describe('SpacedRepetitionEngine', () => {
       expect(card.definition).toBe('Lasting for a very short time');
       expect(card.context).toBe('The beauty of the sunset was ephemeral.');
       expect(card.examples).toHaveLength(1);
-      expect(card.learningStage).toBe(LearningStage.NEW);
+      expect(card.learningStage).toBe('NEW');
       expect(card.mastery).toBe(0);
       expect(card.easeFactor).toBe(2.5);
       expect(card.totalReviews).toBe(0);
@@ -106,7 +95,7 @@ describe('SpacedRepetitionEngine', () => {
   describe('Card Review and Progression', () => {
     it('should update card correctly for EASY review', () => {
       const card = { ...sampleCard };
-      const updatedCard = SpacedRepetitionEngine.reviewCard(card, ReviewResult.EASY, 2000);
+      const updatedCard = SpacedRepetitionEngine.reviewCard(card, 'EASY', 2000);
 
       expect(updatedCard.correctReviews).toBe(1);
       expect(updatedCard.totalReviews).toBe(1);
@@ -118,7 +107,7 @@ describe('SpacedRepetitionEngine', () => {
 
     it('should update card correctly for HARD review', () => {
       const card = { ...sampleCard };
-      const updatedCard = SpacedRepetitionEngine.reviewCard(card, ReviewResult.HARD, 4000);
+      const updatedCard = SpacedRepetitionEngine.reviewCard(card, 'HARD', 4000);
 
       expect(updatedCard.correctReviews).toBe(1);
       expect(updatedCard.totalReviews).toBe(1);
@@ -129,9 +118,9 @@ describe('SpacedRepetitionEngine', () => {
 
     it('should update card correctly for FORGOT review', () => {
       const card = { ...sampleCard };
-      const updatedCard = SpacedRepetitionEngine.reviewCard(card, ReviewResult.FORGOT, 6000);
+      const updatedCard = SpacedRepetitionEngine.reviewCard(card, 'FORGOT', 6000);
 
-      expect(updatedCard.learningStage).toBe(LearningStage.RELEARNING);
+      expect(updatedCard.learningStage).toBe('RELEARNING');
       expect(updatedCard.correctReviews).toBe(0);
       expect(updatedCard.totalReviews).toBe(1);
       expect(updatedCard.mastery).toBe(0);
@@ -145,10 +134,10 @@ describe('SpacedRepetitionEngine', () => {
       
       // Simulate multiple successful reviews
       for (let i = 0; i < 8; i++) {
-        card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.EASY, 2000);
+        card = SpacedRepetitionEngine.reviewCard(card, 'EASY', 2000);
       }
 
-      expect(card.learningStage).toBe(LearningStage.MASTERED);
+      expect(card.learningStage).toBe('MASTERED');
       expect(card.mastery).toBeGreaterThanOrEqual(95);
       expect(card.correctReviews).toBe(8);
       expect(card.totalReviews).toBe(8);
@@ -158,19 +147,19 @@ describe('SpacedRepetitionEngine', () => {
       let card = { ...sampleCard };
       
       // Build up some progress
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.EASY, 2000);
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.EASY, 2000);
+      card = SpacedRepetitionEngine.reviewCard(card, 'EASY', 2000);
+      card = SpacedRepetitionEngine.reviewCard(card, 'EASY', 2000);
       expect(card.mastery).toBeGreaterThan(20);
       
       // Wrong answer should reset progress
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.FORGOT, 6000);
+      card = SpacedRepetitionEngine.reviewCard(card, 'FORGOT', 6000);
       expect(card.mastery).toBe(0);
-      expect(card.learningStage).toBe(LearningStage.RELEARNING);
+      expect(card.learningStage).toBe('RELEARNING');
     });
 
     it('should throw ValidationError for invalid card input', () => {
       expect(() => {
-        SpacedRepetitionEngine.reviewCard(null as any, ReviewResult.EASY, 2000);
+        SpacedRepetitionEngine.reviewCard(null as any, 'EASY', 2000);
       }).toThrow('Card review failed: Card must be an object');
     });
 
@@ -182,14 +171,14 @@ describe('SpacedRepetitionEngine', () => {
 
     it('should handle edge case of maximum ease factor', () => {
       const card = { ...sampleCard, easeFactor: 3.8 };
-      const updatedCard = SpacedRepetitionEngine.reviewCard(card, ReviewResult.EASY, 2000);
+      const updatedCard = SpacedRepetitionEngine.reviewCard(card, 'EASY', 2000);
       
       expect(updatedCard.easeFactor).toBeLessThanOrEqual(4.0);
     });
 
     it('should handle edge case of minimum ease factor', () => {
       const card = { ...sampleCard, easeFactor: 1.4 };
-      const updatedCard = SpacedRepetitionEngine.reviewCard(card, ReviewResult.FORGOT, 6000);
+      const updatedCard = SpacedRepetitionEngine.reviewCard(card, 'FORGOT', 6000);
       
       expect(updatedCard.easeFactor).toBeGreaterThanOrEqual(1.3);
     });
@@ -227,10 +216,10 @@ describe('SpacedRepetitionEngine', () => {
 
     it('should filter new cards correctly', () => {
       const cards: VocabularyCard[] = [
-        { ...sampleCard, id: 'new-1', learningStage: LearningStage.NEW },
-        { ...sampleCard, id: 'learning-1', learningStage: LearningStage.LEARNING },
-        { ...sampleCard, id: 'new-2', learningStage: LearningStage.NEW },
-        { ...sampleCard, id: 'mastered-1', learningStage: LearningStage.MASTERED }
+        { ...sampleCard, id: 'new-1', learningStage: 'NEW' },
+        { ...sampleCard, id: 'learning-1', learningStage: 'LEARNING' },
+        { ...sampleCard, id: 'new-2', learningStage: 'NEW' },
+        { ...sampleCard, id: 'mastered-1', learningStage: 'MASTERED' }
       ];
 
       const newCards = SpacedRepetitionEngine.getNewCards(cards);
@@ -245,8 +234,8 @@ describe('SpacedRepetitionEngine', () => {
     it('should calculate daily statistics correctly', () => {
       const cards = [
         { ...sampleCard, id: 'due-1', nextReviewDate: new Date(Date.now() - 1000) },
-        { ...sampleCard, id: 'new-1', learningStage: LearningStage.NEW },
-        { ...sampleCard, id: 'mastered-1', learningStage: LearningStage.MASTERED }
+        { ...sampleCard, id: 'new-1', learningStage: 'NEW' },
+        { ...sampleCard, id: 'mastered-1', learningStage: 'MASTERED' }
       ];
 
       const stats = SpacedRepetitionEngine.getDailyStats(cards);
@@ -281,7 +270,7 @@ describe('SpacedRepetitionEngine', () => {
       
       // Review the same card multiple times with same result
       for (let i = 0; i < 5; i++) {
-        card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
+        card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
       }
       
       expect(card.totalReviews).toBe(5);
@@ -295,23 +284,23 @@ describe('SpacedRepetitionEngine', () => {
       let card = { ...sampleCard };
       
       // Start as NEW
-      expect(card.learningStage).toBe(LearningStage.NEW);
+      expect(card.learningStage).toBe('NEW');
       
       // First correct review -> LEARNING
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
-      expect(card.learningStage).toBe(LearningStage.LEARNING);
+      card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
+      expect(card.learningStage).toBe('LEARNING');
       
       // Continue reviewing correctly -> REVIEW
       for (let i = 0; i < 3; i++) {
-        card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
+        card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
       }
-      expect(card.learningStage).toBe(LearningStage.REVIEW);
+      expect(card.learningStage).toBe('REVIEW');
       
       // Continue until mastered
-      while (card.learningStage !== LearningStage.MASTERED) {
-        card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
+      while (card.learningStage !== 'MASTERED') {
+        card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
       }
-      expect(card.learningStage).toBe(LearningStage.MASTERED);
+      expect(card.learningStage).toBe('MASTERED');
     });
 
     it('should handle relearning stage correctly', () => {
@@ -319,17 +308,17 @@ describe('SpacedRepetitionEngine', () => {
       
       // Progress to REVIEW stage
       for (let i = 0; i < 5; i++) {
-        card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
+        card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
       }
-      expect(card.learningStage).toBe(LearningStage.REVIEW);
+      expect(card.learningStage).toBe('REVIEW');
       
       // Wrong answer should move to RELEARNING
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.FORGOT, 6000);
-      expect(card.learningStage).toBe(LearningStage.RELEARNING);
+      card = SpacedRepetitionEngine.reviewCard(card, 'FORGOT', 6000);
+      expect(card.learningStage).toBe('RELEARNING');
       
       // Correct answers should progress back through stages
-      card = SpacedRepetitionEngine.reviewCard(card, ReviewResult.GOOD, 3000);
-      expect(card.learningStage).toBe(LearningStage.LEARNING);
+      card = SpacedRepetitionEngine.reviewCard(card, 'GOOD', 3000);
+      expect(card.learningStage).toBe('LEARNING');
     });
   });
 });

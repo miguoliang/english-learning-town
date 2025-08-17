@@ -5,8 +5,8 @@
  */
 
 import type { CEFRLevel, IELTSTaskType, LanguageSkill } from './curriculumAlignment';
-import type { VocabularyCard, LearningStage } from './spacedRepetition';
-import { LearningValidation, ValidationError } from './validation';
+import type { SpacedRepetition } from '../shared/types';
+import { LearningValidation, ValidationError } from '../shared/validation';
 
 export const ContentType = {
   DIALOGUE: 'DIALOGUE',
