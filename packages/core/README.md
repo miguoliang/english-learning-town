@@ -226,77 +226,171 @@ export class MovementSystem implements System {
 }
 ```
 
-### ECS Data Flow Architecture
+### ECS Architecture Structure
 
-Instead of confusing arrows, here's how the ECS system actually works:
-
+```mermaid
+classDiagram
+    class World {
+        -entities: Map~EntityId, Entity~
+        -components: ComponentManager
+        -systems: System[]
+        -events: EventBus
+        +createEntity(id) Entity
+        +addComponent(entityId, component)
+        +addSystem(system)
+        +update()
+    }
+    
+    class Entity {
+        +id: EntityId
+    }
+    
+    class ComponentManager {
+        -components: Map~string, Map~EntityId, Component~~
+        +addComponent(entityId, component)
+        +getComponent(entityId, type) Component
+        +getEntitiesWithComponents(types) EntityId[]
+    }
+    
+    class Component {
+        <<interface>>
+        +type: string
+    }
+    
+    class System {
+        <<interface>>
+        +name: string
+        +requiredComponents: string[]
+        +update(entities, components, deltaTime, events)
+        +canProcess(entity, components) boolean
+    }
+    
+    class EventBus {
+        +emit(event, data)
+        +on(event, handler)
+        +once(event, handler)
+    }
+    
+    World *-- Entity : contains
+    World *-- ComponentManager : uses
+    World *-- System : manages
+    World *-- EventBus : communicates
+    ComponentManager *-- Component : stores
+    System ..> EventBus : emits events
+    System ..> ComponentManager : queries components
+    
+    note for World "Central coordinator managing\nall ECS components"
+    note for System "Systems communicate only\nthrough EventBus - no direct calls"
 ```
-🌍 WORLD (Central Coordinator)
-├── 📦 ENTITIES (Just IDs: "player", "npc-teacher", "building-school")
-├── 🧩 COMPONENTS (Pure Data)
-│   ├── position: { x: 10, y: 5 }
-│   ├── health: { current: 80, max: 100 }
-│   └── renderable: { icon: "🧑", zIndex: 10 }
-└── ⚙️ SYSTEMS (Logic Processors)
-    ├── MovementSystem → reads position+velocity → updates position
-    ├── HealthSystem → reads health → applies regeneration
-    └── RenderSystem → reads position+renderable → draws on screen
 
-📡 EVENT BUS (Communication Layer)
-    MovementSystem emits "player:moved" 
-    → CollisionSystem listens → checks collisions
-    → RenderSystem listens → updates display
-```
+#### Real Example Flow - Player Movement:
 
-#### Real Example Flow:
-```
-1. 🎮 Player presses "W" key
-2. ⚙️ InputSystem detects keypress → emits "input:movement" event
-3. ⚙️ MovementSystem hears event → updates player's VelocityComponent  
-4. ⚙️ PhysicsSystem processes velocity → updates PositionComponent
-5. ⚙️ CollisionSystem checks new position → emits "collision:detected" if needed
-6. ⚙️ RenderSystem reads new position → updates visual display
-7. 📡 All done through events - no system directly calls another!
+```mermaid
+sequenceDiagram
+    participant Player
+    participant InputSystem
+    participant EventBus
+    participant MovementSystem
+    participant PhysicsSystem
+    participant CollisionSystem
+    participant RenderSystem
+    
+    Player->>InputSystem: Press "W" key
+    InputSystem->>EventBus: emit("input:movement", {direction: "north"})
+    EventBus->>MovementSystem: notify("input:movement")
+    MovementSystem->>MovementSystem: Update VelocityComponent
+    PhysicsSystem->>PhysicsSystem: Process velocity → update PositionComponent
+    CollisionSystem->>CollisionSystem: Check new position
+    alt Collision detected
+        CollisionSystem->>EventBus: emit("collision:detected")
+    end
+    RenderSystem->>RenderSystem: Read new position → update display
+    
+    Note over EventBus: All communication through events - no direct system calls!
 ```
 
 ### System Collaboration Examples
 
-#### 🎮 Player Movement (Step-by-Step)
-```
-User Input: Player presses "W" key
-├── 1. InputSystem detects keypress
-├── 2. InputSystem emits event: "input:movement" { direction: "north" }
-├── 3. MovementSystem listens to event
-├── 4. MovementSystem updates VelocityComponent: { x: 0, y: -2 }
-├── 5. PhysicsSystem reads velocity, updates PositionComponent: { x: 10, y: 8 }
-├── 6. CollisionSystem checks new position against walls/NPCs
-├── 7. RenderSystem reads new position, moves player sprite on screen
-└── 8. All systems work independently through events! 🎯
+#### 🎮 Player Movement
+```mermaid
+sequenceDiagram
+    participant Player
+    participant InputSystem
+    participant EventBus
+    participant MovementSystem
+    participant PhysicsSystem
+    participant CollisionSystem
+    participant RenderSystem
+    
+    Player->>InputSystem: Press "W" key
+    InputSystem->>EventBus: emit("input:movement", {direction: "north"})
+    EventBus->>MovementSystem: notify("input:movement")
+    MovementSystem->>MovementSystem: Update VelocityComponent {x: 0, y: -2}
+    PhysicsSystem->>PhysicsSystem: Process velocity → PositionComponent {x: 10, y: 8}
+    CollisionSystem->>CollisionSystem: Check new position
+    alt Collision detected
+        CollisionSystem->>EventBus: emit("collision:detected")
+    end
+    RenderSystem->>RenderSystem: Read position → update sprite display
+    
+    Note over EventBus: Systems communicate only through events
 ```
 
-#### 💬 NPC Dialogue (Event Chain)
-```
-Player Interaction: Player clicks on NPC
-├── 1. MouseInputSystem detects click on NPC entity
-├── 2. MouseInputSystem emits: "interaction:start" { npcId: "teacher", playerId: "player" }
-├── 3. DialogueSystem listens, starts conversation
-├── 4. DialogueSystem emits: "dialogue:begin" { npcId: "teacher", dialogueId: "greeting" }
-├── 5. AISystem switches NPC StateComponent: "dialogue" mode
-├── 6. RenderSystem shows dialogue bubble UI
-└── 7. AudioSystem plays dialogue sound effect 🔊
+#### 💬 NPC Dialogue Interaction
+```mermaid
+sequenceDiagram
+    participant Player
+    participant MouseInputSystem
+    participant EventBus
+    participant DialogueSystem
+    participant AISystem
+    participant RenderSystem
+    participant AudioSystem
+    
+    Player->>MouseInputSystem: Click on NPC
+    MouseInputSystem->>EventBus: emit("interaction:start", {npcId: "teacher"})
+    EventBus->>DialogueSystem: notify("interaction:start")
+    DialogueSystem->>DialogueSystem: Start conversation
+    DialogueSystem->>EventBus: emit("dialogue:begin", {dialogueId: "greeting"})
+    EventBus->>AISystem: notify("dialogue:begin")
+    AISystem->>AISystem: Switch NPC to dialogue state
+    EventBus->>RenderSystem: notify("dialogue:begin")
+    RenderSystem->>RenderSystem: Show dialogue UI
+    EventBus->>AudioSystem: notify("dialogue:begin")
+    AudioSystem->>AudioSystem: Play dialogue sound effect
 ```
 
-#### ⚔️ Combat System (Damage Flow)
-```
-Combat Scenario: Enemy attacks player
-├── 1. AISystem detects player in attack range
-├── 2. AISystem emits: "combat:attack" { attackerId: "goblin", targetId: "player", damage: 25 }
-├── 3. HealthSystem reduces player HealthComponent: 75/100
-├── 4. HealthSystem emits: "entity:damaged" { entityId: "player", newHealth: 75 }
-├── 5. AnimationSystem plays damage animation (red flash)
-├── 6. AudioSystem plays damage sound effect
-├── 7. If health ≤ 0: HealthSystem emits "entity:death" → game over logic
-└── 8. UI System updates health bar display ❤️
+#### ⚔️ Combat Damage System
+```mermaid
+sequenceDiagram
+    participant AISystem
+    participant EventBus
+    participant HealthSystem
+    participant AnimationSystem
+    participant AudioSystem
+    participant UISystem
+    
+    AISystem->>AISystem: Detect player in range
+    AISystem->>EventBus: emit("combat:attack", {damage: 25, target: "player"})
+    EventBus->>HealthSystem: notify("combat:attack")
+    HealthSystem->>HealthSystem: Reduce health 100→75
+    HealthSystem->>EventBus: emit("entity:damaged", {health: 75})
+    
+    par Parallel responses to damage
+        EventBus->>AnimationSystem: notify("entity:damaged")
+        AnimationSystem->>AnimationSystem: Play damage animation (red flash)
+    and
+        EventBus->>AudioSystem: notify("entity:damaged")
+        AudioSystem->>AudioSystem: Play damage sound effect
+    and
+        EventBus->>UISystem: notify("entity:damaged")
+        UISystem->>UISystem: Update health bar display
+    end
+    
+    alt Health ≤ 0
+        HealthSystem->>EventBus: emit("entity:death")
+        Note over EventBus: Game over logic triggered
+    end
 ```
 
 #### 🏃 Why Event-Driven Architecture Works
