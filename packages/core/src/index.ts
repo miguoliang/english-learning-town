@@ -5,7 +5,7 @@
  * Provides the fundamental building blocks for entity-component-system architecture.
  */
 
-// Core ECS classes
+// Core ECS classes (from modular structure)
 export {
   World,
   ComponentManager,
@@ -24,7 +24,7 @@ export {
   type Emitter
 } from './events';
 
-// Component definitions
+// Component definitions (from modular structure)
 export type {
   // Spatial components
   PositionComponent,
@@ -48,7 +48,7 @@ export type {
   FurnitureComponent,
   DecorationComponent,
   
-  // New components
+  // Enhanced components
   HealthComponent,
   StatsComponent,
   InventoryComponent,
@@ -66,24 +66,31 @@ export type {
   ProgressComponent
 } from './components';
 
-// Component factory functions
+// Component factory functions (from modular structure)
 export {
+  // Spatial component factories
   createPositionComponent,
   createSizeComponent,
   createVelocityComponent,
   createCollisionComponent,
+  
+  // Visual component factories
   createRenderableComponent,
   createAnimationComponent,
   createMovementAnimationComponent,
+  
+  // Interactive component factories
   createInteractiveComponent,
   createInputComponent,
+  
+  // Game component factories
   createPlayerComponent,
   createNPCComponent,
   createBuildingComponent,
   createFurnitureComponent,
   createDecorationComponent,
   
-  // New factory functions
+  // Enhanced component factories
   createHealthComponent,
   createStatsComponent,
   createInventoryComponent,
@@ -117,72 +124,3 @@ export {
   MathUtils,
   ComponentUtils
 } from './utils';
-
-// Learning systems
-export {
-  SpacedRepetitionEngine,
-  LearningStage,
-  ReviewResult,
-  type VocabularyCard
-} from './learning/algorithms';
-
-export {
-  ReviewSessionManager,
-  QuestionType,
-  type ReviewSession,
-  type SessionQuestion,
-  type ReviewSessionConfig
-} from './learning/algorithms';
-
-export {
-  LearningAnalyticsEngine,
-  InsightType,
-  type LearningAnalytics,
-  type LearningInsight,
-  type Achievement
-} from './learning/analytics';
-
-export {
-  AchievementEngine,
-  AchievementCategory,
-  AchievementRarity,
-  RequirementType,
-  type EducationalAchievement,
-  type AchievementRequirement
-} from './learning/analytics';
-
-export {
-  LearningGoalEngine,
-  GoalCategory,
-  GoalType,
-  GoalTimeframe,
-  GoalPriority,
-  GoalMetric,
-  type LearningGoal,
-  type GoalRecommendation,
-  type GoalProgress,
-  type GoalMilestone,
-  type ProgressEntry
-} from './learning/analytics';
-
-export {
-  MotivationEngine,
-  MotivationStyle,
-  EncouragementLevel,
-  RewardType,
-  RewardRarity,
-  MessageType,
-  MessageContext,
-  MessagePriority,
-  ConditionType,
-  type MotivationProfile,
-  type Reward,
-  type RewardCondition,
-  type MotivationalMessage,
-  type StreakBonus
-} from './learning/analytics';
-
-export {
-  LearningValidation,
-  ValidationError
-} from './learning/shared';
