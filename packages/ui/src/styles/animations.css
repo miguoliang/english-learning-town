@@ -1,17 +1,16 @@
 /**
- * Reusable CSS animations and keyframes for @elt/ui components
+ * CSS animations for @elt/ui components
+ * Kid-friendly, playful animations for educational games
  */
 
-import { keyframes } from 'styled-components';
-
-// Button animations
-export const buttonBounce = keyframes`
+/* Button animations */
+@keyframes elt-button-bounce {
   0% { transform: scale(1) translateY(0); }
   50% { transform: scale(1.05) translateY(-3px); }
   100% { transform: scale(1) translateY(0); }
-`;
+}
 
-export const hoverPulse = keyframes`
+@keyframes elt-button-pulse {
   0% { 
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4), 0 0 0 0 rgba(255, 107, 107, 0.4);
   }
@@ -21,55 +20,55 @@ export const hoverPulse = keyframes`
   100% {
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4), 0 0 0 0 rgba(255, 107, 107, 0.4);
   }
-`;
+}
 
-// Emoji animations
-export const float = keyframes`
+/* Emoji animations */
+@keyframes elt-float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   25% { transform: translateY(-5px) rotate(2deg); }
   50% { transform: translateY(-3px) rotate(0deg); }
   75% { transform: translateY(-7px) rotate(-2deg); }
-`;
+}
 
-export const happy = keyframes`
+@keyframes elt-happy {
   0%, 100% { transform: scale(1) rotate(0deg); }
   25% { transform: scale(1.1) rotate(5deg); }
   50% { transform: scale(1.15) rotate(0deg); }
   75% { transform: scale(1.1) rotate(-5deg); }
-`;
+}
 
-export const excited = keyframes`
+@keyframes elt-excited {
   0% { transform: scale(1) translateY(0); }
   25% { transform: scale(1.2) translateY(-10px); }
   50% { transform: scale(1.1) translateY(0); }
   75% { transform: scale(1.2) translateY(-5px); }
   100% { transform: scale(1) translateY(0); }
-`;
+}
 
-export const thinking = keyframes`
+@keyframes elt-thinking {
   0%, 100% { transform: rotate(0deg) scale(1); }
   25% { transform: rotate(-10deg) scale(1.05); }
   75% { transform: rotate(10deg) scale(1.05); }
-`;
+}
 
-export const surprised = keyframes`
+@keyframes elt-surprised {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }
   100% { transform: scale(1); }
-`;
+}
 
-// General utility animations
-export const fadeIn = keyframes`
+/* Utility animations */
+@keyframes elt-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
-`;
+}
 
-export const fadeOut = keyframes`
+@keyframes elt-fade-out {
   from { opacity: 1; }
   to { opacity: 0; }
-`;
+}
 
-export const slideInUp = keyframes`
+@keyframes elt-slide-in-up {
   from {
     transform: translateY(100%);
     opacity: 0;
@@ -78,9 +77,9 @@ export const slideInUp = keyframes`
     transform: translateY(0);
     opacity: 1;
   }
-`;
+}
 
-export const slideInDown = keyframes`
+@keyframes elt-slide-in-down {
   from {
     transform: translateY(-100%);
     opacity: 0;
@@ -89,9 +88,9 @@ export const slideInDown = keyframes`
     transform: translateY(0);
     opacity: 1;
   }
-`;
+}
 
-export const slideInLeft = keyframes`
+@keyframes elt-slide-in-left {
   from {
     transform: translateX(-100%);
     opacity: 0;
@@ -100,9 +99,9 @@ export const slideInLeft = keyframes`
     transform: translateX(0);
     opacity: 1;
   }
-`;
+}
 
-export const slideInRight = keyframes`
+@keyframes elt-slide-in-right {
   from {
     transform: translateX(100%);
     opacity: 0;
@@ -111,9 +110,9 @@ export const slideInRight = keyframes`
     transform: translateX(0);
     opacity: 1;
   }
-`;
+}
 
-export const scaleIn = keyframes`
+@keyframes elt-scale-in {
   from {
     transform: scale(0);
     opacity: 0;
@@ -122,9 +121,9 @@ export const scaleIn = keyframes`
     transform: scale(1);
     opacity: 1;
   }
-`;
+}
 
-export const scaleOut = keyframes`
+@keyframes elt-scale-out {
   from {
     transform: scale(1);
     opacity: 1;
@@ -133,25 +132,25 @@ export const scaleOut = keyframes`
     transform: scale(0);
     opacity: 0;
   }
-`;
+}
 
-export const spin = keyframes`
+@keyframes elt-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-`;
+}
 
-export const pulse = keyframes`
+@keyframes elt-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
-`;
+}
 
-export const shake = keyframes`
+@keyframes elt-shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
   20%, 40%, 60%, 80% { transform: translateX(10px); }
-`;
+}
 
-export const wiggle = keyframes`
+@keyframes elt-wiggle {
   0%, 7% { transform: rotateZ(0); }
   15% { transform: rotateZ(-15deg); }
   20% { transform: rotateZ(10deg); }
@@ -159,4 +158,58 @@ export const wiggle = keyframes`
   30% { transform: rotateZ(6deg); }
   35% { transform: rotateZ(-4deg); }
   40%, 100% { transform: rotateZ(0); }
-`;
+}
+
+@keyframes elt-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Animation utility classes */
+.elt-animate-float {
+  animation: elt-float 3s ease-in-out infinite;
+}
+
+.elt-animate-happy {
+  animation: elt-happy 1s ease-in-out;
+}
+
+.elt-animate-excited {
+  animation: elt-excited 0.8s ease-in-out;
+}
+
+.elt-animate-thinking {
+  animation: elt-thinking 2s ease-in-out infinite;
+}
+
+.elt-animate-surprised {
+  animation: elt-surprised 0.6s ease-in-out;
+}
+
+.elt-animate-fade-in {
+  animation: elt-fade-in 0.3s ease-out;
+}
+
+.elt-animate-slide-in-up {
+  animation: elt-slide-in-up 0.3s ease-out;
+}
+
+.elt-animate-scale-in {
+  animation: elt-scale-in 0.2s ease-out;
+}
+
+.elt-animate-spin {
+  animation: elt-spin 1s linear infinite;
+}
+
+.elt-animate-pulse {
+  animation: elt-pulse 2s ease-in-out infinite;
+}
+
+.elt-animate-shake {
+  animation: elt-shake 0.5s ease-in-out;
+}
+
+.elt-animate-wiggle {
+  animation: elt-wiggle 1s ease-in-out;
+}

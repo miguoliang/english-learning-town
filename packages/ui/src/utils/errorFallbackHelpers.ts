@@ -1,4 +1,4 @@
-import type { ButtonSize } from '../components/basic/ButtonStyles';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export type ErrorFallbackVariant = 'minimal' | 'detailed' | 'fullscreen';
 

@@ -6,8 +6,8 @@ describe('LoadingScreen Component', () => {
   it('renders loading screen with default message', () => {
     renderWithTheme(<LoadingScreen />);
     
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.getByText('Preparing your adventure')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Loading...' })).toBeInTheDocument();
+    expect(screen.getByText('Please wait while we prepare your learning adventure!')).toBeInTheDocument();
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
@@ -46,34 +46,34 @@ describe('LoadingScreen Component', () => {
   it('renders animated emoji', () => {
     renderWithTheme(<LoadingScreen />);
     
-    // Should contain animated emoji (game controller or similar)
-    expect(screen.getByText(/🎮|🌟|⭐/)).toBeInTheDocument();
+    // Should contain default educational emoji
+    expect(screen.getByText('🎓')).toBeInTheDocument();
   });
 
   it('has proper accessibility attributes', () => {
     renderWithTheme(<LoadingScreen />);
     
-    const loadingScreen = screen.getByRole('status');
-    expect(loadingScreen).toHaveAttribute('aria-live', 'polite');
+    const loadingContainer = document.querySelector('.elt-loading');
+    expect(loadingContainer).toHaveAttribute('aria-live', 'polite');
   });
 
   it('displays hints when provided', () => {
     const hints = [
-      'Tip: Practice speaking every day!',
-      'Tip: Try talking to NPCs for vocabulary practice'
+      'Practice speaking every day!',
+      'Try talking to NPCs for vocabulary practice'
     ];
     
     renderWithTheme(<LoadingScreen hints={hints} />);
     
-    // Should display one of the hints
-    const hintText = screen.getByText(/Tip:/);
-    expect(hintText).toBeInTheDocument();
+    // Should display both hints with Tip prefix
+    expect(screen.getByText('💡 Tip: Practice speaking every day!')).toBeInTheDocument();
+    expect(screen.getByText('💡 Tip: Try talking to NPCs for vocabulary practice')).toBeInTheDocument();
   });
 
   it('covers full screen', () => {
-    renderWithTheme(<LoadingScreen />);
+    renderWithTheme(<LoadingScreen fullScreen />);
     
-    const container = screen.getByRole('status');
+    const container = document.querySelector('.elt-loading');
     expect(container).toHaveStyle({
       position: 'fixed',
       top: '0',

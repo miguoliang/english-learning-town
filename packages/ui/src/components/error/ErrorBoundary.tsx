@@ -1,151 +1,58 @@
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import styled from 'styled-components';
 import { Button } from '../basic/Button';
-
-const ErrorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  padding: ${({ theme }) => theme.spacing[6]};
-  background: ${({ theme }) => theme.gradients.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.xl};
-  border: 2px solid ${({ theme }) => theme.colors.error};
-  margin: ${({ theme }) => theme.spacing[4]};
-  text-align: center;
-`;
-
-const ErrorIcon = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-`;
-
-const ErrorTitle = styled.h2`
-  color: ${({ theme }) => theme.colors.surface};
-  font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  margin: 0 0 ${({ theme }) => theme.spacing[2]} 0;
-`;
-
-const ErrorMessage = styled.p`
-  color: ${({ theme }) => theme.colors.surface};
-  font-family: ${({ theme }) => theme.fonts.body};
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  margin: 0 0 ${({ theme }) => theme.spacing[4]} 0;
-  opacity: 0.9;
-  max-width: 400px;
-  line-height: ${({ theme }) => theme.lineHeights.relaxed};
-`;
-
-const ErrorDetails = styled.details`
-  margin-top: ${({ theme }) => theme.spacing[4]};
-  max-width: 500px;
-  width: 100%;
-`;
-
-const ErrorSummary = styled.summary`
-  color: ${({ theme }) => theme.colors.surface};
-  font-family: ${({ theme }) => theme.fonts.body};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  cursor: pointer;
-  margin-bottom: ${({ theme }) => theme.spacing[2]};
-  opacity: 0.8;
-
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-const ErrorStack = styled.pre`
-  background: rgba(0, 0, 0, 0.3);
-  color: ${({ theme }) => theme.colors.surface};
-  padding: ${({ theme }) => theme.spacing[3]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-size: ${({ theme }) => theme.fontSizes.xs};
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 200px;
-  overflow-y: auto;
-`;
-
-const ActionContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing[3]};
-  margin-top: ${({ theme }) => theme.spacing[4]};
-`;
-
-interface ErrorBoundaryErrorInfo {
-  componentStack: string;
-}
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorInfo: ErrorBoundaryErrorInfo | null;
+  errorInfo: { componentStack: string } | null;
 }
 
 export interface ErrorBoundaryProps {
   /** Content to render when there's no error */
   children: ReactNode;
   /** Custom fallback component to render when there's an error */
-  fallback?: (error: Error, errorInfo: ErrorBoundaryErrorInfo | null, retry: () => void) => ReactNode;
+  fallback?: (error: Error, errorInfo: { componentStack: string } | null, retry: () => void) => ReactNode;
   /** Callback called when an error occurs */
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
   /** Whether to show error details in development */
   showDetails?: boolean;
-  /** Custom error title */
+  /** Custom title for error display */
   title?: string;
-  /** Custom error message */
+  /** Custom message for error display */
   message?: string;
   /** Whether to show retry button */
   showRetry?: boolean;
-  /** Custom retry button text */
+  /** Custom text for retry button */
   retryText?: string;
 }
 
 /**
- * ErrorBoundary - A React error boundary component for graceful error handling
+ * ErrorBoundary - Catches JavaScript errors in child components
  * 
  * Features:
- * - Catches JavaScript errors anywhere in the child component tree
- * - Displays fallback UI instead of crashing the entire app
- * - Provides error details in development mode
- * - Supports custom fallback components
- * - Includes retry functionality
- * - Logs errors for debugging
- * - Themed styling consistent with UI library
+ * - Graceful error handling
+ * - Custom fallback UI
+ * - Development-friendly error display
+ * - CSS-based theming
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    // Update state so the next render will show the fallback UI
-    return {
-      hasError: true,
-      error,
-    };
+    return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Update state with error details
     this.setState({
       error,
-      errorInfo: { componentStack: errorInfo.componentStack || '' },
+      errorInfo: { componentStack: errorInfo.componentStack || '' }
     });
 
-    // Call the onError callback if provided
+    // Call onError callback if provided
     this.props.onError?.(error, errorInfo);
 
     // Log error to console in development
@@ -156,84 +63,68 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   handleRetry = () => {
-    // Reset error state to retry rendering
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   override render() {
-    const { 
-      children, 
-      fallback, 
-      showDetails = process.env.NODE_ENV === 'development',
-      title = 'Oops! Something went wrong',
-      message = 'An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.',
-      showRetry = true,
-      retryText = 'Try Again'
-    } = this.props;
+    if (this.state.hasError) {
+      const { fallback } = this.props;
+      const { error, errorInfo } = this.state;
 
-    if (this.state.hasError && this.state.error) {
-      // Custom fallback component
-      if (fallback) {
-        return fallback(this.state.error, this.state.errorInfo, this.handleRetry);
+      if (fallback && error) {
+        return fallback(error, errorInfo, this.handleRetry);
       }
 
-      // Default fallback UI
       return (
-        <ErrorContainer role="alert">
-          <ErrorIcon>⚠️</ErrorIcon>
-          <ErrorTitle>{title}</ErrorTitle>
-          <ErrorMessage>{message}</ErrorMessage>
+        <div className="elt-error" role="alert">
+          <div className="elt-error__icon">⚠️</div>
+          <h2 className="elt-error__title">
+            {this.props.title || 'Oops! Something went wrong'}
+          </h2>
+          <p className="elt-error__message">
+            {this.props.message || "We're sorry, but something unexpected happened. Don't worry, you can try again!"}
+          </p>
           
-          {showRetry && (
-            <ActionContainer>
-              <Button 
-                variant="secondary" 
-                onClick={this.handleRetry}
-              >
-                {retryText}
+          {(this.props.showRetry !== false) && (
+            <>
+              <Button onClick={this.handleRetry} variant="primary">
+                {this.props.retryText ? this.props.retryText : '🔄 Try Again'}
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => window.location.reload()}
-              >
+              <Button onClick={() => window.location.reload()} variant="outline">
                 Refresh Page
               </Button>
-            </ActionContainer>
+            </>
           )}
 
-          {showDetails && this.state.error && (
-            <ErrorDetails>
-              <ErrorSummary>Show Error Details</ErrorSummary>
-              <ErrorStack>
-                <strong>Error:</strong> {this.state.error.message}
-                {this.state.error.stack && (
-                  <>
-                    <br /><br />
-                    <strong>Stack Trace:</strong>
-                    <br />
-                    {this.state.error.stack}
-                  </>
-                )}
-                {this.state.errorInfo?.componentStack && (
+          {(process.env.NODE_ENV === 'development' || this.props.showDetails) && error && (
+            <details style={{ marginTop: '1rem', maxWidth: '500px' }}>
+              <summary style={{ cursor: 'pointer', color: '#fff', marginBottom: '0.5rem' }}>
+                Show Error Details
+              </summary>
+              <pre style={{ 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '1rem', 
+                borderRadius: '0.5rem', 
+                fontSize: '0.8rem', 
+                overflow: 'auto', 
+                color: '#fff',
+                whiteSpace: 'pre-wrap' 
+              }}>
+                <strong>Error:</strong> {error.toString()}
+                {errorInfo && (
                   <>
                     <br /><br />
                     <strong>Component Stack:</strong>
-                    <br />
-                    {this.state.errorInfo.componentStack}
+                    {errorInfo.componentStack}
                   </>
                 )}
-              </ErrorStack>
-            </ErrorDetails>
+              </pre>
+            </details>
           )}
-        </ErrorContainer>
+        </div>
       );
     }
 
-    // No error, render children normally
-    return children;
+    return this.props.children;
   }
 }

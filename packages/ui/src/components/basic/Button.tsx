@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { AnimatedEmoji } from './AnimatedEmoji';
 import { parseEmojiContent } from '../../utils/emojiParser';
-import { StyledButton, type ButtonVariant, type ButtonSize } from './ButtonStyles';
+
+export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps {
   /** Button content */
@@ -22,18 +24,18 @@ export interface ButtonProps {
   showEmoji?: boolean;
   /** Custom emoji to display (auto-detected from children if not provided) */
   emoji?: string;
+  /** Additional CSS class name */
+  className?: string;
 }
 
 /**
  * Button - A versatile, animated button component
  * 
  * Features:
- * - Multiple variants (primary, secondary, outline, ghost)
+ * - Multiple variants (primary, secondary, accent, outline, ghost)
  * - Three sizes (sm, md, lg)
  * - Auto-emoji detection and animation
- * - Shine effect on hover
- * - Bounce animation on click
- * - Responsive design
+ * - CSS-based theming
  * - Full accessibility support
  */
 export const Button: React.FC<ButtonProps> = ({
@@ -46,6 +48,7 @@ export const Button: React.FC<ButtonProps> = ({
   type = 'button',
   showEmoji = true,
   emoji,
+  className = '',
 }) => {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -61,24 +64,33 @@ export const Button: React.FC<ButtonProps> = ({
   const { emoji: detectedEmoji, text } = parseEmojiContent(children);
   const displayEmoji = emoji || detectedEmoji;
 
+  // Build CSS classes
+  const classes = [
+    'elt-button',
+    `elt-button--${variant}`,
+    `elt-button--${size}`,
+    fullWidth && 'elt-button--full',
+    isClicked && 'elt-animate-bounce',
+    className
+  ].filter(Boolean).join(' ');
+
   return (
-    <StyledButton
-      variant={variant}
-      size={size}
-      fullWidth={fullWidth}
+    <button
+      type={type}
+      className={classes}
       onClick={handleClick}
       disabled={disabled}
-      type={type}
+      aria-label={typeof children === 'string' ? children : undefined}
     >
-      {showEmoji && (
-        <AnimatedEmoji 
+      {showEmoji && displayEmoji && (
+        <AnimatedEmoji
           emoji={displayEmoji}
-          mood={isClicked ? 'excited' : variant === 'primary' ? 'happy' : 'normal'}
-          size={size === 'lg' ? '1.8rem' : size === 'sm' ? '1.2rem' : '1.5rem'}
-          triggerAnimation={isClicked}
+          mood={isClicked ? 'excited' : 'happy'}
+          size="1.2em"
+          hoverEffect={false}
         />
       )}
-      <span>{text}</span>
-    </StyledButton>
+      {text || children}
+    </button>
   );
 };

@@ -1,188 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { spin, fadeIn } from '../../styles/animations';
+import React from 'react';
+import { Spinner } from './Spinner';
 import { AnimatedEmoji } from '../basic/AnimatedEmoji';
 
-const LoadingScreenContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  background: ${({ theme }) => theme.gradients.primary};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.surface};
-  animation: ${fadeIn} 0.3s ease-in-out;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 60px;
-  height: 60px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  margin-bottom: ${({ theme }) => theme.spacing[6]};
-  animation: ${spin} 1s linear infinite;
-`;
-
-const LoadingText = styled.h2`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  font-family: ${({ theme }) => theme.fonts.heading};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-  color: ${({ theme }) => theme.colors.surface};
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-`;
-
-const LoadingSubtext = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  max-width: 400px;
-  line-height: ${({ theme }) => theme.lineHeights.relaxed};
-`;
-
-const LoadingDots = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing[2]};
-  margin-top: ${({ theme }) => theme.spacing[4]};
-`;
-
-const Dot = styled.div<{ delay: number }>`
-  width: 8px;
-  height: 8px;
-  background: ${({ theme }) => theme.colors.surface};
-  border-radius: 50%;
-  animation: ${fadeIn} 0.8s ease-in-out infinite alternate;
-  animation-delay: ${props => props.delay}s;
-`;
-
-const ProgressContainer = styled.div`
-  width: 300px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  margin: ${({ theme }) => theme.spacing[4]} 0;
-  overflow: hidden;
-`;
-
-const ProgressBar = styled.div<{ progress: number }>`
-  height: 100%;
-  background: ${({ theme }) => theme.gradients.secondary};
-  border-radius: 4px;
-  width: ${props => props.progress}%;
-  transition: width 0.3s ease;
-`;
-
-const HintsContainer = styled.div`
-  margin-top: ${({ theme }) => theme.spacing[6]};
-  text-align: center;
-  max-width: 400px;
-`;
-
-const HintText = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: rgba(255, 255, 255, 0.9);
-  font-style: italic;
-  animation: ${fadeIn} 0.5s ease-in-out;
-`;
-
-const EmojiContainer = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-`;
-
 export interface LoadingScreenProps {
-  /** Main loading message */
-  message?: string;
-  /** Title for the loading screen */
+  /** Loading title */
   title?: string;
-  /** Secondary descriptive text */
-  subMessage?: string;
-  /** Subtitle text */
+  /** Loading message */
+  message?: string;
+  /** Loading subtitle (alias for message) */
   subtitle?: string;
   /** Progress percentage (0-100) */
   progress?: number;
-  /** Array of hint messages to display */
+  /** Show spinner */
+  showSpinner?: boolean;
+  /** Spinner size */
+  spinnerSize?: 'sm' | 'md' | 'lg';
+  /** Show animated emoji */
+  showEmoji?: boolean;
+  /** Emoji to display */
+  emoji?: string;
+  /** Additional CSS class name */
+  className?: string;
+  /** Loading hints to display */
   hints?: string[];
-  /** Whether to show animated dots */
-  showDots?: boolean;
+  /** Whether to cover full screen */
+  fullScreen?: boolean;
 }
 
 /**
- * LoadingScreen - A full-screen loading component with spinner and messages
+ * LoadingScreen - A full-screen loading component
  * 
  * Features:
- * - Full viewport coverage
- * - Animated spinner
- * - Customizable messages
- * - Optional animated dots
- * - Themed styling
- * - Smooth fade-in animation
+ * - Customizable title and message
+ * - Optional spinner and emoji
+ * - Kid-friendly design
+ * - CSS-based theming
  */
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({
-  title,
+  title = 'Loading...',
+  message = 'Please wait while we prepare your learning adventure!',
   subtitle,
   progress,
+  showSpinner = true,
+  spinnerSize = 'lg',
+  showEmoji = true,
+  emoji = '🎓',
+  className = '',
   hints,
-  showDots = true
+  fullScreen = false,
 }) => {
-  const [currentHint, setCurrentHint] = useState(0);
-
-  useEffect(() => {
-    if (hints && hints.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentHint(prev => (prev + 1) % hints.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-    return undefined;
-  }, [hints]);
-
-  const displayTitle = title || "Loading...";
-  const displaySubtitle = subtitle || "Preparing your adventure";
+  // Use subtitle as message if provided
+  const displayMessage = subtitle || message;
+  
+  const classes = [
+    'elt-loading',
+    fullScreen && 'elt-loading--fullscreen',
+    className
+  ].filter(Boolean).join(' ');
 
   return (
-    <LoadingScreenContainer role="status" aria-live="polite">
-      <EmojiContainer>
-        <AnimatedEmoji emoji="🎮" mood="floating" size="3rem" />
-      </EmojiContainer>
-      
-      <LoadingSpinner />
-      <LoadingText>{displayTitle}</LoadingText>
-      <LoadingSubtext>{displaySubtitle}</LoadingSubtext>
-      
-      {progress !== undefined && (
-        <ProgressContainer>
-          <ProgressBar 
-            progress={progress} 
-            role="progressbar" 
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          />
-        </ProgressContainer>
+    <div 
+      className={classes}
+      aria-live="polite"
+      style={fullScreen ? {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      } : undefined}
+    >
+      {showEmoji && (
+        <AnimatedEmoji 
+          emoji={emoji}
+          mood="thinking"
+          size="3rem"
+        />
       )}
       
-      {showDots && (
-        <LoadingDots>
-          <Dot delay={0} />
-          <Dot delay={0.2} />
-          <Dot delay={0.4} />
-        </LoadingDots>
+      <h1 className="elt-loading__title">
+        {title}
+      </h1>
+      
+      <p className="elt-loading__message">
+        {displayMessage}
+      </p>
+      
+      {progress !== undefined && (
+        <div
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="elt-loading__progress"
+        >
+          <div 
+            className="elt-loading__progress-bar"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       )}
       
       {hints && hints.length > 0 && (
-        <HintsContainer>
-          <HintText key={currentHint}>
-            {hints[currentHint]}
-          </HintText>
-        </HintsContainer>
+        <div className="elt-loading__hints">
+          {hints.map((hint, index) => (
+            <p key={index} className="elt-loading__hint">
+              💡 Tip: {hint}
+            </p>
+          ))}
+        </div>
       )}
-    </LoadingScreenContainer>
+      
+      {showSpinner && <Spinner size={spinnerSize} />}
+    </div>
   );
 };

@@ -46,17 +46,18 @@ describe('Spinner Component', () => {
   it('supports custom className', () => {
     renderWithTheme(<Spinner className="custom-spinner" />);
     
-    const spinnerWrapper = screen.getByRole('status').parentElement;
-    expect(spinnerWrapper).toHaveClass('custom-spinner');
+    // When center=false (default), className is applied to the spinner itself
+    const spinner = screen.getByRole('status');
+    expect(spinner).toHaveClass('custom-spinner');
   });
 
   it('renders with proper animation', () => {
     renderWithTheme(<Spinner />);
     
     const spinner = screen.getByRole('status');
-    const computedStyle = window.getComputedStyle(spinner);
     
-    // Should have animation applied
-    expect(computedStyle.animation).toBeTruthy();
+    // Should have the spinner class which contains CSS animations
+    expect(spinner).toHaveClass('elt-spinner');
+    expect(spinner).toHaveClass('elt-spinner--md');
   });
 });
