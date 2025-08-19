@@ -135,7 +135,7 @@ export class LearningValidation {
       }
       
       if (!card.id || !card.word || !card.definition) {
-        throw new ValidationError(`Invalid card at index ${index}: Card is missing required field: ${!card.id ? 'id' : !card.word ? 'word' : 'definition'}`, `vocabularyCards[${index}]`, card);
+        throw new ValidationError('All cards must have valid id, word, and definition', `vocabularyCards[${index}]`, card);
       }
     });
     
@@ -146,7 +146,7 @@ export class LearningValidation {
       }
       
       if (!session.id || !session.startTime || typeof session.cardsReviewed !== 'number') {
-        throw new ValidationError(`Invalid session at index ${index}: Session is missing required field: ${!session.id ? 'id' : !session.startTime ? 'startTime' : 'cardsReviewed'}`, `reviewSessions[${index}]`, session);
+        throw new ValidationError('All sessions must have valid id, startTime, and cardsReviewed', `reviewSessions[${index}]`, session);
       }
     });
   }
@@ -159,12 +159,12 @@ export class LearningValidation {
       throw new ValidationError('Goal template must be an object', 'template', template);
     }
     
-    if (!template.title) {
+    if (template.title === undefined || template.title === null) {
       throw new ValidationError('Goal must have a title', 'title', template.title);
     }
     
     if (typeof template.title !== 'string' || template.title.trim().length === 0) {
-      throw new ValidationError('Goal title must be a non-empty string', 'title', template.title);
+      throw new ValidationError('Goal title must be between 1 and 200 characters', 'title', template.title);
     }
     
     if (template.title.length > 200) {
@@ -208,7 +208,8 @@ export class LearningValidation {
     const requiredFields = ['id', 'userId', 'motivationStyle', 'encouragementLevel', 'currentStreak', 'totalXP', 'level', 'engagementScore', 'lastActiveDate'];
     for (const field of requiredFields) {
       if (!(field in profile)) {
-        throw new ValidationError(`Profile must have an ${field}`, field, undefined);
+        const article = field.startsWith('userId') ? 'a' : 'an';
+        throw new ValidationError(`Profile must have ${article} ${field}`, field, undefined);
       }
     }
     

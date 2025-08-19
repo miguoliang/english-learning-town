@@ -379,7 +379,7 @@ export class LearningAnalyticsEngine {
     const categoryStats: Record<string, { total: number, mastery: number }> = {};
     
     cards.forEach(card => {
-      card.tags.forEach(tag => {
+      (card.tags || []).forEach(tag => {
         if (!categoryStats[tag]) {
           categoryStats[tag] = { total: 0, mastery: 0 };
         }

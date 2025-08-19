@@ -4,8 +4,8 @@
  */
 
 import { LearningAnalyticsEngine } from '../analytics';
-import type { Analytics, SpacedRepetition } from '../../shared/types';
-import { TestFactories } from '../../shared/__tests__/testDataFactories';
+import type { Analytics, SpacedRepetition } from '../shared/types';
+import { TestFactories } from '../shared/__tests__/testDataFactories';
 
 describe('LearningAnalyticsEngine', () => {
   const sampleCards: SpacedRepetition.VocabularyCard[] = [

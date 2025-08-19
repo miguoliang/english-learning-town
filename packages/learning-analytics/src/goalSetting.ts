@@ -287,7 +287,7 @@ export class LearningGoalEngine {
         return goal;
       }
       
-      const currentProgress = this.calculateGoalProgress(goal, vocabularyCards, reviewSessions);
+      const currentProgress = Math.max(0, this.calculateGoalProgress(goal, vocabularyCards, reviewSessions));
       const wasCompleted = goal.isCompleted;
       const isNowCompleted = currentProgress >= goal.target;
       
@@ -362,7 +362,7 @@ export class LearningGoalEngine {
       
       return {
         goal,
-        progressPercentage: Math.min(progressPercentage, 100),
+        progressPercentage: Math.max(0, Math.min(progressPercentage, 100)),
         isOnTrack,
         daysRemaining,
         projectedCompletion,

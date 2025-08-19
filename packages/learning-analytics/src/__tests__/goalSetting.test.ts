@@ -298,6 +298,8 @@ describe('LearningGoalEngine', () => {
     let sampleGoals: LearningGoal[];
 
     beforeEach(() => {
+      // Create goals with start dates 3 days ago to include historical sessions
+      const startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
       sampleGoals = [
         LearningGoalEngine.createGoal({
           title: 'Learn 10 Words',
@@ -306,7 +308,7 @@ describe('LearningGoalEngine', () => {
           target: 10,
           targetMetric: GoalMetric.WORDS_LEARNED,
           timeframe: GoalTimeframe.WEEKLY
-        }),
+        }, { startDate }),
         LearningGoalEngine.createGoal({
           title: 'Review 50 Cards',
           category: GoalCategory.REVIEW,
@@ -314,7 +316,7 @@ describe('LearningGoalEngine', () => {
           target: 50,
           targetMetric: GoalMetric.REVIEW_COUNT,
           timeframe: GoalTimeframe.WEEKLY
-        }),
+        }, { startDate }),
         LearningGoalEngine.createGoal({
           title: 'Maintain 85% Accuracy',
           category: GoalCategory.ACCURACY,
@@ -322,7 +324,7 @@ describe('LearningGoalEngine', () => {
           target: 85,
           targetMetric: GoalMetric.ACCURACY_PERCENTAGE,
           timeframe: GoalTimeframe.WEEKLY
-        })
+        }, { startDate })
       ];
     });
 
@@ -361,12 +363,13 @@ describe('LearningGoalEngine', () => {
     });
 
     it('should mark goals as completed when target is reached', () => {
+      const startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
       const lowTargetGoal = LearningGoalEngine.createGoal({
         title: 'Review 5 Cards',
         target: 5,
         targetMetric: GoalMetric.REVIEW_COUNT,
         timeframe: GoalTimeframe.WEEKLY
-      });
+      }, { startDate });
       
       const updatedGoals = LearningGoalEngine.updateGoalProgress(
         [lowTargetGoal],
@@ -379,12 +382,13 @@ describe('LearningGoalEngine', () => {
     });
 
     it('should update milestone completion', () => {
+      const startDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
       const goal = LearningGoalEngine.createGoal({
         title: 'Review 20 Cards',
         target: 20,
         targetMetric: GoalMetric.REVIEW_COUNT,
         timeframe: GoalTimeframe.WEEKLY
-      });
+      }, { startDate });
       
       const updatedGoals = LearningGoalEngine.updateGoalProgress(
         [goal],

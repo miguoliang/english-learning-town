@@ -154,6 +154,7 @@ export class SpacedRepetitionEngine {
       );
       updatedCard.streakCount = 0;
       updatedCard.learningStage = LearningStage.RELEARNING;
+      updatedCard.mastery = 0; // Reset mastery on forgotten cards
     } else {
       updatedCard.correctReviews++;
       updatedCard.streakCount++;
@@ -198,8 +199,10 @@ export class SpacedRepetitionEngine {
     nextReview.setDate(nextReview.getDate() + updatedCard.interval);
     updatedCard.nextReviewDate = nextReview;
     
-    // Calculate mastery percentage
-    updatedCard.mastery = this.calculateMastery(updatedCard);
+    // Calculate mastery percentage (only if not already reset for forgotten cards)
+    if (result !== ReviewResult.FORGOT) {
+      updatedCard.mastery = this.calculateMastery(updatedCard);
+    }
     
     return updatedCard;
   }
@@ -282,7 +285,7 @@ export class SpacedRepetitionEngine {
    */
   static getDailyStats(cards: VocabularyCard[]): {
     totalCards: number;
-    dueToday: number;
+    dueForReview: number;
     newCards: number;
     masteredCards: number;
     averageMastery: number;
@@ -311,7 +314,7 @@ export class SpacedRepetitionEngine {
     
     return {
       totalCards: cards.length,
-      dueToday,
+      dueForReview: dueToday,
       newCards,
       masteredCards,
       averageMastery: Math.round(averageMastery),

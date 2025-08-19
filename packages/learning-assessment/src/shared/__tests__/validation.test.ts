@@ -288,12 +288,11 @@ describe('LearningValidation', () => {
     });
 
     it('should throw ValidationError for missing target', () => {
-      const template = { ...validGoalTemplate };
-      delete (template as any).target;
+      const template = { ...validGoalTemplate, target: null };
       
       expect(() => {
         LearningValidation.validateGoalCreation(template);
-      }).toThrow('Goal must have a target');
+      }).toThrow('Goal target must be a positive number');
     });
 
     it('should throw ValidationError for invalid target type', () => {

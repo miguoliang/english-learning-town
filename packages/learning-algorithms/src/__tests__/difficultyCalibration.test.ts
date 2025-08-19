@@ -11,7 +11,7 @@ import {
   ContentDifficulty,
   AdaptationStrategy
 } from '../difficultyCalibration';
-import type { CEFRLevel, LanguageSkill } from '../../shared/types';
+import type { CEFRLevel, LanguageSkill } from '../shared/types';
 
 describe('DifficultyCalibrationEngine', () => {
   
@@ -84,7 +84,7 @@ describe('DifficultyCalibrationEngine', () => {
       { correct: false, responseTime: 4000, skill: 'GRAMMAR', timestamp: new Date() },
       { correct: true, responseTime: 3000, skill: 'READING', timestamp: new Date() },
       { correct: true, responseTime: 2500, skill: 'VOCABULARY', timestamp: new Date() },
-      { correct: false, responseTime: 5000, skill: LanguageSkill.WRITING, timestamp: new Date() }
+      { correct: false, responseTime: 5000, skill: 'WRITING', timestamp: new Date() }
     ];
 
     it('should calculate basic performance metrics correctly', () => {
@@ -142,7 +142,6 @@ describe('DifficultyCalibrationEngine', () => {
     it('should recommend difficulty decrease for frustration zone', () => {
       const frustrationMetrics = { ...samplePerformanceMetrics, recentAccuracy: 45 };
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-        sampleContentDifficulty, 
         frustrationMetrics, 
         'B2'
       );
@@ -156,7 +155,6 @@ describe('DifficultyCalibrationEngine', () => {
     it('should recommend difficulty increase for mastery zone', () => {
       const masteryMetrics = { ...samplePerformanceMetrics, recentAccuracy: 97 };
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-        sampleContentDifficulty, 
         masteryMetrics, 
         'B2'
       );
@@ -169,7 +167,6 @@ describe('DifficultyCalibrationEngine', () => {
     it('should maintain difficulty for optimal challenge zone', () => {
       const challengeMetrics = { ...samplePerformanceMetrics, recentAccuracy: 72 };
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-        sampleContentDifficulty, 
         challengeMetrics, 
         'B2'
       );
@@ -191,13 +188,12 @@ describe('DifficultyCalibrationEngine', () => {
       };
       
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-        sampleContentDifficulty, 
         weakWritingMetrics, 
         'B2'
       );
       
-      expect(strategy.focusAreas).toContain(LanguageSkill.WRITING);
-      expect(strategy.focusAreas).toContain(LanguageSkill.SPEAKING);
+      expect(strategy.focusAreas).toContain('WRITING');
+      expect(strategy.focusAreas).toContain('SPEAKING');
     });
 
     it('should recommend appropriate task types for focus areas', () => {
@@ -210,7 +206,6 @@ describe('DifficultyCalibrationEngine', () => {
       };
       
       const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-        sampleContentDifficulty, 
         writingFocusMetrics, 
         'B2'
       );
@@ -342,7 +337,7 @@ describe('DifficultyCalibrationEngine', () => {
 
     it('should adjust difficulty for strong skills', () => {
       const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(
-        CEFRLevel.B1, 
+        'B1', 
         ['VOCABULARY', 'GRAMMAR']
       );
       
@@ -352,9 +347,9 @@ describe('DifficultyCalibrationEngine', () => {
 
     it('should adjust difficulty for weak skills', () => {
       const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(
-        CEFRLevel.B1, 
+        'B1', 
         [], 
-        [LanguageSkill.WRITING, LanguageSkill.SPEAKING]
+        ['WRITING', 'SPEAKING']
       );
       
       expect(difficulty.taskComplexity).toBe(4); // 5 - 1 for weakness
@@ -362,9 +357,9 @@ describe('DifficultyCalibrationEngine', () => {
 
     it('should respect bounds for extreme adjustments', () => {
       const difficulty = DifficultyCalibrationEngine.createInitialDifficulty(
-        CEFRLevel.A1, 
+        'A1', 
         [], 
-        ['VOCABULARY', 'GRAMMAR', LanguageSkill.WRITING, 'READING']
+        ['VOCABULARY', 'GRAMMAR', 'WRITING', 'READING']
       );
       
       expect(difficulty.vocabularyComplexity).toBeGreaterThanOrEqual(1);
@@ -466,7 +461,6 @@ describe('DifficultyCalibrationEngine', () => {
       // Simulate 5 adaptation cycles
       for (let i = 0; i < 5; i++) {
         const strategy = DifficultyCalibrationEngine.generateAdaptationStrategy(
-          currentDifficulty, 
           metrics, 
           'B2'
         );

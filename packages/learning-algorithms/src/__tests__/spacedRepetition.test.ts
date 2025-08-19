@@ -4,8 +4,8 @@
  */
 
 import { SpacedRepetitionEngine } from '../spacedRepetition';
-import type { SpacedRepetition } from '../../shared/types';
-import { TestFactories } from '../../shared/__tests__/testDataFactories';
+import type { SpacedRepetition } from '../shared/types';
+import { TestFactories } from '../shared/__tests__/testDataFactories';
 
 describe('SpacedRepetitionEngine', () => {
   const sampleCard: SpacedRepetition.VocabularyCard = TestFactories.SpacedRepetition.createVocabularyCard({
@@ -233,7 +233,7 @@ describe('SpacedRepetitionEngine', () => {
   describe('Daily Statistics', () => {
     it('should calculate daily statistics correctly', () => {
       const cards = [
-        { ...sampleCard, id: 'due-1', nextReviewDate: new Date(Date.now() - 1000) },
+        { ...sampleCard, id: 'due-1', nextReviewDate: new Date(Date.now() - 1000), learningStage: 'REVIEW' },
         { ...sampleCard, id: 'new-1', learningStage: 'NEW' },
         { ...sampleCard, id: 'mastered-1', learningStage: 'MASTERED' }
       ];
