@@ -32,7 +32,7 @@ interface UnifiedGameState {
   // =============================================================================
   
   // Core ECS
-  world: World | null;
+  world: InstanceType<typeof World> | null;
   sceneLoader: SceneLoader | null;
   systems: SystemRegistry | null;
   

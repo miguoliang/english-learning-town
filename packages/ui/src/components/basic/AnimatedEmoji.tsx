@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export type EmojiMood = 'happy' | 'excited' | 'thinking' | 'surprised' | 'floating';
+export type EmojiMood = 'happy' | 'excited' | 'thinking' | 'surprised' | 'floating' | 'normal';
 
 export interface AnimatedEmojiProps {
   /** The emoji to display */
@@ -11,6 +11,10 @@ export interface AnimatedEmojiProps {
   size?: string;
   /** Whether to trigger animation on prop change */
   animate?: boolean;
+  /** Alternative name for animate (legacy support) */
+  triggerAnimation?: boolean;
+  /** Alternative name for animate (legacy support) */
+  autoAnimate?: boolean;
   /** Rotation in degrees */
   rotation?: number;
   /** Enable hover effects */
@@ -38,18 +42,22 @@ export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
   mood = 'happy',
   size = '2rem',
   animate = true,
+  triggerAnimation,
+  autoAnimate,
   rotation = 0,
   hoverEffect = false,
   className = '',
   onClick,
   ariaLabel,
 }) => {
+  // Handle legacy prop names
+  const shouldAnimate = animate || triggerAnimation || autoAnimate;
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentMood, setCurrentMood] = useState(mood);
 
   // Trigger animation when mood changes
   useEffect(() => {
-    if (animate && mood !== currentMood) {
+    if (shouldAnimate && mood !== currentMood) {
       setCurrentMood(mood);
       if (mood !== 'floating' && mood !== 'thinking') {
         setIsAnimating(true);
@@ -58,7 +66,7 @@ export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
         setTimeout(() => setIsAnimating(false), duration);
       }
     }
-  }, [mood, currentMood, animate]);
+  }, [mood, currentMood, shouldAnimate]);
 
   // Build CSS classes
   const classes = [

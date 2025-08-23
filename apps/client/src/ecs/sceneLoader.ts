@@ -339,11 +339,11 @@ export class SceneLoader {
               throw new Error('Sprite render type requires a sprite path');
             }
             const renderableComponent = createRenderableComponent(renderData.type, {
-              icon: renderData.icon,
-              sprite: renderData.sprite,
-              backgroundColor: renderData.backgroundColor,
-              zIndex: renderData.zIndex,
-              visible: renderData.visible
+              ...(renderData.icon !== undefined && { icon: renderData.icon }),
+              ...(renderData.sprite !== undefined && { sprite: renderData.sprite }),
+              ...(renderData.backgroundColor !== undefined && { backgroundColor: renderData.backgroundColor }),
+              ...(renderData.zIndex !== undefined && { zIndex: renderData.zIndex }),
+              ...(renderData.visible !== undefined && { visible: renderData.visible })
             });
             logger.ecs(`Creating renderable component for ${entity.id}:`, renderableComponent);
             this.world.addComponent(entity.id, renderableComponent);
@@ -355,15 +355,15 @@ export class SceneLoader {
           if (componentData) {
             const interactData = componentData as NonNullable<SceneEntityData['components']['interactive']>;
             const interactiveComponent = createInteractiveComponent(interactData.type, {
-              dialogueId: interactData.dialogueId,
-              entrances: interactData.entrances,
-              targetScene: interactData.targetScene,
-              targetPosition: interactData.targetPosition,
-              activityId: interactData.activityId,
-              questId: interactData.questId,
-              requiresAdjacency: interactData.requiresAdjacency,
-              interactionRange: interactData.interactionRange,
-              interactionZones: interactData.interactionZones
+              ...(interactData.dialogueId !== undefined && { dialogueId: interactData.dialogueId }),
+              ...(interactData.entrances !== undefined && { entrances: interactData.entrances }),
+              ...(interactData.targetScene !== undefined && { targetScene: interactData.targetScene }),
+              ...(interactData.targetPosition !== undefined && { targetPosition: interactData.targetPosition }),
+              ...(interactData.activityId !== undefined && { activityId: interactData.activityId }),
+              ...(interactData.questId !== undefined && { questId: interactData.questId }),
+              ...(interactData.requiresAdjacency !== undefined && { requiresAdjacency: interactData.requiresAdjacency }),
+              ...(interactData.interactionRange !== undefined && { interactionRange: interactData.interactionRange }),
+              ...(interactData.interactionZones !== undefined && { interactionZones: interactData.interactionZones })
             });
 
             this.world.addComponent(entity.id, interactiveComponent);

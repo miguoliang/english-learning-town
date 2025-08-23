@@ -5,13 +5,13 @@
 import type { 
   System, 
   Entity, 
-  ComponentManager,
   Emitter,
   ECSEvents,
   PositionComponent,
   SizeComponent,
   CollisionComponent
 } from '@elt/core';
+import { ComponentManager } from '@elt/core';
 import { logger } from '../../utils/logger';
 
 export class CollisionSystem implements System {

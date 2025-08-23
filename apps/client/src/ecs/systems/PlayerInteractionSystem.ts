@@ -5,11 +5,11 @@
 import type { 
   System, 
   Entity, 
-  ComponentManager,
   Emitter,
   ECSEvents,
   PositionComponent
 } from '@elt/core';
+import { ComponentManager } from '@elt/core';
 import { ECSEventTypes } from '@elt/core';
 import { InputStateSystem } from './InputStateSystem';
 import { InteractionZoneSystem } from './InteractionZoneSystem';

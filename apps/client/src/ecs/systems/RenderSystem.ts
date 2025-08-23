@@ -5,13 +5,13 @@
 import type { 
   System, 
   Entity, 
-  ComponentManager,
   Emitter,
   ECSEvents,
   PositionComponent,
   SizeComponent,
   RenderableComponent
 } from '@elt/core';
+import { ComponentManager } from '@elt/core';
 import { ECSEventTypes } from '@elt/core';
 import { gameConfig } from '../../config/gameConfig';
 import { logger } from '../../utils/logger';

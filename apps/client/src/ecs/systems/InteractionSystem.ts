@@ -5,12 +5,12 @@
 import type { 
   System, 
   Entity, 
-  ComponentManager,
   Emitter,
   ECSEvents,
   PositionComponent,
   InteractiveComponent
 } from '@elt/core';
+import { ComponentManager } from '@elt/core';
 import { ECSEventTypes } from '@elt/core';
 
 export class InteractionSystem implements System {
@@ -89,7 +89,7 @@ export class InteractionSystem implements System {
           events.emit('scene:transition', {
             from: initiatorId,
             to: targetInteractive.targetScene,
-            targetPosition: targetInteractive.targetPosition
+            ...(targetInteractive.targetPosition !== undefined && { targetPosition: targetInteractive.targetPosition })
           });
         }
         break;
