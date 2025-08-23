@@ -15,15 +15,24 @@ English Learning Town transforms language learning into an engaging RPG experien
 
 ```
 english-learning-town/
+├── configs/                    # 🆕 Unified configuration system
+│   ├── tsconfig.*.json         # Shared TypeScript configurations
+│   ├── eslint.config.js        # Unified ESLint rules
+│   ├── vitest.config.js        # Shared test configuration
+│   ├── tsup.config.js          # Package build configuration  
+│   └── versions.json           # Centralized dependency versions
 ├── apps/
 │   └── client/                 # Main React application
 ├── packages/
 │   ├── core/                   # @elt/core - ECS engine (157 tests)
 │   ├── ui/                     # @elt/ui - Reusable React components
-│   └── game-client/            # @elt/game-client - Game-specific UI
+│   ├── game-client/            # @elt/game-client - Game-specific UI
+│   ├── learning-algorithms/    # @elt/learning-algorithms - ML/AI learning
+│   ├── learning-analytics/     # @elt/learning-analytics - Progress tracking
+│   └── learning-assessment/    # @elt/learning-assessment - Testing & evaluation
 ├── pnpm-workspace.yaml         # Workspace configuration
 ├── turbo.json                  # Build system configuration
-└── tsconfig.base.json          # Shared TypeScript config
+└── tsconfig.base.json          # Root TypeScript references
 ```
 
 ## ✨ Key Features
@@ -102,13 +111,29 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 ```
 
 ### Technology Stack
-- **Frontend**: React 18 + TypeScript + Vite
+
+**🆕 Unified Configuration System**
+- **React**: `18.3.1` - Consistent across all packages
+- **TypeScript**: `5.8.3` - Latest stable with modern features
+- **ESLint**: `9.30.1` - Modern flat config system
+- **Vitest**: `1.0.0` - Fast test runner with Vite integration
+- **tsup**: `8.0.0` - Modern TypeScript bundler
+
+**Frontend**
+- **Framework**: React 18 + TypeScript + Vite
 - **State Management**: Zustand with persistence
-- **Styling**: Styled Components + CSS-in-JS
-- **Animations**: Framer Motion
+- **Styling**: CSS-only theming (migrated from Styled Components)
 - **Audio**: Howler.js + Web Audio API
-- **Backend**: Go with Gin framework
+- **Build System**: Turbo + pnpm workspaces
+
+**Backend**
+- **API**: Go with Gin framework
 - **Database**: SQLite for persistence
+
+**Development Tools**
+- **Shared Configs**: TypeScript, ESLint, Vitest, tsup in `/configs/`
+- **Version Management**: Centralized dependency versions
+- **Package Structure**: Proper dependencies vs devDependencies separation
 
 ## 📋 Development Status
 
@@ -148,6 +173,27 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
   - [x] **Optimized bundle size (133KB gzipped)** ⭐ NEW
   - [x] **Zero build errors and warnings** ⭐ NEW
   - [x] **Type-safe development experience** ⭐ NEW
+
+### ✅ Tech Stack Unification (COMPLETED) 🆕
+**Centralized Configuration Management & Version Consistency**
+
+- [x] **Shared Configuration System**
+  - [x] Unified TypeScript configs for React vs Node packages  
+  - [x] Shared ESLint, Vitest, tsup configurations
+  - [x] Centralized dependency version management
+  - [x] Single-source configuration updates
+
+- [x] **Dependency Version Consistency**
+  - [x] React 18.3.1 across all packages (fixed React 19 vs 18 conflict)
+  - [x] TypeScript 5.8.3 with modern language features
+  - [x] ESLint 9.30.1 with flat config system
+  - [x] Proper separation of dependencies vs devDependencies
+
+- [x] **Package Structure Optimization**
+  - [x] Type definitions moved to devDependencies
+  - [x] Package-specific configuration inheritance
+  - [x] Clean dependency hygiene across monorepo
+  - [x] Reduced production bundle size
 
 ### 🎯 Current Focus Areas
 
