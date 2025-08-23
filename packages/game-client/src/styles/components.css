@@ -1,0 +1,380 @@
+/**
+ * Component styles for @elt/game-client
+ * CSS-only styling for game-specific UI components
+ */
+
+@import './tokens.css';
+@import './animations.css';
+
+/* === XP Progress Bar === */
+.elt-game-progress-container {
+  display: flex;
+  align-items: center;
+  gap: var(--elt-game-spacing-lg);
+  padding: var(--elt-game-spacing-md) var(--elt-game-spacing-xl);
+  background: var(--elt-gradient-primary);
+  border-radius: var(--elt-game-border-radius-xl);
+  box-shadow: var(--elt-shadow-fun);
+  border: var(--elt-game-border-width) solid var(--elt-game-border-color);
+  backdrop-filter: blur(10px);
+  min-width: 300px;
+}
+
+.elt-game-progress-container--compact {
+  gap: var(--elt-game-spacing-sm);
+  padding: var(--elt-game-spacing-sm) var(--elt-game-spacing-md);
+  border-radius: var(--elt-game-border-radius-lg);
+  min-width: 200px;
+}
+
+.elt-game-level-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--elt-game-badge-size-md);
+  height: var(--elt-game-badge-size-md);
+  background: var(--elt-game-gradient-xp);
+  border-radius: 50%;
+  border: var(--elt-game-border-width) solid var(--elt-color-surface);
+  font-family: var(--elt-font-family-heading);
+  font-size: var(--elt-game-font-size-lg);
+  font-weight: var(--elt-font-weight-bold);
+  color: var(--elt-color-surface);
+  animation: elt-game-level-glow 2s ease-in-out infinite;
+}
+
+.elt-game-level-badge--compact {
+  width: var(--elt-game-badge-size-sm);
+  height: var(--elt-game-badge-size-sm);
+  font-size: var(--elt-game-font-size-sm);
+}
+
+.elt-game-progress-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.elt-game-progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--elt-game-spacing-xs);
+  font-size: var(--elt-game-font-size-sm);
+  color: var(--elt-color-text);
+  font-weight: var(--elt-font-weight-medium);
+}
+
+.elt-game-progress-text--compact {
+  font-size: var(--elt-game-font-size-xs);
+  margin-bottom: calc(var(--elt-game-spacing-xs) / 2);
+}
+
+.elt-game-progress-bar {
+  width: 100%;
+  height: var(--elt-game-progress-height-md);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: calc(var(--elt-game-progress-height-md) / 2);
+  overflow: hidden;
+  position: relative;
+}
+
+.elt-game-progress-bar--compact {
+  height: var(--elt-game-progress-height-sm);
+  border-radius: calc(var(--elt-game-progress-height-sm) / 2);
+}
+
+.elt-game-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #26de81 0%, #4ecdc4 50%, #FFD700 100%);
+  border-radius: inherit;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: elt-game-progress-fill 1.5s ease-out;
+  position: relative;
+}
+
+.elt-game-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: elt-game-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes elt-game-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.elt-game-level-icon {
+  font-size: 1.5rem;
+  margin-left: var(--elt-game-spacing-sm);
+  flex-shrink: 0;
+}
+
+.elt-game-progress-container--compact .elt-game-level-icon {
+  font-size: 1.2rem;
+  margin-left: var(--elt-game-spacing-xs);
+}
+
+/* === Quest Tracker === */
+.elt-game-tracker-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  background: var(--elt-game-gradient-overlay);
+  border: var(--elt-game-border-width) solid var(--elt-game-color-quest);
+  border-radius: var(--elt-border-radius-xl);
+  padding: var(--elt-spacing-4);
+  box-shadow: var(--elt-game-shadow-tracker);
+  z-index: var(--elt-game-z-tracker);
+  backdrop-filter: blur(5px);
+  animation: elt-game-quest-slide-in 0.5s ease-out;
+}
+
+@media (max-width: 768px) {
+  .elt-game-tracker-container {
+    width: 280px;
+    top: 60px;
+    right: 10px;
+  }
+}
+
+.elt-game-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--elt-spacing-3);
+  padding-bottom: var(--elt-spacing-2);
+  border-bottom: 1px solid var(--elt-game-border-color);
+}
+
+.elt-game-tracker-title {
+  color: var(--elt-game-color-quest);
+  margin: 0;
+  font-size: var(--elt-font-size-base);
+  font-weight: var(--elt-font-weight-semibold);
+  font-family: var(--elt-font-family-heading);
+}
+
+.elt-game-quest-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.elt-game-quest-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.elt-game-quest-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.elt-game-quest-list::-webkit-scrollbar-thumb {
+  background: var(--elt-game-color-quest);
+  border-radius: 2px;
+}
+
+.elt-game-quest-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--elt-game-border-radius-sm);
+  padding: var(--elt-game-spacing-md);
+  margin-bottom: var(--elt-game-spacing-sm);
+  border-left: 4px solid var(--elt-game-color-quest);
+  transition: all 0.3s ease;
+}
+
+.elt-game-quest-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.elt-game-quest-title {
+  color: var(--elt-color-text);
+  font-size: var(--elt-game-font-size-sm);
+  font-weight: var(--elt-font-weight-semibold);
+  margin-bottom: var(--elt-game-spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--elt-game-spacing-sm);
+}
+
+.elt-game-quest-objective {
+  color: var(--elt-color-text-muted);
+  font-size: var(--elt-game-font-size-xs);
+  margin: var(--elt-game-spacing-xs) 0;
+  padding-left: var(--elt-game-spacing-lg);
+  position: relative;
+}
+
+.elt-game-quest-objective::before {
+  content: '•';
+  position: absolute;
+  left: var(--elt-game-spacing-sm);
+  color: var(--elt-game-color-quest);
+}
+
+.elt-game-quest-objective--completed {
+  text-decoration: line-through;
+  color: var(--elt-color-success);
+  animation: elt-game-objective-complete 1s ease-out;
+}
+
+.elt-game-quest-objective--completed::before {
+  content: '✓';
+  color: var(--elt-color-success);
+}
+
+.elt-game-quest-empty {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: var(--elt-spacing-5);
+  font-style: italic;
+  font-family: var(--elt-font-family-body);
+}
+
+.elt-game-quest-item--active {
+  background: var(--elt-game-gradient-quest);
+  border-left-color: var(--elt-color-primary);
+}
+
+.elt-game-quest-item--active:hover {
+  background: var(--elt-gradient-secondary);
+}
+
+.elt-game-quest-progress {
+  font-size: var(--elt-game-font-size-xs);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--elt-font-family-body);
+  margin-bottom: var(--elt-game-spacing-xs);
+}
+
+.elt-game-quest-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: var(--elt-game-spacing-xs);
+}
+
+.elt-game-quest-progress-fill {
+  height: 100%;
+  background: var(--elt-gradient-success);
+  border-radius: 2px;
+  transition: width var(--elt-transition-base);
+}
+
+/* === Dashboard Components === */
+.elt-game-dashboard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--elt-border-radius-lg);
+  padding: var(--elt-spacing-4);
+  border: 1px solid var(--elt-game-border-color);
+  animation: elt-game-dashboard-fade-in 0.8s ease-out;
+}
+
+.elt-game-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  margin-bottom: var(--elt-spacing-3);
+  gap: var(--elt-game-spacing-md);
+}
+
+.elt-game-dashboard-title {
+  font-family: var(--elt-font-family-heading);
+  font-size: var(--elt-font-size-lg);
+  font-weight: var(--elt-font-weight-bold);
+  color: var(--elt-color-text);
+  margin: 0;
+}
+
+.elt-game-stat-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--elt-game-border-radius-md);
+  padding: var(--elt-game-spacing-lg);
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.elt-game-stat-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--elt-game-border-color);
+  animation: elt-game-hover-lift 0.3s ease-out forwards;
+}
+
+.elt-game-stat-value {
+  font-size: var(--elt-font-size-2xl);
+  font-weight: var(--elt-font-weight-bold);
+  color: var(--elt-color-primary);
+  animation: elt-game-stat-counter 0.8s ease-out;
+}
+
+.elt-game-stat-label {
+  font-size: var(--elt-game-font-size-sm);
+  color: var(--elt-color-text-muted);
+  margin-top: var(--elt-game-spacing-xs);
+}
+
+/* === Error Boundary === */
+.elt-game-error {
+  background: var(--elt-gradient-error);
+  border-radius: var(--elt-border-radius-lg);
+  padding: var(--elt-spacing-6);
+  text-align: center;
+  border: var(--elt-game-border-width) solid var(--elt-color-error);
+}
+
+.elt-game-error__icon {
+  font-size: 3rem;
+  margin-bottom: var(--elt-spacing-4);
+}
+
+.elt-game-error__title {
+  font-family: var(--elt-font-family-heading);
+  font-size: var(--elt-font-size-xl);
+  color: var(--elt-color-text);
+  margin-bottom: var(--elt-spacing-3);
+}
+
+.elt-game-error__message {
+  color: var(--elt-color-text-muted);
+  margin-bottom: var(--elt-spacing-4);
+  line-height: 1.5;
+}
+
+.elt-game-error__buttons {
+  display: flex;
+  gap: var(--elt-spacing-3);
+  justify-content: center;
+  margin-top: var(--elt-spacing-4);
+}
+
+.elt-game-error__details {
+  margin-top: var(--elt-spacing-4);
+  text-align: left;
+}
+
+.elt-game-error__details summary {
+  cursor: pointer;
+  font-weight: var(--elt-font-weight-semibold);
+  color: var(--elt-color-text-muted);
+  margin-bottom: var(--elt-spacing-2);
+}
+
+.elt-game-error__code {
+  background: var(--elt-color-surface-light);
+  border-radius: var(--elt-border-radius-md);
+  padding: var(--elt-spacing-3);
+  font-size: var(--elt-font-size-sm);
+  color: var(--elt-color-text);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-family: var(--elt-font-family-mono);
+}

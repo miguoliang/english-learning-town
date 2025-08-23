@@ -6,14 +6,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button, AnimatedEmoji } from '@elt/ui';
-import { 
+import {
   ReviewSessionManager,
   SpacedRepetitionEngine,
   ReviewResult,
   type VocabularyCard,
   type SessionQuestion,
   type ReviewSession
-} from '@elt/core';
+} from '@elt/learning-algorithms';
 
 const slideIn = keyframes`
   from {

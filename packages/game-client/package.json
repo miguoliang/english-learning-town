@@ -11,13 +11,14 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./components.css": "./dist/components.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --format cjs,esm --dts && cp src/styles/*.css dist/",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
@@ -26,15 +27,16 @@
   "dependencies": {
     "@elt/core": "workspace:*",
     "@elt/ui": "workspace:*",
+    "@elt/learning-algorithms": "workspace:*",
+    "@elt/learning-analytics": "workspace:*",
+    "@elt/learning-assessment": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "styled-components": "^6.1.8",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@types/styled-components": "^5.1.34",
     "typescript": "^5.8.3",
     "tsup": "^7.3.0",
     "vitest": "^0.34.6",
@@ -46,8 +48,7 @@
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "styled-components": ">=6.0.0"
+    "react-dom": ">=18.0.0"
   },
   "keywords": [
     "react",

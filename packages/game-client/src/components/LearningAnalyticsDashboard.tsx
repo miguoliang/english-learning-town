@@ -10,9 +10,8 @@ import {
   LearningAnalyticsEngine,
   type LearningAnalytics,
   type LearningInsight,
-  type VocabularyCard,
-  type ReviewSession,
-} from '@elt/core';
+} from '@elt/learning-analytics';
+import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
 import { DashboardErrorBoundary } from './ErrorBoundary';
 
 const DashboardContainer = styled.div`

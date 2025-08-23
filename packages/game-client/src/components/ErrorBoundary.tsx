@@ -1,12 +1,13 @@
 /**
  * Error Boundary Components for Learning Systems
  * Provides graceful error handling and fallback UI for critical failures
+ * Uses CSS-only styling for consistency with @elt/ui architecture
  */
 
-import React, { Component, ReactNode } from 'react';
-import styled from 'styled-components';
+import React, { Component } from 'react';
+import type { ReactNode } from 'react';
 import { Button, AnimatedEmoji } from '@elt/ui';
-import { ValidationError } from '@elt/core';
+import { ValidationError } from '@elt/learning-algorithms';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -20,63 +21,6 @@ interface ErrorBoundaryProps {
   onError?: (error: Error, errorInfo: string) => void;
   isolate?: boolean; // If true, only catches errors from immediate children
 }
-
-const ErrorContainer = styled.div`
-  background: ${({ theme }) => theme.colors.surface};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  padding: ${({ theme }) => theme.spacing[6]};
-  margin: ${({ theme }) => theme.spacing[4]} 0;
-  border: 2px solid ${({ theme }) => theme.colors.error};
-  box-shadow: ${({ theme }) => theme.shadows.medium};
-  text-align: center;
-`;
-
-const ErrorTitle = styled.h3`
-  font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes.xl};
-  color: ${({ theme }) => theme.colors.error};
-  margin-bottom: ${({ theme }) => theme.spacing[3]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing[2]};
-`;
-
-const ErrorMessage = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.base};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-  line-height: 1.5;
-`;
-
-const ErrorDetails = styled.details`
-  margin-top: ${({ theme }) => theme.spacing[4]};
-  text-align: left;
-  
-  summary {
-    cursor: pointer;
-    font-weight: ${({ theme }) => theme.fontWeights.semibold};
-    color: ${({ theme }) => theme.colors.textSecondary};
-    margin-bottom: ${({ theme }) => theme.spacing[2]};
-  }
-`;
-
-const ErrorCode = styled.pre`
-  background: ${({ theme }) => theme.colors.surfaceLight};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: ${({ theme }) => theme.spacing[3]};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.text};
-  overflow-x: auto;
-  white-space: pre-wrap;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing[3]};
-  justify-content: center;
-  margin-top: ${({ theme }) => theme.spacing[4]};
-`;
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private resetTimeoutId: number | null = null;
@@ -93,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     const errorDetails = errorInfo.componentStack || 'No additional error info';
     
     this.setState({
@@ -115,7 +59,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+    this.setState({ hasError: false });
   };
 
   handleAutoReset = () => {
@@ -130,13 +74,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }, 5000);
   };
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     if (this.resetTimeoutId) {
       window.clearTimeout(this.resetTimeoutId);
     }
   }
 
-  render() {
+  override render() {
     if (this.state.hasError && this.state.error) {
       // Use custom fallback if provided
       if (this.props.fallback) {
@@ -160,20 +104,23 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const isDevelopment = process.env.NODE_ENV === 'development';
 
     return (
-      <ErrorContainer>
-        <ErrorTitle>
+      <div className="elt-game-error">
+        <div className="elt-game-error__icon">
           <AnimatedEmoji emoji="⚠️" mood="thinking" />
+        </div>
+        
+        <h3 className="elt-game-error__title">
           {isValidationError ? 'Input Validation Error' : 'Something went wrong'}
-        </ErrorTitle>
+        </h3>
 
-        <ErrorMessage>
+        <p className="elt-game-error__message">
           {isValidationError 
             ? `Invalid input: ${error.message}`
             : 'An unexpected error occurred while loading this component. Please try again.'
           }
-        </ErrorMessage>
+        </p>
 
-        <ButtonGroup>
+        <div className="elt-game-error__buttons">
           <Button onClick={this.handleReset} variant="primary">
             Try Again
           </Button>
@@ -183,12 +130,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               Auto-retry in 5s
             </Button>
           )}
-        </ButtonGroup>
+        </div>
 
         {isDevelopment && (
-          <ErrorDetails>
+          <details className="elt-game-error__details">
             <summary>Debug Information (Development Only)</summary>
-            <ErrorCode>
+            <pre className="elt-game-error__code">
               <strong>Error:</strong> {error.name}: {error.message}
               {error.stack && (
                 <>
@@ -204,10 +151,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   {errorInfo}
                 </>
               )}
-            </ErrorCode>
-          </ErrorDetails>
+            </pre>
+          </details>
         )}
-      </ErrorContainer>
+      </div>
     );
   }
 }
@@ -225,7 +172,7 @@ export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({
   componentName = 'Learning Component',
   onRetry 
 }) => {
-  const handleError = (error: Error, errorInfo: string) => {
+  const handleError = (error: Error, _errorInfo: string) => {
     // Log learning-specific errors
     console.warn(`Learning component error in ${componentName}:`, {
       error: error.message,
@@ -235,25 +182,28 @@ export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({
   };
 
   const fallbackRenderer = (error: Error, reset: () => void) => (
-    <ErrorContainer>
-      <ErrorTitle>
+    <div className="elt-game-error">
+      <div className="elt-game-error__icon">
         <AnimatedEmoji emoji="📚" mood="thinking" />
-        Learning Component Error
-      </ErrorTitle>
+      </div>
       
-      <ErrorMessage>
+      <h3 className="elt-game-error__title">
+        Learning Component Error
+      </h3>
+      
+      <p className="elt-game-error__message">
         The {componentName.toLowerCase()} encountered an error and couldn't load properly.
         {error instanceof ValidationError && (
           <><br /><strong>Details:</strong> {error.message}</>
         )}
-      </ErrorMessage>
+      </p>
 
-      <ButtonGroup>
+      <div className="elt-game-error__buttons">
         <Button onClick={() => { reset(); onRetry?.(); }} variant="primary">
           Retry Learning
         </Button>
-      </ButtonGroup>
-    </ErrorContainer>
+      </div>
+    </div>
   );
 
   return (
@@ -275,24 +225,27 @@ export const DashboardErrorBoundary: React.FC<DashboardErrorBoundaryProps> = ({
   children, 
   dashboardName 
 }) => {
-  const fallbackRenderer = (error: Error, reset: () => void) => (
-    <ErrorContainer>
-      <ErrorTitle>
+  const fallbackRenderer = (_error: Error, reset: () => void) => (
+    <div className="elt-game-error">
+      <div className="elt-game-error__icon">
         <AnimatedEmoji emoji="📊" mood="thinking" />
-        Dashboard Error
-      </ErrorTitle>
+      </div>
       
-      <ErrorMessage>
+      <h3 className="elt-game-error__title">
+        Dashboard Error
+      </h3>
+      
+      <p className="elt-game-error__message">
         The {dashboardName} dashboard encountered an error while loading your data.
         Please check your internet connection and try again.
-      </ErrorMessage>
+      </p>
 
-      <ButtonGroup>
+      <div className="elt-game-error__buttons">
         <Button onClick={reset} variant="primary">
           Reload Dashboard
         </Button>
-      </ButtonGroup>
-    </ErrorContainer>
+      </div>
+    </div>
   );
 
   return (

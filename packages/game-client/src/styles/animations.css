@@ -1,0 +1,161 @@
+/**
+ * CSS animations for @elt/game-client components
+ * Game-specific animations for UI elements
+ */
+
+/* XP Progress animations */
+@keyframes elt-game-progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
+}
+
+@keyframes elt-game-level-glow {
+  0%, 100% {
+    box-shadow: var(--elt-game-shadow-badge);
+  }
+  50% {
+    box-shadow: var(--elt-game-shadow-glow);
+  }
+}
+
+@keyframes elt-game-xp-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Quest tracker animations */
+@keyframes elt-game-quest-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes elt-game-objective-complete {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(39, 174, 96, 0.3);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Achievement animations */
+@keyframes elt-game-achievement-unlock {
+  0% {
+    transform: scale(0.8) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes elt-game-badge-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Dashboard animations */
+@keyframes elt-game-dashboard-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes elt-game-stat-counter {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Motivation animations */
+@keyframes elt-game-motivation-heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+}
+
+/* Learning goals animations */
+@keyframes elt-game-goal-progress {
+  from {
+    stroke-dashoffset: 251;
+  }
+  to {
+    stroke-dashoffset: calc(251 - (251 * var(--progress-percent) / 100));
+  }
+}
+
+/* Vocabulary animations */
+@keyframes elt-game-vocab-highlight {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(52, 152, 219, 0.3);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Hover and interaction animations */
+@keyframes elt-game-hover-lift {
+  from {
+    transform: translateY(0);
+    box-shadow: var(--elt-game-shadow-progress);
+  }
+  to {
+    transform: translateY(-2px);
+    box-shadow: var(--elt-game-shadow-tracker);
+  }
+}

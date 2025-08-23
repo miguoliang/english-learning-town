@@ -14,12 +14,11 @@ import {
   type MotivationProfile,
   type Reward,
   type StreakBonus,
-  type VocabularyCard,
-  type ReviewSession,
   type EducationalAchievement,
   type LearningAnalytics,
   LearningAnalyticsEngine
-} from '@elt/core';
+} from '@elt/learning-analytics';
+import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};

@@ -6,13 +6,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button, AnimatedEmoji } from '@elt/ui';
-import { 
-  SpacedRepetitionEngine, 
-  LearningAnalyticsEngine, 
+import {
+  SpacedRepetitionEngine,
   type VocabularyCard,
-  type LearningAnalytics,
-  type ReviewSession 
-} from '@elt/core';
+  type ReviewSession
+} from '@elt/learning-algorithms';
+import {
+  LearningAnalyticsEngine,
+  type LearningAnalytics
+} from '@elt/learning-analytics';
 import { LearningErrorBoundary } from './ErrorBoundary';
 
 const DashboardContainer = styled.div`

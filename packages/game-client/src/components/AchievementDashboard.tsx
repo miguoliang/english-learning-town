@@ -6,14 +6,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button, AnimatedEmoji } from '@elt/ui';
-import { 
+import {
   AchievementEngine,
   AchievementCategory,
   AchievementRarity,
-  type EducationalAchievement,
-  type VocabularyCard,
-  type ReviewSession
-} from '@elt/core';
+  type EducationalAchievement
+} from '@elt/learning-analytics';
+import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
