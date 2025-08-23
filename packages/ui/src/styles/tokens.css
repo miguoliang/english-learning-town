@@ -80,29 +80,29 @@
   /* Spacing scale */
   --elt-space-px: 1px;
   --elt-space-0: 0;
-  --elt-space-1: 0.25rem;   /* 4px */
-  --elt-space-2: 0.5rem;    /* 8px */
-  --elt-space-3: 0.75rem;   /* 12px */
-  --elt-space-4: 1rem;      /* 16px */
-  --elt-space-5: 1.25rem;   /* 20px */
-  --elt-space-6: 1.5rem;    /* 24px */
-  --elt-space-8: 2rem;      /* 32px */
-  --elt-space-10: 2.5rem;   /* 40px */
-  --elt-space-12: 3rem;     /* 48px */
-  --elt-space-16: 4rem;     /* 64px */
-  --elt-space-20: 5rem;     /* 80px */
-  --elt-space-24: 6rem;     /* 96px */
-  --elt-space-32: 8rem;     /* 128px */
+  --elt-space-1: 0.25rem; /* 4px */
+  --elt-space-2: 0.5rem; /* 8px */
+  --elt-space-3: 0.75rem; /* 12px */
+  --elt-space-4: 1rem; /* 16px */
+  --elt-space-5: 1.25rem; /* 20px */
+  --elt-space-6: 1.5rem; /* 24px */
+  --elt-space-8: 2rem; /* 32px */
+  --elt-space-10: 2.5rem; /* 40px */
+  --elt-space-12: 3rem; /* 48px */
+  --elt-space-16: 4rem; /* 64px */
+  --elt-space-20: 5rem; /* 80px */
+  --elt-space-24: 6rem; /* 96px */
+  --elt-space-32: 8rem; /* 128px */
 
   /* Font sizes */
-  --elt-font-size-xs: 0.75rem;    /* 12px */
-  --elt-font-size-sm: 0.875rem;   /* 14px */
-  --elt-font-size-base: 1rem;     /* 16px */
-  --elt-font-size-lg: 1.125rem;   /* 18px */
-  --elt-font-size-xl: 1.25rem;    /* 20px */
-  --elt-font-size-2xl: 1.5rem;    /* 24px */
-  --elt-font-size-3xl: 1.875rem;  /* 30px */
-  --elt-font-size-4xl: 2.25rem;   /* 36px */
+  --elt-font-size-xs: 0.75rem; /* 12px */
+  --elt-font-size-sm: 0.875rem; /* 14px */
+  --elt-font-size-base: 1rem; /* 16px */
+  --elt-font-size-lg: 1.125rem; /* 18px */
+  --elt-font-size-xl: 1.25rem; /* 20px */
+  --elt-font-size-2xl: 1.5rem; /* 24px */
+  --elt-font-size-3xl: 1.875rem; /* 30px */
+  --elt-font-size-4xl: 2.25rem; /* 36px */
 
   /* Font weights */
   --elt-font-weight-normal: 400;
@@ -131,10 +131,14 @@
 
   /* Shadows */
   --elt-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --elt-shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --elt-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --elt-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --elt-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --elt-shadow-base:
+    0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --elt-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --elt-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --elt-shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --elt-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
   /* Transitions */

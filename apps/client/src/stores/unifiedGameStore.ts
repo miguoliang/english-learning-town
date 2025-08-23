@@ -4,19 +4,32 @@
  * Eliminates parallel architecture for perfect SRP compliance
  */
 
-import { create } from 'zustand';
-import { persist, subscribeWithSelector } from 'zustand/middleware';
-import { World, type PositionComponent, type SizeComponent, type RenderableComponent, type PlayerComponent, ecsEventBus, ECSEventTypes } from '@elt/core';
-import { SceneLoader } from '../ecs/sceneLoader';
-import { SystemFactory, type SystemRegistry } from '../ecs/systemRegistry';
-import type { 
-  PlayerData, 
+import { create } from "zustand";
+import { persist, subscribeWithSelector } from "zustand/middleware";
+import {
+  World,
+  type PositionComponent,
+  type SizeComponent,
+  type RenderableComponent,
+  type PlayerComponent,
+  ecsEventBus,
+  ECSEventTypes,
+} from "@elt/core";
+import { SceneLoader } from "../ecs/sceneLoader";
+import { SystemFactory, type SystemRegistry } from "../ecs/systemRegistry";
+import type {
+  PlayerData,
   QuestData,
   Notification,
-  PlayerProgress
-} from '../types';
-import { ACHIEVEMENTS, calculateLevel, calculateXPToNextLevel, XP_CURVE } from '../data/achievements';
-import { logger } from '../utils/logger';
+  PlayerProgress,
+} from "../types";
+import {
+  ACHIEVEMENTS,
+  calculateLevel,
+  calculateXPToNextLevel,
+  XP_CURVE,
+} from "../data/achievements";
+import { logger } from "../utils/logger";
 
 // Types for the unified store
 interface RenderableEntity {
@@ -30,72 +43,82 @@ interface UnifiedGameState {
   // =============================================================================
   // ECS ENGINE STATE (Non-persistent - Runtime only)
   // =============================================================================
-  
+
   // Core ECS
   world: InstanceType<typeof World> | null;
   sceneLoader: SceneLoader | null;
   systems: SystemRegistry | null;
-  
+
   // ECS Runtime state
   isECSInitialized: boolean;
   renderableEntities: RenderableEntity[];
   playerPosition: { x: number; y: number } | null;
-  
+
   // =============================================================================
   // GAME DATA STATE (Persistent - Save data)
   // =============================================================================
-  
+
   // Game progression
   currentScene: string;
   isInDialogue: boolean;
   isPaused: boolean;
-  
+
   // Player data
   player: PlayerData;
   currentQuest: QuestData | undefined;
   notifications: Notification[];
-  
+
   // =============================================================================
   // ECS ENGINE ACTIONS (Non-persistent)
   // =============================================================================
-  
+
   initializeECS: () => void;
   loadScene: (scenePath: string) => Promise<void>;
-  addPlayer: (playerId: string, position: { x: number; y: number }, name?: string) => void;
+  addPlayer: (
+    playerId: string,
+    position: { x: number; y: number },
+    name?: string,
+  ) => void;
   updateRenderableEntities: (entities: RenderableEntity[]) => void;
   startGameLoop: () => void;
   stopGameLoop: () => void;
   cleanupECS: () => void;
-  
+
   // =============================================================================
   // GAME DATA ACTIONS (Persistent)
   // =============================================================================
-  
+
   // Scene management
   setCurrentScene: (scene: string) => void;
   setInDialogue: (inDialogue: boolean) => void;
   setPaused: (paused: boolean) => void;
-  
+
   // Player actions
   updatePlayer: (playerData: Partial<PlayerData>) => void;
   addExperience: (amount: number) => void;
   addMoney: (amount: number) => void;
   addVocabulary: (words: string[]) => void;
-  
+
   // Achievement & Gamification actions
   unlockAchievement: (achievementId: string) => void;
   checkAchievements: () => void;
   updateDailyStreak: () => void;
   initializePlayerProgress: () => void;
-  
+
   // Quest actions
   startQuest: (quest: QuestData) => void;
   completeQuest: (questId: string) => void;
-  updateQuestObjective: (questId: string, objectiveIndex: number, progress: number) => void;
+  updateQuestObjective: (
+    questId: string,
+    objectiveIndex: number,
+    progress: number,
+  ) => void;
   setCurrentQuest: (quest: QuestData | undefined) => void;
-  
+
   // Notification actions
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
+  addNotification: (
+    notification: Omit<Notification, "id" | "timestamp">,
+  ) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
 }
@@ -110,7 +133,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
         // =============================================================================
         // INITIAL STATE
         // =============================================================================
-        
+
         // ECS Engine (Non-persistent)
         world: null,
         sceneLoader: null,
@@ -118,23 +141,23 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
         isECSInitialized: false,
         renderableEntities: [],
         playerPosition: null,
-        
+
         // Game Data (Persistent)
-        currentScene: 'MainMenu',
+        currentScene: "MainMenu",
         isInDialogue: false,
         isPaused: false,
         player: {
-          id: '',
-          name: 'Player',
+          id: "",
+          name: "Player",
           level: 1,
           experience: 0,
           money: 100,
-          currentLocation: 'town_center',
+          currentLocation: "town_center",
           completedQuests: [],
           activeQuests: [],
           knownVocabulary: [],
-          unlockedAreas: ['town_center'],
-          
+          unlockedAreas: ["town_center"],
+
           // Gamification additions
           achievements: [...ACHIEVEMENTS], // Copy all available achievements
           unlockedAchievements: [],
@@ -154,33 +177,33 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               listening: 1,
               reading: 1,
               writing: 1,
-              pronunciation: 1
-            }
+              pronunciation: 1,
+            },
           },
           preferences: {
             celebrationsEnabled: true,
             soundEffectsEnabled: true,
-            animationsEnabled: true
-          }
+            animationsEnabled: true,
+          },
         },
         currentQuest: undefined,
         notifications: [],
-        
+
         // =============================================================================
         // ECS ENGINE ACTIONS
         // =============================================================================
-        
+
         initializeECS: () => {
-          logger.ecs('Initializing ECS world and systems...');
-          
+          logger.ecs("Initializing ECS world and systems...");
+
           const world = new World();
           const sceneLoader = new SceneLoader(world);
-          
+
           // Create all systems with proper dependency injection using factory
           const systems = SystemFactory.createSystems();
 
           // Add systems to world
-          logger.ecs('Adding systems to world...');
+          logger.ecs("Adding systems to world...");
           world.addSystem(systems.collision);
           world.addSystem(systems.movement);
           world.addSystem(systems.inputState);
@@ -201,112 +224,122 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
 
           // Set up input event handlers using type-safe events
           const handleKeyDown = (event: KeyboardEvent) => {
-            ecsEventBus.emit(ECSEventTypes.INPUT_KEY_PRESSED, { key: event.code });
+            ecsEventBus.emit(ECSEventTypes.INPUT_KEY_PRESSED, {
+              key: event.code,
+            });
           };
 
           const handleKeyUp = (event: KeyboardEvent) => {
-            ecsEventBus.emit(ECSEventTypes.INPUT_KEY_RELEASED, { key: event.code });
+            ecsEventBus.emit(ECSEventTypes.INPUT_KEY_RELEASED, {
+              key: event.code,
+            });
           };
 
-          window.addEventListener('keydown', handleKeyDown);
-          window.addEventListener('keyup', handleKeyUp);
+          window.addEventListener("keydown", handleKeyDown);
+          window.addEventListener("keyup", handleKeyUp);
 
           set({
             world,
             sceneLoader,
             systems,
-            isECSInitialized: true
+            isECSInitialized: true,
           });
 
-          logger.ecs('ECS initialized successfully');
+          logger.ecs("ECS initialized successfully");
         },
 
         // Load a scene
         loadScene: async (scenePath: string) => {
           const { sceneLoader } = get();
           if (!sceneLoader) {
-            throw new Error('ECS not initialized');
+            throw new Error("ECS not initialized");
           }
 
           logger.scene(`Loading scene: ${scenePath}`);
           await sceneLoader.loadSceneFromFile(scenePath);
-          
+
           // Update both ECS current scene and persistent game scene
           set({ currentScene: scenePath });
           logger.scene(`Scene loaded: ${scenePath}`);
         },
 
         // Add player to ECS world
-        addPlayer: (playerId: string, position: { x: number; y: number }, name?: string) => {
+        addPlayer: (
+          playerId: string,
+          position: { x: number; y: number },
+          name?: string,
+        ) => {
           const { world } = get();
           if (!world) {
-            throw new Error('ECS not initialized');
+            throw new Error("ECS not initialized");
           }
 
-          logger.player(`Adding player ${playerId} at position (${position.x}, ${position.y})`);
-          
+          logger.player(
+            `Adding player ${playerId} at position (${position.x}, ${position.y})`,
+          );
+
           const player = world.createEntity(playerId);
-          
+
           world.addComponent(player.id, {
-            type: 'position',
+            type: "position",
             x: position.x,
-            y: position.y
-          });
-          
-          world.addComponent(player.id, {
-            type: 'size',
-            width: 1,
-            height: 1
-          });
-          
-          world.addComponent(player.id, {
-            type: 'renderable',
-            renderType: 'emoji',
-            icon: '🧑',
-            color: '#4F9EFF',
-            zIndex: 10,
-            visible: true
-          });
-          
-          world.addComponent(player.id, {
-            type: 'velocity',
-            x: 0,
-            y: 0,
-            maxSpeed: 5
-          });
-          
-          world.addComponent(player.id, {
-            type: 'collision',
-            solid: true,
-            bounds: { x: 0, y: 0, width: 1, height: 1 }
-          });
-          
-          world.addComponent(player.id, {
-            type: 'controllable',
-            isControllable: true
+            y: position.y,
           });
 
           world.addComponent(player.id, {
-            type: 'input',
-            inputType: 'player',
-            controllable: true
+            type: "size",
+            width: 1,
+            height: 1,
+          });
+
+          world.addComponent(player.id, {
+            type: "renderable",
+            renderType: "emoji",
+            icon: "🧑",
+            color: "#4F9EFF",
+            zIndex: 10,
+            visible: true,
+          });
+
+          world.addComponent(player.id, {
+            type: "velocity",
+            x: 0,
+            y: 0,
+            maxSpeed: 5,
+          });
+
+          world.addComponent(player.id, {
+            type: "collision",
+            solid: true,
+            bounds: { x: 0, y: 0, width: 1, height: 1 },
+          });
+
+          world.addComponent(player.id, {
+            type: "controllable",
+            isControllable: true,
+          });
+
+          world.addComponent(player.id, {
+            type: "input",
+            inputType: "player",
+            controllable: true,
           });
 
           // Add the 'player' component that systems use to identify player entities
           world.addComponent(player.id, {
-            type: 'player',
+            type: "player",
             name: name || get().player.name,
             level: get().player.level,
             experience: get().player.experience,
             health: 100, // Default health
-            maxHealth: 100 // Default max health
+            maxHealth: 100, // Default max health
           } as PlayerComponent);
 
-          set({ 
+          set({
             playerPosition: position,
-            player: { ...get().player, name: name || get().player.name }
+            player: { ...get().player, name: name || get().player.name },
           });
-          
+
           logger.player(`Player added: ${playerId}`);
         },
 
@@ -320,19 +353,19 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           const { world } = get();
           if (!world || gameLoopId !== null) return;
 
-          logger.ecs('Starting game loop...');
-          
+          logger.ecs("Starting game loop...");
+
           const gameLoop = () => {
             world.update();
             gameLoopId = requestAnimationFrame(gameLoop);
           };
-          
+
           gameLoopId = requestAnimationFrame(gameLoop);
         },
 
         stopGameLoop: () => {
           if (gameLoopId !== null) {
-            logger.ecs('Stopping game loop...');
+            logger.ecs("Stopping game loop...");
             cancelAnimationFrame(gameLoopId);
             gameLoopId = null;
           }
@@ -344,21 +377,21 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             cancelAnimationFrame(gameLoopId);
             gameLoopId = null;
           }
-          
+
           if (world) {
             world.destroy();
           }
-          
+
           set({
             world: null,
             sceneLoader: null,
             systems: null,
             isECSInitialized: false,
             renderableEntities: [],
-            playerPosition: null
+            playerPosition: null,
           });
-          
-          logger.ecs('ECS cleanup completed');
+
+          logger.ecs("ECS cleanup completed");
         },
 
         // =============================================================================
@@ -373,7 +406,7 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
         // Player management
         updatePlayer: (playerData) =>
           set((state) => ({
-            player: { ...state.player, ...playerData }
+            player: { ...state.player, ...playerData },
           })),
 
         addExperience: (amount) =>
@@ -382,19 +415,23 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             const newLevel = calculateLevel(newTotalXP);
             const leveledUp = newLevel > state.player.level;
             const xpToNext = calculateXPToNextLevel(newTotalXP);
-            
+
             const updatedProgress: PlayerProgress = {
               ...state.player.progress,
               totalXP: newTotalXP,
               xpToNextLevel: xpToNext,
-              currentLevelXP: newTotalXP - (newLevel > 0 ? XP_CURVE.levelRequirements[newLevel - 1] || 0 : 0)
+              currentLevelXP:
+                newTotalXP -
+                (newLevel > 0
+                  ? XP_CURVE.levelRequirements[newLevel - 1] || 0
+                  : 0),
             };
 
             const updatedPlayer = {
               ...state.player,
               experience: newTotalXP, // Keep backwards compatibility
               level: newLevel,
-              progress: updatedProgress
+              progress: updatedProgress,
             };
 
             const notifications = [...state.notifications];
@@ -402,28 +439,28 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             // Add XP gain notification for kids
             notifications.push({
               id: `xp-gain-${Date.now()}`,
-              type: 'xp_gained',
+              type: "xp_gained",
               title: `+${amount} XP! 🌟`,
               message: `Great job! You earned ${amount} experience points!`,
               duration: 3000,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
 
             // Add level up notification with celebration
             if (leveledUp) {
               notifications.push({
                 id: `level-up-${Date.now()}`,
-                type: 'level_up',
+                type: "level_up",
                 title: `🎉 Level Up! 🎉`,
                 message: `Awesome! You reached level ${newLevel}!`,
                 duration: 8000,
-                timestamp: Date.now()
+                timestamp: Date.now(),
               });
             }
 
             const result = {
               player: updatedPlayer,
-              notifications
+              notifications,
             };
 
             // Check for achievements after state update
@@ -436,91 +473,95 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           set((state) => ({
             player: {
               ...state.player,
-              money: state.player.money + amount
-            }
+              money: state.player.money + amount,
+            },
           })),
 
         addVocabulary: (words) =>
           set((state) => {
             const newVocabulary = [...state.player.knownVocabulary];
             let wordsAdded = 0;
-            
-            words.forEach(word => {
+
+            words.forEach((word) => {
               if (!newVocabulary.includes(word)) {
                 newVocabulary.push(word);
                 wordsAdded++;
               }
             });
-            
+
             if (wordsAdded === 0) return state; // No new words added
-            
+
             // Update progress tracking
             const updatedProgress = {
               ...state.player.progress,
-              vocabularyLearned: newVocabulary.length
+              vocabularyLearned: newVocabulary.length,
             };
-            
+
             // Award XP for vocabulary learning
             const xpGain = wordsAdded * XP_CURVE.rewards.vocabularyLearned;
             const newTotalXP = updatedProgress.totalXP + xpGain;
             const newLevel = calculateLevel(newTotalXP);
             const leveledUp = newLevel > state.player.level;
-            
+
             const finalProgress = {
               ...updatedProgress,
               totalXP: newTotalXP,
               xpToNextLevel: calculateXPToNextLevel(newTotalXP),
-              currentLevelXP: newTotalXP - (newLevel > 0 ? XP_CURVE.levelRequirements[newLevel - 1] || 0 : 0)
+              currentLevelXP:
+                newTotalXP -
+                (newLevel > 0
+                  ? XP_CURVE.levelRequirements[newLevel - 1] || 0
+                  : 0),
             };
-            
+
             const notifications = [...state.notifications];
-            
+
             // Add vocabulary learning notification
             notifications.push({
               id: `vocab-learned-${Date.now()}`,
-              type: 'vocabulary_learned',
+              type: "vocabulary_learned",
               title: `📚 New Words Learned! 📚`,
-              message: `Amazing! You learned ${wordsAdded} new word${wordsAdded > 1 ? 's' : ''}!`,
+              message: `Amazing! You learned ${wordsAdded} new word${wordsAdded > 1 ? "s" : ""}!`,
               duration: 5000,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
-            
+
             // Add XP notification
             notifications.push({
               id: `vocab-xp-${Date.now()}`,
-              type: 'xp_gained',
+              type: "xp_gained",
               title: `+${xpGain} XP! 🌟`,
               message: `Great vocabulary work!`,
               duration: 3000,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
-            
+
             // Add level up notification if needed
             if (leveledUp) {
               notifications.push({
                 id: `level-up-vocab-${Date.now()}`,
-                type: 'level_up',
+                type: "level_up",
                 title: `🎉 Level Up! 🎉`,
                 message: `Vocabulary power helped you reach level ${newLevel}!`,
                 duration: 8000,
-                timestamp: Date.now()
+                timestamp: Date.now(),
               });
             }
-            
+
             const result = {
               player: {
                 ...state.player,
                 knownVocabulary: newVocabulary,
                 level: newLevel,
                 experience: newTotalXP,
-                progress: finalProgress
+                progress: finalProgress,
               },
-              notifications
+              notifications,
             };
-            
+
             // Check for achievements after state update
             setTimeout(() => get().checkAchievements(), 100);
-            
+
             return result;
           }),
 
@@ -529,29 +570,39 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           set((state) => ({
             player: {
               ...state.player,
-              activeQuests: [...state.player.activeQuests, quest.id]
+              activeQuests: [...state.player.activeQuests, quest.id],
             },
-            currentQuest: quest
+            currentQuest: quest,
           })),
 
         completeQuest: (questId) =>
           set((state) => ({
             player: {
               ...state.player,
-              activeQuests: state.player.activeQuests.filter(id => id !== questId),
-              completedQuests: [...state.player.completedQuests, questId]
+              activeQuests: state.player.activeQuests.filter(
+                (id) => id !== questId,
+              ),
+              completedQuests: [...state.player.completedQuests, questId],
             },
-            currentQuest: state.currentQuest?.id === questId ? undefined : state.currentQuest
+            currentQuest:
+              state.currentQuest?.id === questId
+                ? undefined
+                : state.currentQuest,
           })),
 
         updateQuestObjective: (questId, objectiveIndex, progress) =>
           set((state) => {
-            if (state.currentQuest?.id === questId && state.currentQuest.objectives[objectiveIndex]) {
+            if (
+              state.currentQuest?.id === questId &&
+              state.currentQuest.objectives[objectiveIndex]
+            ) {
               const updatedQuest = { ...state.currentQuest };
               updatedQuest.objectives[objectiveIndex] = {
                 ...updatedQuest.objectives[objectiveIndex],
                 currentCount: progress,
-                isCompleted: progress >= updatedQuest.objectives[objectiveIndex].targetCount
+                isCompleted:
+                  progress >=
+                  updatedQuest.objectives[objectiveIndex].targetCount,
               };
               return { currentQuest: updatedQuest };
             }
@@ -568,14 +619,14 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               {
                 ...notification,
                 id: `notification-${Date.now()}`,
-                timestamp: Date.now()
-              }
-            ]
+                timestamp: Date.now(),
+              },
+            ],
           })),
 
         removeNotification: (id) =>
           set((state) => ({
-            notifications: state.notifications.filter(n => n.id !== id)
+            notifications: state.notifications.filter((n) => n.id !== id),
           })),
 
         clearNotifications: () => set({ notifications: [] }),
@@ -587,26 +638,34 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
         initializePlayerProgress: () =>
           set((state) => {
             if (state.player.progress) return state; // Already initialized
-            
+
             const totalXP = state.player.experience || 0;
             const progress: PlayerProgress = {
               totalXP,
               xpToNextLevel: calculateXPToNextLevel(totalXP),
-              currentLevelXP: totalXP - (state.player.level > 0 ? XP_CURVE.levelRequirements[state.player.level - 1] || 0 : 0),
+              currentLevelXP:
+                totalXP -
+                (state.player.level > 0
+                  ? XP_CURVE.levelRequirements[state.player.level - 1] || 0
+                  : 0),
               vocabularyLearned: state.player.knownVocabulary?.length || 0,
               questsCompleted: state.player.completedQuests?.length || 0,
               dialoguesCompleted: 0,
               currentStreak: 0,
               longestStreak: 0,
               skillLevels: {
-                vocabulary: Math.max(1, Math.floor((state.player.knownVocabulary?.length || 0) / 10) + 1),
+                vocabulary: Math.max(
+                  1,
+                  Math.floor((state.player.knownVocabulary?.length || 0) / 10) +
+                    1,
+                ),
                 grammar: 1,
                 speaking: 1,
                 listening: 1,
                 reading: 1,
                 writing: 1,
-                pronunciation: 1
-              }
+                pronunciation: 1,
+              },
             };
 
             return {
@@ -618,9 +677,9 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
                 preferences: state.player.preferences || {
                   celebrationsEnabled: true,
                   soundEffectsEnabled: true,
-                  animationsEnabled: true
-                }
-              }
+                  animationsEnabled: true,
+                },
+              },
             };
           }),
 
@@ -630,30 +689,33 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               return state; // Already unlocked
             }
 
-            const achievement = state.player.achievements.find(a => a.id === achievementId);
+            const achievement = state.player.achievements.find(
+              (a) => a.id === achievementId,
+            );
             if (!achievement) {
               logger.warn(`Achievement ${achievementId} not found`);
               return state;
             }
 
-            const updatedAchievements = state.player.achievements.map(a =>
-              a.id === achievementId ? { ...a, unlockedAt: new Date() } : a
+            const updatedAchievements = state.player.achievements.map((a) =>
+              a.id === achievementId ? { ...a, unlockedAt: new Date() } : a,
             );
 
             const notifications = [...state.notifications];
-            
+
             // Add achievement unlock notification with celebration
             notifications.push({
               id: `achievement-${achievementId}-${Date.now()}`,
-              type: 'achievement_unlocked',
+              type: "achievement_unlocked",
               title: `🏆 Achievement Unlocked! 🏆`,
               message: `${achievement.icon} ${achievement.title}`,
               duration: 8000,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             });
 
             // Give XP reward
-            const newTotalXP = state.player.progress.totalXP + achievement.xpReward;
+            const newTotalXP =
+              state.player.progress.totalXP + achievement.xpReward;
             const newLevel = calculateLevel(newTotalXP);
             const leveledUp = newLevel > state.player.level;
 
@@ -661,18 +723,22 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               ...state.player.progress,
               totalXP: newTotalXP,
               xpToNextLevel: calculateXPToNextLevel(newTotalXP),
-              currentLevelXP: newTotalXP - (newLevel > 0 ? XP_CURVE.levelRequirements[newLevel - 1] || 0 : 0)
+              currentLevelXP:
+                newTotalXP -
+                (newLevel > 0
+                  ? XP_CURVE.levelRequirements[newLevel - 1] || 0
+                  : 0),
             };
 
             // Add level up notification if needed
             if (leveledUp) {
               notifications.push({
                 id: `level-up-${Date.now()}`,
-                type: 'level_up',
+                type: "level_up",
                 title: `🎉 Level Up! 🎉`,
                 message: `Awesome! You reached level ${newLevel}!`,
                 duration: 8000,
-                timestamp: Date.now()
+                timestamp: Date.now(),
               });
             }
 
@@ -682,17 +748,20 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
                 level: newLevel,
                 experience: newTotalXP,
                 achievements: updatedAchievements,
-                unlockedAchievements: [...state.player.unlockedAchievements, achievementId],
-                progress: updatedProgress
+                unlockedAchievements: [
+                  ...state.player.unlockedAchievements,
+                  achievementId,
+                ],
+                progress: updatedProgress,
               },
-              notifications
+              notifications,
             };
           }),
 
         checkAchievements: () => {
           const state = get();
           const player = state.player;
-          
+
           if (!player.progress) return;
 
           // Check each achievement
@@ -702,28 +771,36 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             let shouldUnlock = false;
 
             switch (achievement.requirement.type) {
-              case 'vocabulary_count':
-                shouldUnlock = player.progress.vocabularyLearned >= achievement.requirement.target;
+              case "vocabulary_count":
+                shouldUnlock =
+                  player.progress.vocabularyLearned >=
+                  achievement.requirement.target;
                 break;
-              case 'quest_count':
-                shouldUnlock = player.progress.questsCompleted >= achievement.requirement.target;
+              case "quest_count":
+                shouldUnlock =
+                  player.progress.questsCompleted >=
+                  achievement.requirement.target;
                 break;
-              case 'dialogue_count':
-                shouldUnlock = player.progress.dialoguesCompleted >= achievement.requirement.target;
+              case "dialogue_count":
+                shouldUnlock =
+                  player.progress.dialoguesCompleted >=
+                  achievement.requirement.target;
                 break;
-              case 'level_reached':
+              case "level_reached":
                 shouldUnlock = player.level >= achievement.requirement.target;
                 break;
-              case 'streak_count':
-                shouldUnlock = player.progress.currentStreak >= achievement.requirement.target;
+              case "streak_count":
+                shouldUnlock =
+                  player.progress.currentStreak >=
+                  achievement.requirement.target;
                 break;
-              case 'learning_time': {
+              case "learning_time": {
                 const currentHour = new Date().getHours();
                 const targetHour = achievement.requirement.target;
                 const condition = achievement.requirement.data?.timeCondition;
-                if (condition === 'after') {
+                if (condition === "after") {
                   shouldUnlock = currentHour >= targetHour;
-                } else if (condition === 'before') {
+                } else if (condition === "before") {
                   shouldUnlock = currentHour <= targetHour;
                 }
                 break;
@@ -742,12 +819,12 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             const lastActive = state.player.progress.lastActiveDate;
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            
+
             let newStreak = 1;
-            
+
             if (lastActive) {
               const lastActiveDate = new Date(lastActive).toDateString();
-              
+
               if (lastActiveDate === today) {
                 // Same day, don't update streak
                 return state;
@@ -758,13 +835,16 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
               // If more than 1 day gap, streak resets to 1
             }
 
-            const longestStreak = Math.max(state.player.progress.longestStreak, newStreak);
+            const longestStreak = Math.max(
+              state.player.progress.longestStreak,
+              newStreak,
+            );
 
             const updatedProgress = {
               ...state.player.progress,
               currentStreak: newStreak,
               longestStreak,
-              lastActiveDate: new Date()
+              lastActiveDate: new Date(),
             };
 
             // Check for streak achievements
@@ -773,13 +853,13 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
             return {
               player: {
                 ...state.player,
-                progress: updatedProgress
-              }
+                progress: updatedProgress,
+              },
             };
-          })
+          }),
       }),
       {
-        name: 'unified-game-store',
+        name: "unified-game-store",
         // Only persist game data, not ECS runtime state
         partialize: (state) => ({
           currentScene: state.currentScene,
@@ -787,11 +867,11 @@ export const useUnifiedGameStore = create<UnifiedGameState>()(
           isPaused: state.isPaused,
           player: state.player,
           currentQuest: state.currentQuest,
-          notifications: state.notifications
-        })
-      }
-    )
-  )
+          notifications: state.notifications,
+        }),
+      },
+    ),
+  ),
 );
 
 // Export the store as the primary game store

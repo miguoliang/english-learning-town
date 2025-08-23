@@ -25,14 +25,14 @@ import '@elt/game-client/components.css'; // Required CSS import
 function GameUI() {
   return (
     <ErrorBoundary>
-      <XPProgressBar 
-        currentLevel={5} 
-        totalXP={1250} 
-        xpToNextLevel={150} 
+      <XPProgressBar
+        currentLevel={5}
+        totalXP={1250}
+        xpToNextLevel={150}
         isCompact={false}
       />
-      
-      <QuestTracker 
+
+      <QuestTracker
         quests={gameQuests}
         activeQuestId="quest-1"
         onQuestClick={(questId) => console.log('Quest clicked:', questId)}
@@ -71,10 +71,10 @@ Extends the `@elt/ui` design system with game-specific tokens:
 /* tokens.css - Game-specific design tokens */
 :root {
   /* Extends @elt/ui tokens */
-  --elt-game-color-xp: #FFD700;        /* XP gold */
-  --elt-game-color-quest: #4ECDC4;     /* Quest accent */
-  --elt-game-color-achievement: #9B59B6; /* Achievement purple */
-  --elt-game-gradient-xp: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --elt-game-color-xp: #ffd700; /* XP gold */
+  --elt-game-color-quest: #4ecdc4; /* Quest accent */
+  --elt-game-color-achievement: #9b59b6; /* Achievement purple */
+  --elt-game-gradient-xp: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
   --elt-game-shadow-tracker: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 ```
@@ -87,16 +87,17 @@ Displays player experience and level progression with animated progress bars.
 
 ```typescript
 interface XPProgressBarProps {
-  currentLevel: number;        // Current player level
-  totalXP: number;            // Total accumulated XP
-  xpToNextLevel: number;      // XP needed for next level
-  isCompact?: boolean;        // Compact display mode
-  showLevelIcon?: boolean;    // Show emoji level indicator
-  className?: string;         // Additional CSS classes
+  currentLevel: number; // Current player level
+  totalXP: number; // Total accumulated XP
+  xpToNextLevel: number; // XP needed for next level
+  isCompact?: boolean; // Compact display mode
+  showLevelIcon?: boolean; // Show emoji level indicator
+  className?: string; // Additional CSS classes
 }
 ```
 
 **Features:**
+
 - Animated progress bar with shimmer effect
 - Level badge with glow animation
 - Compact and full display modes
@@ -104,6 +105,7 @@ interface XPProgressBarProps {
 - Responsive design
 
 **CSS Classes:**
+
 - `.elt-game-progress-container` - Main container
 - `.elt-game-progress-container--compact` - Compact mode
 - `.elt-game-level-badge` - Level number badge
@@ -116,23 +118,24 @@ Fixed-position quest tracking component with scrollable quest list.
 
 ```typescript
 interface Quest {
-  id: string;                 // Unique quest identifier
-  title: string;              // Display title
-  description: string;        // Quest description
-  progress: number;           // Current progress
-  maxProgress: number;        // Progress target
-  isActive?: boolean;         // Active quest highlight
+  id: string; // Unique quest identifier
+  title: string; // Display title
+  description: string; // Quest description
+  progress: number; // Current progress
+  maxProgress: number; // Progress target
+  isActive?: boolean; // Active quest highlight
 }
 
 interface QuestTrackerProps {
-  quests: Quest[];            // Array of quests to display
-  activeQuestId?: string;     // Currently active quest ID
+  quests: Quest[]; // Array of quests to display
+  activeQuestId?: string; // Currently active quest ID
   onQuestClick?: (questId: string) => void; // Quest selection handler
-  className?: string;         // Additional CSS classes
+  className?: string; // Additional CSS classes
 }
 ```
 
 **Features:**
+
 - Fixed positioning on screen edge
 - Scrollable quest list with custom scrollbars
 - Progress indicators per quest
@@ -142,6 +145,7 @@ interface QuestTrackerProps {
 - Empty state handling
 
 **CSS Classes:**
+
 - `.elt-game-tracker-container` - Main fixed container
 - `.elt-game-quest-list` - Scrollable quest container
 - `.elt-game-quest-item` - Individual quest item
@@ -171,6 +175,7 @@ interface ErrorBoundaryProps {
 ```
 
 **Features:**
+
 - Multiple error boundary types for different use cases
 - Custom fallback UI with game-appropriate messaging
 - Auto-retry functionality with timeouts
@@ -179,6 +184,7 @@ interface ErrorBoundaryProps {
 - Integration with learning analytics
 
 **CSS Classes:**
+
 - `.elt-game-error` - Main error container
 - `.elt-game-error__title` - Error title styling
 - `.elt-game-error__message` - Error message text
@@ -202,7 +208,7 @@ interface XPComponent extends Component {
   xpToNextLevel: number;
 }
 
-// Quest Component (from ECS) 
+// Quest Component (from ECS)
 interface QuestComponent extends Component {
   activeQuests: Quest[];
   completedQuests: string[];
@@ -211,7 +217,7 @@ interface QuestComponent extends Component {
 // React Integration
 function GameHUD() {
   const { xp, quests } = useECSData(gameWorld);
-  
+
   return (
     <>
       <XPProgressBar {...xp} />
@@ -226,7 +232,7 @@ function GameHUD() {
 Components integrate with `@elt/learning-analytics` for educational tracking:
 
 ```typescript
-import { ProgressTracker, AchievementEngine } from '@elt/learning-analytics';
+import { ProgressTracker, AchievementEngine } from "@elt/learning-analytics";
 
 // XP Progress triggers analytics
 const handleXPGain = (xpAmount: number) => {
@@ -268,26 +274,42 @@ All animations are implemented in pure CSS for optimal performance:
 ```css
 /* Progress fill animation */
 @keyframes elt-game-progress-fill {
-  from { width: 0%; }
-  to { width: var(--progress-width); }
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width);
+  }
 }
 
 /* Level badge glow effect */
 @keyframes elt-game-level-glow {
-  0%, 100% { box-shadow: var(--elt-game-shadow-badge); }
-  50% { box-shadow: var(--elt-game-shadow-glow); }
+  0%,
+  100% {
+    box-shadow: var(--elt-game-shadow-badge);
+  }
+  50% {
+    box-shadow: var(--elt-game-shadow-glow);
+  }
 }
 
 /* Quest tracker slide-in */
 @keyframes elt-game-quest-slide-in {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 ```
 
 ### Animation Triggers
 
 Animations are triggered by:
+
 - **XP changes**: Progress bar fills animate smoothly
 - **Level ups**: Badge glow intensifies with pulse effect
 - **Quest updates**: New quests slide in from the right
@@ -307,7 +329,7 @@ Components adapt to different screen sizes:
     top: 60px;
     right: 10px;
   }
-  
+
   .elt-game-progress-container {
     min-width: 200px;
     padding: var(--elt-game-spacing-sm);
@@ -330,8 +352,8 @@ All components include proper accessibility attributes:
 
 ```typescript
 // XP Progress Bar
-<div 
-  role="progressbar" 
+<div
+  role="progressbar"
   aria-valuenow={progressPercentage}
   aria-valuemin={0}
   aria-valuemax={100}
@@ -339,7 +361,7 @@ All components include proper accessibility attributes:
 >
 
 // Quest Items
-<div 
+<div
   role="button"
   tabIndex={0}
   aria-selected={isActive}
@@ -368,22 +390,22 @@ import { XPProgressBar } from '@elt/game-client';
 describe('XPProgressBar', () => {
   it('displays correct level and XP information', () => {
     render(
-      <XPProgressBar 
-        currentLevel={5} 
-        totalXP={1250} 
-        xpToNextLevel={150} 
+      <XPProgressBar
+        currentLevel={5}
+        totalXP={1250}
+        xpToNextLevel={150}
       />
     );
-    
+
     expect(screen.getByText('Level 5')).toBeInTheDocument();
     expect(screen.getByText('150 XP to go!')).toBeInTheDocument();
   });
-  
+
   it('shows progress bar with correct percentage', () => {
     const { container } = render(
       <XPProgressBar currentLevel={5} totalXP={1250} xpToNextLevel={150} />
     );
-    
+
     const progressFill = container.querySelector('.elt-game-progress-fill');
     expect(progressFill).toHaveStyle({ width: '89.3%' });
   });
@@ -480,7 +502,7 @@ function GameHUD({ gameState }: { gameState: GameState }) {
           />
         </LearningErrorBoundary>
       </div>
-      
+
       {/* Quest Tracker in top-right */}
       <LearningErrorBoundary componentName="Quest Tracker">
         <QuestTracker
@@ -536,23 +558,26 @@ function ProgressTrackingExample() {
 ### Common Issues
 
 **CSS not applying:**
+
 ```typescript
 // Make sure to import CSS
-import '@elt/game-client/components.css';
+import "@elt/game-client/components.css";
 
 // Check CSS load order - should be after @elt/ui
-import '@elt/ui/theme.css';
-import '@elt/game-client/components.css';
+import "@elt/ui/theme.css";
+import "@elt/game-client/components.css";
 ```
 
 **TypeScript errors:**
+
 ```typescript
 // Use type-only imports for interfaces
-import type { Quest, XPProgressBarProps } from '@elt/game-client';
-import { XPProgressBar, QuestTracker } from '@elt/game-client';
+import type { Quest, XPProgressBarProps } from "@elt/game-client";
+import { XPProgressBar, QuestTracker } from "@elt/game-client";
 ```
 
 **Animation not working:**
+
 ```css
 /* Ensure CSS custom properties are defined */
 :root {

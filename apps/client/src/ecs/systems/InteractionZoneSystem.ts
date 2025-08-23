@@ -2,21 +2,26 @@
  * InteractionZoneSystem - Manages interaction zone detection and validation
  */
 
-import type { 
-  System, 
-  Entity, 
+import type {
+  System,
+  Entity,
   ComponentManager,
   Emitter,
   ECSEvents,
   PositionComponent,
-  InteractiveComponent
-} from '@elt/core';
+  InteractiveComponent,
+} from "@elt/core";
 
 export class InteractionZoneSystem implements System {
-  readonly name = 'InteractionZoneSystem';
-  readonly requiredComponents = ['position', 'interactive'] as const;
+  readonly name = "InteractionZoneSystem";
+  readonly requiredComponents = ["position", "interactive"] as const;
 
-  update(_entities: Entity[], _components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
+  update(
+    _entities: Entity[],
+    _components: ComponentManager,
+    _deltaTime: number,
+    _events: Emitter<ECSEvents>,
+  ): void {
     // This system is primarily a utility for other systems
   }
 
@@ -30,28 +35,33 @@ export class InteractionZoneSystem implements System {
   isPlayerInInteractionZone(
     playerPosition: PositionComponent,
     entityPosition: PositionComponent,
-    interactive: InteractiveComponent
+    interactive: InteractiveComponent,
   ): boolean {
     // If entity has defined interaction zones, use those
-    if (interactive.interactionZones && interactive.interactionZones.length > 0) {
+    if (
+      interactive.interactionZones &&
+      interactive.interactionZones.length > 0
+    ) {
       for (const zone of interactive.interactionZones) {
-        const zoneX = zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
-        const zoneY = zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
-        
+        const zoneX =
+          zone.isRelative !== false ? entityPosition.x + zone.x : zone.x;
+        const zoneY =
+          zone.isRelative !== false ? entityPosition.y + zone.y : zone.y;
+
         if (playerPosition.x === zoneX && playerPosition.y === zoneY) {
           return true;
         }
       }
       return false;
     }
-    
+
     // Fallback: use adjacency (default behavior for entities without defined zones)
     const dx = Math.abs(playerPosition.x - entityPosition.x);
     const dy = Math.abs(playerPosition.y - entityPosition.y);
     const maxRange = interactive.interactionRange || 1;
-    
+
     // Check if player is adjacent (within range)
-    return dx <= maxRange && dy <= maxRange && (dx + dy) > 0; // > 0 ensures not same position
+    return dx <= maxRange && dy <= maxRange && dx + dy > 0; // > 0 ensures not same position
   }
 
   /**
@@ -59,22 +69,31 @@ export class InteractionZoneSystem implements System {
    */
   findInteractableEntities(
     playerPosition: PositionComponent,
-    components: ComponentManager
+    components: ComponentManager,
   ): string[] {
     const interactableEntities: string[] = [];
-    const interactiveEntityIds = components.getEntitiesWithComponent('interactive');
-    
+    const interactiveEntityIds =
+      components.getEntitiesWithComponent("interactive");
+
     for (const entityId of interactiveEntityIds) {
-      const position = components.getComponent<PositionComponent>(entityId, 'position');
-      const interactive = components.getComponent<InteractiveComponent>(entityId, 'interactive');
-      
+      const position = components.getComponent<PositionComponent>(
+        entityId,
+        "position",
+      );
+      const interactive = components.getComponent<InteractiveComponent>(
+        entityId,
+        "interactive",
+      );
+
       if (!position || !interactive) continue;
-      
-      if (this.isPlayerInInteractionZone(playerPosition, position, interactive)) {
+
+      if (
+        this.isPlayerInInteractionZone(playerPosition, position, interactive)
+      ) {
         interactableEntities.push(entityId);
       }
     }
-    
+
     return interactableEntities;
   }
 }

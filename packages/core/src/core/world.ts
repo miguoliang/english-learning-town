@@ -1,13 +1,18 @@
 /**
  * ECS World - Main ECS coordinator
- * 
+ *
  * Main coordinator of entities, components, and systems.
  * Handles entity lifecycle, system management, and world updates.
  */
 
-import { ecsEventBus, ECSEventTypes, type Emitter, type ECSEvents } from '../events';
-import { ComponentManager } from './componentManager';
-import type { EntityId, Entity, Component, System } from './types';
+import {
+  ecsEventBus,
+  ECSEventTypes,
+  type Emitter,
+  type ECSEvents,
+} from "../events";
+import { ComponentManager } from "./componentManager";
+import type { EntityId, Entity, Component, System } from "./types";
 
 /**
  * ECS World - Main coordinator of entities, components, and systems
@@ -60,7 +65,10 @@ export class World {
    */
   addComponent<T extends Component>(entityId: EntityId, component: T): void {
     this.components.addComponent(entityId, component);
-    this.events.emit(ECSEventTypes.COMPONENT_ADDED, { entityId, componentType: component.type });
+    this.events.emit(ECSEventTypes.COMPONENT_ADDED, {
+      entityId,
+      componentType: component.type,
+    });
   }
 
   /**
@@ -68,13 +76,19 @@ export class World {
    */
   removeComponent(entityId: EntityId, componentType: string): void {
     this.components.removeComponent(entityId, componentType);
-    this.events.emit(ECSEventTypes.COMPONENT_REMOVED, { entityId, componentType });
+    this.events.emit(ECSEventTypes.COMPONENT_REMOVED, {
+      entityId,
+      componentType,
+    });
   }
 
   /**
    * Get a component from an entity
    */
-  getComponent<T extends Component>(entityId: EntityId, componentType: string): T | undefined {
+  getComponent<T extends Component>(
+    entityId: EntityId,
+    componentType: string,
+  ): T | undefined {
     return this.components.getComponent<T>(entityId, componentType);
   }
 
@@ -89,7 +103,7 @@ export class World {
    * Remove a system from the world
    */
   removeSystem(systemName: string): void {
-    this.systems = this.systems.filter(system => system.name !== systemName);
+    this.systems = this.systems.filter((system) => system.name !== systemName);
   }
 
   /**
@@ -118,11 +132,13 @@ export class World {
    */
   update(): void {
     const currentTime = Date.now();
-    const deltaTime = this.lastUpdateTime ? currentTime - this.lastUpdateTime : 0;
+    const deltaTime = this.lastUpdateTime
+      ? currentTime - this.lastUpdateTime
+      : 0;
     this.lastUpdateTime = currentTime;
 
     const entities = this.getAllEntities();
-    
+
     for (const system of this.systems) {
       system.update(entities, this.components, deltaTime, this.events);
     }

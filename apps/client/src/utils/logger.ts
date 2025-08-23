@@ -3,7 +3,7 @@
  * Provides clean console output with emoji prefixes
  */
 
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+type LogLevel = "info" | "warn" | "error" | "debug";
 
 class Logger {
   private isDevelopment = import.meta.env.DEV;
@@ -13,15 +13,15 @@ class Logger {
 
     const prefix = this.getPrefix(level);
     const timestamp = new Date().toLocaleTimeString();
-    
+
     switch (level) {
-      case 'error':
+      case "error":
         console.error(`[${timestamp}] ${prefix} ${message}`, ...args);
         break;
-      case 'warn':
+      case "warn":
         console.warn(`[${timestamp}] ${prefix} ${message}`, ...args);
         break;
-      case 'debug':
+      case "debug":
         console.debug(`[${timestamp}] ${prefix} ${message}`, ...args);
         break;
       default:
@@ -31,45 +31,50 @@ class Logger {
 
   private getPrefix(level: LogLevel): string {
     switch (level) {
-      case 'info': return '🎮';
-      case 'warn': return '⚠️';
-      case 'error': return '❌';
-      case 'debug': return '🔍';
-      default: return '🎮';
+      case "info":
+        return "🎮";
+      case "warn":
+        return "⚠️";
+      case "error":
+        return "❌";
+      case "debug":
+        return "🔍";
+      default:
+        return "🎮";
     }
   }
 
   info(message: string, ...args: unknown[]): void {
-    this.log('info', message, ...args);
+    this.log("info", message, ...args);
   }
 
   warn(message: string, ...args: unknown[]): void {
-    this.log('warn', message, ...args);
+    this.log("warn", message, ...args);
   }
 
   error(message: string, ...args: unknown[]): void {
-    this.log('error', message, ...args);
+    this.log("error", message, ...args);
   }
 
   debug(message: string, ...args: unknown[]): void {
-    this.log('debug', message, ...args);
+    this.log("debug", message, ...args);
   }
 
   // Game-specific convenience methods
   ecs(message: string, ...args: unknown[]): void {
-    this.log('info', `🌍 ECS: ${message}`, ...args);
+    this.log("info", `🌍 ECS: ${message}`, ...args);
   }
 
   scene(message: string, ...args: unknown[]): void {
-    this.log('info', `🏙️ Scene: ${message}`, ...args);
+    this.log("info", `🏙️ Scene: ${message}`, ...args);
   }
 
   player(message: string, ...args: unknown[]): void {
-    this.log('info', `🧑 Player: ${message}`, ...args);
+    this.log("info", `🧑 Player: ${message}`, ...args);
   }
 
   achievement(message: string, ...args: unknown[]): void {
-    this.log('info', `🏆 Achievement: ${message}`, ...args);
+    this.log("info", `🏆 Achievement: ${message}`, ...args);
   }
 }
 

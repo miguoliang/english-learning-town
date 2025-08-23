@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useEffect, useState } from "react";
+import styled, { keyframes } from "styled-components";
 
 const fadeInOut = keyframes`
   0% { opacity: 0; transform: scale(0.9); }
@@ -25,7 +25,7 @@ const BlinkReminderOverlay = styled.div`
   z-index: 4000;
   animation: ${fadeInOut} 4s ease-in-out;
   backdrop-filter: blur(8px);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.6),
     0 4px 8px rgba(212, 144, 74, 0.2);
 `;
@@ -41,7 +41,7 @@ const BreakReminderOverlay = styled.div`
   padding: 32px;
   z-index: 5000;
   backdrop-filter: blur(12px);
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.8),
     0 8px 25px rgba(212, 144, 74, 0.1);
   animation: ${breatheAnimation} 3s ease-in-out infinite;
@@ -56,9 +56,9 @@ const BlinkText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   &::before {
-    content: '👁️';
+    content: "👁️";
     font-size: 1.2rem;
   }
 `;
@@ -72,9 +72,9 @@ const BreakTitle = styled.h3`
   align-items: center;
   justify-content: center;
   gap: 10px;
-  
+
   &::before {
-    content: '🌅';
+    content: "🌅";
     font-size: 1.5rem;
   }
 `;
@@ -104,22 +104,20 @@ const ButtonGroup = styled.div`
 `;
 
 const ActionButton = styled.button<{ primary?: boolean }>`
-  background: ${props => props.primary 
-    ? 'rgba(212, 144, 74, 0.8)' 
-    : 'rgba(0, 0, 0, 0.6)'};
+  background: ${(props) =>
+    props.primary ? "rgba(212, 144, 74, 0.8)" : "rgba(0, 0, 0, 0.6)"};
   border: 1px solid rgba(212, 144, 74, 0.6);
-  color: ${props => props.primary ? '#0a0906' : '#d4904a'};
+  color: ${(props) => (props.primary ? "#0a0906" : "#d4904a")};
   padding: 12px 20px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.3s;
-  
+
   &:hover {
-    background: ${props => props.primary 
-      ? 'rgba(212, 144, 74, 1)' 
-      : 'rgba(212, 144, 74, 0.2)'};
+    background: ${(props) =>
+      props.primary ? "rgba(212, 144, 74, 1)" : "rgba(212, 144, 74, 0.2)"};
     transform: translateY(-1px);
   }
 `;
@@ -137,7 +135,7 @@ const ProgressFill = styled.div<{ progress: number }>`
   height: 100%;
   background: linear-gradient(90deg, #d4904a, #b8783a);
   border-radius: 2px;
-  width: ${props => props.progress}%;
+  width: ${(props) => props.progress}%;
   transition: width 1s ease;
 `;
 
@@ -168,7 +166,7 @@ export const EyeBreakReminder: React.FC<EyeBreakReminderProps> = ({
     if (showBlinkReminder) {
       setBlinkCountdown(4);
       const timer = setInterval(() => {
-        setBlinkCountdown(prev => {
+        setBlinkCountdown((prev) => {
           if (prev <= 1) {
             onAcknowledgeBlink();
             return 4;
@@ -184,9 +182,7 @@ export const EyeBreakReminder: React.FC<EyeBreakReminderProps> = ({
   if (showBlinkReminder) {
     return (
       <BlinkReminderOverlay>
-        <BlinkText>
-          Remember to blink naturally
-        </BlinkText>
+        <BlinkText>Remember to blink naturally</BlinkText>
         <ProgressBar>
           <ProgressFill progress={(4 - blinkCountdown) * 25} />
         </ProgressBar>
@@ -197,30 +193,24 @@ export const EyeBreakReminder: React.FC<EyeBreakReminderProps> = ({
   if (showBreakReminder) {
     return (
       <BreakReminderOverlay>
-        <BreakTitle>
-          Time for an Eye Break!
-        </BreakTitle>
-        
+        <BreakTitle>Time for an Eye Break!</BreakTitle>
+
         <BreakText>
-          You've been reading for {sessionStats.readingTimeMinutes} minutes. 
+          You've been reading for {sessionStats.readingTimeMinutes} minutes.
           Consider taking a break to rest your eyes.
         </BreakText>
 
         <Rule2020>
-          <strong>20-20-20 Rule:</strong><br />
+          <strong>20-20-20 Rule:</strong>
+          <br />
           Look at something 20 feet away for at least 20 seconds
         </Rule2020>
 
         <ButtonGroup>
-          <ActionButton 
-            primary 
-            onClick={() => onAcknowledgeBreak(true)}
-          >
+          <ActionButton primary onClick={() => onAcknowledgeBreak(true)}>
             Taking a break
           </ActionButton>
-          <ActionButton 
-            onClick={() => onAcknowledgeBreak(false)}
-          >
+          <ActionButton onClick={() => onAcknowledgeBreak(false)}>
             Continue reading
           </ActionButton>
         </ButtonGroup>

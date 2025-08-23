@@ -3,9 +3,9 @@
  * Displays gamification elements, rewards, and motivational features
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
 import {
   MotivationEngine,
   MotivationStyle,
@@ -16,9 +16,9 @@ import {
   type StreakBonus,
   type EducationalAchievement,
   type LearningAnalytics,
-  LearningAnalyticsEngine
-} from '@elt/learning-analytics';
-import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
+  LearningAnalyticsEngine,
+} from "@elt/learning-analytics";
+import type { VocabularyCard, ReviewSession } from "@elt/learning-algorithms";
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
@@ -36,7 +36,7 @@ const DashboardHeader = styled.div`
 
 const DashboardTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -63,7 +63,7 @@ const LevelInfo = styled.div`
 `;
 
 const LevelNumber = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['4xl']};
+  font-size: ${({ theme }) => theme.fontSizes["4xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.primary};
@@ -87,7 +87,7 @@ const XPLabel = styled.div`
 `;
 
 const XPAmount = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
 `;
 
@@ -103,7 +103,7 @@ const XPBar = styled.div`
 const XPFill = styled.div<{ progress: number }>`
   background: ${({ theme }) => theme.colors.surface};
   height: 100%;
-  width: ${props => props.progress}%;
+  width: ${(props) => props.progress}%;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   transition: width 0.5s ease;
 `;
@@ -128,7 +128,7 @@ const StatCard = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.medium};
   border: 2px solid transparent;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: ${({ theme }) => theme.colors.accent};
     transform: translateY(-2px);
@@ -136,12 +136,12 @@ const StatCard = styled.div`
 `;
 
 const StatIcon = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
@@ -167,7 +167,7 @@ const StreakHeader = styled.div`
 
 const StreakTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -185,10 +185,10 @@ const StreakDisplay = styled.div`
 `;
 
 const StreakNumber = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['4xl']};
+  font-size: ${({ theme }) => theme.fontSizes["4xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.error};
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const StreakLabel = styled.div`
@@ -211,7 +211,7 @@ const RewardsSection = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
@@ -230,20 +230,27 @@ const RewardCard = styled.div<{ rarity: RewardRarity; isUnlocked: boolean }>`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing[4]};
   box-shadow: ${({ theme }) => theme.shadows.medium};
-  border: 2px solid ${props => {
-    if (!props.isUnlocked) return props.theme.colors.surfaceLight;
-    switch (props.rarity) {
-      case 'LEGENDARY': return '#FFD700';
-      case 'EPIC': return '#9B59B6';
-      case 'RARE': return '#3498DB';
-      case 'UNCOMMON': return '#27AE60';
-      case 'COMMON': return '#95A5A6';
-      default: return props.theme.colors.surfaceLight;
-    }
-  }};
-  opacity: ${props => props.isUnlocked ? 1 : 0.6};
+  border: 2px solid
+    ${(props) => {
+      if (!props.isUnlocked) return props.theme.colors.surfaceLight;
+      switch (props.rarity) {
+        case "LEGENDARY":
+          return "#FFD700";
+        case "EPIC":
+          return "#9B59B6";
+        case "RARE":
+          return "#3498DB";
+        case "UNCOMMON":
+          return "#27AE60";
+        case "COMMON":
+          return "#95A5A6";
+        default:
+          return props.theme.colors.surfaceLight;
+      }
+    }};
+  opacity: ${(props) => (props.isUnlocked ? 1 : 0.6)};
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadows.large};
@@ -258,8 +265,8 @@ const RewardHeader = styled.div`
 `;
 
 const RewardIcon = styled.div<{ isUnlocked: boolean }>`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
-  filter: ${props => props.isUnlocked ? 'none' : 'grayscale(100%)'};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
+  filter: ${(props) => (props.isUnlocked ? "none" : "grayscale(100%)")};
 `;
 
 const RewardInfo = styled.div`
@@ -274,14 +281,20 @@ const RewardTitle = styled.h3`
 `;
 
 const RewardRarityBadge = styled.span<{ rarity: RewardRarity }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.rarity) {
-      case 'LEGENDARY': return '#FFD700';
-      case 'EPIC': return '#9B59B6';
-      case 'RARE': return '#3498DB';
-      case 'UNCOMMON': return '#27AE60';
-      case 'COMMON': return '#95A5A6';
-      default: return props.theme.colors.textSecondary;
+      case "LEGENDARY":
+        return "#FFD700";
+      case "EPIC":
+        return "#9B59B6";
+      case "RARE":
+        return "#3498DB";
+      case "UNCOMMON":
+        return "#27AE60";
+      case "COMMON":
+        return "#95A5A6";
+      default:
+        return props.theme.colors.textSecondary;
     }
   }};
   color: ${({ theme }) => theme.colors.surface};
@@ -331,7 +344,7 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
   vocabularyCards,
   reviewSessions,
   achievements,
-  onClose
+  onClose,
 }) => {
   const [profile, setProfile] = useState<MotivationProfile | null>(null);
   const [analytics, setAnalytics] = useState<LearningAnalytics | null>(null);
@@ -342,14 +355,14 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
     // Generate analytics
     const generatedAnalytics = LearningAnalyticsEngine.generateAnalytics(
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
     setAnalytics(generatedAnalytics);
 
     // Create or load motivation profile (in real app, this would come from storage)
-    const userProfile = MotivationEngine.createProfile('user1', {
+    const userProfile = MotivationEngine.createProfile("user1", {
       motivationStyle: MotivationStyle.ACHIEVER,
-      encouragementLevel: EncouragementLevel.HIGH
+      encouragementLevel: EncouragementLevel.HIGH,
     });
 
     // Update profile with current analytics
@@ -357,7 +370,7 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
       userProfile,
       generatedAnalytics,
       achievements,
-      []
+      [],
     );
 
     // Get rewards and check for unlocks
@@ -366,14 +379,16 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
       updatedProfile,
       generatedAnalytics,
       achievements,
-      defaultRewards
+      defaultRewards,
     );
 
     setProfile(profileWithRewards);
     setRewards(defaultRewards);
 
     // Get current streak bonus
-    const currentStreakBonus = MotivationEngine.getCurrentStreakBonus(generatedAnalytics.dailyStreak);
+    const currentStreakBonus = MotivationEngine.getCurrentStreakBonus(
+      generatedAnalytics.dailyStreak,
+    );
     setStreakBonus(currentStreakBonus);
   }, [vocabularyCards, reviewSessions, achievements]);
 
@@ -388,12 +403,13 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
     );
   }
 
-  const levelProgress = profile.level > 1 ? 
-    100 - (profile.xpToNextLevel / (100 + (profile.level - 1) * 50)) * 100 : 
-    (100 - profile.xpToNextLevel);
+  const levelProgress =
+    profile.level > 1
+      ? 100 - (profile.xpToNextLevel / (100 + (profile.level - 1) * 50)) * 100
+      : 100 - profile.xpToNextLevel;
 
-  const unlockedRewards = rewards.filter(r => r.isUnlocked);
-  const pendingRewards = rewards.filter(r => !r.isUnlocked);
+  const unlockedRewards = rewards.filter((r) => r.isUnlocked);
+  const pendingRewards = rewards.filter((r) => !r.isUnlocked);
 
   return (
     <DashboardContainer>
@@ -403,7 +419,9 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
           Motivation Hub
           <AnimatedEmoji emoji="🏆" mood="floating" />
         </DashboardTitle>
-        <Button variant="ghost" onClick={onClose}>← Back to Dashboard</Button>
+        <Button variant="ghost" onClick={onClose}>
+          ← Back to Dashboard
+        </Button>
       </DashboardHeader>
 
       <LevelSection>
@@ -414,7 +432,7 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
             <XPAmount>{profile.totalXP} XP</XPAmount>
           </XPInfo>
         </LevelInfo>
-        
+
         <XPBar>
           <XPFill progress={levelProgress} />
         </XPBar>
@@ -427,19 +445,19 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
           <StatValue>{profile.engagementScore}%</StatValue>
           <StatLabel>Engagement Score</StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon>🎯</StatIcon>
           <StatValue>{profile.weeklyGoalProgress}%</StatValue>
           <StatLabel>Weekly Goals</StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon>⏱️</StatIcon>
           <StatValue>{profile.averageSessionLength}</StatValue>
           <StatLabel>Avg Session (min)</StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon>🏅</StatIcon>
           <StatValue>{unlockedRewards.length}</StatValue>
@@ -454,12 +472,12 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
             Current Streak
           </StreakTitle>
         </StreakHeader>
-        
+
         <StreakDisplay>
           <StreakNumber>{profile.currentStreak}</StreakNumber>
           <StreakLabel>days</StreakLabel>
         </StreakDisplay>
-        
+
         {streakBonus && (
           <StreakBonus>
             <AnimatedEmoji emoji="⚡" mood="floating" />
@@ -475,7 +493,7 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
             Earned Rewards
           </SectionTitle>
           <RewardsGrid>
-            {unlockedRewards.map(reward => (
+            {unlockedRewards.map((reward) => (
               <RewardCard
                 key={reward.id}
                 rarity={reward.rarity}
@@ -496,9 +514,9 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
                     Earned
                   </UnlockedBadge>
                 </RewardHeader>
-                
+
                 <RewardDescription>{reward.description}</RewardDescription>
-                
+
                 <RewardXP>
                   <AnimatedEmoji emoji="⭐" mood="floating" />
                   {reward.xpValue} XP
@@ -515,7 +533,7 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
           Available Rewards
         </SectionTitle>
         <RewardsGrid>
-          {pendingRewards.slice(0, 6).map(reward => (
+          {pendingRewards.slice(0, 6).map((reward) => (
             <RewardCard
               key={reward.id}
               rarity={reward.rarity}
@@ -532,9 +550,9 @@ export const MotivationDashboard: React.FC<MotivationDashboardProps> = ({
                   </RewardRarityBadge>
                 </RewardInfo>
               </RewardHeader>
-              
+
               <RewardDescription>{reward.description}</RewardDescription>
-              
+
               <RewardXP>
                 <AnimatedEmoji emoji="⭐" mood="floating" />
                 {reward.xpValue} XP

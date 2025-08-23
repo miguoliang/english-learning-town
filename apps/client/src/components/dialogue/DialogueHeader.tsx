@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { getNPCAvatar } from '../../utils/vocabularyHighlighter';
-import { AnimatedEmoji } from '@elt/ui';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { getNPCAvatar } from "../../utils/vocabularyHighlighter";
+import { AnimatedEmoji } from "@elt/ui";
 
 const Header = styled.div`
   display: flex;
@@ -11,15 +11,20 @@ const Header = styled.div`
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(212, 144, 74, 0.2);
   position: relative;
-  
+
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -1px;
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(212, 144, 74, 0.1) 50%, transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(212, 144, 74, 0.1) 50%,
+      transparent 100%
+    );
   }
 `;
 
@@ -30,7 +35,7 @@ const SpeakerInfo = styled.div`
 `;
 
 const SpeakerAvatar = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['isSpeaking'].includes(prop),
+  shouldForwardProp: (prop) => !["isSpeaking"].includes(prop),
 })<{ isSpeaking?: boolean }>`
   width: 70px;
   height: 70px;
@@ -40,22 +45,24 @@ const SpeakerAvatar = styled.div.withConfig({
   align-items: center;
   justify-content: center;
   border: 4px solid ${({ theme }) => theme.colors.primary};
-  box-shadow: 
+  box-shadow:
     ${({ theme }) => theme.shadows.glow},
     0 6px 16px rgba(255, 107, 107, 0.2);
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
-  
-  ${props => props.isSpeaking && `
+
+  ${(props) =>
+    props.isSpeaking &&
+    `
     animation: celebration 1s ease-in-out infinite;
     box-shadow: 
       0 0 25px rgba(255, 107, 107, 0.6),
       0 6px 16px rgba(255, 107, 107, 0.3);
   `}
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -4px;
     border-radius: 50%;
@@ -64,10 +71,10 @@ const SpeakerAvatar = styled.div.withConfig({
     opacity: 0.4;
     animation: rainbow 3s linear infinite;
   }
-  
+
   &:hover {
     transform: scale(1.1);
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(78, 205, 196, 0.7),
       0 8px 20px rgba(78, 205, 196, 0.3);
   }
@@ -81,7 +88,7 @@ const SpeakerName = styled.h3`
   letter-spacing: 0.025em;
   line-height: 1.4;
   text-shadow: 0 2px 4px rgba(255, 107, 107, 0.2);
-  
+
   &:hover {
     color: ${({ theme }) => theme.colors.secondary};
     transition: color 0.3s ease;
@@ -112,21 +119,21 @@ const VoiceModeIndicator = styled.div`
   margin-right: 8px;
   animation: pulse 2s infinite;
   box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
-  
+
   @keyframes pulse {
-    0% { 
-      transform: scale(1); 
-      opacity: 1; 
+    0% {
+      transform: scale(1);
+      opacity: 1;
       box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
     }
-    50% { 
-      transform: scale(1.3); 
-      opacity: 0.8; 
+    50% {
+      transform: scale(1.3);
+      opacity: 0.8;
       box-shadow: 0 0 20px rgba(150, 206, 180, 0.8);
     }
-    100% { 
-      transform: scale(1); 
-      opacity: 1; 
+    100% {
+      transform: scale(1);
+      opacity: 1;
       box-shadow: 0 0 12px rgba(150, 206, 180, 0.6);
     }
   }
@@ -137,7 +144,7 @@ const KeyHint = styled.span`
   color: ${({ theme }) => theme.colors.surface};
   padding: 6px 10px;
   border-radius: 8px;
-  font-family: 'Comic Neue', 'Fredoka One', monospace;
+  font-family: "Comic Neue", "Fredoka One", monospace;
   font-size: 0.9rem;
   font-weight: 600;
   border: 2px solid ${({ theme }) => theme.colors.surface};
@@ -160,13 +167,13 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(255, 234, 167, 0.4);
-  
+
   &:hover {
     background: ${({ theme }) => theme.gradients.magical};
     transform: scale(1.1) rotate(15deg);
     box-shadow: 0 6px 16px rgba(162, 155, 254, 0.5);
   }
-  
+
   &:active {
     transform: scale(0.95);
     animation: wiggle 0.3s ease;
@@ -190,41 +197,46 @@ const AudioButton = styled.button`
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: all 0.3s ease;
-  box-shadow: 
+  box-shadow:
     ${({ theme }) => theme.shadows.fun},
     0 4px 12px rgba(255, 107, 107, 0.3);
   position: relative;
   overflow: hidden;
   min-height: 48px;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
     transition: left 0.6s;
   }
-  
+
   &:hover {
     background: ${({ theme }) => theme.gradients.secondary};
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 
+    box-shadow:
       ${({ theme }) => theme.shadows.glow},
       0 6px 16px rgba(78, 205, 196, 0.4);
-      
+
     &::before {
       left: 100%;
     }
   }
-  
+
   &:active {
     transform: translateY(0) scale(1.02);
     animation: bounce 0.3s ease;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -250,46 +262,48 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
   onStopSpeech,
   isSpeaking = false,
 }) => {
-  const [avatarMood, setAvatarMood] = useState<'normal' | 'happy' | 'excited' | 'thinking'>('normal');
+  const [avatarMood, setAvatarMood] = useState<
+    "normal" | "happy" | "excited" | "thinking"
+  >("normal");
 
   const handleSpeakClick = () => {
     if (onSpeak) {
       const message = `Hello, I am ${speakerName}. Nice to meet you!`;
       onSpeak(message);
-      setAvatarMood('excited');
-      setTimeout(() => setAvatarMood('normal'), 2000);
+      setAvatarMood("excited");
+      setTimeout(() => setAvatarMood("normal"), 2000);
     }
   };
 
   const handleStopClick = () => {
     if (onStopSpeech) {
       onStopSpeech();
-      setAvatarMood('normal');
+      setAvatarMood("normal");
     }
   };
 
   const handleAvatarClick = () => {
-    setAvatarMood('happy');
-    setTimeout(() => setAvatarMood('normal'), 1000);
+    setAvatarMood("happy");
+    setTimeout(() => setAvatarMood("normal"), 1000);
   };
 
   return (
     <Header>
       <SpeakerInfo>
         <SpeakerAvatar isSpeaking={isSpeaking} onClick={handleAvatarClick}>
-          <AnimatedEmoji 
+          <AnimatedEmoji
             emoji={getNPCAvatar(npcId)}
-            mood={isSpeaking ? 'excited' : avatarMood}
+            mood={isSpeaking ? "excited" : avatarMood}
             size="2.2rem"
             autoAnimate={isSpeaking}
-            triggerAnimation={avatarMood !== 'normal'}
+            triggerAnimation={avatarMood !== "normal"}
           />
         </SpeakerAvatar>
         <SpeakerName>{speakerName}</SpeakerName>
       </SpeakerInfo>
       <AudioControls>
         {onSpeak && (
-          <AudioButton 
+          <AudioButton
             onClick={handleSpeakClick}
             disabled={isSpeaking}
             title="Hear the speaker's voice"
@@ -298,10 +312,7 @@ export const DialogueHeader: React.FC<DialogueHeaderProps> = ({
           </AudioButton>
         )}
         {onStopSpeech && (
-          <AudioButton 
-            onClick={handleStopClick}
-            disabled={!isSpeaking}
-          >
+          <AudioButton onClick={handleStopClick} disabled={!isSpeaking}>
             🔇 Stop
           </AudioButton>
         )}

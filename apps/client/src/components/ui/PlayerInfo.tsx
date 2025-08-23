@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { useGameStore } from '../../stores/unifiedGameStore';
+import React from "react";
+import styled from "styled-components";
+import { useGameStore } from "../../stores/unifiedGameStore";
 
 const PlayerInfoContainer = styled.div`
   display: flex;
@@ -21,12 +21,14 @@ interface PlayerInfoProps {
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({ playerPosition }) => {
   const { player } = useGameStore();
-  
+
   // Convert screen coordinates to grid coordinates
-  const gridPosition = playerPosition ? {
-    x: Math.round((playerPosition.x - 20) / 40),
-    y: Math.round((playerPosition.y - 20) / 40)
-  } : null;
+  const gridPosition = playerPosition
+    ? {
+        x: Math.round((playerPosition.x - 20) / 40),
+        y: Math.round((playerPosition.y - 20) / 40),
+      }
+    : null;
 
   return (
     <PlayerInfoContainer>
@@ -49,7 +51,9 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({ playerPosition }) => {
       {gridPosition && (
         <InfoItem>
           <span>📍</span>
-          <span>({gridPosition.x}, {gridPosition.y})</span>
+          <span>
+            ({gridPosition.x}, {gridPosition.y})
+          </span>
         </InfoItem>
       )}
     </PlayerInfoContainer>

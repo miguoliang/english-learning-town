@@ -1,6 +1,6 @@
-import { packageConfig } from '../../configs/tsup.config.js';
+import { packageConfig } from "../../configs/tsup.config.js";
 
 export default {
   ...packageConfig,
-  tsconfig: './tsconfig.build.json'
+  tsconfig: "./tsconfig.build.json",
 };

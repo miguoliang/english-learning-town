@@ -30,7 +30,7 @@ export class MathUtils {
     const angle = Math.random() * Math.PI * 2;
     return {
       x: Math.cos(angle),
-      y: Math.sin(angle)
+      y: Math.sin(angle),
     };
   }
 }

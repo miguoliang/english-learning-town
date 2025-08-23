@@ -3,19 +3,19 @@
  * Main interface for spaced repetition vocabulary learning
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
 import {
   SpacedRepetitionEngine,
   type VocabularyCard,
-  type ReviewSession
-} from '@elt/learning-algorithms';
+  type ReviewSession,
+} from "@elt/learning-algorithms";
 import {
   LearningAnalyticsEngine,
-  type LearningAnalytics
-} from '@elt/learning-analytics';
-import { LearningErrorBoundary } from './ErrorBoundary';
+  type LearningAnalytics,
+} from "@elt/learning-analytics";
+import { LearningErrorBoundary } from "./ErrorBoundary";
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
@@ -33,7 +33,7 @@ const DashboardHeader = styled.div`
 
 const DashboardTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -63,7 +63,7 @@ const StatCard = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.medium};
   border: 2px solid transparent;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: ${({ theme }) => theme.colors.accent};
     transform: translateY(-2px);
@@ -71,7 +71,7 @@ const StatCard = styled.div`
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
@@ -126,7 +126,7 @@ const ProgressSection = styled.div`
 
 const ProgressTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
   align-items: center;
@@ -145,7 +145,7 @@ const ProgressBar = styled.div`
 const ProgressFill = styled.div<{ progress: number }>`
   background: ${({ theme }) => theme.colors.surface};
   height: 100%;
-  width: ${props => props.progress}%;
+  width: ${(props) => props.progress}%;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   transition: width 0.5s ease;
 `;
@@ -164,13 +164,15 @@ interface VocabularyReviewDashboardProps {
   onManageCards: () => void;
 }
 
-export const VocabularyReviewDashboard: React.FC<VocabularyReviewDashboardProps> = ({
+export const VocabularyReviewDashboard: React.FC<
+  VocabularyReviewDashboardProps
+> = ({
   vocabularyCards,
   reviewSessions,
   onStartReview,
   onStartCustomSession,
   onViewAnalytics,
-  onManageCards
+  onManageCards,
 }) => {
   const [analytics, setAnalytics] = useState<LearningAnalytics | null>(null);
   const [dueCards, setDueCards] = useState<VocabularyCard[]>([]);
@@ -180,14 +182,17 @@ export const VocabularyReviewDashboard: React.FC<VocabularyReviewDashboardProps>
     // Generate analytics
     const generatedAnalytics = LearningAnalyticsEngine.generateAnalytics(
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
     setAnalytics(generatedAnalytics);
 
     // Get due and new cards
     const due = SpacedRepetitionEngine.getDueCards(vocabularyCards, 20);
-    const newCardsToLearn = SpacedRepetitionEngine.getNewCards(vocabularyCards, 5);
-    
+    const newCardsToLearn = SpacedRepetitionEngine.getNewCards(
+      vocabularyCards,
+      5,
+    );
+
     setDueCards(due);
     setNewCards(newCardsToLearn);
   }, [vocabularyCards, reviewSessions]);
@@ -206,139 +211,138 @@ export const VocabularyReviewDashboard: React.FC<VocabularyReviewDashboardProps>
   // const dailyStats = SpacedRepetitionEngine.getDailyStats(vocabularyCards);
 
   return (
-    <LearningErrorBoundary 
+    <LearningErrorBoundary
       componentName="Vocabulary Review Dashboard"
       onRetry={() => window.location.reload()}
     >
       <DashboardContainer>
-      <DashboardHeader>
-        <DashboardTitle>
-          <AnimatedEmoji emoji="🧠" mood="excited" />
-          Vocabulary Learning
-          <AnimatedEmoji emoji="⭐" mood="floating" />
-        </DashboardTitle>
-        <DashboardSubtitle>
-          Master English vocabulary with spaced repetition
-        </DashboardSubtitle>
-      </DashboardHeader>
+        <DashboardHeader>
+          <DashboardTitle>
+            <AnimatedEmoji emoji="🧠" mood="excited" />
+            Vocabulary Learning
+            <AnimatedEmoji emoji="⭐" mood="floating" />
+          </DashboardTitle>
+          <DashboardSubtitle>
+            Master English vocabulary with spaced repetition
+          </DashboardSubtitle>
+        </DashboardHeader>
 
-      <StatsGrid>
-        <StatCard>
-          <StatValue>{analytics.totalWordsLearned}</StatValue>
-          <StatLabel>Words Learned</StatLabel>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue>{dueCards.length}</StatValue>
-          <StatLabel>Due Today</StatLabel>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue>{newCards.length}</StatValue>
-          <StatLabel>New Words</StatLabel>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue>{analytics.averageMastery}%</StatValue>
-          <StatLabel>Mastery Level</StatLabel>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue>{analytics.dailyStreak}</StatValue>
-          <StatLabel>Day Streak</StatLabel>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue>{analytics.overallAccuracy}%</StatValue>
-          <StatLabel>Accuracy</StatLabel>
-        </StatCard>
-      </StatsGrid>
+        <StatsGrid>
+          <StatCard>
+            <StatValue>{analytics.totalWordsLearned}</StatValue>
+            <StatLabel>Words Learned</StatLabel>
+          </StatCard>
 
-      <ActionGrid>
-        <ActionCard>
-          <ActionTitle>
-            <AnimatedEmoji emoji="🎯" mood="excited" />
-            Daily Review
-          </ActionTitle>
-          <ActionDescription>
-            Review {dueCards.length} words that are due today. Perfect for maintaining your vocabulary.
-          </ActionDescription>
-          <Button 
-            variant="primary" 
-            size="lg"
-            onClick={onStartReview}
-            disabled={dueCards.length === 0}
-          >
-            {dueCards.length > 0 ? `Review ${dueCards.length} Words` : 'All Caught Up! 🎉'}
-          </Button>
-        </ActionCard>
+          <StatCard>
+            <StatValue>{dueCards.length}</StatValue>
+            <StatLabel>Due Today</StatLabel>
+          </StatCard>
 
-        <ActionCard>
-          <ActionTitle>
-            <AnimatedEmoji emoji="🌟" mood="happy" />
-            Learn New Words
-          </ActionTitle>
-          <ActionDescription>
-            Discover {newCards.length} new vocabulary words to expand your English skills.
-          </ActionDescription>
-          <Button 
-            variant="secondary" 
-            size="lg"
-            onClick={onStartCustomSession}
-            disabled={newCards.length === 0}
-          >
-            {newCards.length > 0 ? `Learn ${newCards.length} New Words` : 'No New Words'}
-          </Button>
-        </ActionCard>
+          <StatCard>
+            <StatValue>{newCards.length}</StatValue>
+            <StatLabel>New Words</StatLabel>
+          </StatCard>
 
-        <ActionCard>
-          <ActionTitle>
-            <AnimatedEmoji emoji="📊" mood="thinking" />
-            View Progress
-          </ActionTitle>
-          <ActionDescription>
-            Check your learning analytics, insights, and progress tracking.
-          </ActionDescription>
-          <Button 
-            variant="outline" 
-            size="lg"
-            onClick={onViewAnalytics}
-          >
-            View Analytics
-          </Button>
-        </ActionCard>
+          <StatCard>
+            <StatValue>{analytics.averageMastery}%</StatValue>
+            <StatLabel>Mastery Level</StatLabel>
+          </StatCard>
 
-        <ActionCard>
-          <ActionTitle>
-            <AnimatedEmoji emoji="🔧" mood="happy" />
-            Manage Cards
-          </ActionTitle>
-          <ActionDescription>
-            Add, edit, or organize your vocabulary cards and learning preferences.
-          </ActionDescription>
-          <Button 
-            variant="ghost" 
-            size="lg"
-            onClick={onManageCards}
-          >
-            Manage Vocabulary
-          </Button>
-        </ActionCard>
-      </ActionGrid>
+          <StatCard>
+            <StatValue>{analytics.dailyStreak}</StatValue>
+            <StatLabel>Day Streak</StatLabel>
+          </StatCard>
 
-      <ProgressSection>
-        <ProgressTitle>
-          <AnimatedEmoji emoji="🏆" mood="excited" />
-          Weekly Progress
-        </ProgressTitle>
-        <ProgressBar>
-          <ProgressFill progress={analytics.weeklyProgress} />
-        </ProgressBar>
-        <ProgressText>
-          {analytics.weeklyProgress}% of weekly goal completed
-        </ProgressText>
-      </ProgressSection>
-    </DashboardContainer>
+          <StatCard>
+            <StatValue>{analytics.overallAccuracy}%</StatValue>
+            <StatLabel>Accuracy</StatLabel>
+          </StatCard>
+        </StatsGrid>
+
+        <ActionGrid>
+          <ActionCard>
+            <ActionTitle>
+              <AnimatedEmoji emoji="🎯" mood="excited" />
+              Daily Review
+            </ActionTitle>
+            <ActionDescription>
+              Review {dueCards.length} words that are due today. Perfect for
+              maintaining your vocabulary.
+            </ActionDescription>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onStartReview}
+              disabled={dueCards.length === 0}
+            >
+              {dueCards.length > 0
+                ? `Review ${dueCards.length} Words`
+                : "All Caught Up! 🎉"}
+            </Button>
+          </ActionCard>
+
+          <ActionCard>
+            <ActionTitle>
+              <AnimatedEmoji emoji="🌟" mood="happy" />
+              Learn New Words
+            </ActionTitle>
+            <ActionDescription>
+              Discover {newCards.length} new vocabulary words to expand your
+              English skills.
+            </ActionDescription>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={onStartCustomSession}
+              disabled={newCards.length === 0}
+            >
+              {newCards.length > 0
+                ? `Learn ${newCards.length} New Words`
+                : "No New Words"}
+            </Button>
+          </ActionCard>
+
+          <ActionCard>
+            <ActionTitle>
+              <AnimatedEmoji emoji="📊" mood="thinking" />
+              View Progress
+            </ActionTitle>
+            <ActionDescription>
+              Check your learning analytics, insights, and progress tracking.
+            </ActionDescription>
+            <Button variant="outline" size="lg" onClick={onViewAnalytics}>
+              View Analytics
+            </Button>
+          </ActionCard>
+
+          <ActionCard>
+            <ActionTitle>
+              <AnimatedEmoji emoji="🔧" mood="happy" />
+              Manage Cards
+            </ActionTitle>
+            <ActionDescription>
+              Add, edit, or organize your vocabulary cards and learning
+              preferences.
+            </ActionDescription>
+            <Button variant="ghost" size="lg" onClick={onManageCards}>
+              Manage Vocabulary
+            </Button>
+          </ActionCard>
+        </ActionGrid>
+
+        <ProgressSection>
+          <ProgressTitle>
+            <AnimatedEmoji emoji="🏆" mood="excited" />
+            Weekly Progress
+          </ProgressTitle>
+          <ProgressBar>
+            <ProgressFill progress={analytics.weeklyProgress} />
+          </ProgressBar>
+          <ProgressText>
+            {analytics.weeklyProgress}% of weekly goal completed
+          </ProgressText>
+        </ProgressSection>
+      </DashboardContainer>
     </LearningErrorBoundary>
   );
 };

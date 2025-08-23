@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface EyeBreakState {
   readingTime: number;
@@ -33,7 +33,7 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
     isBreakSuggested: false,
     blinkCount: 0,
   });
-  
+
   const [showBlinkReminder, setShowBlinkReminder] = useState(false);
   const [showBreakReminder, setShowBreakReminder] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,33 +42,39 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
   // Start tracking when dialogue is active
   const startTracking = useCallback(() => {
     startTimeRef.current = Date.now();
-    
+
     intervalRef.current = setInterval(() => {
       const now = Date.now();
       const elapsed = now - startTimeRef.current;
-      
-      setState(prev => {
+
+      setState((prev) => {
         const newState = {
           ...prev,
           readingTime: elapsed,
           totalTime: prev.totalTime + 1000, // Add 1 second
         };
-        
+
         // Check for blink reminder
-        if (elapsed - prev.lastBlinkReminder >= fullConfig.blinkReminderInterval) {
+        if (
+          elapsed - prev.lastBlinkReminder >=
+          fullConfig.blinkReminderInterval
+        ) {
           if (elapsed >= fullConfig.minReadingTime) {
             setShowBlinkReminder(true);
             newState.lastBlinkReminder = elapsed;
           }
         }
-        
+
         // Check for break reminder (20-20-20 rule)
-        if (prev.totalTime - prev.lastBreakReminder >= fullConfig.breakReminderInterval) {
+        if (
+          prev.totalTime - prev.lastBreakReminder >=
+          fullConfig.breakReminderInterval
+        ) {
           setShowBreakReminder(true);
           newState.lastBreakReminder = prev.totalTime;
           newState.isBreakSuggested = true;
         }
-        
+
         return newState;
       });
     }, 1000);
@@ -85,7 +91,7 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
   // Handle blink reminder acknowledgment
   const acknowledgeBlinkReminder = useCallback(() => {
     setShowBlinkReminder(false);
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       blinkCount: prev.blinkCount + 1,
     }));
@@ -94,7 +100,7 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
   // Handle break reminder acknowledgment
   const acknowledgeBreakReminder = useCallback((taken: boolean) => {
     setShowBreakReminder(false);
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       isBreakSuggested: false,
       lastBreakReminder: taken ? prev.totalTime : prev.lastBreakReminder,
@@ -117,9 +123,15 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
 
   // Get time until next break
   const getTimeUntilNextBreak = useCallback(() => {
-    const timeUntilBreak = fullConfig.breakReminderInterval - (state.totalTime - state.lastBreakReminder);
+    const timeUntilBreak =
+      fullConfig.breakReminderInterval -
+      (state.totalTime - state.lastBreakReminder);
     return Math.max(0, timeUntilBreak);
-  }, [state.totalTime, state.lastBreakReminder, fullConfig.breakReminderInterval]);
+  }, [
+    state.totalTime,
+    state.lastBreakReminder,
+    fullConfig.breakReminderInterval,
+  ]);
 
   // Get session statistics
   const getSessionStats = useCallback(() => {
@@ -145,14 +157,14 @@ export const useEyeBreakReminder = (config: Partial<EyeBreakConfig> = {}) => {
     showBlinkReminder,
     showBreakReminder,
     isBreakSuggested: state.isBreakSuggested,
-    
+
     // Actions
     startTracking,
     stopTracking,
     acknowledgeBlinkReminder,
     acknowledgeBreakReminder,
     resetSession,
-    
+
     // Data
     getSessionStats,
     getTimeUntilNextBreak,

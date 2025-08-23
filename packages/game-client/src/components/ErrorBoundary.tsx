@@ -4,10 +4,10 @@
  * Uses CSS-only styling for consistency with @elt/ui architecture
  */
 
-import React, { Component } from 'react';
-import type { ReactNode } from 'react';
-import { Button, AnimatedEmoji } from '@elt/ui';
-import { ValidationError } from '@elt/learning-algorithms';
+import React, { Component } from "react";
+import type { ReactNode } from "react";
+import { Button, AnimatedEmoji } from "@elt/ui";
+import { ValidationError } from "@elt/learning-algorithms";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -22,7 +22,10 @@ interface ErrorBoundaryProps {
   isolate?: boolean; // If true, only catches errors from immediate children
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   private resetTimeoutId: number | null = null;
 
   constructor(props: ErrorBoundaryProps) {
@@ -38,10 +41,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    const errorDetails = errorInfo.componentStack || 'No additional error info';
-    
+    const errorDetails = errorInfo.componentStack || "No additional error info";
+
     this.setState({
-      errorInfo: errorDetails
+      errorInfo: errorDetails,
     });
 
     // Call the onError callback if provided
@@ -50,10 +53,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Log error for development
-    if (process.env.NODE_ENV === 'development') {
-      console.group('🚨 Error Boundary Caught Error');
-      console.error('Error:', error);
-      console.error('Error Info:', errorDetails);
+    if (process.env.NODE_ENV === "development") {
+      console.group("🚨 Error Boundary Caught Error");
+      console.error("Error:", error);
+      console.error("Error Info:", errorDetails);
       console.groupEnd();
     }
   }
@@ -96,35 +99,36 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   private renderDefaultErrorUI() {
     const { error, errorInfo } = this.state;
-    
+
     if (!error) return null;
 
     // Customize error message based on error type
     const isValidationError = error instanceof ValidationError;
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    const isDevelopment = process.env.NODE_ENV === "development";
 
     return (
       <div className="elt-game-error">
         <div className="elt-game-error__icon">
           <AnimatedEmoji emoji="⚠️" mood="thinking" />
         </div>
-        
+
         <h3 className="elt-game-error__title">
-          {isValidationError ? 'Input Validation Error' : 'Something went wrong'}
+          {isValidationError
+            ? "Input Validation Error"
+            : "Something went wrong"}
         </h3>
 
         <p className="elt-game-error__message">
-          {isValidationError 
+          {isValidationError
             ? `Invalid input: ${error.message}`
-            : 'An unexpected error occurred while loading this component. Please try again.'
-          }
+            : "An unexpected error occurred while loading this component. Please try again."}
         </p>
 
         <div className="elt-game-error__buttons">
           <Button onClick={this.handleReset} variant="primary">
             Try Again
           </Button>
-          
+
           {!isValidationError && (
             <Button onClick={this.handleAutoReset} variant="outline">
               Auto-retry in 5s
@@ -139,15 +143,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <strong>Error:</strong> {error.name}: {error.message}
               {error.stack && (
                 <>
-                  <br /><br />
-                  <strong>Stack Trace:</strong><br />
+                  <br />
+                  <br />
+                  <strong>Stack Trace:</strong>
+                  <br />
                   {error.stack}
                 </>
               )}
               {errorInfo && (
                 <>
-                  <br /><br />
-                  <strong>Component Stack:</strong><br />
+                  <br />
+                  <br />
+                  <strong>Component Stack:</strong>
+                  <br />
                   {errorInfo}
                 </>
               )}
@@ -167,17 +175,17 @@ interface LearningErrorBoundaryProps {
   onRetry?: () => void;
 }
 
-export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({ 
-  children, 
-  componentName = 'Learning Component',
-  onRetry 
+export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({
+  children,
+  componentName = "Learning Component",
+  onRetry,
 }) => {
   const handleError = (error: Error, _errorInfo: string) => {
     // Log learning-specific errors
     console.warn(`Learning component error in ${componentName}:`, {
       error: error.message,
       type: error.constructor.name,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   };
 
@@ -186,20 +194,28 @@ export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({
       <div className="elt-game-error__icon">
         <AnimatedEmoji emoji="📚" mood="thinking" />
       </div>
-      
-      <h3 className="elt-game-error__title">
-        Learning Component Error
-      </h3>
-      
+
+      <h3 className="elt-game-error__title">Learning Component Error</h3>
+
       <p className="elt-game-error__message">
-        The {componentName.toLowerCase()} encountered an error and couldn't load properly.
+        The {componentName.toLowerCase()} encountered an error and couldn't load
+        properly.
         {error instanceof ValidationError && (
-          <><br /><strong>Details:</strong> {error.message}</>
+          <>
+            <br />
+            <strong>Details:</strong> {error.message}
+          </>
         )}
       </p>
 
       <div className="elt-game-error__buttons">
-        <Button onClick={() => { reset(); onRetry?.(); }} variant="primary">
+        <Button
+          onClick={() => {
+            reset();
+            onRetry?.();
+          }}
+          variant="primary"
+        >
           Retry Learning
         </Button>
       </div>
@@ -207,10 +223,7 @@ export const LearningErrorBoundary: React.FC<LearningErrorBoundaryProps> = ({
   );
 
   return (
-    <ErrorBoundary 
-      fallback={fallbackRenderer}
-      onError={handleError}
-    >
+    <ErrorBoundary fallback={fallbackRenderer} onError={handleError}>
       {children}
     </ErrorBoundary>
   );
@@ -221,23 +234,21 @@ interface DashboardErrorBoundaryProps {
   dashboardName: string;
 }
 
-export const DashboardErrorBoundary: React.FC<DashboardErrorBoundaryProps> = ({ 
-  children, 
-  dashboardName 
+export const DashboardErrorBoundary: React.FC<DashboardErrorBoundaryProps> = ({
+  children,
+  dashboardName,
 }) => {
   const fallbackRenderer = (_error: Error, reset: () => void) => (
     <div className="elt-game-error">
       <div className="elt-game-error__icon">
         <AnimatedEmoji emoji="📊" mood="thinking" />
       </div>
-      
-      <h3 className="elt-game-error__title">
-        Dashboard Error
-      </h3>
-      
+
+      <h3 className="elt-game-error__title">Dashboard Error</h3>
+
       <p className="elt-game-error__message">
-        The {dashboardName} dashboard encountered an error while loading your data.
-        Please check your internet connection and try again.
+        The {dashboardName} dashboard encountered an error while loading your
+        data. Please check your internet connection and try again.
       </p>
 
       <div className="elt-game-error__buttons">
@@ -248,11 +259,7 @@ export const DashboardErrorBoundary: React.FC<DashboardErrorBoundaryProps> = ({
     </div>
   );
 
-  return (
-    <ErrorBoundary fallback={fallbackRenderer}>
-      {children}
-    </ErrorBoundary>
-  );
+  return <ErrorBoundary fallback={fallbackRenderer}>{children}</ErrorBoundary>;
 };
 
 // Hook for error handling in functional components
@@ -261,9 +268,9 @@ export const useErrorHandler = () => {
 
   const handleError = React.useCallback((error: Error) => {
     setError(error);
-    
+
     // Log error
-    console.error('Component error:', error);
+    console.error("Component error:", error);
   }, []);
 
   const clearError = React.useCallback(() => {
@@ -279,6 +286,6 @@ export const useErrorHandler = () => {
     error,
     handleError,
     clearError,
-    hasError: error !== null
+    hasError: error !== null,
   };
 };

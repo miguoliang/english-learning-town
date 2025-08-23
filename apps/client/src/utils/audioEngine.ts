@@ -11,7 +11,9 @@ export const createAudioContextManager = (): AudioContextManager => {
 
   const getContext = (): AudioContext => {
     if (!context) {
-      context = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      context = new (window.AudioContext ||
+        (window as typeof window & { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext)();
     }
     return context;
   };
@@ -24,9 +26,11 @@ export const createAudioContextManager = (): AudioContextManager => {
   };
 
   return {
-    get context() { return context; },
+    get context() {
+      return context;
+    },
     getContext,
-    cleanup
+    cleanup,
   };
 };
 
@@ -42,29 +46,34 @@ export const generateTone = (options: ToneOptions): void => {
   const {
     frequency,
     duration,
-    type = 'sine',
+    type = "sine",
     volume = 0.3,
-    fadeOut = true
+    fadeOut = true,
   } = options;
 
-  const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+  const audioContext = new (window.AudioContext ||
+    (window as typeof window & { webkitAudioContext: typeof AudioContext })
+      .webkitAudioContext)();
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
-  
+
   oscillator.connect(gainNode);
   gainNode.connect(audioContext.destination);
-  
+
   oscillator.frequency.value = frequency;
   oscillator.type = type;
-  
+
   gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
-  
+
   if (fadeOut) {
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioContext.currentTime + duration,
+    );
   } else {
     gainNode.gain.setValueAtTime(volume, audioContext.currentTime + duration);
   }
-  
+
   oscillator.start(audioContext.currentTime);
   oscillator.stop(audioContext.currentTime + duration);
 };
@@ -81,7 +90,7 @@ export const SOUND_FREQUENCIES = {
   level_up: 880, // High A
   error: 150,
   notification: 440,
-  success: 523
+  success: 523,
 } as const;
 
 export type SoundType = keyof typeof SOUND_FREQUENCIES;

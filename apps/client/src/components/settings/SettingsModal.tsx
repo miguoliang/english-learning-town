@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import styled from 'styled-components';
-import { Button, Input } from '@elt/ui';
-import { useGameStore } from '../../stores/unifiedGameStore';
+import React, { useState, useCallback } from "react";
+import styled from "styled-components";
+import { Button, Input } from "@elt/ui";
+import { useGameStore } from "../../stores/unifiedGameStore";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -17,8 +17,12 @@ const ModalOverlay = styled.div`
   animation: fadeIn 0.3s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -35,11 +39,11 @@ const ModalContainer = styled.div`
   animation: slideIn 0.3s ease-out;
 
   @keyframes slideIn {
-    from { 
+    from {
       transform: translateY(-50px);
       opacity: 0;
     }
-    to { 
+    to {
       transform: translateY(0);
       opacity: 1;
     }
@@ -56,14 +60,14 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h2`
   color: ${({ theme }) => theme.colors.surface};
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin: 0;
 `;
 
 const SettingsSection = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[6]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -82,7 +86,7 @@ const SettingItem = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${({ theme }) => theme.spacing[4]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -110,11 +114,11 @@ const Slider = styled.input`
   outline: none;
   opacity: 0.7;
   transition: opacity 0.3s ease;
-  
+
   &:hover {
     opacity: 1;
   }
-  
+
   &::-webkit-slider-thumb {
     appearance: none;
     width: 20px;
@@ -123,7 +127,7 @@ const Slider = styled.input`
     background: ${({ theme }) => theme.colors.primary};
     cursor: pointer;
   }
-  
+
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -136,7 +140,7 @@ const Slider = styled.input`
 
 const VolumeValue = styled.span`
   color: ${({ theme }) => theme.colors.surface};
-  font-family: ${({ theme }) => theme.fonts.mono || 'monospace'};
+  font-family: ${({ theme }) => theme.fonts.mono || "monospace"};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   min-width: 40px;
   text-align: right;
@@ -159,10 +163,13 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const player = useGameStore(state => state.player);
-  const updatePlayer = useGameStore(state => state.updatePlayer);
-  
+export const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const player = useGameStore((state) => state.player);
+  const updatePlayer = useGameStore((state) => state.updatePlayer);
+
   // Local state for settings
   const [masterVolume, setMasterVolume] = useState(75);
   const [musicVolume, setMusicVolume] = useState(60);
@@ -174,10 +181,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     if (playerName !== player.name) {
       updatePlayer({ name: playerName });
     }
-    
+
     // TODO: Save volume settings to game preferences
     // This would be connected to audio manager in a full implementation
-    
+
     onClose();
   }, [playerName, player.name, updatePlayer, onClose]);
 
@@ -188,11 +195,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setPlayerName(player.name); // Reset to current saved name
   }, [player.name]);
 
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   if (!isOpen) return null;
 
@@ -208,7 +218,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         <SettingsSection>
           <SectionTitle>🎵 Audio Settings</SectionTitle>
-          
+
           <SettingItem>
             <SettingLabel htmlFor="master-volume">Master Volume</SettingLabel>
             <SliderContainer>
@@ -223,7 +233,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </SliderContainer>
             <VolumeValue>{masterVolume}%</VolumeValue>
           </SettingItem>
-          
+
           <SettingItem>
             <SettingLabel htmlFor="music-volume">Music Volume</SettingLabel>
             <SliderContainer>
@@ -238,7 +248,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </SliderContainer>
             <VolumeValue>{musicVolume}%</VolumeValue>
           </SettingItem>
-          
+
           <SettingItem>
             <SettingLabel htmlFor="sfx-volume">Sound Effects</SettingLabel>
             <SliderContainer>
@@ -257,7 +267,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         <SettingsSection>
           <SectionTitle>👤 Player Settings</SectionTitle>
-          
+
           <SettingItem>
             <SettingLabel htmlFor="player-name">Player Name</SettingLabel>
             <PlayerNameSection>

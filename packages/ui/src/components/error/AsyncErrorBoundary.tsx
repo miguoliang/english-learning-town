@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { ErrorBoundary } from './ErrorBoundary';
-import type { ErrorBoundaryProps } from './ErrorBoundary';
+import React, { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { ErrorBoundary } from "./ErrorBoundary";
+import type { ErrorBoundaryProps } from "./ErrorBoundary";
 
-
-export interface AsyncErrorBoundaryProps extends Omit<ErrorBoundaryProps, 'children'> {
+export interface AsyncErrorBoundaryProps
+  extends Omit<ErrorBoundaryProps, "children"> {
   /** Content to render when there's no error */
   children: ReactNode;
   /** Whether to catch unhandled promise rejections */
@@ -13,7 +13,7 @@ export interface AsyncErrorBoundaryProps extends Omit<ErrorBoundaryProps, 'child
 
 /**
  * AsyncErrorBoundary - An enhanced error boundary that also catches async errors
- * 
+ *
  * Features:
  * - All features of regular ErrorBoundary
  * - Catches unhandled promise rejections
@@ -34,25 +34,29 @@ export const AsyncErrorBoundary: React.FC<AsyncErrorBoundaryProps> = ({
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       // Convert promise rejection to Error
-      const error = event.reason instanceof Error 
-        ? event.reason 
-        : new Error(String(event.reason));
+      const error =
+        event.reason instanceof Error
+          ? event.reason
+          : new Error(String(event.reason));
 
       // Set async error to trigger error boundary
       setAsyncError(error);
 
       // Call onError callback if provided
-      onError?.(error, { componentStack: 'Async Error' });
+      onError?.(error, { componentStack: "Async Error" });
 
       // Prevent the default browser behavior
       event.preventDefault();
     };
 
     // Listen for unhandled promise rejections
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
     return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
     };
   }, [catchUnhandledRejections, onError]);
 

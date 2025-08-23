@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import { PlayerInfo } from './PlayerInfo';
-import { GameControls } from './GameControls';
+import React from "react";
+import styled from "styled-components";
+import { PlayerInfo } from "./PlayerInfo";
+import { GameControls } from "./GameControls";
 
 const HUDContainer = styled.div`
   position: fixed;
@@ -50,7 +50,7 @@ const MovementInstructions = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -82,27 +82,29 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onOpenQuestLog,
   onToggleQuestTracker,
   isQuestTrackerVisible,
-  currentQuestTitle
+  currentQuestTitle,
 }) => {
   return (
     <HUDContainer>
       <TopBar>
         <PlayerInfo playerPosition={playerPosition} />
-        <GameControls 
+        <GameControls
           onReturnToMenu={onReturnToMenu}
           onToggleQuestTracker={onToggleQuestTracker}
           isQuestTrackerVisible={isQuestTrackerVisible}
         />
       </TopBar>
-      
+
       <BottomBar>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <LocationLabel>📍 {currentLocation}</LocationLabel>
           <MovementInstructions>
-            Use <ArrowKey>↑</ArrowKey> <ArrowKey>↓</ArrowKey> <ArrowKey>←</ArrowKey> <ArrowKey>→</ArrowKey> to move • <ArrowKey>SPACE</ArrowKey> to talk
+            Use <ArrowKey>↑</ArrowKey> <ArrowKey>↓</ArrowKey>{" "}
+            <ArrowKey>←</ArrowKey> <ArrowKey>→</ArrowKey> to move •{" "}
+            <ArrowKey>SPACE</ArrowKey> to talk
           </MovementInstructions>
         </div>
-        <GameControls 
+        <GameControls
           onOpenQuestLog={onOpenQuestLog}
           currentQuestTitle={currentQuestTitle}
         />

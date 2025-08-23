@@ -3,8 +3,8 @@
  * CSS-only styling for game-specific UI components
  */
 
-@import './tokens.css';
-@import './animations.css';
+@import "./tokens.css";
+@import "./animations.css";
 
 /* === XP Progress Bar === */
 .elt-game-progress-container {
@@ -85,7 +85,7 @@
 
 .elt-game-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #26de81 0%, #4ecdc4 50%, #FFD700 100%);
+  background: linear-gradient(90deg, #26de81 0%, #4ecdc4 50%, #ffd700 100%);
   border-radius: inherit;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   animation: elt-game-progress-fill 1.5s ease-out;
@@ -93,19 +93,28 @@
 }
 
 .elt-game-progress-fill::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
   animation: elt-game-shimmer 2s ease-in-out infinite;
 }
 
 @keyframes elt-game-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .elt-game-level-icon {
@@ -212,7 +221,7 @@
 }
 
 .elt-game-quest-objective::before {
-  content: '•';
+  content: "•";
   position: absolute;
   left: var(--elt-game-spacing-sm);
   color: var(--elt-game-color-quest);
@@ -225,7 +234,7 @@
 }
 
 .elt-game-quest-objective--completed::before {
-  content: '✓';
+  content: "✓";
   color: var(--elt-color-success);
 }
 

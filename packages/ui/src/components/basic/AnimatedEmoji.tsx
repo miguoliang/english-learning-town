@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-export type EmojiMood = 'happy' | 'excited' | 'thinking' | 'surprised' | 'floating' | 'normal';
+export type EmojiMood =
+  | "happy"
+  | "excited"
+  | "thinking"
+  | "surprised"
+  | "floating"
+  | "normal";
 
 export interface AnimatedEmojiProps {
   /** The emoji to display */
@@ -29,7 +35,7 @@ export interface AnimatedEmojiProps {
 
 /**
  * AnimatedEmoji - An emoji component with playful animations
- * 
+ *
  * Features:
  * - Multiple animation moods (happy, excited, thinking, surprised, floating)
  * - Customizable size and rotation
@@ -39,14 +45,14 @@ export interface AnimatedEmojiProps {
  */
 export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
   emoji,
-  mood = 'happy',
-  size = '2rem',
+  mood = "happy",
+  size = "2rem",
   animate = true,
   triggerAnimation,
   autoAnimate,
   rotation = 0,
   hoverEffect = false,
-  className = '',
+  className = "",
   onClick,
   ariaLabel,
 }) => {
@@ -59,10 +65,11 @@ export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
   useEffect(() => {
     if (shouldAnimate && mood !== currentMood) {
       setCurrentMood(mood);
-      if (mood !== 'floating' && mood !== 'thinking') {
+      if (mood !== "floating" && mood !== "thinking") {
         setIsAnimating(true);
         // Reset animation after it completes
-        const duration = mood === 'excited' ? 800 : mood === 'surprised' ? 600 : 1000;
+        const duration =
+          mood === "excited" ? 800 : mood === "surprised" ? 600 : 1000;
         setTimeout(() => setIsAnimating(false), duration);
       }
     }
@@ -70,17 +77,19 @@ export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
 
   // Build CSS classes
   const classes = [
-    'elt-emoji',
+    "elt-emoji",
     // Animation classes
-    mood === 'floating' && 'elt-animate-float',
-    mood === 'thinking' && 'elt-animate-thinking',
-    isAnimating && mood === 'happy' && 'elt-animate-happy',
-    isAnimating && mood === 'excited' && 'elt-animate-excited',
-    isAnimating && mood === 'surprised' && 'elt-animate-surprised',
+    mood === "floating" && "elt-animate-float",
+    mood === "thinking" && "elt-animate-thinking",
+    isAnimating && mood === "happy" && "elt-animate-happy",
+    isAnimating && mood === "excited" && "elt-animate-excited",
+    isAnimating && mood === "surprised" && "elt-animate-surprised",
     // Hover effect
-    hoverEffect && 'elt-emoji--hover',
-    className
-  ].filter(Boolean).join(' ');
+    hoverEffect && "elt-emoji--hover",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const style: React.CSSProperties = {
     fontSize: size,
@@ -92,15 +101,19 @@ export const AnimatedEmoji: React.FC<AnimatedEmojiProps> = ({
       className={classes}
       style={style}
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
+      role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       aria-label={ariaLabel}
-      onKeyDown={onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      } : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
     >
       {emoji}
     </span>

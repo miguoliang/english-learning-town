@@ -1,200 +1,338 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en" class="light sidebar-visible" dir="ltr">
-    <head>
-        <!-- Book generated using mdBook -->
-        <meta charset="UTF-8">
-        <title>Gameplay Mechanics - English Learning Town</title>
+  <head>
+    <!-- Book generated using mdBook -->
+    <meta charset="UTF-8" />
+    <title>Gameplay Mechanics - English Learning Town</title>
 
+    <!-- Custom HTML head -->
 
-        <!-- Custom HTML head -->
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
 
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="../favicon.svg" />
+    <link rel="shortcut icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="../css/general.css" />
+    <link rel="stylesheet" href="../css/chrome.css" />
+    <link rel="stylesheet" href="../css/print.css" media="print" />
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
-        <link rel="stylesheet" href="../css/print.css" media="print">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="../fonts/fonts.css" />
 
-        <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="../fonts/fonts.css">
+    <!-- Highlight.js Stylesheets -->
+    <link rel="stylesheet" id="highlight-css" href="../highlight.css" />
+    <link
+      rel="stylesheet"
+      id="tomorrow-night-css"
+      href="../tomorrow-night.css"
+    />
+    <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css" />
 
-        <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+    <!-- Custom theme stylesheets -->
 
-        <!-- Custom theme stylesheets -->
-
-
-        <!-- Provide site root and default themes to javascript -->
-        <script>
-            const path_to_root = "../";
-            const default_light_theme = "light";
-            const default_dark_theme = "navy";
-        </script>
-        <!-- Start loading toc.js asap -->
-        <script src="../toc.js"></script>
-    </head>
-    <body>
+    <!-- Provide site root and default themes to javascript -->
+    <script>
+      const path_to_root = "../";
+      const default_light_theme = "light";
+      const default_dark_theme = "navy";
+    </script>
+    <!-- Start loading toc.js asap -->
+    <script src="../toc.js"></script>
+  </head>
+  <body>
     <div id="mdbook-help-container">
-        <div id="mdbook-help-popup">
-            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
-            <div>
-                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
-                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
-                <p>Press <kbd>?</kbd> to show this help</p>
-                <p>Press <kbd>Esc</kbd> to hide this help</p>
-            </div>
+      <div id="mdbook-help-popup">
+        <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+        <div>
+          <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+          <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+          <p>Press <kbd>?</kbd> to show this help</p>
+          <p>Press <kbd>Esc</kbd> to hide this help</p>
         </div>
+      </div>
     </div>
     <div id="body-container">
-        <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script>
-            try {
-                let theme = localStorage.getItem('mdbook-theme');
-                let sidebar = localStorage.getItem('mdbook-sidebar');
+      <!-- Work around some values being stored in localStorage wrapped in quotes -->
+      <script>
+        try {
+          let theme = localStorage.getItem("mdbook-theme");
+          let sidebar = localStorage.getItem("mdbook-sidebar");
 
-                if (theme.startsWith('"') && theme.endsWith('"')) {
-                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
-                }
+          if (theme.startsWith('"') && theme.endsWith('"')) {
+            localStorage.setItem(
+              "mdbook-theme",
+              theme.slice(1, theme.length - 1),
+            );
+          }
 
-                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
-                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
-                }
-            } catch (e) { }
-        </script>
+          if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+            localStorage.setItem(
+              "mdbook-sidebar",
+              sidebar.slice(1, sidebar.length - 1),
+            );
+          }
+        } catch (e) {}
+      </script>
 
-        <!-- Set the theme before any content is loaded, prevents flash -->
-        <script>
-            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
-            let theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
-            if (theme === null || theme === undefined) { theme = default_theme; }
-            const html = document.documentElement;
-            html.classList.remove('light')
-            html.classList.add(theme);
-            html.classList.add("js");
-        </script>
+      <!-- Set the theme before any content is loaded, prevents flash -->
+      <script>
+        const default_theme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? default_dark_theme
+          : default_light_theme;
+        let theme;
+        try {
+          theme = localStorage.getItem("mdbook-theme");
+        } catch (e) {}
+        if (theme === null || theme === undefined) {
+          theme = default_theme;
+        }
+        const html = document.documentElement;
+        html.classList.remove("light");
+        html.classList.add(theme);
+        html.classList.add("js");
+      </script>
 
-        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+      <input type="checkbox" id="sidebar-toggle-anchor" class="hidden" />
 
-        <!-- Hide / unhide sidebar before it is displayed -->
-        <script>
-            let sidebar = null;
-            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
-            if (document.body.clientWidth >= 1080) {
-                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
-                sidebar = sidebar || 'visible';
-            } else {
-                sidebar = 'hidden';
-            }
-            sidebar_toggle.checked = sidebar === 'visible';
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
-        </script>
+      <!-- Hide / unhide sidebar before it is displayed -->
+      <script>
+        let sidebar = null;
+        const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+        if (document.body.clientWidth >= 1080) {
+          try {
+            sidebar = localStorage.getItem("mdbook-sidebar");
+          } catch (e) {}
+          sidebar = sidebar || "visible";
+        } else {
+          sidebar = "hidden";
+        }
+        sidebar_toggle.checked = sidebar === "visible";
+        html.classList.remove("sidebar-visible");
+        html.classList.add("sidebar-" + sidebar);
+      </script>
 
-        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <!-- populated by js -->
-            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
-            <noscript>
-                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
-            </noscript>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
-                <div class="sidebar-resize-indicator"></div>
+      <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+        <!-- populated by js -->
+        <mdbook-sidebar-scrollbox
+          class="sidebar-scrollbox"
+        ></mdbook-sidebar-scrollbox>
+        <noscript>
+          <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+        </noscript>
+        <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+          <div class="sidebar-resize-indicator"></div>
+        </div>
+      </nav>
+
+      <div id="page-wrapper" class="page-wrapper">
+        <div class="page">
+          <div id="menu-bar-hover-placeholder"></div>
+          <div id="menu-bar" class="menu-bar sticky">
+            <div class="left-buttons">
+              <label
+                id="sidebar-toggle"
+                class="icon-button"
+                for="sidebar-toggle-anchor"
+                title="Toggle Table of Contents"
+                aria-label="Toggle Table of Contents"
+                aria-controls="sidebar"
+              >
+                <i class="fa fa-bars"></i>
+              </label>
+              <button
+                id="theme-toggle"
+                class="icon-button"
+                type="button"
+                title="Change theme"
+                aria-label="Change theme"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="theme-list"
+              >
+                <i class="fa fa-paint-brush"></i>
+              </button>
+              <ul
+                id="theme-list"
+                class="theme-popup"
+                aria-label="Themes"
+                role="menu"
+              >
+                <li role="none">
+                  <button role="menuitem" class="theme" id="default_theme">
+                    Auto
+                  </button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="light">
+                    Light
+                  </button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="rust">Rust</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="coal">Coal</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="navy">Navy</button>
+                </li>
+                <li role="none">
+                  <button role="menuitem" class="theme" id="ayu">Ayu</button>
+                </li>
+              </ul>
+              <button
+                id="search-toggle"
+                class="icon-button"
+                type="button"
+                title="Search (`/`)"
+                aria-label="Toggle Searchbar"
+                aria-expanded="false"
+                aria-keyshortcuts="/ s"
+                aria-controls="searchbar"
+              >
+                <i class="fa fa-search"></i>
+              </button>
             </div>
-        </nav>
 
-        <div id="page-wrapper" class="page-wrapper">
+            <h1 class="menu-title">English Learning Town</h1>
 
-            <div class="page">
-                <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky">
-                    <div class="left-buttons">
-                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                            <i class="fa fa-bars"></i>
-                        </label>
-                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                            <i class="fa fa-paint-brush"></i>
-                        </button>
-                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                        </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
+            <div class="right-buttons">
+              <a
+                href="../print.html"
+                title="Print this book"
+                aria-label="Print this book"
+              >
+                <i id="print-button" class="fa fa-print"></i>
+              </a>
+            </div>
+          </div>
 
-                    <h1 class="menu-title">English Learning Town</h1>
+          <div id="search-wrapper" class="hidden">
+            <form id="searchbar-outer" class="searchbar-outer">
+              <input
+                type="search"
+                id="searchbar"
+                name="searchbar"
+                placeholder="Search this book ..."
+                aria-controls="searchresults-outer"
+                aria-describedby="searchresults-header"
+              />
+            </form>
+            <div id="searchresults-outer" class="searchresults-outer hidden">
+              <div id="searchresults-header" class="searchresults-header"></div>
+              <ul id="searchresults"></ul>
+            </div>
+          </div>
 
-                    <div class="right-buttons">
-                        <a href="../print.html" title="Print this book" aria-label="Print this book">
-                            <i id="print-button" class="fa fa-print"></i>
-                        </a>
+          <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+          <script>
+            document
+              .getElementById("sidebar-toggle")
+              .setAttribute("aria-expanded", sidebar === "visible");
+            document
+              .getElementById("sidebar")
+              .setAttribute("aria-hidden", sidebar !== "visible");
+            Array.from(document.querySelectorAll("#sidebar a")).forEach(
+              function (link) {
+                link.setAttribute("tabIndex", sidebar === "visible" ? 0 : -1);
+              },
+            );
+          </script>
 
-                    </div>
-                </div>
-
-                <div id="search-wrapper" class="hidden">
-                    <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
-                    </form>
-                    <div id="searchresults-outer" class="searchresults-outer hidden">
-                        <div id="searchresults-header" class="searchresults-header"></div>
-                        <ul id="searchresults">
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script>
-                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
-                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
-                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
-                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
-                    });
-                </script>
-
-                <div id="content" class="content">
-                    <main>
-                        <h1 id="gameplay-mechanics"><a class="header" href="#gameplay-mechanics">Gameplay Mechanics</a></h1>
-<h2 id="question-system"><a class="header" href="#question-system">Question System</a></h2>
-<h3 id="question-types"><a class="header" href="#question-types">Question Types</a></h3>
-<h4 id="multiple-choice"><a class="header" href="#multiple-choice">Multiple Choice</a></h4>
-<ul>
-<li><strong>Format</strong>: Question with 4 possible answers (A, B, C, D)</li>
-<li><strong>Use Cases</strong>: Vocabulary, grammar rules, reading comprehension</li>
-<li><strong>Scoring</strong>: Immediate feedback with explanation for correct/incorrect answers</li>
-</ul>
-<h4 id="fill-in-the-blank"><a class="header" href="#fill-in-the-blank">Fill in the Blank</a></h4>
-<ul>
-<li><strong>Format</strong>: Sentence with missing word(s)</li>
-<li><strong>Use Cases</strong>: Grammar practice, vocabulary in context</li>
-<li><strong>Scoring</strong>: Exact match or synonym recognition</li>
-</ul>
-<h4 id="dialogue-selection"><a class="header" href="#dialogue-selection">Dialogue Selection</a></h4>
-<ul>
-<li><strong>Format</strong>: Conversation with NPCs requiring appropriate responses</li>
-<li><strong>Use Cases</strong>: Social situations, cultural context, pragmatics</li>
-<li><strong>Scoring</strong>: Context-appropriate answers, not just grammatically correct</li>
-</ul>
-<h4 id="audio-comprehension"><a class="header" href="#audio-comprehension">Audio Comprehension</a></h4>
-<ul>
-<li><strong>Format</strong>: Listen to dialogue and answer questions</li>
-<li><strong>Use Cases</strong>: Pronunciation, listening skills, accent familiarity</li>
-<li><strong>Scoring</strong>: Understanding over perfect transcription</li>
-</ul>
-<h3 id="adaptive-difficulty"><a class="header" href="#adaptive-difficulty">Adaptive Difficulty</a></h3>
-<pre class="mermaid">flowchart TD
+          <div id="content" class="content">
+            <main>
+              <h1 id="gameplay-mechanics">
+                <a class="header" href="#gameplay-mechanics"
+                  >Gameplay Mechanics</a
+                >
+              </h1>
+              <h2 id="question-system">
+                <a class="header" href="#question-system">Question System</a>
+              </h2>
+              <h3 id="question-types">
+                <a class="header" href="#question-types">Question Types</a>
+              </h3>
+              <h4 id="multiple-choice">
+                <a class="header" href="#multiple-choice">Multiple Choice</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Format</strong>: Question with 4 possible answers (A,
+                  B, C, D)
+                </li>
+                <li>
+                  <strong>Use Cases</strong>: Vocabulary, grammar rules, reading
+                  comprehension
+                </li>
+                <li>
+                  <strong>Scoring</strong>: Immediate feedback with explanation
+                  for correct/incorrect answers
+                </li>
+              </ul>
+              <h4 id="fill-in-the-blank">
+                <a class="header" href="#fill-in-the-blank"
+                  >Fill in the Blank</a
+                >
+              </h4>
+              <ul>
+                <li><strong>Format</strong>: Sentence with missing word(s)</li>
+                <li>
+                  <strong>Use Cases</strong>: Grammar practice, vocabulary in
+                  context
+                </li>
+                <li>
+                  <strong>Scoring</strong>: Exact match or synonym recognition
+                </li>
+              </ul>
+              <h4 id="dialogue-selection">
+                <a class="header" href="#dialogue-selection"
+                  >Dialogue Selection</a
+                >
+              </h4>
+              <ul>
+                <li>
+                  <strong>Format</strong>: Conversation with NPCs requiring
+                  appropriate responses
+                </li>
+                <li>
+                  <strong>Use Cases</strong>: Social situations, cultural
+                  context, pragmatics
+                </li>
+                <li>
+                  <strong>Scoring</strong>: Context-appropriate answers, not
+                  just grammatically correct
+                </li>
+              </ul>
+              <h4 id="audio-comprehension">
+                <a class="header" href="#audio-comprehension"
+                  >Audio Comprehension</a
+                >
+              </h4>
+              <ul>
+                <li>
+                  <strong>Format</strong>: Listen to dialogue and answer
+                  questions
+                </li>
+                <li>
+                  <strong>Use Cases</strong>: Pronunciation, listening skills,
+                  accent familiarity
+                </li>
+                <li>
+                  <strong>Scoring</strong>: Understanding over perfect
+                  transcription
+                </li>
+              </ul>
+              <h3 id="adaptive-difficulty">
+                <a class="header" href="#adaptive-difficulty"
+                  >Adaptive Difficulty</a
+                >
+              </h3>
+              <pre class="mermaid">
+flowchart TD
     A[Player Performance] --&gt; B{Accuracy Rate}
     B --&gt;|80%+ correct| C[Increase Difficulty Level]
     B --&gt;|60-79% correct| D[Maintain Current Level]
@@ -212,66 +350,120 @@
     J --&gt; K
     
     K --&gt; A
-</pre>
-<h3 id="question-categories"><a class="header" href="#question-categories">Question Categories</a></h3>
-<ol>
-<li>
-<p><strong>Grammar Fundamentals</strong></p>
-<ul>
-<li>Tenses, articles, prepositions</li>
-<li>Sentence structure, punctuation</li>
-<li>Common grammatical patterns</li>
-</ul>
-</li>
-<li>
-<p><strong>Vocabulary Building</strong></p>
-<ul>
-<li>Common words by frequency</li>
-<li>Topic-specific terminology</li>
-<li>Idioms and expressions</li>
-</ul>
-</li>
-<li>
-<p><strong>Reading Comprehension</strong></p>
-<ul>
-<li>Short passages with questions</li>
-<li>Context clue usage</li>
-<li>Inference and analysis</li>
-</ul>
-</li>
-<li>
-<p><strong>Practical Communication</strong></p>
-<ul>
-<li>Restaurant ordering, shopping</li>
-<li>Asking for help, giving directions</li>
-<li>Phone conversations, email writing</li>
-</ul>
-</li>
-</ol>
-<h2 id="character-progression"><a class="header" href="#character-progression">Character Progression</a></h2>
-<h3 id="experience-points-xp"><a class="header" href="#experience-points-xp">Experience Points (XP)</a></h3>
-<ul>
-<li><strong>Correct Answer</strong>: Base XP = Question difficulty × 10</li>
-<li><strong>First Attempt</strong>: +50% bonus</li>
-<li><strong>Streak Bonus</strong>: +10% per consecutive correct answer (max 100%)</li>
-<li><strong>Daily Goal</strong>: +200 XP for completing daily question quota</li>
-</ul>
-<h3 id="skill-trees"><a class="header" href="#skill-trees">Skill Trees</a></h3>
-<h4 id="language-skills"><a class="header" href="#language-skills">Language Skills</a></h4>
-<ul>
-<li><strong>Vocabulary</strong>: Unlocks advanced word recognition and usage</li>
-<li><strong>Grammar</strong>: Enables complex sentence construction</li>
-<li><strong>Listening</strong>: Improves audio question performance</li>
-<li><strong>Speaking</strong>: Unlocks voice-based interactions (future feature)</li>
-</ul>
-<h4 id="social-skills"><a class="header" href="#social-skills">Social Skills</a></h4>
-<ul>
-<li><strong>Charisma</strong>: Better NPC relationships and quest rewards</li>
-<li><strong>Cultural Awareness</strong>: Access to cultural context explanations</li>
-<li><strong>Teaching</strong>: Ability to help other players (mentorship system)</li>
-</ul>
-<h3 id="character-attributes"><a class="header" href="#character-attributes">Character Attributes</a></h3>
-<pre class="mermaid">graph LR
+</pre
+              >
+              <h3 id="question-categories">
+                <a class="header" href="#question-categories"
+                  >Question Categories</a
+                >
+              </h3>
+              <ol>
+                <li>
+                  <p><strong>Grammar Fundamentals</strong></p>
+                  <ul>
+                    <li>Tenses, articles, prepositions</li>
+                    <li>Sentence structure, punctuation</li>
+                    <li>Common grammatical patterns</li>
+                  </ul>
+                </li>
+                <li>
+                  <p><strong>Vocabulary Building</strong></p>
+                  <ul>
+                    <li>Common words by frequency</li>
+                    <li>Topic-specific terminology</li>
+                    <li>Idioms and expressions</li>
+                  </ul>
+                </li>
+                <li>
+                  <p><strong>Reading Comprehension</strong></p>
+                  <ul>
+                    <li>Short passages with questions</li>
+                    <li>Context clue usage</li>
+                    <li>Inference and analysis</li>
+                  </ul>
+                </li>
+                <li>
+                  <p><strong>Practical Communication</strong></p>
+                  <ul>
+                    <li>Restaurant ordering, shopping</li>
+                    <li>Asking for help, giving directions</li>
+                    <li>Phone conversations, email writing</li>
+                  </ul>
+                </li>
+              </ol>
+              <h2 id="character-progression">
+                <a class="header" href="#character-progression"
+                  >Character Progression</a
+                >
+              </h2>
+              <h3 id="experience-points-xp">
+                <a class="header" href="#experience-points-xp"
+                  >Experience Points (XP)</a
+                >
+              </h3>
+              <ul>
+                <li>
+                  <strong>Correct Answer</strong>: Base XP = Question difficulty
+                  × 10
+                </li>
+                <li><strong>First Attempt</strong>: +50% bonus</li>
+                <li>
+                  <strong>Streak Bonus</strong>: +10% per consecutive correct
+                  answer (max 100%)
+                </li>
+                <li>
+                  <strong>Daily Goal</strong>: +200 XP for completing daily
+                  question quota
+                </li>
+              </ul>
+              <h3 id="skill-trees">
+                <a class="header" href="#skill-trees">Skill Trees</a>
+              </h3>
+              <h4 id="language-skills">
+                <a class="header" href="#language-skills">Language Skills</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Vocabulary</strong>: Unlocks advanced word recognition
+                  and usage
+                </li>
+                <li>
+                  <strong>Grammar</strong>: Enables complex sentence
+                  construction
+                </li>
+                <li>
+                  <strong>Listening</strong>: Improves audio question
+                  performance
+                </li>
+                <li>
+                  <strong>Speaking</strong>: Unlocks voice-based interactions
+                  (future feature)
+                </li>
+              </ul>
+              <h4 id="social-skills">
+                <a class="header" href="#social-skills">Social Skills</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Charisma</strong>: Better NPC relationships and quest
+                  rewards
+                </li>
+                <li>
+                  <strong>Cultural Awareness</strong>: Access to cultural
+                  context explanations
+                </li>
+                <li>
+                  <strong>Teaching</strong>: Ability to help other players
+                  (mentorship system)
+                </li>
+              </ul>
+              <h3 id="character-attributes">
+                <a class="header" href="#character-attributes"
+                  >Character Attributes</a
+                >
+              </h3>
+              <pre class="mermaid">
+graph LR
     subgraph &quot;Base Attributes&quot;
         A[Total XP] --&gt; B[Level = XP ÷ 1000]
         B --&gt; C[Health = 100 + Level × 10]
@@ -295,141 +487,329 @@
     D -.-&gt;|Daily Question Limit| K[Question Attempts]
     I -.-&gt;|NPC Interactions| L[Social Bonuses]
     J -.-&gt;|Learning Rate| M[XP Multipliers]
-</pre>
-<h2 id="town-interaction-system"><a class="header" href="#town-interaction-system">Town Interaction System</a></h2>
-<h3 id="npc-dialogue-trees"><a class="header" href="#npc-dialogue-trees">NPC Dialogue Trees</a></h3>
-<ul>
-<li><strong>Branching Conversations</strong>: Player choices affect dialogue progression</li>
-<li><strong>Skill Checks</strong>: Higher language skills unlock additional dialogue options</li>
-<li><strong>Reputation System</strong>: NPC relationships improve with successful interactions</li>
-</ul>
-<h3 id="building-interactions"><a class="header" href="#building-interactions">Building Interactions</a></h3>
-<h4 id="library"><a class="header" href="#library">Library</a></h4>
-<ul>
-<li><strong>Research Quests</strong>: Answer questions to unlock lore and backstory</li>
-<li><strong>Reading Challenges</strong>: Comprehension passages with increasing difficulty</li>
-<li><strong>Study Groups</strong>: Multiplayer collaborative learning sessions</li>
-</ul>
-<h4 id="school"><a class="header" href="#school">School</a></h4>
-<ul>
-<li><strong>Formal Lessons</strong>: Structured grammar and vocabulary tutorials</li>
-<li><strong>Examinations</strong>: Timed tests for significant XP rewards</li>
-<li><strong>Peer Tutoring</strong>: Help lower-level players for mutual benefits</li>
-</ul>
-<h4 id="marketplace"><a class="header" href="#marketplace">Marketplace</a></h4>
-<ul>
-<li><strong>Shopping Simulations</strong>: Practice numbers, currency, negotiation</li>
-<li><strong>Job Opportunities</strong>: Work part-time jobs that require specific language skills</li>
-<li><strong>Cultural Exchange</strong>: Learn about different English-speaking cultures</li>
-</ul>
-<h3 id="quest-system"><a class="header" href="#quest-system">Quest System</a></h3>
-<h4 id="main-story-quests"><a class="header" href="#main-story-quests">Main Story Quests</a></h4>
-<ul>
-<li><strong>Narrative Arc</strong>: Becoming fluent enough to achieve a major goal (job interview, university admission, etc.)</li>
-<li><strong>Chapter Structure</strong>: Each chapter focuses on specific language skills</li>
-<li><strong>Character Development</strong>: Personal growth mirrors language learning journey</li>
-</ul>
-<h4 id="side-quests"><a class="header" href="#side-quests">Side Quests</a></h4>
-<ul>
-<li><strong>NPC Problems</strong>: Help townspeople with language-related challenges</li>
-<li><strong>Exploration</strong>: Discover hidden areas by solving language puzzles</li>
-<li><strong>Collection</strong>: Gather vocabulary words, grammar rules, or cultural facts</li>
-</ul>
-<h4 id="daily-quests"><a class="header" href="#daily-quests">Daily Quests</a></h4>
-<ul>
-<li><strong>Streak Maintenance</strong>: Complete daily question quotas</li>
-<li><strong>Skill Focus</strong>: Target specific weak areas identified by the system</li>
-<li><strong>Social Challenges</strong>: Interact with other players or NPCs</li>
-</ul>
-<h2 id="reward-systems"><a class="header" href="#reward-systems">Reward Systems</a></h2>
-<h3 id="immediate-rewards"><a class="header" href="#immediate-rewards">Immediate Rewards</a></h3>
-<ul>
-<li><strong>XP and Currency</strong>: Instant gratification for correct answers</li>
-<li><strong>Visual Feedback</strong>: Particle effects, sound cues, and animations</li>
-<li><strong>Progress Bars</strong>: Clear visualization of advancement</li>
-</ul>
-<h3 id="long-term-rewards"><a class="header" href="#long-term-rewards">Long-term Rewards</a></h3>
-<ul>
-<li><strong>Unlockable Content</strong>: New areas, NPCs, and storylines</li>
-<li><strong>Cosmetic Items</strong>: Character customization options</li>
-<li><strong>Achievement Badges</strong>: Recognition for specific accomplishments</li>
-</ul>
-<h3 id="social-rewards"><a class="header" href="#social-rewards">Social Rewards</a></h3>
-<ul>
-<li><strong>Leaderboards</strong>: Weekly and monthly rankings</li>
-<li><strong>Mentorship Opportunities</strong>: Advanced players can guide beginners</li>
-<li><strong>Community Recognition</strong>: Spotlight exceptional learners</li>
-</ul>
-<h2 id="failure-and-support-mechanics"><a class="header" href="#failure-and-support-mechanics">Failure and Support Mechanics</a></h2>
-<h3 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h3>
-<ul>
-<li><strong>Constructive Feedback</strong>: Explanation of why an answer is incorrect</li>
-<li><strong>Hint System</strong>: Progressive clues for struggling players</li>
-<li><strong>Review Mode</strong>: Revisit missed questions with additional context</li>
-</ul>
-<h3 id="learning-support"><a class="header" href="#learning-support">Learning Support</a></h3>
-<ul>
-<li><strong>Spaced Repetition</strong>: Difficult concepts reappear at optimal intervals</li>
-<li><strong>Weakness Detection</strong>: System identifies and targets problem areas</li>
-<li><strong>Adaptive Pacing</strong>: Slower progression for players who need more time</li>
-</ul>
-<h3 id="motivation-maintenance"><a class="header" href="#motivation-maintenance">Motivation Maintenance</a></h3>
-<ul>
-<li><strong>Comeback Mechanics</strong>: Extra rewards for returning after breaks</li>
-<li><strong>Alternative Paths</strong>: Multiple ways to progress for different learning styles</li>
-<li><strong>Celebration Moments</strong>: Special recognition for breakthrough achievements</li>
-</ul>
+</pre
+              >
+              <h2 id="town-interaction-system">
+                <a class="header" href="#town-interaction-system"
+                  >Town Interaction System</a
+                >
+              </h2>
+              <h3 id="npc-dialogue-trees">
+                <a class="header" href="#npc-dialogue-trees"
+                  >NPC Dialogue Trees</a
+                >
+              </h3>
+              <ul>
+                <li>
+                  <strong>Branching Conversations</strong>: Player choices
+                  affect dialogue progression
+                </li>
+                <li>
+                  <strong>Skill Checks</strong>: Higher language skills unlock
+                  additional dialogue options
+                </li>
+                <li>
+                  <strong>Reputation System</strong>: NPC relationships improve
+                  with successful interactions
+                </li>
+              </ul>
+              <h3 id="building-interactions">
+                <a class="header" href="#building-interactions"
+                  >Building Interactions</a
+                >
+              </h3>
+              <h4 id="library">
+                <a class="header" href="#library">Library</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Research Quests</strong>: Answer questions to unlock
+                  lore and backstory
+                </li>
+                <li>
+                  <strong>Reading Challenges</strong>: Comprehension passages
+                  with increasing difficulty
+                </li>
+                <li>
+                  <strong>Study Groups</strong>: Multiplayer collaborative
+                  learning sessions
+                </li>
+              </ul>
+              <h4 id="school"><a class="header" href="#school">School</a></h4>
+              <ul>
+                <li>
+                  <strong>Formal Lessons</strong>: Structured grammar and
+                  vocabulary tutorials
+                </li>
+                <li>
+                  <strong>Examinations</strong>: Timed tests for significant XP
+                  rewards
+                </li>
+                <li>
+                  <strong>Peer Tutoring</strong>: Help lower-level players for
+                  mutual benefits
+                </li>
+              </ul>
+              <h4 id="marketplace">
+                <a class="header" href="#marketplace">Marketplace</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Shopping Simulations</strong>: Practice numbers,
+                  currency, negotiation
+                </li>
+                <li>
+                  <strong>Job Opportunities</strong>: Work part-time jobs that
+                  require specific language skills
+                </li>
+                <li>
+                  <strong>Cultural Exchange</strong>: Learn about different
+                  English-speaking cultures
+                </li>
+              </ul>
+              <h3 id="quest-system">
+                <a class="header" href="#quest-system">Quest System</a>
+              </h3>
+              <h4 id="main-story-quests">
+                <a class="header" href="#main-story-quests"
+                  >Main Story Quests</a
+                >
+              </h4>
+              <ul>
+                <li>
+                  <strong>Narrative Arc</strong>: Becoming fluent enough to
+                  achieve a major goal (job interview, university admission,
+                  etc.)
+                </li>
+                <li>
+                  <strong>Chapter Structure</strong>: Each chapter focuses on
+                  specific language skills
+                </li>
+                <li>
+                  <strong>Character Development</strong>: Personal growth
+                  mirrors language learning journey
+                </li>
+              </ul>
+              <h4 id="side-quests">
+                <a class="header" href="#side-quests">Side Quests</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>NPC Problems</strong>: Help townspeople with
+                  language-related challenges
+                </li>
+                <li>
+                  <strong>Exploration</strong>: Discover hidden areas by solving
+                  language puzzles
+                </li>
+                <li>
+                  <strong>Collection</strong>: Gather vocabulary words, grammar
+                  rules, or cultural facts
+                </li>
+              </ul>
+              <h4 id="daily-quests">
+                <a class="header" href="#daily-quests">Daily Quests</a>
+              </h4>
+              <ul>
+                <li>
+                  <strong>Streak Maintenance</strong>: Complete daily question
+                  quotas
+                </li>
+                <li>
+                  <strong>Skill Focus</strong>: Target specific weak areas
+                  identified by the system
+                </li>
+                <li>
+                  <strong>Social Challenges</strong>: Interact with other
+                  players or NPCs
+                </li>
+              </ul>
+              <h2 id="reward-systems">
+                <a class="header" href="#reward-systems">Reward Systems</a>
+              </h2>
+              <h3 id="immediate-rewards">
+                <a class="header" href="#immediate-rewards"
+                  >Immediate Rewards</a
+                >
+              </h3>
+              <ul>
+                <li>
+                  <strong>XP and Currency</strong>: Instant gratification for
+                  correct answers
+                </li>
+                <li>
+                  <strong>Visual Feedback</strong>: Particle effects, sound
+                  cues, and animations
+                </li>
+                <li>
+                  <strong>Progress Bars</strong>: Clear visualization of
+                  advancement
+                </li>
+              </ul>
+              <h3 id="long-term-rewards">
+                <a class="header" href="#long-term-rewards"
+                  >Long-term Rewards</a
+                >
+              </h3>
+              <ul>
+                <li>
+                  <strong>Unlockable Content</strong>: New areas, NPCs, and
+                  storylines
+                </li>
+                <li>
+                  <strong>Cosmetic Items</strong>: Character customization
+                  options
+                </li>
+                <li>
+                  <strong>Achievement Badges</strong>: Recognition for specific
+                  accomplishments
+                </li>
+              </ul>
+              <h3 id="social-rewards">
+                <a class="header" href="#social-rewards">Social Rewards</a>
+              </h3>
+              <ul>
+                <li>
+                  <strong>Leaderboards</strong>: Weekly and monthly rankings
+                </li>
+                <li>
+                  <strong>Mentorship Opportunities</strong>: Advanced players
+                  can guide beginners
+                </li>
+                <li>
+                  <strong>Community Recognition</strong>: Spotlight exceptional
+                  learners
+                </li>
+              </ul>
+              <h2 id="failure-and-support-mechanics">
+                <a class="header" href="#failure-and-support-mechanics"
+                  >Failure and Support Mechanics</a
+                >
+              </h2>
+              <h3 id="error-handling">
+                <a class="header" href="#error-handling">Error Handling</a>
+              </h3>
+              <ul>
+                <li>
+                  <strong>Constructive Feedback</strong>: Explanation of why an
+                  answer is incorrect
+                </li>
+                <li>
+                  <strong>Hint System</strong>: Progressive clues for struggling
+                  players
+                </li>
+                <li>
+                  <strong>Review Mode</strong>: Revisit missed questions with
+                  additional context
+                </li>
+              </ul>
+              <h3 id="learning-support">
+                <a class="header" href="#learning-support">Learning Support</a>
+              </h3>
+              <ul>
+                <li>
+                  <strong>Spaced Repetition</strong>: Difficult concepts
+                  reappear at optimal intervals
+                </li>
+                <li>
+                  <strong>Weakness Detection</strong>: System identifies and
+                  targets problem areas
+                </li>
+                <li>
+                  <strong>Adaptive Pacing</strong>: Slower progression for
+                  players who need more time
+                </li>
+              </ul>
+              <h3 id="motivation-maintenance">
+                <a class="header" href="#motivation-maintenance"
+                  >Motivation Maintenance</a
+                >
+              </h3>
+              <ul>
+                <li>
+                  <strong>Comeback Mechanics</strong>: Extra rewards for
+                  returning after breaks
+                </li>
+                <li>
+                  <strong>Alternative Paths</strong>: Multiple ways to progress
+                  for different learning styles
+                </li>
+                <li>
+                  <strong>Celebration Moments</strong>: Special recognition for
+                  breakthrough achievements
+                </li>
+              </ul>
+            </main>
 
-                    </main>
+            <nav class="nav-wrapper" aria-label="Page navigation">
+              <!-- Mobile navigation buttons -->
+              <a
+                rel="prev"
+                href="../game-design/concept.html"
+                class="mobile-nav-chapters previous"
+                title="Previous chapter"
+                aria-label="Previous chapter"
+                aria-keyshortcuts="Left"
+              >
+                <i class="fa fa-angle-left"></i>
+              </a>
 
-                    <nav class="nav-wrapper" aria-label="Page navigation">
-                        <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../game-design/concept.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
+              <a
+                rel="next prefetch"
+                href="../game-design/characters.html"
+                class="mobile-nav-chapters next"
+                title="Next chapter"
+                aria-label="Next chapter"
+                aria-keyshortcuts="Right"
+              >
+                <i class="fa fa-angle-right"></i>
+              </a>
 
-                            <a rel="next prefetch" href="../game-design/characters.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
-
-                        <div style="clear: both"></div>
-                    </nav>
-                </div>
-            </div>
-
-            <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../game-design/concept.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-
-                    <a rel="next prefetch" href="../game-design/characters.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
+              <div style="clear: both"></div>
             </nav>
-
+          </div>
         </div>
 
+        <nav class="nav-wide-wrapper" aria-label="Page navigation">
+          <a
+            rel="prev"
+            href="../game-design/concept.html"
+            class="nav-chapters previous"
+            title="Previous chapter"
+            aria-label="Previous chapter"
+            aria-keyshortcuts="Left"
+          >
+            <i class="fa fa-angle-left"></i>
+          </a>
 
+          <a
+            rel="next prefetch"
+            href="../game-design/characters.html"
+            class="nav-chapters next"
+            title="Next chapter"
+            aria-label="Next chapter"
+            aria-keyshortcuts="Right"
+          >
+            <i class="fa fa-angle-right"></i>
+          </a>
+        </nav>
+      </div>
 
+      <script>
+        window.playground_copyable = true;
+      </script>
 
-        <script>
-            window.playground_copyable = true;
-        </script>
+      <script src="../elasticlunr.min.js"></script>
+      <script src="../mark.min.js"></script>
+      <script src="../searcher.js"></script>
 
+      <script src="../clipboard.min.js"></script>
+      <script src="../highlight.js"></script>
+      <script src="../book.js"></script>
 
-        <script src="../elasticlunr.min.js"></script>
-        <script src="../mark.min.js"></script>
-        <script src="../searcher.js"></script>
-
-        <script src="../clipboard.min.js"></script>
-        <script src="../highlight.js"></script>
-        <script src="../book.js"></script>
-
-        <!-- Custom JS scripts -->
-        <script src="../mermaid.min.js"></script>
-        <script src="../mermaid-init.js"></script>
-
-
+      <!-- Custom JS scripts -->
+      <script src="../mermaid.min.js"></script>
+      <script src="../mermaid-init.js"></script>
     </div>
-    </body>
+  </body>
 </html>

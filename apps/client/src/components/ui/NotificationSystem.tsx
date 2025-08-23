@@ -1,9 +1,9 @@
 // Notification System Component
 
-import React, { useEffect } from 'react';
-import styled from 'styled-components';
-import { useGameStore } from '../../stores/unifiedGameStore';
-import type { Notification } from '../../types';
+import React, { useEffect } from "react";
+import styled from "styled-components";
+import { useGameStore } from "../../stores/unifiedGameStore";
+import type { Notification } from "../../types";
 
 const NotificationContainer = styled.div`
   position: fixed;
@@ -14,16 +14,22 @@ const NotificationContainer = styled.div`
 `;
 
 const NotificationItem = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['type'].includes(prop),
+  shouldForwardProp: (prop) => !["type"].includes(prop),
 })<{ type?: string }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.type) {
-      case 'quest_started': return 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)';
-      case 'quest_completed': return 'linear-gradient(135deg, #00b894 0%, #00a085 100%)';
-      case 'objective_completed': return 'linear-gradient(135deg, #fdcb6e 0%, #e17055 100%)';
-      case 'experience_gained': return 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)';
-      case 'level_up': return 'linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%)';
-      default: return 'linear-gradient(135deg, #636e72 0%, #2d3436 100%)';
+      case "quest_started":
+        return "linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)";
+      case "quest_completed":
+        return "linear-gradient(135deg, #00b894 0%, #00a085 100%)";
+      case "objective_completed":
+        return "linear-gradient(135deg, #fdcb6e 0%, #e17055 100%)";
+      case "experience_gained":
+        return "linear-gradient(135deg, #fd79a8 0%, #e84393 100%)";
+      case "level_up":
+        return "linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%)";
+      default:
+        return "linear-gradient(135deg, #636e72 0%, #2d3436 100%)";
     }
   }};
   color: white;
@@ -38,11 +44,11 @@ const NotificationItem = styled.div.withConfig({
   pointer-events: auto;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     transform: translateX(-5px) scale(1.02);
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -56,23 +62,34 @@ const NotificationHeader = styled.div`
 `;
 
 const NotificationIcon = styled.span.withConfig({
-  shouldForwardProp: (prop) => !['type'].includes(prop),
+  shouldForwardProp: (prop) => !["type"].includes(prop),
 })<{ type?: string }>`
   font-size: 20px;
-  ${props => {
+  ${(props) => {
     switch (props.type) {
-      case 'quest_started': return '';
-      case 'quest_completed': return 'filter: drop-shadow(0 0 8px rgba(0, 184, 148, 0.8));';
-      case 'objective_completed': return 'filter: drop-shadow(0 0 8px rgba(253, 203, 110, 0.8));';
-      case 'experience_gained': return 'filter: drop-shadow(0 0 8px rgba(253, 121, 168, 0.8));';
-      case 'level_up': return 'filter: drop-shadow(0 0 12px rgba(255, 234, 167, 1)); animation: pulse 2s infinite;';
-      default: return '';
+      case "quest_started":
+        return "";
+      case "quest_completed":
+        return "filter: drop-shadow(0 0 8px rgba(0, 184, 148, 0.8));";
+      case "objective_completed":
+        return "filter: drop-shadow(0 0 8px rgba(253, 203, 110, 0.8));";
+      case "experience_gained":
+        return "filter: drop-shadow(0 0 8px rgba(253, 121, 168, 0.8));";
+      case "level_up":
+        return "filter: drop-shadow(0 0 12px rgba(255, 234, 167, 1)); animation: pulse 2s infinite;";
+      default:
+        return "";
     }
   }}
-  
+
   @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
   }
 `;
 
@@ -92,7 +109,7 @@ const CloseButton = styled.button`
   padding: 4px;
   border-radius: 4px;
   transition: all 0.2s;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     color: white;
@@ -116,10 +133,10 @@ const ProgressBar = styled.div`
 `;
 
 const ProgressFill = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['progress'].includes(prop),
+  shouldForwardProp: (prop) => !["progress"].includes(prop),
 })<{ progress: number }>`
   height: 100%;
-  width: ${props => props.progress}%;
+  width: ${(props) => props.progress}%;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 2px;
   transition: width 0.8s ease-out;
@@ -127,12 +144,18 @@ const ProgressFill = styled.div.withConfig({
 
 const getNotificationIcon = (type: string): string => {
   switch (type) {
-    case 'quest_started': return '🎯';
-    case 'quest_completed': return '✅';
-    case 'objective_completed': return '⭐';
-    case 'experience_gained': return '📈';
-    case 'level_up': return '🎉';
-    default: return '💡';
+    case "quest_started":
+      return "🎯";
+    case "quest_completed":
+      return "✅";
+    case "objective_completed":
+      return "⭐";
+    case "experience_gained":
+      return "📈";
+    case "level_up":
+      return "🎉";
+    default:
+      return "💡";
   }
 };
 
@@ -141,9 +164,9 @@ interface NotificationItemProps {
   onClose: (id: string) => void;
 }
 
-const NotificationComponent: React.FC<NotificationItemProps> = ({ 
-  notification, 
-  onClose 
+const NotificationComponent: React.FC<NotificationItemProps> = ({
+  notification,
+  onClose,
 }) => {
   useEffect(() => {
     if (notification.duration > 0) {
@@ -160,24 +183,23 @@ const NotificationComponent: React.FC<NotificationItemProps> = ({
   };
 
   return (
-    <NotificationItem
-      type={notification.type}
-      onClick={handleClick}
-    >
+    <NotificationItem type={notification.type} onClick={handleClick}>
       <NotificationHeader>
         <NotificationIcon type={notification.type}>
           {getNotificationIcon(notification.type)}
         </NotificationIcon>
         <NotificationTitle>{notification.title}</NotificationTitle>
-        <CloseButton onClick={(e) => {
-          e.stopPropagation();
-          onClose(notification.id);
-        }}>
+        <CloseButton
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(notification.id);
+          }}
+        >
           ×
         </CloseButton>
       </NotificationHeader>
 
-      <NotificationMessage 
+      <NotificationMessage
         dangerouslySetInnerHTML={{ __html: notification.message }}
       />
 

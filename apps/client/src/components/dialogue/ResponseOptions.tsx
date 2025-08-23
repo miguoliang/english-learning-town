@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
-import type { DialogueResponse } from '../../types';
-import { VoiceInput } from './VoiceInput';
-import { AudioManager } from '../../utils/audioManager';
-import { AnimatedEmoji } from '@elt/ui';
-import { logger } from '../../utils/logger';
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import type { DialogueResponse } from "../../types";
+import { VoiceInput } from "./VoiceInput";
+import { AudioManager } from "../../utils/audioManager";
+import { AnimatedEmoji } from "@elt/ui";
+import { logger } from "../../utils/logger";
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -73,8 +73,10 @@ const MatchedResponse = styled.div`
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 16px;
-  animation: ${celebrationPop} 0.6s ease-out, ${sparkleAnimation} 2s ease-in-out 0.6s;
-  box-shadow: 
+  animation:
+    ${celebrationPop} 0.6s ease-out,
+    ${sparkleAnimation} 2s ease-in-out 0.6s;
+  box-shadow:
     ${({ theme }) => theme.shadows.fun},
     0 6px 20px rgba(150, 206, 180, 0.4);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -83,21 +85,30 @@ const MatchedResponse = styled.div`
   gap: 12px;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
     animation: shimmer 2s ease-in-out 0.8s;
   }
-  
+
   @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
   }
 `;
 
@@ -131,42 +142,44 @@ const PromptList = styled.div`
 
 const PromptItem = styled.div<{ isHighlighted?: boolean }>`
   padding: 16px 20px;
-  background: ${props => props.isHighlighted 
-    ? 'rgba(212, 144, 74, 0.15)' 
-    : 'rgba(0, 0, 0, 0.3)'};
-  border: 1px solid ${props => props.isHighlighted 
-    ? 'rgba(212, 144, 74, 0.5)' 
-    : 'rgba(212, 144, 74, 0.2)'};
+  background: ${(props) =>
+    props.isHighlighted ? "rgba(212, 144, 74, 0.15)" : "rgba(0, 0, 0, 0.3)"};
+  border: 1px solid
+    ${(props) =>
+      props.isHighlighted
+        ? "rgba(212, 144, 74, 0.5)"
+        : "rgba(212, 144, 74, 0.2)"};
   border-radius: 10px;
-  color: ${props => props.isHighlighted 
-    ? 'rgba(232, 212, 184, 1)' 
-    : 'rgba(232, 212, 184, 0.85)'};
+  color: ${(props) =>
+    props.isHighlighted
+      ? "rgba(232, 212, 184, 1)"
+      : "rgba(232, 212, 184, 0.85)"};
   font-size: 0.95rem;
-  font-weight: ${props => props.isHighlighted ? 500 : 400};
+  font-weight: ${(props) => (props.isHighlighted ? 500 : 400)};
   line-height: 1.6;
   letter-spacing: 0.02em;
   position: relative;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 
+  box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(212, 144, 74, 0.05);
   cursor: pointer;
-  
+
   &::before {
-    content: ${props => props.isHighlighted ? "'🔊'" : "'💬'"};
+    content: ${(props) => (props.isHighlighted ? "'🔊'" : "'💬'")};
     margin-right: 12px;
-    opacity: ${props => props.isHighlighted ? 1 : 0.6};
+    opacity: ${(props) => (props.isHighlighted ? 1 : 0.6)};
     transition: opacity 0.3s;
   }
-  
+
   &:hover {
     background: rgba(212, 144, 74, 0.05);
     border-color: rgba(212, 144, 74, 0.3);
     transform: translateY(-1px);
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.3),
       0 2px 4px rgba(212, 144, 74, 0.1);
-      
+
     &::before {
       opacity: 0.8;
     }
@@ -184,7 +197,6 @@ const PromptHint = styled.div`
   letter-spacing: 0.01em;
 `;
 
-
 interface ResponseOptionsProps {
   responses: DialogueResponse[];
   onResponseClick: (response: DialogueResponse) => void;
@@ -194,67 +206,78 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
   responses,
   onResponseClick,
 }) => {
-  const [matchedResponse, setMatchedResponse] = useState<DialogueResponse | null>(null);
+  const [matchedResponse, setMatchedResponse] =
+    useState<DialogueResponse | null>(null);
   const [currentlyReading, setCurrentlyReading] = useState<string | null>(null);
 
   const findBestMatch = (transcript: string): DialogueResponse | null => {
     if (!transcript.trim()) return null;
-    
+
     const lowerTranscript = transcript.toLowerCase().trim();
-    
+
     // First, try exact matches
     for (const response of responses) {
-      if (response.text.toLowerCase().includes(lowerTranscript) || 
-          lowerTranscript.includes(response.text.toLowerCase())) {
+      if (
+        response.text.toLowerCase().includes(lowerTranscript) ||
+        lowerTranscript.includes(response.text.toLowerCase())
+      ) {
         return response;
       }
     }
-    
+
     // Then try keyword matching
     const transcriptWords = lowerTranscript.split(/\s+/);
     let bestMatch: DialogueResponse | null = null;
     let bestScore = 0;
-    
+
     for (const response of responses) {
       const responseWords = response.text.toLowerCase().split(/\s+/);
       let score = 0;
-      
+
       for (const transcriptWord of transcriptWords) {
         for (const responseWord of responseWords) {
-          if (transcriptWord.length > 2 && responseWord.includes(transcriptWord)) {
+          if (
+            transcriptWord.length > 2 &&
+            responseWord.includes(transcriptWord)
+          ) {
             score += transcriptWord.length;
           }
-          if (responseWord.length > 2 && transcriptWord.includes(responseWord)) {
+          if (
+            responseWord.length > 2 &&
+            transcriptWord.includes(responseWord)
+          ) {
             score += responseWord.length;
           }
         }
       }
-      
+
       if (score > bestScore) {
         bestScore = score;
         bestMatch = response;
       }
     }
-    
+
     return bestScore > 3 ? bestMatch : null;
   };
 
   const handleVoiceTranscript = (transcript: string) => {
     const match = findBestMatch(transcript);
     setMatchedResponse(match);
-    
+
     if (match) {
       // Play success sound and announce match
       AudioManager.playSuccess();
       AudioManager.speakText(`Selected: ${match.text}`);
-      
+
       setTimeout(() => {
         onResponseClick(match);
       }, 1500);
     } else if (transcript.trim()) {
       // Play error sound for unmatched input
       AudioManager.playError();
-      AudioManager.speakText("I didn't quite catch that. Please try saying one of the available options.");
+      AudioManager.speakText(
+        "I didn't quite catch that. Please try saying one of the available options.",
+      );
     }
   };
 
@@ -268,12 +291,12 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
       // Start reading this response
       setCurrentlyReading(response.id);
       AudioManager.playClick();
-      
+
       try {
         await AudioManager.speakText(response.text);
         setCurrentlyReading(null);
       } catch (error) {
-        logger.error('Error reading response:', error);
+        logger.error("Error reading response:", error);
         setCurrentlyReading(null);
       }
     }
@@ -283,12 +306,13 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
   useEffect(() => {
     const readOptions = async () => {
       if (responses.length > 0) {
-        await new Promise(resolve => setTimeout(resolve, 800)); // Brief delay
-        
-        const optionsText = responses.length === 1 
-          ? `You can say: ${responses[0].text}`
-          : `You have ${responses.length} options. ${responses.map(r => r.text).join(', or ')}.`;
-        
+        await new Promise((resolve) => setTimeout(resolve, 800)); // Brief delay
+
+        const optionsText =
+          responses.length === 1
+            ? `You can say: ${responses[0].text}`
+            : `You have ${responses.length} options. ${responses.map((r) => r.text).join(", or ")}.`;
+
         AudioManager.speakText(optionsText);
       }
     };
@@ -308,28 +332,24 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
           <AnimatedEmoji emoji="🎤" mood="floating" size="1.3rem" />
           Speak Your Answer!
         </SectionTitle>
-        <VoiceInput 
+        <VoiceInput
           onTranscript={handleVoiceTranscript}
           placeholder="Say your response... (e.g., 'Yes, I'm excited' or 'I need help')"
         />
         {matchedResponse && (
           <MatchedResponse>
-            <AnimatedEmoji 
-              emoji="🎉" 
-              mood="excited" 
+            <AnimatedEmoji
+              emoji="🎉"
+              mood="excited"
               size="1.5rem"
               autoAnimate={true}
             />
             <span>Great choice! You said: "{matchedResponse.text}"</span>
-            <AnimatedEmoji 
-              emoji="⭐" 
-              mood="floating" 
-              size="1.3rem"
-            />
+            <AnimatedEmoji emoji="⭐" mood="floating" size="1.3rem" />
           </MatchedResponse>
         )}
       </VoiceSection>
-      
+
       <VoicePrompts>
         <PromptsTitle>
           <AnimatedEmoji emoji="💭" mood="thinking" size="1.3rem" />
@@ -337,7 +357,7 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
         </PromptsTitle>
         <PromptList>
           {responses.map((response) => (
-            <PromptItem 
+            <PromptItem
               key={response.id}
               isHighlighted={currentlyReading === response.id}
               onClick={() => handlePromptClick(response)}
@@ -348,7 +368,8 @@ export const ResponseOptions: React.FC<ResponseOptionsProps> = ({
           ))}
         </PromptList>
         <PromptHint>
-          💡 Speak naturally - you don't need to say the exact words above<br />
+          💡 Speak naturally - you don't need to say the exact words above
+          <br />
           🔊 Click any option to hear it read aloud
         </PromptHint>
       </VoicePrompts>

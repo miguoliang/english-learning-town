@@ -1,6 +1,6 @@
 /**
  * @elt/core - Entity Component System Core Engine
- * 
+ *
  * A pure, reusable ECS implementation for educational games and beyond.
  * Provides the fundamental building blocks for entity-component-system architecture.
  */
@@ -12,8 +12,8 @@ export {
   type Entity,
   type EntityId,
   type Component,
-  type System
-} from './core';
+  type System,
+} from "./core";
 
 // Event system
 export {
@@ -21,8 +21,8 @@ export {
   createECSEventBus,
   ECSEventTypes,
   type ECSEvents,
-  type Emitter
-} from './events';
+  type Emitter,
+} from "./events";
 
 // Component definitions (from modular structure)
 export type {
@@ -31,23 +31,23 @@ export type {
   SizeComponent,
   VelocityComponent,
   CollisionComponent,
-  
+
   // Visual components
   RenderableComponent,
   AnimationComponent,
   MovementAnimationComponent,
-  
+
   // Interactive components
   InteractiveComponent,
   InputComponent,
-  
+
   // Game-specific components
   PlayerComponent,
   NPCComponent,
   BuildingComponent,
   FurnitureComponent,
   DecorationComponent,
-  
+
   // Enhanced components
   HealthComponent,
   StatsComponent,
@@ -63,8 +63,8 @@ export type {
   QuestGiverComponent,
   QuestObjectiveComponent,
   LearningComponent,
-  ProgressComponent
-} from './components';
+  ProgressComponent,
+} from "./components";
 
 // Component factory functions (from modular structure)
 export {
@@ -73,23 +73,23 @@ export {
   createSizeComponent,
   createVelocityComponent,
   createCollisionComponent,
-  
+
   // Visual component factories
   createRenderableComponent,
   createAnimationComponent,
   createMovementAnimationComponent,
-  
+
   // Interactive component factories
   createInteractiveComponent,
   createInputComponent,
-  
+
   // Game component factories
   createPlayerComponent,
   createNPCComponent,
   createBuildingComponent,
   createFurnitureComponent,
   createDecorationComponent,
-  
+
   // Enhanced component factories
   createHealthComponent,
   createStatsComponent,
@@ -101,8 +101,8 @@ export {
   createPhysicsComponent,
   createForceComponent,
   createTimerComponent,
-  createTagComponent
-} from './components';
+  createTagComponent,
+} from "./components";
 
 // Advanced systems
 export {
@@ -111,8 +111,8 @@ export {
   PhysicsSystem,
   TimerSystem,
   HealthSystem,
-  StateMachineSystem
-} from './systems';
+  StateMachineSystem,
+} from "./systems";
 
 // Utilities and optimizations
 export {
@@ -122,5 +122,5 @@ export {
   EntityArchetypes,
   SpatialIndex,
   MathUtils,
-  ComponentUtils
-} from './utils';
+  ComponentUtils,
+} from "./utils";

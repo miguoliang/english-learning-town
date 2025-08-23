@@ -1,6 +1,6 @@
-import React from 'react';
-import { Spinner } from './Spinner';
-import { AnimatedEmoji } from '../basic/AnimatedEmoji';
+import React from "react";
+import { Spinner } from "./Spinner";
+import { AnimatedEmoji } from "../basic/AnimatedEmoji";
 
 export interface LoadingScreenProps {
   /** Loading title */
@@ -14,7 +14,7 @@ export interface LoadingScreenProps {
   /** Show spinner */
   showSpinner?: boolean;
   /** Spinner size */
-  spinnerSize?: 'sm' | 'md' | 'lg';
+  spinnerSize?: "sm" | "md" | "lg";
   /** Show animated emoji */
   showEmoji?: boolean;
   /** Emoji to display */
@@ -29,7 +29,7 @@ export interface LoadingScreenProps {
 
 /**
  * LoadingScreen - A full-screen loading component
- * 
+ *
  * Features:
  * - Customizable title and message
  * - Optional spinner and emoji
@@ -37,55 +37,51 @@ export interface LoadingScreenProps {
  * - CSS-based theming
  */
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({
-  title = 'Loading...',
-  message = 'Please wait while we prepare your learning adventure!',
+  title = "Loading...",
+  message = "Please wait while we prepare your learning adventure!",
   subtitle,
   progress,
   showSpinner = true,
-  spinnerSize = 'lg',
+  spinnerSize = "lg",
   showEmoji = true,
-  emoji = '🎓',
-  className = '',
+  emoji = "🎓",
+  className = "",
   hints,
   fullScreen = false,
 }) => {
   // Use subtitle as message if provided
   const displayMessage = subtitle || message;
-  
+
   const classes = [
-    'elt-loading',
-    fullScreen && 'elt-loading--fullscreen',
-    className
-  ].filter(Boolean).join(' ');
+    "elt-loading",
+    fullScreen && "elt-loading--fullscreen",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div 
+    <div
       className={classes}
       aria-live="polite"
-      style={fullScreen ? {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-      } : undefined}
+      style={
+        fullScreen
+          ? {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }
+          : undefined
+      }
     >
-      {showEmoji && (
-        <AnimatedEmoji 
-          emoji={emoji}
-          mood="thinking"
-          size="3rem"
-        />
-      )}
-      
-      <h1 className="elt-loading__title">
-        {title}
-      </h1>
-      
-      <p className="elt-loading__message">
-        {displayMessage}
-      </p>
-      
+      {showEmoji && <AnimatedEmoji emoji={emoji} mood="thinking" size="3rem" />}
+
+      <h1 className="elt-loading__title">{title}</h1>
+
+      <p className="elt-loading__message">{displayMessage}</p>
+
       {progress !== undefined && (
         <div
           role="progressbar"
@@ -94,13 +90,13 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
           aria-valuemax={100}
           className="elt-loading__progress"
         >
-          <div 
+          <div
             className="elt-loading__progress-bar"
             style={{ width: `${progress}%` }}
           />
         </div>
       )}
-      
+
       {hints && hints.length > 0 && (
         <div className="elt-loading__hints">
           {hints.map((hint, index) => (
@@ -110,7 +106,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
           ))}
         </div>
       )}
-      
+
       {showSpinner && <Spinner size={spinnerSize} />}
     </div>
   );

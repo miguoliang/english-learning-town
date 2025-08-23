@@ -2,36 +2,43 @@
  * PlayerInteractionSystem - Handles spacebar-triggered player interactions
  */
 
-import type { 
-  System, 
-  Entity, 
+import type {
+  System,
+  Entity,
   Emitter,
   ECSEvents,
-  PositionComponent
-} from '@elt/core';
-import { ComponentManager } from '@elt/core';
-import { ECSEventTypes } from '@elt/core';
-import { InputStateSystem } from './InputStateSystem';
-import { InteractionZoneSystem } from './InteractionZoneSystem';
-import { logger } from '../../utils/logger';
+  PositionComponent,
+} from "@elt/core";
+import { ComponentManager } from "@elt/core";
+import { ECSEventTypes } from "@elt/core";
+import { InputStateSystem } from "./InputStateSystem";
+import { InteractionZoneSystem } from "./InteractionZoneSystem";
+import { logger } from "../../utils/logger";
 
 export class PlayerInteractionSystem implements System {
-  readonly name = 'PlayerInteractionSystem';
-  readonly requiredComponents = ['player', 'position'] as const;
+  readonly name = "PlayerInteractionSystem";
+  readonly requiredComponents = ["player", "position"] as const;
 
   private isInitialized = false;
 
   constructor(
     private inputStateSystem: InputStateSystem,
-    private interactionZoneSystem: InteractionZoneSystem
+    private interactionZoneSystem: InteractionZoneSystem,
   ) {
     // Validate dependencies
     if (!this.inputStateSystem || !this.interactionZoneSystem) {
-      throw new Error('PlayerInteractionSystem requires InputStateSystem and InteractionZoneSystem dependencies');
+      throw new Error(
+        "PlayerInteractionSystem requires InputStateSystem and InteractionZoneSystem dependencies",
+      );
     }
   }
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+  update(
+    _entities: Entity[],
+    components: ComponentManager,
+    _deltaTime: number,
+    events: Emitter<ECSEvents>,
+  ): void {
     // Initialize event listeners once
     if (!this.isInitialized) {
       this.setupEventListeners(events, components);
@@ -43,42 +50,59 @@ export class PlayerInteractionSystem implements System {
     return components.hasAllComponents(entity.id, this.requiredComponents);
   }
 
-  private setupEventListeners(events: Emitter<ECSEvents>, components: ComponentManager): void {
+  private setupEventListeners(
+    events: Emitter<ECSEvents>,
+    components: ComponentManager,
+  ): void {
     // Listen for spacebar presses
     events.on(ECSEventTypes.INPUT_KEY_DOWN, (data) => {
-      if (data.key === 'Space') {
+      if (data.key === "Space") {
         this.handleInteractionInput(components, events);
       }
     });
   }
 
-  private handleInteractionInput(components: ComponentManager, events: Emitter<ECSEvents>): void {
+  private handleInteractionInput(
+    components: ComponentManager,
+    events: Emitter<ECSEvents>,
+  ): void {
     // Find the player entity
-    const playerEntities = components.getEntitiesWithComponent('player');
+    const playerEntities = components.getEntitiesWithComponent("player");
     if (playerEntities.length === 0) return;
 
     const playerId = playerEntities[0];
-    const playerPosition = components.getComponent<PositionComponent>(playerId, 'position');
+    const playerPosition = components.getComponent<PositionComponent>(
+      playerId,
+      "position",
+    );
     if (!playerPosition) return;
 
-    logger.ecs(`Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`);
-    
+    logger.ecs(
+      `Player pressed spacebar at position (${playerPosition.x}, ${playerPosition.y})`,
+    );
+
     // Use InteractionZoneSystem to find interactable entities
-    const interactableEntities = this.interactionZoneSystem.findInteractableEntities(playerPosition, components);
-    
+    const interactableEntities =
+      this.interactionZoneSystem.findInteractableEntities(
+        playerPosition,
+        components,
+      );
+
     if (interactableEntities.length > 0) {
       // Take the first interactable entity (could be enhanced to prioritize by distance)
       const targetEntityId = interactableEntities[0];
-      
+
       logger.ecs(`Player can interact with ${targetEntityId}`);
-      
+
       // Emit interaction event
-      events.emit(ECSEventTypes.PLAYER_INTERACTION, { 
+      events.emit(ECSEventTypes.PLAYER_INTERACTION, {
         initiatorId: playerId,
-        targetEntityId 
+        targetEntityId,
       });
     } else {
-      logger.ecs(`No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`);
+      logger.ecs(
+        `No interactive entities in range at (${playerPosition.x}, ${playerPosition.y})`,
+      );
     }
   }
 }

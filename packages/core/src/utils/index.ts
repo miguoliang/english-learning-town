@@ -1,6 +1,6 @@
 /**
  * Utilities Index - Modular Utility Organization
- * 
+ *
  * Utilities are organized by functional responsibility following SRP:
  * - performance: Entity pooling, component caching, query optimization
  * - archetypes: Predefined entity creation patterns
@@ -10,16 +10,16 @@
  */
 
 // Performance Utilities
-export * from './performance';
+export * from "./performance";
 
 // Entity Archetypes
-export * from './archetypes';
+export * from "./archetypes";
 
 // Spatial Utilities
-export * from './spatial';
+export * from "./spatial";
 
 // Math Utilities
-export * from './math';
+export * from "./math";
 
 // Component Utilities
-export * from './components';
+export * from "./components";

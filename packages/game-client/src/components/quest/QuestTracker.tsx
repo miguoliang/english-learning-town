@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface Quest {
   id: string;
@@ -22,7 +22,7 @@ export interface QuestTrackerProps {
 
 /**
  * QuestTracker - A fixed-position quest tracking component
- * 
+ *
  * Features:
  * - Fixed positioning on screen
  * - Scrollable quest list
@@ -32,16 +32,15 @@ export interface QuestTrackerProps {
  * - Responsive design
  * - CSS-based theming
  */
-export const QuestTracker: React.FC<QuestTrackerProps> = ({ 
-  quests, 
+export const QuestTracker: React.FC<QuestTrackerProps> = ({
+  quests,
   activeQuestId,
   onQuestClick,
-  className 
+  className,
 }) => {
-  const containerClasses = [
-    'elt-game-tracker-container',
-    className
-  ].filter(Boolean).join(' ');
+  const containerClasses = ["elt-game-tracker-container", className]
+    .filter(Boolean)
+    .join(" ");
 
   if (!quests.length) {
     return (
@@ -61,16 +60,18 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({
       <div className="elt-game-tracker-header">
         <h3 className="elt-game-tracker-title">📝 Quests ({quests.length})</h3>
       </div>
-      
+
       <div className="elt-game-quest-list">
         {quests.map((quest) => {
           const isActive = quest.id === activeQuestId || quest.isActive;
           const progressPercentage = (quest.progress / quest.maxProgress) * 100;
-          
+
           const questItemClasses = [
-            'elt-game-quest-item',
-            isActive && 'elt-game-quest-item--active'
-          ].filter(Boolean).join(' ');
+            "elt-game-quest-item",
+            isActive && "elt-game-quest-item--active",
+          ]
+            .filter(Boolean)
+            .join(" ");
 
           return (
             <div
@@ -83,7 +84,7 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({
                 {quest.progress} / {quest.maxProgress} completed
               </div>
               <div className="elt-game-quest-progress-bar">
-                <div 
+                <div
                   className="elt-game-quest-progress-fill"
                   style={{ width: `${progressPercentage}%` }}
                 />

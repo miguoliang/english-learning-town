@@ -2,7 +2,7 @@
  * Integration Tests - Full ECS system integration scenarios
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   World,
   type System,
@@ -18,21 +18,23 @@ import {
   createPlayerComponent,
   createNPCComponent,
   createInteractiveComponent,
-  ECSEventTypes
-} from '../index';
+  ECSEventTypes,
+} from "../index";
 
 // Test game systems for integration testing
 class MovementSystem implements System {
-  readonly name = 'MovementSystem';
-  readonly requiredComponents = ['position', 'velocity'] as const;
+  readonly name = "MovementSystem";
+  readonly requiredComponents = ["position", "velocity"] as const;
 
   update(entities: Entity[], components: ComponentManager): void {
-    const movableEntities = components.getEntitiesWithComponents(this.requiredComponents);
-    
+    const movableEntities = components.getEntitiesWithComponents(
+      this.requiredComponents,
+    );
+
     for (const entityId of movableEntities) {
-      const position = components.getComponent(entityId, 'position');
-      const velocity = components.getComponent(entityId, 'velocity');
-      
+      const position = components.getComponent(entityId, "position");
+      const velocity = components.getComponent(entityId, "velocity");
+
       if (position && velocity) {
         position.x += velocity.x;
         position.y += velocity.y;
@@ -46,32 +48,39 @@ class MovementSystem implements System {
 }
 
 class CollisionSystem implements System {
-  readonly name = 'CollisionSystem';
-  readonly requiredComponents = ['position', 'size', 'collision'] as const;
-  
+  readonly name = "CollisionSystem";
+  readonly requiredComponents = ["position", "size", "collision"] as const;
+
   public collisions: Array<{ entity1: string; entity2: string }> = [];
 
-  update(entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
+  update(
+    entities: Entity[],
+    components: ComponentManager,
+    _deltaTime: number,
+    events: Emitter<ECSEvents>,
+  ): void {
     this.collisions = [];
-    const collidableEntities = components.getEntitiesWithComponents(this.requiredComponents);
-    
+    const collidableEntities = components.getEntitiesWithComponents(
+      this.requiredComponents,
+    );
+
     // Check collisions between all entities
     for (let i = 0; i < collidableEntities.length; i++) {
       for (let j = i + 1; j < collidableEntities.length; j++) {
         const entity1Id = collidableEntities[i];
         const entity2Id = collidableEntities[j];
-        
-        const pos1 = components.getComponent(entity1Id, 'position');
-        const size1 = components.getComponent(entity1Id, 'size');
-        const pos2 = components.getComponent(entity2Id, 'position');
-        const size2 = components.getComponent(entity2Id, 'size');
-        
+
+        const pos1 = components.getComponent(entity1Id, "position");
+        const size1 = components.getComponent(entity1Id, "size");
+        const pos2 = components.getComponent(entity2Id, "position");
+        const size2 = components.getComponent(entity2Id, "size");
+
         if (pos1 && size1 && pos2 && size2) {
           if (this.isColliding(pos1, size1, pos2, size2)) {
             this.collisions.push({ entity1: entity1Id, entity2: entity2Id });
             events.emit(ECSEventTypes.ENTITY_COLLISION, {
               entityId: entity1Id,
-              blockedPosition: { x: pos2.x, y: pos2.y }
+              blockedPosition: { x: pos2.x, y: pos2.y },
             });
           }
         }
@@ -84,35 +93,46 @@ class CollisionSystem implements System {
   }
 
   private isColliding(pos1: any, size1: any, pos2: any, size2: any): boolean {
-    return pos1.x < pos2.x + size2.width &&
-           pos1.x + size1.width > pos2.x &&
-           pos1.y < pos2.y + size2.height &&
-           pos1.y + size1.height > pos2.y;
+    return (
+      pos1.x < pos2.x + size2.width &&
+      pos1.x + size1.width > pos2.x &&
+      pos1.y < pos2.y + size2.height &&
+      pos1.y + size1.height > pos2.y
+    );
   }
 }
 
 class RenderSystem implements System {
-  readonly name = 'RenderSystem';
-  readonly requiredComponents = ['position', 'size', 'renderable'] as const;
-  
+  readonly name = "RenderSystem";
+  readonly requiredComponents = ["position", "size", "renderable"] as const;
+
   public lastRenderData: any[] = [];
 
-  update(entities: Entity[], components: ComponentManager, _deltaTime: number, events: Emitter<ECSEvents>): void {
-    const renderableEntities = components.getEntitiesWithComponents(this.requiredComponents);
-    
+  update(
+    entities: Entity[],
+    components: ComponentManager,
+    _deltaTime: number,
+    events: Emitter<ECSEvents>,
+  ): void {
+    const renderableEntities = components.getEntitiesWithComponents(
+      this.requiredComponents,
+    );
+
     this.lastRenderData = renderableEntities
-      .map(entityId => ({
+      .map((entityId) => ({
         id: entityId,
-        position: components.getComponent(entityId, 'position'),
-        size: components.getComponent(entityId, 'size'),
-        renderable: components.getComponent(entityId, 'renderable')
+        position: components.getComponent(entityId, "position"),
+        size: components.getComponent(entityId, "size"),
+        renderable: components.getComponent(entityId, "renderable"),
       }))
-      .filter(data => data.renderable?.visible !== false)
-      .sort((a, b) => (a.renderable?.zIndex || 0) - (b.renderable?.zIndex || 0));
+      .filter((data) => data.renderable?.visible !== false)
+      .sort(
+        (a, b) => (a.renderable?.zIndex || 0) - (b.renderable?.zIndex || 0),
+      );
 
     events.emit(ECSEventTypes.RENDER_FRAME_READY, {
       entities: this.lastRenderData,
-      reason: 'frame_update'
+      reason: "frame_update",
     });
   }
 
@@ -121,7 +141,7 @@ class RenderSystem implements System {
   }
 }
 
-describe('ECS Integration Tests', () => {
+describe("ECS Integration Tests", () => {
   let world: World;
   let movementSystem: MovementSystem;
   let collisionSystem: CollisionSystem;
@@ -134,31 +154,37 @@ describe('ECS Integration Tests', () => {
     renderSystem = new RenderSystem();
   });
 
-  describe('Basic Entity-Component-System Integration', () => {
-    it('should create a complete game entity with all systems working together', () => {
+  describe("Basic Entity-Component-System Integration", () => {
+    it("should create a complete game entity with all systems working together", () => {
       // Add systems to world
       world.addSystem(movementSystem);
       world.addSystem(collisionSystem);
       world.addSystem(renderSystem);
 
       // Create a player entity
-      const player = world.createEntity('player');
+      const player = world.createEntity("player");
       world.addComponent(player.id, createPositionComponent(10, 10));
       world.addComponent(player.id, createSizeComponent(1, 1));
       world.addComponent(player.id, createVelocityComponent(1, 0));
       world.addComponent(player.id, createCollisionComponent(false));
-      world.addComponent(player.id, createRenderableComponent('emoji', { icon: '🧑', zIndex: 10 }));
-      world.addComponent(player.id, createPlayerComponent('Hero'));
+      world.addComponent(
+        player.id,
+        createRenderableComponent("emoji", { icon: "🧑", zIndex: 10 }),
+      );
+      world.addComponent(player.id, createPlayerComponent("Hero"));
 
       // Create a wall entity
-      const wall = world.createEntity('wall');
+      const wall = world.createEntity("wall");
       world.addComponent(wall.id, createPositionComponent(15, 10));
       world.addComponent(wall.id, createSizeComponent(1, 1));
       world.addComponent(wall.id, createCollisionComponent(false));
-      world.addComponent(wall.id, createRenderableComponent('emoji', { icon: '🧱', zIndex: 1 }));
+      world.addComponent(
+        wall.id,
+        createRenderableComponent("emoji", { icon: "🧱", zIndex: 1 }),
+      );
 
       // Initial state check
-      let playerPos = world.getComponent(player.id, 'position');
+      let playerPos = world.getComponent(player.id, "position");
       expect(playerPos?.x).toBe(10);
       expect(playerPos?.y).toBe(10);
 
@@ -166,14 +192,14 @@ describe('ECS Integration Tests', () => {
       world.update();
 
       // Check movement system worked
-      playerPos = world.getComponent(player.id, 'position');
+      playerPos = world.getComponent(player.id, "position");
       expect(playerPos?.x).toBe(11); // Moved by velocity.x = 1
       expect(playerPos?.y).toBe(10); // No change in y
 
       // Check render system worked
       expect(renderSystem.lastRenderData).toHaveLength(2);
-      expect(renderSystem.lastRenderData[0].id).toBe('wall'); // Lower zIndex
-      expect(renderSystem.lastRenderData[1].id).toBe('player'); // Higher zIndex
+      expect(renderSystem.lastRenderData[0].id).toBe("wall"); // Lower zIndex
+      expect(renderSystem.lastRenderData[1].id).toBe("player"); // Higher zIndex
 
       // Run more updates to test collision
       world.update(); // x = 12
@@ -184,26 +210,29 @@ describe('ECS Integration Tests', () => {
       // Check collision detection
       expect(collisionSystem.collisions).toHaveLength(1);
       expect(collisionSystem.collisions[0]).toEqual({
-        entity1: 'player',
-        entity2: 'wall'
+        entity1: "player",
+        entity2: "wall",
       });
     });
 
-    it('should handle complex entity interactions and state changes', () => {
+    it("should handle complex entity interactions and state changes", () => {
       world.addSystem(movementSystem);
       world.addSystem(renderSystem);
 
       // Create multiple moving entities
-      const entities = ['entity1', 'entity2', 'entity3'];
+      const entities = ["entity1", "entity2", "entity3"];
       entities.forEach((id, index) => {
         const entity = world.createEntity(id);
         world.addComponent(entity.id, createPositionComponent(index * 2, 0));
         world.addComponent(entity.id, createSizeComponent(1, 1));
         world.addComponent(entity.id, createVelocityComponent(index + 1, 1));
-        world.addComponent(entity.id, createRenderableComponent('emoji', { 
-          icon: `${index + 1}️⃣`, 
-          zIndex: index + 1 
-        }));
+        world.addComponent(
+          entity.id,
+          createRenderableComponent("emoji", {
+            icon: `${index + 1}️⃣`,
+            zIndex: index + 1,
+          }),
+        );
       });
 
       // Run multiple update cycles
@@ -212,15 +241,15 @@ describe('ECS Integration Tests', () => {
       }
 
       // Check final positions
-      const finalPositions = entities.map(id => 
-        world.getComponent(id, 'position')
+      const finalPositions = entities.map((id) =>
+        world.getComponent(id, "position"),
       );
 
-      expect(finalPositions[0]?.x).toBe(5);  // 0 + (1 * 5)
+      expect(finalPositions[0]?.x).toBe(5); // 0 + (1 * 5)
       expect(finalPositions[1]?.x).toBe(12); // 2 + (2 * 5)
       expect(finalPositions[2]?.x).toBe(19); // 4 + (3 * 5)
 
-      finalPositions.forEach(pos => {
+      finalPositions.forEach((pos) => {
         expect(pos?.y).toBe(5); // All moved 1 * 5 in y direction
       });
 
@@ -229,13 +258,13 @@ describe('ECS Integration Tests', () => {
     });
   });
 
-  describe('Event System Integration', () => {
-    it('should handle event-driven communication between systems', () => {
+  describe("Event System Integration", () => {
+    it("should handle event-driven communication between systems", () => {
       const events: any[] = [];
       const eventBus = world.getEventBus();
 
       // Listen to all events
-      Object.values(ECSEventTypes).forEach(eventType => {
+      Object.values(ECSEventTypes).forEach((eventType) => {
         eventBus.on(eventType, (data) => {
           events.push({ type: eventType, data });
         });
@@ -244,12 +273,12 @@ describe('ECS Integration Tests', () => {
       world.addSystem(collisionSystem);
 
       // Create entities that will collide
-      const entity1 = world.createEntity('movable');
+      const entity1 = world.createEntity("movable");
       world.addComponent(entity1.id, createPositionComponent(0, 0));
       world.addComponent(entity1.id, createSizeComponent(2, 2));
       world.addComponent(entity1.id, createCollisionComponent(false));
 
-      const entity2 = world.createEntity('obstacle');
+      const entity2 = world.createEntity("obstacle");
       world.addComponent(entity2.id, createPositionComponent(1, 1));
       world.addComponent(entity2.id, createSizeComponent(2, 2));
       world.addComponent(entity2.id, createCollisionComponent(false));
@@ -261,19 +290,21 @@ describe('ECS Integration Tests', () => {
       world.update();
 
       // Should have collision event
-      const collisionEvents = events.filter(e => e.type === ECSEventTypes.ENTITY_COLLISION);
+      const collisionEvents = events.filter(
+        (e) => e.type === ECSEventTypes.ENTITY_COLLISION,
+      );
       expect(collisionEvents).toHaveLength(1);
-      expect(collisionEvents[0].data.entityId).toBe('movable');
+      expect(collisionEvents[0].data.entityId).toBe("movable");
       expect(collisionEvents[0].data.blockedPosition).toEqual({ x: 1, y: 1 });
     });
 
-    it('should handle event cascades and system communication', () => {
+    it("should handle event cascades and system communication", () => {
       const eventLog: string[] = [];
       const eventBus = world.getEventBus();
 
       // Create a system that responds to collisions by stopping movement
       class CollisionResponseSystem implements System {
-        readonly name = 'CollisionResponseSystem';
+        readonly name = "CollisionResponseSystem";
         readonly requiredComponents = [] as const;
 
         constructor() {
@@ -296,24 +327,24 @@ describe('ECS Integration Tests', () => {
       world.addSystem(collisionSystem);
 
       // Create colliding entities
-      const entity1 = world.createEntity('player');
+      const entity1 = world.createEntity("player");
       world.addComponent(entity1.id, createPositionComponent(0, 0));
       world.addComponent(entity1.id, createSizeComponent(1, 1));
       world.addComponent(entity1.id, createCollisionComponent(false));
 
-      const entity2 = world.createEntity('wall');
+      const entity2 = world.createEntity("wall");
       world.addComponent(entity2.id, createPositionComponent(0, 0));
       world.addComponent(entity2.id, createSizeComponent(1, 1));
       world.addComponent(entity2.id, createCollisionComponent(false));
 
       world.update();
 
-      expect(eventLog).toContain('Collision detected for player');
+      expect(eventLog).toContain("Collision detected for player");
     });
   });
 
-  describe('Performance and Scalability', () => {
-    it('should handle many entities efficiently', () => {
+  describe("Performance and Scalability", () => {
+    it("should handle many entities efficiently", () => {
       world.addSystem(movementSystem);
       world.addSystem(renderSystem);
 
@@ -323,10 +354,19 @@ describe('ECS Integration Tests', () => {
       // Create many entities
       for (let i = 0; i < entityCount; i++) {
         const entity = world.createEntity(`entity_${i}`);
-        world.addComponent(entity.id, createPositionComponent(i % 100, Math.floor(i / 100)));
+        world.addComponent(
+          entity.id,
+          createPositionComponent(i % 100, Math.floor(i / 100)),
+        );
         world.addComponent(entity.id, createSizeComponent(1, 1));
-        world.addComponent(entity.id, createVelocityComponent(Math.random() - 0.5, Math.random() - 0.5));
-        world.addComponent(entity.id, createRenderableComponent('emoji', { icon: '•' }));
+        world.addComponent(
+          entity.id,
+          createVelocityComponent(Math.random() - 0.5, Math.random() - 0.5),
+        );
+        world.addComponent(
+          entity.id,
+          createRenderableComponent("emoji", { icon: "•" }),
+        );
       }
 
       const creationTime = performance.now() - startTime;
@@ -344,26 +384,29 @@ describe('ECS Integration Tests', () => {
       expect(renderSystem.lastRenderData).toHaveLength(entityCount);
     });
 
-    it('should handle frequent component changes efficiently', () => {
+    it("should handle frequent component changes efficiently", () => {
       world.addSystem(renderSystem);
 
-      const entity = world.createEntity('dynamic');
+      const entity = world.createEntity("dynamic");
       world.addComponent(entity.id, createPositionComponent(0, 0));
       world.addComponent(entity.id, createSizeComponent(1, 1));
-      world.addComponent(entity.id, createRenderableComponent('emoji', { icon: '🎯' }));
+      world.addComponent(
+        entity.id,
+        createRenderableComponent("emoji", { icon: "🎯" }),
+      );
 
       const operationCount = 1000;
       const startTime = performance.now();
 
       // Rapid component modifications
       for (let i = 0; i < operationCount; i++) {
-        const position = world.getComponent(entity.id, 'position');
+        const position = world.getComponent(entity.id, "position");
         if (position) {
           position.x = i;
           position.y = i;
         }
 
-        world.removeComponent(entity.id, 'velocity');
+        world.removeComponent(entity.id, "velocity");
         world.addComponent(entity.id, createVelocityComponent(i, i));
         world.update();
       }
@@ -371,17 +414,20 @@ describe('ECS Integration Tests', () => {
       const totalTime = performance.now() - startTime;
       expect(totalTime).toBeLessThan(2000); // Should handle rapid changes efficiently
 
-      const finalPosition = world.getComponent(entity.id, 'position');
+      const finalPosition = world.getComponent(entity.id, "position");
       expect(finalPosition?.x).toBe(operationCount - 1);
     });
   });
 
-  describe('System Dependencies and Order', () => {
-    it('should handle system update order correctly', () => {
+  describe("System Dependencies and Order", () => {
+    it("should handle system update order correctly", () => {
       const updateOrder: string[] = [];
 
       class OrderedSystem implements System {
-        constructor(public readonly name: string, private order: number) {}
+        constructor(
+          public readonly name: string,
+          private order: number,
+        ) {}
         readonly requiredComponents = [] as const;
 
         update(): void {
@@ -394,21 +440,21 @@ describe('ECS Integration Tests', () => {
       }
 
       // Add systems in specific order
-      world.addSystem(new OrderedSystem('Third', 3));
-      world.addSystem(new OrderedSystem('First', 1));
-      world.addSystem(new OrderedSystem('Second', 2));
+      world.addSystem(new OrderedSystem("Third", 3));
+      world.addSystem(new OrderedSystem("First", 1));
+      world.addSystem(new OrderedSystem("Second", 2));
 
       world.update();
 
       // Systems should update in the order they were added
-      expect(updateOrder).toEqual(['Third_3', 'First_1', 'Second_2']);
+      expect(updateOrder).toEqual(["Third_3", "First_1", "Second_2"]);
     });
 
-    it('should handle system removal during updates', () => {
+    it("should handle system removal during updates", () => {
       let updateCount = 0;
 
       class CountingSystem implements System {
-        readonly name = 'CountingSystem';
+        readonly name = "CountingSystem";
         readonly requiredComponents = [] as const;
 
         update(): void {
@@ -426,23 +472,26 @@ describe('ECS Integration Tests', () => {
       world.update();
       expect(updateCount).toBe(1);
 
-      world.removeSystem('CountingSystem');
+      world.removeSystem("CountingSystem");
       world.update();
       expect(updateCount).toBe(1); // Should not increment after removal
     });
   });
 
-  describe('Memory Management and Cleanup', () => {
-    it('should clean up entities and components properly', () => {
+  describe("Memory Management and Cleanup", () => {
+    it("should clean up entities and components properly", () => {
       world.addSystem(renderSystem);
 
       // Create entities
-      const entities = ['entity1', 'entity2', 'entity3'];
-      entities.forEach(id => {
+      const entities = ["entity1", "entity2", "entity3"];
+      entities.forEach((id) => {
         const entity = world.createEntity(id);
         world.addComponent(entity.id, createPositionComponent(0, 0));
         world.addComponent(entity.id, createSizeComponent(1, 1));
-        world.addComponent(entity.id, createRenderableComponent('emoji', { icon: '🎮' }));
+        world.addComponent(
+          entity.id,
+          createRenderableComponent("emoji", { icon: "🎮" }),
+        );
       });
 
       expect(world.getAllEntities()).toHaveLength(3);
@@ -450,26 +499,26 @@ describe('ECS Integration Tests', () => {
       expect(renderSystem.lastRenderData).toHaveLength(3);
 
       // Remove entities
-      world.removeEntity('entity2');
+      world.removeEntity("entity2");
       expect(world.getAllEntities()).toHaveLength(2);
-      expect(world.getEntity('entity2')).toBeUndefined();
+      expect(world.getEntity("entity2")).toBeUndefined();
 
       world.update();
       expect(renderSystem.lastRenderData).toHaveLength(2);
 
       // Clean up remaining entities
-      world.removeEntity('entity1');
-      world.removeEntity('entity3');
+      world.removeEntity("entity1");
+      world.removeEntity("entity3");
       expect(world.getAllEntities()).toHaveLength(0);
 
       world.update();
       expect(renderSystem.lastRenderData).toHaveLength(0);
     });
 
-    it('should handle world destruction and cleanup', () => {
+    it("should handle world destruction and cleanup", () => {
       world.addSystem(movementSystem);
 
-      const entity = world.createEntity('test');
+      const entity = world.createEntity("test");
       world.addComponent(entity.id, createPositionComponent(0, 0));
       world.addComponent(entity.id, createVelocityComponent(1, 1));
 
@@ -483,29 +532,38 @@ describe('ECS Integration Tests', () => {
     });
   });
 
-  describe('Real-World Game Scenarios', () => {
-    it('should simulate a simple RPG scenario', () => {
+  describe("Real-World Game Scenarios", () => {
+    it("should simulate a simple RPG scenario", () => {
       world.addSystem(movementSystem);
       world.addSystem(collisionSystem);
       world.addSystem(renderSystem);
 
       // Create player
-      const player = world.createEntity('player');
+      const player = world.createEntity("player");
       world.addComponent(player.id, createPositionComponent(0, 0));
       world.addComponent(player.id, createSizeComponent(1, 1));
       world.addComponent(player.id, createVelocityComponent(1, 0));
       world.addComponent(player.id, createCollisionComponent(false));
-      world.addComponent(player.id, createRenderableComponent('emoji', { icon: '🧙', zIndex: 10 }));
-      world.addComponent(player.id, createPlayerComponent('Wizard'));
+      world.addComponent(
+        player.id,
+        createRenderableComponent("emoji", { icon: "🧙", zIndex: 10 }),
+      );
+      world.addComponent(player.id, createPlayerComponent("Wizard"));
 
       // Create NPC
-      const npc = world.createEntity('npc');
+      const npc = world.createEntity("npc");
       world.addComponent(npc.id, createPositionComponent(5, 0));
       world.addComponent(npc.id, createSizeComponent(1, 1));
       world.addComponent(npc.id, createCollisionComponent(false));
-      world.addComponent(npc.id, createRenderableComponent('emoji', { icon: '🧝', zIndex: 5 }));
-      world.addComponent(npc.id, createNPCComponent('Elf Guide', 'guide'));
-      world.addComponent(npc.id, createInteractiveComponent('dialogue', { dialogueId: 'greeting' }));
+      world.addComponent(
+        npc.id,
+        createRenderableComponent("emoji", { icon: "🧝", zIndex: 5 }),
+      );
+      world.addComponent(npc.id, createNPCComponent("Elf Guide", "guide"));
+      world.addComponent(
+        npc.id,
+        createInteractiveComponent("dialogue", { dialogueId: "greeting" }),
+      );
 
       // Create obstacles
       for (let i = 2; i < 5; i++) {
@@ -513,7 +571,10 @@ describe('ECS Integration Tests', () => {
         world.addComponent(obstacle.id, createPositionComponent(i, 0));
         world.addComponent(obstacle.id, createSizeComponent(1, 1));
         world.addComponent(obstacle.id, createCollisionComponent(false));
-        world.addComponent(obstacle.id, createRenderableComponent('emoji', { icon: '🌳', zIndex: 1 }));
+        world.addComponent(
+          obstacle.id,
+          createRenderableComponent("emoji", { icon: "🌳", zIndex: 1 }),
+        );
       }
 
       // Simulate player movement towards NPC
@@ -522,8 +583,8 @@ describe('ECS Integration Tests', () => {
         world.update();
         stepCount++;
 
-        const playerPos = world.getComponent(player.id, 'position');
-        
+        const playerPos = world.getComponent(player.id, "position");
+
         // Player should move until collision
         if (collisionSystem.collisions.length > 0) {
           break;
@@ -532,20 +593,20 @@ describe('ECS Integration Tests', () => {
 
       // Player should have collided with first obstacle
       expect(collisionSystem.collisions.length).toBeGreaterThan(0);
-      
-      const playerPos = world.getComponent(player.id, 'position');
+
+      const playerPos = world.getComponent(player.id, "position");
       expect(playerPos?.x).toBe(2); // Should be at position 2 when hitting obstacle at position 2
 
       // Verify entities are being rendered (player might have collided, so check what we have)
       expect(renderSystem.lastRenderData.length).toBeGreaterThan(0);
-      
+
       // Check that player and obstacles are rendered
-      const entityIds = renderSystem.lastRenderData.map(e => e.id);
-      expect(entityIds).toContain('player');
-      
+      const entityIds = renderSystem.lastRenderData.map((e) => e.id);
+      expect(entityIds).toContain("player");
+
       // Check z-index ordering (obstacles=1, npc=5, player=10)
       const sortedEntities = renderSystem.lastRenderData;
-      const playerEntity = sortedEntities.find(e => e.id === 'player');
+      const playerEntity = sortedEntities.find((e) => e.id === "player");
       expect(playerEntity?.renderable.zIndex).toBe(10); // Player should have highest zIndex
     });
   });

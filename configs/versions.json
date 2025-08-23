@@ -4,7 +4,7 @@
     "reason": "Stable version used across all packages for consistency"
   },
   "react-dom": {
-    "version": "^18.3.1", 
+    "version": "^18.3.1",
     "reason": "Must match React version"
   },
   "@types/react": {

@@ -1,10 +1,10 @@
 // Quest Log Modal - Full quest management interface
 
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useQuestStore } from '../../stores/questStore';
-import type { QuestData } from '../../types';
-import { QuestType, QuestStatus } from '../../types';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useQuestStore } from "../../stores/questStore";
+import type { QuestData } from "../../types";
+import { QuestType, QuestStatus } from "../../types";
 
 const Overlay = styled.div`
   position: fixed;
@@ -79,12 +79,12 @@ const QuestList = styled.div`
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #4a90e2;
     border-radius: 3px;
@@ -92,18 +92,19 @@ const QuestList = styled.div`
 `;
 
 const QuestListItem = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['isSelected', 'status'].includes(prop),
+  shouldForwardProp: (prop) => !["isSelected", "status"].includes(prop),
 })<{ isSelected?: boolean; status?: QuestStatus }>`
-  background: ${props => {
-    if (props.status === QuestStatus.COMPLETED) return 'rgba(34, 139, 34, 0.2)';
-    if (props.isSelected) return 'rgba(74, 144, 226, 0.3)';
-    return 'rgba(255, 255, 255, 0.05)';
+  background: ${(props) => {
+    if (props.status === QuestStatus.COMPLETED) return "rgba(34, 139, 34, 0.2)";
+    if (props.isSelected) return "rgba(74, 144, 226, 0.3)";
+    return "rgba(255, 255, 255, 0.05)";
   }};
-  border: 1px solid ${props => {
-    if (props.status === QuestStatus.COMPLETED) return '#228b22';
-    if (props.isSelected) return '#4a90e2';
-    return 'rgba(255, 255, 255, 0.1)';
-  }};
+  border: 1px solid
+    ${(props) => {
+      if (props.status === QuestStatus.COMPLETED) return "#228b22";
+      if (props.isSelected) return "#4a90e2";
+      return "rgba(255, 255, 255, 0.1)";
+    }};
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 8px;
@@ -111,11 +112,10 @@ const QuestListItem = styled.div.withConfig({
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => 
-      props.status === QuestStatus.COMPLETED 
-        ? 'rgba(34, 139, 34, 0.3)'
-        : 'rgba(74, 144, 226, 0.2)'
-    };
+    background: ${(props) =>
+      props.status === QuestStatus.COMPLETED
+        ? "rgba(34, 139, 34, 0.3)"
+        : "rgba(74, 144, 226, 0.2)"};
   }
 `;
 
@@ -127,28 +127,27 @@ const QuestItemHeader = styled.div`
 `;
 
 const QuestIcon = styled.span.withConfig({
-  shouldForwardProp: (prop) => !['status'].includes(prop),
+  shouldForwardProp: (prop) => !["status"].includes(prop),
 })<{ status?: QuestStatus }>`
   font-size: 14px;
-  color: ${props => {
-    if (props.status === QuestStatus.COMPLETED) return '#90EE90';
-    return 'white';
+  color: ${(props) => {
+    if (props.status === QuestStatus.COMPLETED) return "#90EE90";
+    return "white";
   }};
 `;
 
 const QuestItemTitle = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['status'].includes(prop),
+  shouldForwardProp: (prop) => !["status"].includes(prop),
 })<{ status?: QuestStatus }>`
-  color: ${props => {
-    if (props.status === QuestStatus.COMPLETED) return '#90EE90';
-    return 'white';
+  color: ${(props) => {
+    if (props.status === QuestStatus.COMPLETED) return "#90EE90";
+    return "white";
   }};
   font-weight: 500;
   font-size: 13px;
   flex: 1;
-  text-decoration: ${props => 
-    props.status === QuestStatus.COMPLETED ? 'line-through' : 'none'
-  };
+  text-decoration: ${(props) =>
+    props.status === QuestStatus.COMPLETED ? "line-through" : "none"};
 `;
 
 const QuestProgress = styled.div`
@@ -166,15 +165,14 @@ const ProgressBar = styled.div`
 `;
 
 const ProgressFill = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['progress', 'status'].includes(prop),
+  shouldForwardProp: (prop) => !["progress", "status"].includes(prop),
 })<{ progress: number; status?: QuestStatus }>`
   height: 100%;
-  width: ${props => props.progress}%;
-  background: ${props => 
-    props.status === QuestStatus.COMPLETED 
-      ? 'linear-gradient(90deg, #228b22, #32cd32)'
-      : 'linear-gradient(90deg, #4a90e2, #357abd)'
-  };
+  width: ${(props) => props.progress}%;
+  background: ${(props) =>
+    props.status === QuestStatus.COMPLETED
+      ? "linear-gradient(90deg, #228b22, #32cd32)"
+      : "linear-gradient(90deg, #4a90e2, #357abd)"};
   transition: width 0.3s ease;
 `;
 
@@ -230,18 +228,19 @@ const SectionTitle = styled.h3`
 `;
 
 const ObjectiveItem = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['isCompleted', 'isCurrent'].includes(prop),
+  shouldForwardProp: (prop) => !["isCompleted", "isCurrent"].includes(prop),
 })<{ isCompleted?: boolean; isCurrent?: boolean }>`
-  background: ${props => {
-    if (props.isCompleted) return 'rgba(34, 139, 34, 0.2)';
-    if (props.isCurrent) return 'rgba(255, 165, 0, 0.2)';
-    return 'rgba(255, 255, 255, 0.05)';
+  background: ${(props) => {
+    if (props.isCompleted) return "rgba(34, 139, 34, 0.2)";
+    if (props.isCurrent) return "rgba(255, 165, 0, 0.2)";
+    return "rgba(255, 255, 255, 0.05)";
   }};
-  border: 1px solid ${props => {
-    if (props.isCompleted) return '#228b22';
-    if (props.isCurrent) return '#ffa500';
-    return 'rgba(255, 255, 255, 0.1)';
-  }};
+  border: 1px solid
+    ${(props) => {
+      if (props.isCompleted) return "#228b22";
+      if (props.isCurrent) return "#ffa500";
+      return "rgba(255, 255, 255, 0.1)";
+    }};
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 8px;
@@ -255,22 +254,22 @@ const ObjectiveHeader = styled.div`
 `;
 
 const ObjectiveStatus = styled.span.withConfig({
-  shouldForwardProp: (prop) => !['isCompleted', 'isCurrent'].includes(prop),
+  shouldForwardProp: (prop) => !["isCompleted", "isCurrent"].includes(prop),
 })<{ isCompleted?: boolean; isCurrent?: boolean }>`
   font-size: 16px;
-  color: ${props => {
-    if (props.isCompleted) return '#90EE90';
-    if (props.isCurrent) return '#ffa500';
-    return '#ccc';
+  color: ${(props) => {
+    if (props.isCompleted) return "#90EE90";
+    if (props.isCurrent) return "#ffa500";
+    return "#ccc";
   }};
 `;
 
 const ObjectiveText = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['isCompleted'].includes(prop),
-})<{ isCompleted?: boolean }>` 
-  color: ${props => props.isCompleted ? '#90EE90' : 'white'};
+  shouldForwardProp: (prop) => !["isCompleted"].includes(prop),
+})<{ isCompleted?: boolean }>`
+  color: ${(props) => (props.isCompleted ? "#90EE90" : "white")};
   font-weight: 500;
-  text-decoration: ${props => props.isCompleted ? 'line-through' : 'none'};
+  text-decoration: ${(props) => (props.isCompleted ? "line-through" : "none")};
   flex: 1;
 `;
 
@@ -307,13 +306,20 @@ const EmptyState = styled.div`
 
 const getQuestIcon = (questType: QuestType): string => {
   switch (questType) {
-    case QuestType.CONVERSATION: return '💬';
-    case QuestType.DELIVERY: return '📦';
-    case QuestType.SHOPPING: return '🛒';
-    case QuestType.EXPLORATION: return '🗺️';
-    case QuestType.COLLECTION: return '📚';
-    case QuestType.LEARNING: return '🎓';
-    default: return '⭐';
+    case QuestType.CONVERSATION:
+      return "💬";
+    case QuestType.DELIVERY:
+      return "📦";
+    case QuestType.SHOPPING:
+      return "🛒";
+    case QuestType.EXPLORATION:
+      return "🗺️";
+    case QuestType.COLLECTION:
+      return "📚";
+    case QuestType.LEARNING:
+      return "🎓";
+    default:
+      return "⭐";
   }
 };
 
@@ -324,27 +330,24 @@ interface QuestLogProps {
 
 export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
   const [selectedQuest, setSelectedQuest] = useState<QuestData | null>(null);
-  const { 
-    activeQuests, 
-    allQuests,
-    completedQuests
-  } = useQuestStore();
+  const { activeQuests, allQuests, completedQuests } = useQuestStore();
 
   // Combine active and completed quests for display
   const allDisplayQuests = [
     ...activeQuests,
-    ...completedQuests.map(id => allQuests[id]).filter(Boolean)
+    ...completedQuests.map((id) => allQuests[id]).filter(Boolean),
   ];
 
   const calculateProgress = (quest: QuestData): number => {
-    const completedObjectives = quest.objectives.filter(obj => obj.isCompleted).length;
+    const completedObjectives = quest.objectives.filter(
+      (obj) => obj.isCompleted,
+    ).length;
     return (completedObjectives / quest.objectives.length) * 100;
   };
 
   const handleQuestSelect = (quest: QuestData) => {
     setSelectedQuest(quest);
   };
-
 
   if (!selectedQuest && allDisplayQuests.length > 0) {
     setSelectedQuest(allDisplayQuests[0]);
@@ -360,15 +363,17 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                 <Title>Quest Log</Title>
                 <CloseButton onClick={onClose}>×</CloseButton>
               </SidebarHeader>
-              
+
               <QuestList>
                 {allDisplayQuests.length === 0 ? (
                   <EmptyState>No quests available</EmptyState>
                 ) : (
                   allDisplayQuests.map((quest) => {
                     const progress = calculateProgress(quest);
-                    const completedCount = quest.objectives.filter(obj => obj.isCompleted).length;
-                    
+                    const completedCount = quest.objectives.filter(
+                      (obj) => obj.isCompleted,
+                    ).length;
+
                     return (
                       <QuestListItem
                         key={quest.id}
@@ -378,19 +383,24 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                       >
                         <QuestItemHeader>
                           <QuestIcon status={quest.status}>
-                            {quest.status === QuestStatus.COMPLETED ? '✓' : getQuestIcon(quest.questType)}
+                            {quest.status === QuestStatus.COMPLETED
+                              ? "✓"
+                              : getQuestIcon(quest.questType)}
                           </QuestIcon>
                           <QuestItemTitle status={quest.status}>
                             {quest.title}
                           </QuestItemTitle>
                         </QuestItemHeader>
-                        
+
                         <QuestProgress>
                           {completedCount}/{quest.objectives.length} objectives
                         </QuestProgress>
-                        
+
                         <ProgressBar>
-                          <ProgressFill progress={progress} status={quest.status} />
+                          <ProgressFill
+                            progress={progress}
+                            status={quest.status}
+                          />
                         </ProgressBar>
                       </QuestListItem>
                     );
@@ -404,13 +414,19 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                 <>
                   <QuestDetailsHeader>
                     <QuestTitle>{selectedQuest.title}</QuestTitle>
-                    <QuestDescription>{selectedQuest.description}</QuestDescription>
-                    
+                    <QuestDescription>
+                      {selectedQuest.description}
+                    </QuestDescription>
+
                     <QuestMeta>
                       <MetaItem>Type: {selectedQuest.questType}</MetaItem>
-                      <MetaItem>Category: {selectedQuest.learningCategory}</MetaItem>
+                      <MetaItem>
+                        Category: {selectedQuest.learningCategory}
+                      </MetaItem>
                       {selectedQuest.experienceReward > 0 && (
-                        <MetaItem>XP: {selectedQuest.experienceReward}</MetaItem>
+                        <MetaItem>
+                          XP: {selectedQuest.experienceReward}
+                        </MetaItem>
                       )}
                       {selectedQuest.moneyReward > 0 && (
                         <MetaItem>Money: ${selectedQuest.moneyReward}</MetaItem>
@@ -420,12 +436,19 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
 
                   <ObjectivesSection>
                     <SectionTitle>
-                      Objectives ({selectedQuest.objectives.filter(obj => obj.isCompleted).length}/{selectedQuest.objectives.length})
+                      Objectives (
+                      {
+                        selectedQuest.objectives.filter(
+                          (obj) => obj.isCompleted,
+                        ).length
+                      }
+                      /{selectedQuest.objectives.length})
                     </SectionTitle>
-                    
+
                     {selectedQuest.objectives.map((objective, index) => {
-                      const isCurrent = index === selectedQuest.currentObjectiveIndex;
-                      
+                      const isCurrent =
+                        index === selectedQuest.currentObjectiveIndex;
+
                       return (
                         <ObjectiveItem
                           key={objective.id}
@@ -433,22 +456,27 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                           isCurrent={isCurrent && !objective.isCompleted}
                         >
                           <ObjectiveHeader>
-                            <ObjectiveStatus 
+                            <ObjectiveStatus
                               isCompleted={objective.isCompleted}
                               isCurrent={isCurrent && !objective.isCompleted}
                             >
-                              {objective.isCompleted ? '✓' : isCurrent ? '►' : '○'}
+                              {objective.isCompleted
+                                ? "✓"
+                                : isCurrent
+                                  ? "►"
+                                  : "○"}
                             </ObjectiveStatus>
                             <ObjectiveText isCompleted={objective.isCompleted}>
                               {objective.description}
                             </ObjectiveText>
                             {objective.targetCount > 1 && (
                               <ObjectiveProgress>
-                                ({objective.currentCount}/{objective.targetCount})
+                                ({objective.currentCount}/
+                                {objective.targetCount})
                               </ObjectiveProgress>
                             )}
                           </ObjectiveHeader>
-                          
+
                           {isCurrent && objective.hint && (
                             <HintText>💡 {objective.hint}</HintText>
                           )}
@@ -460,13 +488,17 @@ export const QuestLog: React.FC<QuestLogProps> = ({ isOpen, onClose }) => {
                   <RewardsSection>
                     <SectionTitle>Rewards</SectionTitle>
                     {selectedQuest.experienceReward > 0 && (
-                      <RewardItem>📈 {selectedQuest.experienceReward} Experience</RewardItem>
+                      <RewardItem>
+                        📈 {selectedQuest.experienceReward} Experience
+                      </RewardItem>
                     )}
                     {selectedQuest.moneyReward > 0 && (
                       <RewardItem>💰 ${selectedQuest.moneyReward}</RewardItem>
                     )}
                     {selectedQuest.newVocabulary.length > 0 && (
-                      <RewardItem>📚 Vocabulary: {selectedQuest.newVocabulary.join(', ')}</RewardItem>
+                      <RewardItem>
+                        📚 Vocabulary: {selectedQuest.newVocabulary.join(", ")}
+                      </RewardItem>
                     )}
                   </RewardsSection>
                 </>

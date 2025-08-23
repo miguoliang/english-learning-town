@@ -1,11 +1,11 @@
 /**
  * Component Manager - Component data management and queries
- * 
+ *
  * Manages all component data and provides efficient access to components by type and entity.
  * Handles component storage, retrieval, and entity queries.
  */
 
-import type { EntityId, Component } from './types';
+import type { EntityId, Component } from "./types";
 
 /**
  * ComponentManager - Manages all component data
@@ -21,7 +21,7 @@ export class ComponentManager {
     if (!this.components.has(component.type)) {
       this.components.set(component.type, new Map());
     }
-    
+
     this.components.get(component.type)!.set(entityId, component);
   }
 
@@ -38,7 +38,10 @@ export class ComponentManager {
   /**
    * Get a specific component from an entity
    */
-  getComponent<T extends Component>(entityId: EntityId, componentType: string): T | undefined {
+  getComponent<T extends Component>(
+    entityId: EntityId,
+    componentType: string,
+  ): T | undefined {
     const componentMap = this.components.get(componentType);
     return componentMap?.get(entityId) as T | undefined;
   }
@@ -54,8 +57,11 @@ export class ComponentManager {
   /**
    * Check if entity has all required components
    */
-  hasAllComponents(entityId: EntityId, componentTypes: readonly string[]): boolean {
-    return componentTypes.every(type => this.hasComponent(entityId, type));
+  hasAllComponents(
+    entityId: EntityId,
+    componentTypes: readonly string[],
+  ): boolean {
+    return componentTypes.every((type) => this.hasComponent(entityId, type));
   }
 
   /**
@@ -71,16 +77,18 @@ export class ComponentManager {
    */
   getEntitiesWithComponents(componentTypes: readonly string[]): EntityId[] {
     if (componentTypes.length === 0) return [];
-    
+
     // Start with entities that have the first component type
     let entities = this.getEntitiesWithComponent(componentTypes[0]);
-    
+
     // Filter to only entities that have all required components
     for (let i = 1; i < componentTypes.length; i++) {
       const componentType = componentTypes[i];
-      entities = entities.filter(entityId => this.hasComponent(entityId, componentType));
+      entities = entities.filter((entityId) =>
+        this.hasComponent(entityId, componentType),
+      );
     }
-    
+
     return entities;
   }
 

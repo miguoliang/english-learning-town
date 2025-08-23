@@ -1,6 +1,6 @@
 /**
  * ECS Systems - Modular System Organization
- * 
+ *
  * Systems are organized by functional responsibility following SRP:
  * - ai: Artificial intelligence and NPC behavior
  * - audio: Audio playback and sound management
@@ -9,13 +9,13 @@
  */
 
 // AI Systems
-export * from './ai';
+export * from "./ai";
 
 // Audio Systems
-export * from './audio';
+export * from "./audio";
 
 // Physics Systems
-export * from './physics';
+export * from "./physics";
 
 // Utility Systems (Timer, Health, State)
-export * from './utility';
+export * from "./utility";

@@ -1,6 +1,6 @@
 /**
  * ECS Core - Modular Core Organization
- * 
+ *
  * Core ECS architecture organized by responsibility:
  * - types: Entity, Component, System interfaces
  * - componentManager: Component data management and queries
@@ -8,10 +8,10 @@
  */
 
 // Core type definitions
-export type { EntityId, Entity, Component, System } from './types';
+export type { EntityId, Entity, Component, System } from "./types";
 
 // Component management
-export { ComponentManager } from './componentManager';
+export { ComponentManager } from "./componentManager";
 
 // World coordination
-export { World } from './world';
+export { World } from "./world";

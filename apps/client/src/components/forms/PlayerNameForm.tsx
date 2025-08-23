@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Button, Spinner } from '@elt/ui';
-import { useGameStore } from '../../stores/unifiedGameStore';
-import { logger } from '../../utils/logger';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Button, Spinner } from "@elt/ui";
+import { useGameStore } from "../../stores/unifiedGameStore";
+import { logger } from "../../utils/logger";
 
 const FormContainer = styled.div`
   display: flex;
@@ -14,7 +14,7 @@ const FormContainer = styled.div`
 const PlayerNameInput = styled.input`
   padding: 1.5rem 2rem;
   font-size: 1.3rem;
-  font-family: 'Comic Neue', 'Fredoka One', sans-serif;
+  font-family: "Comic Neue", "Fredoka One", sans-serif;
   font-weight: 600;
   border: 4px solid ${({ theme }) => theme.colors.surface};
   border-radius: 16px;
@@ -23,30 +23,30 @@ const PlayerNameInput = styled.input`
   backdrop-filter: blur(10px);
   text-align: center;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  box-shadow: 
+  box-shadow:
     ${({ theme }) => theme.shadows.fun},
     0 4px 16px rgba(69, 183, 209, 0.3);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   min-height: 60px;
-  
+
   &::placeholder {
     color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
   }
-  
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.primary};
     background: ${({ theme }) => theme.gradients.magical};
-    box-shadow: 
+    box-shadow:
       ${({ theme }) => theme.shadows.glow},
       0 6px 20px rgba(255, 107, 107, 0.4);
     transform: translateY(-2px) scale(1.02);
   }
-  
+
   &:hover:not(:focus) {
     transform: translateY(-1px);
-    box-shadow: 
+    box-shadow:
       ${({ theme }) => theme.shadows.fun},
       0 6px 18px rgba(69, 183, 209, 0.4);
   }
@@ -65,23 +65,23 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
   onStartGame,
   onLoadGame,
   onSettings,
-  onHelp
+  onHelp,
 }) => {
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { updatePlayer, setCurrentScene } = useGameStore();
 
   useEffect(() => {
     // Load saved player name if exists
     const savedPlayer = useGameStore.getState().player;
-    if (savedPlayer.name && savedPlayer.name !== 'Player') {
+    if (savedPlayer.name && savedPlayer.name !== "Player") {
       setPlayerName(savedPlayer.name);
     }
   }, []);
 
   const handleStartGame = async () => {
     if (!playerName.trim()) {
-      alert('Please enter your name to start playing!');
+      alert("Please enter your name to start playing!");
       return;
     }
 
@@ -89,26 +89,29 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
 
     try {
       // Update player data
-      updatePlayer({ 
+      updatePlayer({
         name: playerName.trim(),
-        id: playerName.trim().toLowerCase().replace(/\s+/g, '_') + '_' + Date.now()
+        id:
+          playerName.trim().toLowerCase().replace(/\s+/g, "_") +
+          "_" +
+          Date.now(),
       });
 
       // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      setCurrentScene('town');
+      setCurrentScene("town");
       onStartGame();
     } catch (error) {
-      logger.error('Failed to start game:', error);
-      alert('Failed to start game. Please try again.');
+      logger.error("Failed to start game:", error);
+      alert("Failed to start game. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLoadGame = () => {
-    setCurrentScene('town');
+    setCurrentScene("town");
     onLoadGame();
   };
 
@@ -126,8 +129,12 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
         type="text"
         placeholder="What's your name, adventurer? ✨"
         value={playerName}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value)}
-        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleStartGame()}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setPlayerName(e.target.value)
+        }
+        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+          e.key === "Enter" && handleStartGame()
+        }
         maxLength={20}
       />
 
@@ -140,27 +147,15 @@ export const PlayerNameForm: React.FC<PlayerNameFormProps> = ({
         🚀 Start New Adventure
       </Button>
 
-      <Button
-        variant="secondary"
-        size="lg"
-        onClick={handleLoadGame}
-      >
+      <Button variant="secondary" size="lg" onClick={handleLoadGame}>
         📖 Continue Learning
       </Button>
 
-      <Button
-        variant="secondary"
-        size="lg"
-        onClick={onSettings}
-      >
+      <Button variant="secondary" size="lg" onClick={onSettings}>
         ⚙️ Settings
       </Button>
 
-      <Button
-        variant="secondary"
-        size="lg"
-        onClick={onHelp}
-      >
+      <Button variant="secondary" size="lg" onClick={onHelp}>
         ❓ How to Play
       </Button>
     </FormContainer>

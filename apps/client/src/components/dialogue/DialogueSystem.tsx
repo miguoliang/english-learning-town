@@ -1,18 +1,18 @@
 // Refactored Dialogue System Component with Single Responsibility Principle
 
-import React from 'react';
-import styled from 'styled-components';
-import { useDialogueState } from '../../hooks/useDialogueState';
-import { useDialogueKeyboard } from '../../hooks/useDialogueKeyboard';
-import { useEyeBreakReminder } from '../../hooks/useEyeBreakReminder';
-import { DialogueHeader } from './DialogueHeader';
-import { DialogueTextAudio } from './DialogueTextAudio';
-import { ResponseOptions } from './ResponseOptions';
-import { ContinueButton } from './ContinueButton';
-import { VocabularyProgress } from './VocabularyProgress';
-import { EyeBreakReminder } from './EyeBreakReminder';
-import { BrightnessControl } from './BrightnessControl';
-import { VoiceGuidance } from './VoiceGuidance';
+import React from "react";
+import styled from "styled-components";
+import { useDialogueState } from "../../hooks/useDialogueState";
+import { useDialogueKeyboard } from "../../hooks/useDialogueKeyboard";
+import { useEyeBreakReminder } from "../../hooks/useEyeBreakReminder";
+import { DialogueHeader } from "./DialogueHeader";
+import { DialogueTextAudio } from "./DialogueTextAudio";
+import { ResponseOptions } from "./ResponseOptions";
+import { ContinueButton } from "./ContinueButton";
+import { VocabularyProgress } from "./VocabularyProgress";
+import { EyeBreakReminder } from "./EyeBreakReminder";
+import { BrightnessControl } from "./BrightnessControl";
+import { VoiceGuidance } from "./VoiceGuidance";
 
 const DialogueOverlay = styled.div`
   position: fixed;
@@ -36,13 +36,13 @@ const DialogueBox = styled.div`
   max-width: 820px;
   min-height: 220px;
   padding: 32px;
-  box-shadow: 
+  box-shadow:
     0 -20px 60px rgba(0, 0, 0, 0.9),
     0 -8px 25px rgba(212, 144, 74, 0.1),
     inset 0 1px 0 rgba(212, 144, 74, 0.2);
   backdrop-filter: blur(8px);
   animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  
+
   @keyframes slideUp {
     from {
       transform: translateY(100px);
@@ -60,9 +60,14 @@ interface DialogueSystemProps {
   onClose: () => void;
 }
 
-export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }) => {
+export const DialogueSystem: React.FC<DialogueSystemProps> = ({
+  npcId,
+  onClose,
+}) => {
   const [showVoiceGuidance, setShowVoiceGuidance] = React.useState(true);
-  const [guidanceContext, setGuidanceContext] = React.useState<'dialogue-start' | 'response-options'>('dialogue-start');
+  const [guidanceContext, setGuidanceContext] = React.useState<
+    "dialogue-start" | "response-options"
+  >("dialogue-start");
 
   // Use custom hooks for state and keyboard handling
   const {
@@ -99,11 +104,12 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
   // Handle voice guidance context changes
   React.useEffect(() => {
     if (currentDialogue) {
-      const hasResponses = currentDialogue.responses && currentDialogue.responses.length > 0;
+      const hasResponses =
+        currentDialogue.responses && currentDialogue.responses.length > 0;
       if (hasResponses && !hasResponded) {
         // Show guidance when response options are available
         setTimeout(() => {
-          setGuidanceContext('response-options');
+          setGuidanceContext("response-options");
           setShowVoiceGuidance(true);
         }, 2000); // Show after dialogue has been read
       }
@@ -114,7 +120,8 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
     return null;
   }
 
-  const hasResponses = currentDialogue.responses && currentDialogue.responses.length > 0;
+  const hasResponses =
+    currentDialogue.responses && currentDialogue.responses.length > 0;
 
   return (
     <>
@@ -156,9 +163,9 @@ export const DialogueSystem: React.FC<DialogueSystemProps> = ({ npcId, onClose }
         onAcknowledgeBreak={acknowledgeBreakReminder}
         sessionStats={getSessionStats()}
       />
-      
+
       <BrightnessControl isVisible={true} />
-      
+
       <VoiceGuidance
         context={guidanceContext}
         isVisible={showVoiceGuidance}

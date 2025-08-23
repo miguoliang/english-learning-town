@@ -31,18 +31,18 @@ function App() {
       <Button variant="primary" onClick={() => console.log('Clicked!')}>
         Click me! 🚀
       </Button>
-      
-      <Input 
+
+      <Input
         placeholder="Enter your name"
         onChange={(e) => console.log(e.target.value)}
       />
-      
-      <AnimatedEmoji 
-        emoji="🎉" 
-        mood="excited" 
-        autoAnimate 
+
+      <AnimatedEmoji
+        emoji="🎉"
+        mood="excited"
+        autoAnimate
       />
-      
+
       <LoadingScreen />
     </div>
   );
@@ -54,17 +54,20 @@ function App() {
 ### Basic Components
 
 **Button**
+
 - Multiple variants: primary, secondary, ghost, outline
 - Size options: sm, md, lg
 - Emoji parsing support
 - Loading states and disabled states
 
 **Input**
+
 - Styled form input with theme integration
 - Error state styling
 - Placeholder and validation support
 
 **AnimatedEmoji**
+
 - Mood-based animations: happy, excited, thinking, surprised, floating
 - Click interactions
 - Customizable size and auto-animation
@@ -72,11 +75,13 @@ function App() {
 ### Feedback Components
 
 **LoadingScreen**
+
 - Full-screen loading overlay
 - Animated spinner
 - Customizable messaging
 
 **Spinner**
+
 - Reusable loading indicator
 - Multiple size options
 - Theme-integrated styling
@@ -84,16 +89,19 @@ function App() {
 ### Error Handling
 
 **ErrorBoundary**
+
 - React error boundary implementation
 - Fallback UI for component errors
 - Error logging and reporting
 
 **ErrorFallback**
+
 - Customizable error display component
 - Retry functionality
 - Multiple error types and styling
 
 **AsyncErrorBoundary**
+
 - Error boundary for async operations
 - Loading state management
 - Error recovery mechanisms
@@ -101,7 +109,7 @@ function App() {
 ## Theme System
 
 ```typescript
-import { theme } from '@elt/ui';
+import { theme } from "@elt/ui";
 
 // Access theme properties
 const primaryColor = theme.colors.primary;
@@ -121,11 +129,13 @@ const borderRadius = theme.borderRadius.md;
 ## Utilities
 
 **Emoji Parser**
+
 - Extracts and processes emoji from text
 - Used internally by Button component
 - Supports emoji detection and replacement
 
 **Error Helpers**
+
 - Utility functions for error boundary components
 - Error categorization and handling
 - Recovery action generators
@@ -139,7 +149,7 @@ pnpm install
 # Run tests
 pnpm test
 
-# Run tests in watch mode  
+# Run tests in watch mode
 pnpm test --watch
 
 # Build package

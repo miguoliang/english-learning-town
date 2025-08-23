@@ -11,7 +11,7 @@ export default defineConfig({
   minify: false,
   target: 'es2022',
   tsconfig: './tsconfig.json',
-  external: ['react', 'react-dom']
+  external: ['react', 'react-dom'],
 });
 
 export const packageConfig = defineConfig({
@@ -25,5 +25,5 @@ export const packageConfig = defineConfig({
   minify: false,
   target: 'es2022',
   external: ['react', 'react-dom'],
-  onSuccess: 'cp -r src/styles/*.css dist/ 2>/dev/null || true'
+  onSuccess: 'cp -r src/styles/*.css dist/ 2>/dev/null || true',
 });

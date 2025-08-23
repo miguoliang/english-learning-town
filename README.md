@@ -19,7 +19,7 @@ english-learning-town/
 │   ├── tsconfig.*.json         # Shared TypeScript configurations
 │   ├── eslint.config.js        # Unified ESLint rules
 │   ├── vitest.config.js        # Shared test configuration
-│   ├── tsup.config.js          # Package build configuration  
+│   ├── tsup.config.js          # Package build configuration
 │   └── versions.json           # Centralized dependency versions
 ├── apps/
 │   └── client/                 # Main React application
@@ -38,12 +38,14 @@ english-learning-town/
 ## ✨ Key Features
 
 ### 🏗️ Architecture & Development
-- **📦 Monorepo Structure**: Clean package separation with @elt/* namespaced packages
+
+- **📦 Monorepo Structure**: Clean package separation with @elt/\* namespaced packages
 - **⚡ Turbo Build System**: Optimized builds with intelligent caching
 - **🧪 200+ Tests**: Comprehensive test coverage across all packages (157 in @elt/core alone)
 - **🔒 Type Safety**: Strict TypeScript across all packages with zero compilation errors
 
-### 🎮 Game Features  
+### 🎮 Game Features
+
 - **🎯 Enhanced Quest System**: Visual progress tracking with real-time indicators and multi-quest management
 - **💬 Rich Dialogue System**: Interactive conversations with vocabulary highlighting and learning feedback
 - **⚙️ Settings & Help**: Complete configuration UI and interactive tutorial system
@@ -54,6 +56,7 @@ english-learning-town/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **Node.js 18+**: For React development
 - **pnpm**: Package manager for monorepo
 - **Go 1.19+**: Backend API server
@@ -71,7 +74,7 @@ pnpm install
 
 # Start development
 pnpm dev          # Start client development server
-pnpm build        # Build all packages with Turbo  
+pnpm build        # Build all packages with Turbo
 pnpm test         # Run all tests (200+ tests)
 ```
 
@@ -82,11 +85,12 @@ Open [http://localhost:5173](http://localhost:5173) to play the game!
 ```bash
 # Individual package development
 cd packages/core && pnpm test --watch    # ECS engine tests
-cd packages/ui && pnpm build --watch     # UI components  
+cd packages/ui && pnpm build --watch     # UI components
 cd apps/client && pnpm dev               # Main application
 ```
 
 #### Start Script Options
+
 ```bash
 # Direct script usage
 ./start.sh                  # Start both backend and frontend
@@ -113,6 +117,7 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 ### Technology Stack
 
 **🆕 Unified Configuration System**
+
 - **React**: `18.3.1` - Consistent across all packages
 - **TypeScript**: `5.8.3` - Latest stable with modern features
 - **ESLint**: `9.30.1` - Modern flat config system
@@ -120,6 +125,7 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 - **tsup**: `8.0.0` - Modern TypeScript bundler
 
 **Frontend**
+
 - **Framework**: React 18 + TypeScript + Vite
 - **State Management**: Zustand with persistence
 - **Styling**: CSS-only theming (migrated from Styled Components)
@@ -127,10 +133,12 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 - **Build System**: Turbo + pnpm workspaces
 
 **Backend**
+
 - **API**: Go with Gin framework
 - **Database**: SQLite for persistence
 
 **Development Tools**
+
 - **Shared Configs**: TypeScript, ESLint, Vitest, tsup in `/configs/`
 - **Version Management**: Centralized dependency versions
 - **Package Structure**: Proper dependencies vs devDependencies separation
@@ -138,6 +146,7 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 ## 📋 Development Status
 
 ### ✅ React Implementation (COMPLETED)
+
 **Modern Web-Based Educational Game with Clean Architecture**
 
 - [x] **React Frontend Architecture**
@@ -175,10 +184,11 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
   - [x] **Type-safe development experience** ⭐ NEW
 
 ### ✅ Tech Stack Unification (COMPLETED) 🆕
+
 **Centralized Configuration Management & Version Consistency**
 
 - [x] **Shared Configuration System**
-  - [x] Unified TypeScript configs for React vs Node packages  
+  - [x] Unified TypeScript configs for React vs Node packages
   - [x] Shared ESLint, Vitest, tsup configurations
   - [x] Centralized dependency version management
   - [x] Single-source configuration updates
@@ -206,12 +216,14 @@ React Frontend (TypeScript) ←→ Go Backend (REST API) ←→ SQLite Database
 ## 🎯 Game Mechanics
 
 ### Learning System
+
 - **Contextual Vocabulary**: Words introduced through meaningful conversations
 - **Progressive Difficulty**: Quests build on previous knowledge
 - **Repetition & Reinforcement**: Natural review through gameplay
 - **Multiple Learning Styles**: Visual, auditory, and kinesthetic approaches
 
 ### Character Progression
+
 - **Experience Points**: Earned through successful interactions
 - **Friendship Levels**: Deeper relationships unlock advanced content
 - **Achievement System**: Milestones for motivation and tracking
@@ -236,11 +248,13 @@ cd react-client && npm run type-check
 ## 📖 Documentation
 
 ### Core Documentation
+
 - **[CLAUDE.md](CLAUDE.md)** - Technical collaboration guide and coding patterns
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Feature roadmap, sprint planning, and implementation guide
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture, ECS patterns, and best practices
 
 ### Additional Resources
+
 - **[Development Guide](docs/src/development/README.md)**: Setup and contribution guidelines
 - **[API Documentation](docs/src/api/README.md)**: Backend endpoints and data models
 - **[Game Design](docs/src/game-design/README.md)**: Educational methodology and mechanics
@@ -248,11 +262,13 @@ cd react-client && npm run type-check
 ## 🤝 Contributing
 
 We welcome contributions! Please see our organized documentation:
+
 - **[CLAUDE.md](CLAUDE.md)** - Technical collaboration guide and coding patterns
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Current priorities and implementation roadmap
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture principles and best practices
 
 ### Development Setup
+
 1. Fork the repository
 2. Create a feature branch
 3. Follow the coding patterns in CLAUDE.md
@@ -262,6 +278,7 @@ We welcome contributions! Please see our organized documentation:
 ## 📊 Current Status
 
 **🎉 React Implementation Complete!** - Modern educational game ready to play
+
 - ✅ Full React + TypeScript implementation
 - ✅ Enhanced quest system with visual progress tracking
 - ✅ Rich dialogue system with vocabulary learning

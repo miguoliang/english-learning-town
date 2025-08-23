@@ -1,52 +1,53 @@
 // Game Types - Converted from Godot GDScript
 
 export const QuestType = {
-  CONVERSATION: 'CONVERSATION',
-  DELIVERY: 'DELIVERY', 
-  SHOPPING: 'SHOPPING',
-  EXPLORATION: 'EXPLORATION',
-  COLLECTION: 'COLLECTION',
-  LEARNING: 'LEARNING'
+  CONVERSATION: "CONVERSATION",
+  DELIVERY: "DELIVERY",
+  SHOPPING: "SHOPPING",
+  EXPLORATION: "EXPLORATION",
+  COLLECTION: "COLLECTION",
+  LEARNING: "LEARNING",
 } as const;
 
-export type QuestType = typeof QuestType[keyof typeof QuestType];
+export type QuestType = (typeof QuestType)[keyof typeof QuestType];
 
 export const LearningCategory = {
-  VOCABULARY: 'VOCABULARY',
-  GRAMMAR: 'GRAMMAR',
-  SPEAKING: 'SPEAKING',
-  LISTENING: 'LISTENING',
-  READING: 'READING',
-  WRITING: 'WRITING',
-  PRONUNCIATION: 'PRONUNCIATION'
+  VOCABULARY: "VOCABULARY",
+  GRAMMAR: "GRAMMAR",
+  SPEAKING: "SPEAKING",
+  LISTENING: "LISTENING",
+  READING: "READING",
+  WRITING: "WRITING",
+  PRONUNCIATION: "PRONUNCIATION",
 } as const;
 
-export type LearningCategory = typeof LearningCategory[keyof typeof LearningCategory];
+export type LearningCategory =
+  (typeof LearningCategory)[keyof typeof LearningCategory];
 
 export const QuestStatus = {
-  NOT_STARTED: 'NOT_STARTED',
-  ACTIVE: 'ACTIVE',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED',
-  TURNED_IN: 'TURNED_IN'
+  NOT_STARTED: "NOT_STARTED",
+  ACTIVE: "ACTIVE",
+  COMPLETED: "COMPLETED",
+  FAILED: "FAILED",
+  TURNED_IN: "TURNED_IN",
 } as const;
 
-export type QuestStatus = typeof QuestStatus[keyof typeof QuestStatus];
+export type QuestStatus = (typeof QuestStatus)[keyof typeof QuestStatus];
 
 export const ObjectiveType = {
-  TALK_TO_NPC: 'TALK_TO_NPC',
-  GO_TO_LOCATION: 'GO_TO_LOCATION',
-  COLLECT_ITEM: 'COLLECT_ITEM',
-  BUY_ITEM: 'BUY_ITEM',
-  DELIVER_ITEM: 'DELIVER_ITEM',
-  USE_VOCABULARY: 'USE_VOCABULARY',
-  COMPLETE_DIALOGUE: 'COMPLETE_DIALOGUE',
-  LEARN_GRAMMAR: 'LEARN_GRAMMAR',
-  READ_TEXT: 'READ_TEXT',
-  WRITE_TEXT: 'WRITE_TEXT'
+  TALK_TO_NPC: "TALK_TO_NPC",
+  GO_TO_LOCATION: "GO_TO_LOCATION",
+  COLLECT_ITEM: "COLLECT_ITEM",
+  BUY_ITEM: "BUY_ITEM",
+  DELIVER_ITEM: "DELIVER_ITEM",
+  USE_VOCABULARY: "USE_VOCABULARY",
+  COMPLETE_DIALOGUE: "COMPLETE_DIALOGUE",
+  LEARN_GRAMMAR: "LEARN_GRAMMAR",
+  READ_TEXT: "READ_TEXT",
+  WRITE_TEXT: "WRITE_TEXT",
 } as const;
 
-export type ObjectiveType = typeof ObjectiveType[keyof typeof ObjectiveType];
+export type ObjectiveType = (typeof ObjectiveType)[keyof typeof ObjectiveType];
 
 export interface QuestObjective {
   id: string;
@@ -90,27 +91,29 @@ export interface QuestData {
 
 // Achievement & Gamification Types
 export const AchievementType = {
-  VOCABULARY: 'VOCABULARY',
-  QUEST: 'QUEST', 
-  CONVERSATION: 'CONVERSATION',
-  STREAK: 'STREAK',
-  EXPLORATION: 'EXPLORATION',
-  LEARNING: 'LEARNING',
-  SOCIAL: 'SOCIAL',
-  MILESTONE: 'MILESTONE'
+  VOCABULARY: "VOCABULARY",
+  QUEST: "QUEST",
+  CONVERSATION: "CONVERSATION",
+  STREAK: "STREAK",
+  EXPLORATION: "EXPLORATION",
+  LEARNING: "LEARNING",
+  SOCIAL: "SOCIAL",
+  MILESTONE: "MILESTONE",
 } as const;
 
-export type AchievementType = typeof AchievementType[keyof typeof AchievementType];
+export type AchievementType =
+  (typeof AchievementType)[keyof typeof AchievementType];
 
 export const AchievementRarity = {
-  COMMON: 'COMMON',
-  UNCOMMON: 'UNCOMMON', 
-  RARE: 'RARE',
-  EPIC: 'EPIC',
-  LEGENDARY: 'LEGENDARY'
+  COMMON: "COMMON",
+  UNCOMMON: "UNCOMMON",
+  RARE: "RARE",
+  EPIC: "EPIC",
+  LEGENDARY: "LEGENDARY",
 } as const;
 
-export type AchievementRarity = typeof AchievementRarity[keyof typeof AchievementRarity];
+export type AchievementRarity =
+  (typeof AchievementRarity)[keyof typeof AchievementRarity];
 
 export interface Achievement {
   id: string;
@@ -161,7 +164,7 @@ export interface PlayerData {
   activeQuests: string[];
   knownVocabulary: string[];
   unlockedAreas: string[];
-  
+
   // Gamification additions
   achievements: Achievement[];
   unlockedAchievements: string[];
@@ -203,13 +206,22 @@ export interface DialogueResponse {
 }
 
 export interface DialogueCondition {
-  type: 'quest_completed' | 'has_item' | 'level_requirement' | 'vocabulary_known';
+  type:
+    | "quest_completed"
+    | "has_item"
+    | "level_requirement"
+    | "vocabulary_known";
   value: string | number;
-  operator?: 'equals' | 'greater_than' | 'less_than' | 'contains';
+  operator?: "equals" | "greater_than" | "less_than" | "contains";
 }
 
 export interface DialogueEffect {
-  type: 'complete_objective' | 'start_quest' | 'add_item' | 'add_experience' | 'learn_vocabulary';
+  type:
+    | "complete_objective"
+    | "start_quest"
+    | "add_item"
+    | "add_experience"
+    | "learn_vocabulary";
   value: string | number;
   data?: Record<string, unknown>;
 }
@@ -234,7 +246,15 @@ export interface GameState {
 
 export interface Notification {
   id: string;
-  type: 'quest_started' | 'quest_completed' | 'objective_completed' | 'experience_gained' | 'level_up' | 'xp_gained' | 'vocabulary_learned' | 'achievement_unlocked';
+  type:
+    | "quest_started"
+    | "quest_completed"
+    | "objective_completed"
+    | "experience_gained"
+    | "level_up"
+    | "xp_gained"
+    | "vocabulary_learned"
+    | "achievement_unlocked";
   title: string;
   message: string;
   duration: number;
@@ -258,5 +278,5 @@ export interface GameSettings {
   musicEnabled: boolean;
   autoSaveEnabled: boolean;
   tutorialEnabled: boolean;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }

@@ -3,10 +3,10 @@
  * Player, NPC, building, and game entity components
  */
 
-import type { Component } from '../core';
+import type { Component } from "../core";
 
 export interface PlayerComponent extends Component {
-  readonly type: 'player';
+  readonly type: "player";
   name: string;
   level: number;
   experience: number;
@@ -15,7 +15,7 @@ export interface PlayerComponent extends Component {
 }
 
 export interface NPCComponent extends Component {
-  readonly type: 'npc';
+  readonly type: "npc";
   name: string;
   role: string;
   personality?: string;
@@ -23,35 +23,46 @@ export interface NPCComponent extends Component {
 }
 
 export interface BuildingComponent extends Component {
-  readonly type: 'building';
+  readonly type: "building";
   name: string;
-  buildingType: 'educational' | 'commercial' | 'residential' | 'social' | 'storage';
+  buildingType:
+    | "educational"
+    | "commercial"
+    | "residential"
+    | "social"
+    | "storage";
   description?: string;
 }
 
 export interface FurnitureComponent extends Component {
-  readonly type: 'furniture';
+  readonly type: "furniture";
   name: string;
-  furnitureType: 'desk' | 'chair' | 'blackboard' | 'bookshelf' | 'storage' | 'teaching-aid';
+  furnitureType:
+    | "desk"
+    | "chair"
+    | "blackboard"
+    | "bookshelf"
+    | "storage"
+    | "teaching-aid";
   usable?: boolean;
 }
 
 export interface DecorationComponent extends Component {
-  readonly type: 'decoration';
-  decorationType: 'plant' | 'sign' | 'statue' | 'fountain';
+  readonly type: "decoration";
+  decorationType: "plant" | "sign" | "statue" | "fountain";
   category: string; // 'tree', 'flower', 'bush', 'grass', etc.
   seasonal?: boolean;
 }
 
 export interface QuestGiverComponent extends Component {
-  readonly type: 'questGiver';
+  readonly type: "questGiver";
   availableQuests: string[];
   completedQuests: string[];
   currentQuest?: string;
 }
 
 export interface QuestObjectiveComponent extends Component {
-  readonly type: 'questObjective';
+  readonly type: "questObjective";
   questId: string;
   objectiveId: string;
   isCompleted: boolean;
@@ -59,7 +70,7 @@ export interface QuestObjectiveComponent extends Component {
 }
 
 export interface LearningComponent extends Component {
-  readonly type: 'learning';
+  readonly type: "learning";
   contentId: string;
   difficulty: number;
   subject: string;
@@ -67,7 +78,7 @@ export interface LearningComponent extends Component {
 }
 
 export interface ProgressComponent extends Component {
-  readonly type: 'progress';
+  readonly type: "progress";
   xp: number;
   level: number;
   skills: Record<string, number>;
@@ -80,56 +91,62 @@ export const createPlayerComponent = (
   level: number = 1,
   experience: number = 0,
   health: number = 100,
-  maxHealth: number = 100
+  maxHealth: number = 100,
 ): PlayerComponent => ({
-  type: 'player',
+  type: "player",
   name,
   level,
   experience,
   health,
-  maxHealth
+  maxHealth,
 });
 
 export const createNPCComponent = (
   name: string,
   role: string,
   personality?: string,
-  currentDialogue?: string
+  currentDialogue?: string,
 ): NPCComponent => {
-  const component: NPCComponent = { type: 'npc', name, role };
+  const component: NPCComponent = { type: "npc", name, role };
   if (personality !== undefined) component.personality = personality;
-  if (currentDialogue !== undefined) component.currentDialogue = currentDialogue;
+  if (currentDialogue !== undefined)
+    component.currentDialogue = currentDialogue;
   return component;
 };
 
 export const createBuildingComponent = (
   name: string,
-  buildingType: 'educational' | 'commercial' | 'residential' | 'social' | 'storage',
-  description?: string
+  buildingType:
+    | "educational"
+    | "commercial"
+    | "residential"
+    | "social"
+    | "storage",
+  description?: string,
 ): BuildingComponent => {
-  const component: BuildingComponent = { type: 'building', name, buildingType };
+  const component: BuildingComponent = { type: "building", name, buildingType };
   if (description !== undefined) component.description = description;
   return component;
 };
 
 export const createFurnitureComponent = (
-  name: string, 
-  furnitureType: FurnitureComponent['furnitureType'],
-  usable = false
+  name: string,
+  furnitureType: FurnitureComponent["furnitureType"],
+  usable = false,
 ): FurnitureComponent => ({
-  type: 'furniture',
+  type: "furniture",
   name,
   furnitureType,
-  usable
+  usable,
 });
 
 export const createDecorationComponent = (
-  decorationType: DecorationComponent['decorationType'],
+  decorationType: DecorationComponent["decorationType"],
   category: string,
-  seasonal = false
+  seasonal = false,
 ): DecorationComponent => ({
-  type: 'decoration',
+  type: "decoration",
   decorationType,
   category,
-  seasonal
+  seasonal,
 });

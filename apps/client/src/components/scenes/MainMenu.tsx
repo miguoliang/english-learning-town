@@ -1,12 +1,12 @@
 // Main Menu Scene
 
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
 // BackgroundAnimation removed for cleaner architecture
-import { GameTitle } from '../ui/GameTitle';
-import { PlayerNameForm } from '../forms/PlayerNameForm';
-import { SettingsModal } from '../settings/SettingsModal';
-import { HelpModal } from '../help/HelpModal';
+import { GameTitle } from "../ui/GameTitle";
+import { PlayerNameForm } from "../forms/PlayerNameForm";
+import { SettingsModal } from "../settings/SettingsModal";
+import { HelpModal } from "../help/HelpModal";
 
 const MenuContainer = styled.div`
   width: 100vw;
@@ -64,19 +64,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame }) => {
         />
       </GameTitle>
 
-      <VersionInfo>
-        English Learning Town v1.0.0 - React Edition
-      </VersionInfo>
+      <VersionInfo>English Learning Town v1.0.0 - React Edition</VersionInfo>
 
-      <SettingsModal 
+      <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
-      
-      <HelpModal 
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-      />
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </MenuContainer>
   );
 };

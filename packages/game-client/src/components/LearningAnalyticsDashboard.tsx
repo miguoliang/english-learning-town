@@ -3,16 +3,16 @@
  * Comprehensive view of learning progress and insights
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
-import { 
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
+import {
   LearningAnalyticsEngine,
   type LearningAnalytics,
   type LearningInsight,
-} from '@elt/learning-analytics';
-import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
-import { DashboardErrorBoundary } from './ErrorBoundary';
+} from "@elt/learning-analytics";
+import type { VocabularyCard, ReviewSession } from "@elt/learning-algorithms";
+import { DashboardErrorBoundary } from "./ErrorBoundary";
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
@@ -30,7 +30,7 @@ const DashboardHeader = styled.div`
 
 const DashboardTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -45,7 +45,7 @@ const Section = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
@@ -68,7 +68,7 @@ const MetricCard = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.medium};
   border: 2px solid transparent;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: ${({ theme }) => theme.colors.accent};
     transform: translateY(-2px);
@@ -76,7 +76,7 @@ const MetricCard = styled.div`
 `;
 
 const MetricValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
@@ -99,16 +99,21 @@ const InsightsContainer = styled.div`
   gap: ${({ theme }) => theme.spacing[4]};
 `;
 
-const InsightCard = styled.div<{ priority: 'low' | 'medium' | 'high' }>`
+const InsightCard = styled.div<{ priority: "low" | "medium" | "high" }>`
   background: ${({ theme }) => theme.colors.surface};
-  border-left: 4px solid ${props => {
-    switch (props.priority) {
-      case 'high': return props.theme.colors.error;
-      case 'medium': return props.theme.colors.warning;
-      case 'low': return props.theme.colors.success;
-      default: return props.theme.colors.accent;
-    }
-  }};
+  border-left: 4px solid
+    ${(props) => {
+      switch (props.priority) {
+        case "high":
+          return props.theme.colors.error;
+        case "medium":
+          return props.theme.colors.warning;
+        case "low":
+          return props.theme.colors.success;
+        default:
+          return props.theme.colors.accent;
+      }
+    }};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing[5]};
   box-shadow: ${({ theme }) => theme.shadows.medium};
@@ -122,13 +127,18 @@ const InsightHeader = styled.div`
 `;
 
 const InsightTypeDisplay = styled.span<{ type: string }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.type) {
-      case 'CELEBRATION': return props.theme.colors.success;
-      case 'WARNING': return props.theme.colors.error;
-      case 'RECOMMENDATION': return props.theme.colors.warning;
-      case 'TIP': return props.theme.colors.accent;
-      default: return props.theme.colors.textSecondary;
+      case "CELEBRATION":
+        return props.theme.colors.success;
+      case "WARNING":
+        return props.theme.colors.error;
+      case "RECOMMENDATION":
+        return props.theme.colors.warning;
+      case "TIP":
+        return props.theme.colors.accent;
+      default:
+        return props.theme.colors.textSecondary;
     }
   }};
   color: ${({ theme }) => theme.colors.surface};
@@ -190,7 +200,7 @@ const ProgressItem = styled.div`
 `;
 
 const ProgressValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
 `;
@@ -204,7 +214,7 @@ const CategorySection = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${({ theme }) => theme.spacing[6]};
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     grid-template-columns: 1fr;
   }
@@ -238,7 +248,7 @@ const CategoryItem = styled.li`
   border-bottom: 1px solid ${({ theme }) => theme.colors.surfaceLight};
   font-size: ${({ theme }) => theme.fontSizes.base};
   color: ${({ theme }) => theme.colors.textSecondary};
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -250,21 +260,20 @@ interface LearningAnalyticsDashboardProps {
   onClose: () => void;
 }
 
-export const LearningAnalyticsDashboard: React.FC<LearningAnalyticsDashboardProps> = ({
-  vocabularyCards,
-  reviewSessions,
-  onClose
-}) => {
+export const LearningAnalyticsDashboard: React.FC<
+  LearningAnalyticsDashboardProps
+> = ({ vocabularyCards, reviewSessions, onClose }) => {
   const [analytics, setAnalytics] = useState<LearningAnalytics | null>(null);
   const [insights, setInsights] = useState<LearningInsight[]>([]);
 
   useEffect(() => {
     const generatedAnalytics = LearningAnalyticsEngine.generateAnalytics(
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
-    const generatedInsights = LearningAnalyticsEngine.generateInsights(generatedAnalytics);
-    
+    const generatedInsights =
+      LearningAnalyticsEngine.generateInsights(generatedAnalytics);
+
     setAnalytics(generatedAnalytics);
     setInsights(generatedInsights);
   }, [vocabularyCards, reviewSessions]);
@@ -282,193 +291,213 @@ export const LearningAnalyticsDashboard: React.FC<LearningAnalyticsDashboardProp
 
   const getInsightEmoji = (type: string) => {
     switch (type) {
-      case 'CELEBRATION': return '🎉';
-      case 'WARNING': return '⚠️';
-      case 'RECOMMENDATION': return '💡';
-      case 'TIP': return '💭';
-      default: return '📈';
+      case "CELEBRATION":
+        return "🎉";
+      case "WARNING":
+        return "⚠️";
+      case "RECOMMENDATION":
+        return "💡";
+      case "TIP":
+        return "💭";
+      default:
+        return "📈";
     }
   };
 
   return (
     <DashboardErrorBoundary dashboardName="Learning Analytics">
       <DashboardContainer>
-      <DashboardHeader>
-        <DashboardTitle>
-          <AnimatedEmoji emoji="📊" mood="excited" />
-          Learning Analytics
-          <AnimatedEmoji emoji="📈" mood="floating" />
-        </DashboardTitle>
-        <Button variant="ghost" onClick={onClose}>← Back to Dashboard</Button>
-      </DashboardHeader>
+        <DashboardHeader>
+          <DashboardTitle>
+            <AnimatedEmoji emoji="📊" mood="excited" />
+            Learning Analytics
+            <AnimatedEmoji emoji="📈" mood="floating" />
+          </DashboardTitle>
+          <Button variant="ghost" onClick={onClose}>
+            ← Back to Dashboard
+          </Button>
+        </DashboardHeader>
 
-      <Section>
-        <SectionTitle>
-          <AnimatedEmoji emoji="🎯" mood="happy" />
-          Overall Progress
-        </SectionTitle>
-        <MetricsGrid>
-          <MetricCard>
-            <MetricValue>{analytics.totalWordsLearned}</MetricValue>
-            <MetricLabel>Total Words Learned</MetricLabel>
-            <MetricSubtext>Growing your vocabulary</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.activeCards}</MetricValue>
-            <MetricLabel>Active Learning</MetricLabel>
-            <MetricSubtext>Words in progress</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.masteredCards}</MetricValue>
-            <MetricLabel>Mastered Words</MetricLabel>
-            <MetricSubtext>Well learned vocabulary</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.averageMastery}%</MetricValue>
-            <MetricLabel>Average Mastery</MetricLabel>
-            <MetricSubtext>Overall skill level</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.overallAccuracy}%</MetricValue>
-            <MetricLabel>Accuracy Rate</MetricLabel>
-            <MetricSubtext>Correct answers</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.learningVelocity}</MetricValue>
-            <MetricLabel>Words/Week</MetricLabel>
-            <MetricSubtext>Learning pace</MetricSubtext>
-          </MetricCard>
-        </MetricsGrid>
-      </Section>
+        <Section>
+          <SectionTitle>
+            <AnimatedEmoji emoji="🎯" mood="happy" />
+            Overall Progress
+          </SectionTitle>
+          <MetricsGrid>
+            <MetricCard>
+              <MetricValue>{analytics.totalWordsLearned}</MetricValue>
+              <MetricLabel>Total Words Learned</MetricLabel>
+              <MetricSubtext>Growing your vocabulary</MetricSubtext>
+            </MetricCard>
 
-      <Section>
-        <ProgressSection>
-          <ProgressTitle>
-            <AnimatedEmoji emoji="📅" mood="excited" />
-            Time-Based Progress
-          </ProgressTitle>
-          <ProgressGrid>
-            <ProgressItem>
-              <ProgressValue>{analytics.dailyStreak}</ProgressValue>
-              <ProgressLabel>Day Streak</ProgressLabel>
-            </ProgressItem>
-            <ProgressItem>
-              <ProgressValue>{analytics.weeklyProgress}%</ProgressValue>
-              <ProgressLabel>Weekly Goal</ProgressLabel>
-            </ProgressItem>
-            <ProgressItem>
-              <ProgressValue>{analytics.monthlyProgress}%</ProgressValue>
-              <ProgressLabel>Monthly Goal</ProgressLabel>
-            </ProgressItem>
-            <ProgressItem>
-              <ProgressValue>{analytics.totalStudyTime}min</ProgressValue>
-              <ProgressLabel>Total Study Time</ProgressLabel>
-            </ProgressItem>
-            <ProgressItem>
-              <ProgressValue>{analytics.averageSessionLength}min</ProgressValue>
-              <ProgressLabel>Avg. Session</ProgressLabel>
-            </ProgressItem>
-            <ProgressItem>
-              <ProgressValue>{analytics.bestTimeOfDay}</ProgressValue>
-              <ProgressLabel>Best Time</ProgressLabel>
-            </ProgressItem>
-          </ProgressGrid>
-        </ProgressSection>
-      </Section>
+            <MetricCard>
+              <MetricValue>{analytics.activeCards}</MetricValue>
+              <MetricLabel>Active Learning</MetricLabel>
+              <MetricSubtext>Words in progress</MetricSubtext>
+            </MetricCard>
 
-      <Section>
-        <SectionTitle>
-          <AnimatedEmoji emoji="💡" mood="thinking" />
-          Learning Insights
-        </SectionTitle>
-        <InsightsContainer>
-          {insights.map((insight, index) => (
-            <InsightCard key={index} priority={insight.priority}>
-              <InsightHeader>
-                <AnimatedEmoji emoji={getInsightEmoji(insight.type)} mood="happy" />
-                <InsightTypeDisplay type={insight.type}>{insight.type}</InsightTypeDisplay>
-                <InsightTitle>{insight.title}</InsightTitle>
-              </InsightHeader>
-              <InsightDescription>{insight.description}</InsightDescription>
-              <InsightAction>💫 {insight.actionable}</InsightAction>
-            </InsightCard>
-          ))}
-        </InsightsContainer>
-      </Section>
+            <MetricCard>
+              <MetricValue>{analytics.masteredCards}</MetricValue>
+              <MetricLabel>Mastered Words</MetricLabel>
+              <MetricSubtext>Well learned vocabulary</MetricSubtext>
+            </MetricCard>
 
-      <Section>
-        <SectionTitle>
-          <AnimatedEmoji emoji="📚" mood="happy" />
-          Category Performance
-        </SectionTitle>
-        <CategorySection>
-          <CategoryCard>
-            <CategoryTitle>
-              <AnimatedEmoji emoji="💪" mood="excited" />
-              Strongest Areas
-            </CategoryTitle>
-            <CategoryList>
-              {analytics.strongestCategories.length > 0 ? (
-                analytics.strongestCategories.map((category, index) => (
-                  <CategoryItem key={index}>✅ {category}</CategoryItem>
-                ))
-              ) : (
-                <CategoryItem>Keep learning to discover your strengths!</CategoryItem>
-              )}
-            </CategoryList>
-          </CategoryCard>
-          
-          <CategoryCard>
-            <CategoryTitle>
-              <AnimatedEmoji emoji="🎯" mood="thinking" />
-              Areas to Improve
-            </CategoryTitle>
-            <CategoryList>
-              {analytics.weakestCategories.length > 0 ? (
-                analytics.weakestCategories.map((category, index) => (
-                  <CategoryItem key={index}>🔄 {category}</CategoryItem>
-                ))
-              ) : (
-                <CategoryItem>You're doing great across all areas!</CategoryItem>
-              )}
-            </CategoryList>
-          </CategoryCard>
-        </CategorySection>
-      </Section>
+            <MetricCard>
+              <MetricValue>{analytics.averageMastery}%</MetricValue>
+              <MetricLabel>Average Mastery</MetricLabel>
+              <MetricSubtext>Overall skill level</MetricSubtext>
+            </MetricCard>
 
-      <Section>
-        <SectionTitle>
-          <AnimatedEmoji emoji="🚀" mood="excited" />
-          Recommendations
-        </SectionTitle>
-        <MetricsGrid>
-          <MetricCard>
-            <MetricValue>{analytics.readinessLevel}%</MetricValue>
-            <MetricLabel>Ready for Challenges</MetricLabel>
-            <MetricSubtext>
-              {analytics.readinessLevel >= 80 ? 'Try harder words!' : 'Keep practicing current level'}
-            </MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.suggestedDailyGoal}</MetricValue>
-            <MetricLabel>Suggested Daily Goal</MetricLabel>
-            <MetricSubtext>Cards to review per day</MetricSubtext>
-          </MetricCard>
-          
-          <MetricCard>
-            <MetricValue>{analytics.estimatedTimeToMastery}</MetricValue>
-            <MetricLabel>Days to Mastery</MetricLabel>
-            <MetricSubtext>At current pace</MetricSubtext>
-          </MetricCard>
-        </MetricsGrid>
-      </Section>
-    </DashboardContainer>
+            <MetricCard>
+              <MetricValue>{analytics.overallAccuracy}%</MetricValue>
+              <MetricLabel>Accuracy Rate</MetricLabel>
+              <MetricSubtext>Correct answers</MetricSubtext>
+            </MetricCard>
+
+            <MetricCard>
+              <MetricValue>{analytics.learningVelocity}</MetricValue>
+              <MetricLabel>Words/Week</MetricLabel>
+              <MetricSubtext>Learning pace</MetricSubtext>
+            </MetricCard>
+          </MetricsGrid>
+        </Section>
+
+        <Section>
+          <ProgressSection>
+            <ProgressTitle>
+              <AnimatedEmoji emoji="📅" mood="excited" />
+              Time-Based Progress
+            </ProgressTitle>
+            <ProgressGrid>
+              <ProgressItem>
+                <ProgressValue>{analytics.dailyStreak}</ProgressValue>
+                <ProgressLabel>Day Streak</ProgressLabel>
+              </ProgressItem>
+              <ProgressItem>
+                <ProgressValue>{analytics.weeklyProgress}%</ProgressValue>
+                <ProgressLabel>Weekly Goal</ProgressLabel>
+              </ProgressItem>
+              <ProgressItem>
+                <ProgressValue>{analytics.monthlyProgress}%</ProgressValue>
+                <ProgressLabel>Monthly Goal</ProgressLabel>
+              </ProgressItem>
+              <ProgressItem>
+                <ProgressValue>{analytics.totalStudyTime}min</ProgressValue>
+                <ProgressLabel>Total Study Time</ProgressLabel>
+              </ProgressItem>
+              <ProgressItem>
+                <ProgressValue>
+                  {analytics.averageSessionLength}min
+                </ProgressValue>
+                <ProgressLabel>Avg. Session</ProgressLabel>
+              </ProgressItem>
+              <ProgressItem>
+                <ProgressValue>{analytics.bestTimeOfDay}</ProgressValue>
+                <ProgressLabel>Best Time</ProgressLabel>
+              </ProgressItem>
+            </ProgressGrid>
+          </ProgressSection>
+        </Section>
+
+        <Section>
+          <SectionTitle>
+            <AnimatedEmoji emoji="💡" mood="thinking" />
+            Learning Insights
+          </SectionTitle>
+          <InsightsContainer>
+            {insights.map((insight, index) => (
+              <InsightCard key={index} priority={insight.priority}>
+                <InsightHeader>
+                  <AnimatedEmoji
+                    emoji={getInsightEmoji(insight.type)}
+                    mood="happy"
+                  />
+                  <InsightTypeDisplay type={insight.type}>
+                    {insight.type}
+                  </InsightTypeDisplay>
+                  <InsightTitle>{insight.title}</InsightTitle>
+                </InsightHeader>
+                <InsightDescription>{insight.description}</InsightDescription>
+                <InsightAction>💫 {insight.actionable}</InsightAction>
+              </InsightCard>
+            ))}
+          </InsightsContainer>
+        </Section>
+
+        <Section>
+          <SectionTitle>
+            <AnimatedEmoji emoji="📚" mood="happy" />
+            Category Performance
+          </SectionTitle>
+          <CategorySection>
+            <CategoryCard>
+              <CategoryTitle>
+                <AnimatedEmoji emoji="💪" mood="excited" />
+                Strongest Areas
+              </CategoryTitle>
+              <CategoryList>
+                {analytics.strongestCategories.length > 0 ? (
+                  analytics.strongestCategories.map((category, index) => (
+                    <CategoryItem key={index}>✅ {category}</CategoryItem>
+                  ))
+                ) : (
+                  <CategoryItem>
+                    Keep learning to discover your strengths!
+                  </CategoryItem>
+                )}
+              </CategoryList>
+            </CategoryCard>
+
+            <CategoryCard>
+              <CategoryTitle>
+                <AnimatedEmoji emoji="🎯" mood="thinking" />
+                Areas to Improve
+              </CategoryTitle>
+              <CategoryList>
+                {analytics.weakestCategories.length > 0 ? (
+                  analytics.weakestCategories.map((category, index) => (
+                    <CategoryItem key={index}>🔄 {category}</CategoryItem>
+                  ))
+                ) : (
+                  <CategoryItem>
+                    You're doing great across all areas!
+                  </CategoryItem>
+                )}
+              </CategoryList>
+            </CategoryCard>
+          </CategorySection>
+        </Section>
+
+        <Section>
+          <SectionTitle>
+            <AnimatedEmoji emoji="🚀" mood="excited" />
+            Recommendations
+          </SectionTitle>
+          <MetricsGrid>
+            <MetricCard>
+              <MetricValue>{analytics.readinessLevel}%</MetricValue>
+              <MetricLabel>Ready for Challenges</MetricLabel>
+              <MetricSubtext>
+                {analytics.readinessLevel >= 80
+                  ? "Try harder words!"
+                  : "Keep practicing current level"}
+              </MetricSubtext>
+            </MetricCard>
+
+            <MetricCard>
+              <MetricValue>{analytics.suggestedDailyGoal}</MetricValue>
+              <MetricLabel>Suggested Daily Goal</MetricLabel>
+              <MetricSubtext>Cards to review per day</MetricSubtext>
+            </MetricCard>
+
+            <MetricCard>
+              <MetricValue>{analytics.estimatedTimeToMastery}</MetricValue>
+              <MetricLabel>Days to Mastery</MetricLabel>
+              <MetricSubtext>At current pace</MetricSubtext>
+            </MetricCard>
+          </MetricsGrid>
+        </Section>
+      </DashboardContainer>
     </DashboardErrorBoundary>
   );
 };

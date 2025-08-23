@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import styled from 'styled-components';
-import { Button } from '@elt/ui';
+import React, { useState, useCallback } from "react";
+import styled from "styled-components";
+import { Button } from "@elt/ui";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -16,8 +16,12 @@ const ModalOverlay = styled.div`
   animation: fadeIn 0.3s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -34,11 +38,11 @@ const ModalContainer = styled.div`
   animation: slideIn 0.3s ease-out;
 
   @keyframes slideIn {
-    from { 
+    from {
       transform: translateY(-50px);
       opacity: 0;
     }
-    to { 
+    to {
       transform: translateY(0);
       opacity: 1;
     }
@@ -55,7 +59,7 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h2`
   color: ${({ theme }) => theme.colors.surface};
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin: 0;
 `;
@@ -67,8 +71,8 @@ const TabContainer = styled.div`
 `;
 
 const Tab = styled.button<{ isActive: boolean }>`
-  background: ${({ isActive, theme }) => 
-    isActive ? theme.colors.primary : 'transparent'};
+  background: ${({ isActive, theme }) =>
+    isActive ? theme.colors.primary : "transparent"};
   color: ${({ theme }) => theme.colors.surface};
   border: none;
   padding: ${({ theme }) => theme.spacing[3]} ${({ theme }) => theme.spacing[4]};
@@ -76,18 +80,19 @@ const Tab = styled.button<{ isActive: boolean }>`
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  border-radius: ${({ theme }) => theme.borderRadius.md} ${({ theme }) => theme.borderRadius.md} 0 0;
+  border-radius: ${({ theme }) => theme.borderRadius.md}
+    ${({ theme }) => theme.borderRadius.md} 0 0;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background: ${({ isActive, theme }) => 
-      isActive ? theme.colors.primary : 'rgba(255, 255, 255, 0.1)'};
+    background: ${({ isActive, theme }) =>
+      isActive ? theme.colors.primary : "rgba(255, 255, 255, 0.1)"};
   }
 `;
 
 const HelpSection = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[6]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -108,7 +113,7 @@ const HelpItem = styled.div`
   display: flex;
   align-items: flex-start;
   margin-bottom: ${({ theme }) => theme.spacing[3]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -119,7 +124,7 @@ const KeyboardKey = styled.kbd`
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: ${({ theme }) => theme.borderRadius.sm};
   padding: ${({ theme }) => theme.spacing[1]} ${({ theme }) => theme.spacing[2]};
-  font-family: ${({ theme }) => theme.fonts.mono || 'monospace'};
+  font-family: ${({ theme }) => theme.fonts.mono || "monospace"};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.surface};
   margin-right: ${({ theme }) => theme.spacing[3]};
@@ -142,7 +147,7 @@ const ButtonContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacing[8]};
 `;
 
-type HelpTab = 'controls' | 'gameplay' | 'features';
+type HelpTab = "controls" | "gameplay" | "features";
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -150,13 +155,16 @@ interface HelpModalProps {
 }
 
 export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<HelpTab>('controls');
+  const [activeTab, setActiveTab] = useState<HelpTab>("controls");
 
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   const renderControls = () => (
     <>
@@ -164,15 +172,23 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <SectionTitle>🎮 Movement Controls</SectionTitle>
         <HelpItem>
           <KeyboardKey>WASD</KeyboardKey>
-          <HelpText>Move your character around the world using W (up), A (left), S (down), D (right)</HelpText>
+          <HelpText>
+            Move your character around the world using W (up), A (left), S
+            (down), D (right)
+          </HelpText>
         </HelpItem>
         <HelpItem>
           <KeyboardKey>Arrow Keys</KeyboardKey>
-          <HelpText>Alternative movement controls - use arrow keys to move your character</HelpText>
+          <HelpText>
+            Alternative movement controls - use arrow keys to move your
+            character
+          </HelpText>
         </HelpItem>
         <HelpItem>
           <KeyboardKey>Mouse Click</KeyboardKey>
-          <HelpText>Click anywhere on the map to move your character to that location</HelpText>
+          <HelpText>
+            Click anywhere on the map to move your character to that location
+          </HelpText>
         </HelpItem>
       </HelpSection>
 
@@ -180,11 +196,15 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <SectionTitle>💬 Interaction Controls</SectionTitle>
         <HelpItem>
           <KeyboardKey>Space</KeyboardKey>
-          <HelpText>Interact with NPCs, buildings, and objects when you're close enough</HelpText>
+          <HelpText>
+            Interact with NPCs, buildings, and objects when you're close enough
+          </HelpText>
         </HelpItem>
         <HelpItem>
           <KeyboardKey>Enter</KeyboardKey>
-          <HelpText>Continue dialogue conversations or select dialogue options</HelpText>
+          <HelpText>
+            Continue dialogue conversations or select dialogue options
+          </HelpText>
         </HelpItem>
         <HelpItem>
           <KeyboardKey>Esc</KeyboardKey>
@@ -192,7 +212,9 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         </HelpItem>
         <HelpItem>
           <KeyboardKey>Mouse Click</KeyboardKey>
-          <HelpText>Click on NPCs or buildings to interact with them directly</HelpText>
+          <HelpText>
+            Click on NPCs or buildings to interact with them directly
+          </HelpText>
         </HelpItem>
       </HelpSection>
     </>
@@ -203,33 +225,37 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       <HelpSection>
         <SectionTitle>🏛️ Exploring the Town</SectionTitle>
         <HelpText>
-          Welcome to English Learning Town! Walk around and explore different buildings like the School, 
-          Library, Café, and Shop. Each location offers unique learning opportunities and NPCs to talk with.
+          Welcome to English Learning Town! Walk around and explore different
+          buildings like the School, Library, Café, and Shop. Each location
+          offers unique learning opportunities and NPCs to talk with.
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>🗣️ Talking to NPCs</SectionTitle>
         <HelpText>
-          Approach any NPC (Non-Player Character) and press Space or click on them to start a conversation. 
-          NPCs will teach you new vocabulary, give you quests, and help you practice English in different contexts.
+          Approach any NPC (Non-Player Character) and press Space or click on
+          them to start a conversation. NPCs will teach you new vocabulary, give
+          you quests, and help you practice English in different contexts.
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>📚 Learning Vocabulary</SectionTitle>
         <HelpText>
-          During conversations, new vocabulary words will be highlighted in blue. Click on highlighted words 
-          to see their definitions and add them to your vocabulary collection. The more words you learn, 
-          the more XP you'll earn!
+          During conversations, new vocabulary words will be highlighted in
+          blue. Click on highlighted words to see their definitions and add them
+          to your vocabulary collection. The more words you learn, the more XP
+          you'll earn!
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>🎯 Completing Quests</SectionTitle>
         <HelpText>
-          Accept quests from NPCs to earn experience points and money. Quests might involve delivering items, 
-          having conversations, or learning specific vocabulary. Check your quest progress in the top-left corner.
+          Accept quests from NPCs to earn experience points and money. Quests
+          might involve delivering items, having conversations, or learning
+          specific vocabulary. Check your quest progress in the top-left corner.
         </HelpText>
       </HelpSection>
     </>
@@ -240,40 +266,41 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       <HelpSection>
         <SectionTitle>⭐ Experience & Levels</SectionTitle>
         <HelpText>
-          Earn XP by learning vocabulary, completing quests, and having conversations. 
-          Level up to unlock new areas and content!
+          Earn XP by learning vocabulary, completing quests, and having
+          conversations. Level up to unlock new areas and content!
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>🏆 Achievements</SectionTitle>
         <HelpText>
-          Complete various challenges to unlock achievements. Each achievement gives you bonus XP 
-          and recognition for your learning progress.
+          Complete various challenges to unlock achievements. Each achievement
+          gives you bonus XP and recognition for your learning progress.
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>💰 Currency System</SectionTitle>
         <HelpText>
-          Earn coins by completing quests and conversations. Use your money to buy items 
-          from the shop or unlock special features.
+          Earn coins by completing quests and conversations. Use your money to
+          buy items from the shop or unlock special features.
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>🔔 Progress Tracking</SectionTitle>
         <HelpText>
-          Your progress is automatically saved. Track your vocabulary size, completed quests, 
-          current level, and achievements in your player profile.
+          Your progress is automatically saved. Track your vocabulary size,
+          completed quests, current level, and achievements in your player
+          profile.
         </HelpText>
       </HelpSection>
 
       <HelpSection>
         <SectionTitle>🎵 Audio & Settings</SectionTitle>
         <HelpText>
-          Adjust game settings including audio volumes and player preferences through the 
-          Settings menu accessible from the main menu.
+          Adjust game settings including audio volumes and player preferences
+          through the Settings menu accessible from the main menu.
         </HelpText>
       </HelpSection>
     </>
@@ -281,11 +308,11 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'controls':
+      case "controls":
         return renderControls();
-      case 'gameplay':
+      case "gameplay":
         return renderGameplay();
-      case 'features':
+      case "features":
         return renderFeatures();
       default:
         return renderControls();
@@ -305,21 +332,21 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         </ModalHeader>
 
         <TabContainer>
-          <Tab 
-            isActive={activeTab === 'controls'} 
-            onClick={() => setActiveTab('controls')}
+          <Tab
+            isActive={activeTab === "controls"}
+            onClick={() => setActiveTab("controls")}
           >
             🎮 Controls
           </Tab>
-          <Tab 
-            isActive={activeTab === 'gameplay'} 
-            onClick={() => setActiveTab('gameplay')}
+          <Tab
+            isActive={activeTab === "gameplay"}
+            onClick={() => setActiveTab("gameplay")}
           >
             🎯 Gameplay
           </Tab>
-          <Tab 
-            isActive={activeTab === 'features'} 
-            onClick={() => setActiveTab('features')}
+          <Tab
+            isActive={activeTab === "features"}
+            onClick={() => setActiveTab("features")}
           >
             ✨ Features
           </Tab>

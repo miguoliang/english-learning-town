@@ -1,6 +1,6 @@
 /**
  * ECS Components - Modular Component Organization
- * 
+ *
  * Components are organized by domain responsibility following SRP:
  * - spatial: Position, size, collision, velocity
  * - visual: Rendering, animation, visual presentation
@@ -10,16 +10,16 @@
  */
 
 // Spatial Components
-export * from './spatial';
+export * from "./spatial";
 
-// Visual Components  
-export * from './visual';
+// Visual Components
+export * from "./visual";
 
 // Interaction Components
-export * from './interaction';
+export * from "./interaction";
 
 // Game-Specific Components
-export * from './game';
+export * from "./game";
 
 // Enhanced Gameplay Components
-export * from './enhanced';
+export * from "./enhanced";

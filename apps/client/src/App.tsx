@@ -1,7 +1,7 @@
-import { ThemeProvider } from 'styled-components';
-import { ECSGameApp } from './components/ECSGameApp';
-import { GlobalStyle } from './styles/globalStyles';
-import { theme } from './styles/theme';
+import { ThemeProvider } from "styled-components";
+import { ECSGameApp } from "./components/ECSGameApp";
+import { GlobalStyle } from "./styles/globalStyles";
+import { theme } from "./styles/theme";
 
 function App() {
   return (
@@ -12,4 +12,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

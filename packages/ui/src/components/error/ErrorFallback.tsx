@@ -1,16 +1,15 @@
-import React from 'react';
-import { Button } from '../basic/Button';
-import { AnimatedEmoji } from '../basic/AnimatedEmoji';
-import { 
-  getDefaultErrorTitle, 
-  getDefaultErrorMessage, 
+import React from "react";
+import { Button } from "../basic/Button";
+import { AnimatedEmoji } from "../basic/AnimatedEmoji";
+import {
+  getDefaultErrorTitle,
+  getDefaultErrorMessage,
   getErrorFallbackButtonSize,
   getErrorFallbackEmojiSize,
   shouldShowErrorCode,
   shouldShowRefreshButton,
-  type ErrorFallbackVariant
-} from '../../utils/errorFallbackHelpers';
-
+  type ErrorFallbackVariant,
+} from "../../utils/errorFallbackHelpers";
 
 export interface ErrorFallbackProps {
   /** The error that occurred */
@@ -35,7 +34,7 @@ export interface ErrorFallbackProps {
 
 /**
  * ErrorFallback - A customizable error fallback component
- * 
+ *
  * Features:
  * - Multiple display variants (minimal, detailed, fullscreen)
  * - Animated emoji indicators
@@ -48,49 +47,47 @@ export interface ErrorFallbackProps {
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,
   retry,
-  variant = 'detailed',
+  variant = "detailed",
   title,
   message,
   showErrorCode = shouldShowErrorCode(variant),
   showRetry = true,
   showRefresh = shouldShowRefreshButton(variant),
-  emoji = '⚠️'
+  emoji = "⚠️",
 }) => {
   // Build CSS classes
   const containerClasses = [
-    'elt-error-fallback',
-    `elt-error-fallback--${variant}`
-  ].join(' ');
+    "elt-error-fallback",
+    `elt-error-fallback--${variant}`,
+  ].join(" ");
 
   const titleClasses = [
-    'elt-error-fallback__title',
-    `elt-error-fallback__title--${variant}`
-  ].join(' ');
+    "elt-error-fallback__title",
+    `elt-error-fallback__title--${variant}`,
+  ].join(" ");
 
   const messageClasses = [
-    'elt-error-fallback__message',
-    `elt-error-fallback__message--${variant}`
-  ].join(' ');
+    "elt-error-fallback__message",
+    `elt-error-fallback__message--${variant}`,
+  ].join(" ");
 
   const actionsClasses = [
-    'elt-error-fallback__actions',
-    `elt-error-fallback__actions--${variant}`
-  ].join(' ');
+    "elt-error-fallback__actions",
+    `elt-error-fallback__actions--${variant}`,
+  ].join(" ");
 
   return (
     <div className={containerClasses} role="alert">
       <div className="elt-error-fallback__emoji">
-        <AnimatedEmoji 
-          emoji={emoji} 
-          mood="thinking" 
+        <AnimatedEmoji
+          emoji={emoji}
+          mood="thinking"
           size={getErrorFallbackEmojiSize(variant)}
         />
       </div>
-      
-      <h2 className={titleClasses}>
-        {title || getDefaultErrorTitle(variant)}
-      </h2>
-      
+
+      <h2 className={titleClasses}>{title || getDefaultErrorTitle(variant)}</h2>
+
       <p className={messageClasses}>
         {message || getDefaultErrorMessage(variant)}
       </p>
@@ -98,8 +95,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
       {(showRetry || showRefresh) && (
         <div className={actionsClasses}>
           {showRetry && (
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               size={getErrorFallbackButtonSize(variant)}
               onClick={retry}
             >
@@ -107,8 +104,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
             </Button>
           )}
           {showRefresh && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size={getErrorFallbackButtonSize(variant)}
               onClick={() => window.location.reload()}
             >

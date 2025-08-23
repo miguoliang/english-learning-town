@@ -1,3 +1,3 @@
-export { QuestTracker } from './QuestTracker';
+export { QuestTracker } from "./QuestTracker";
 
-export type { QuestTrackerProps, Quest } from './QuestTracker';
+export type { QuestTrackerProps, Quest } from "./QuestTracker";

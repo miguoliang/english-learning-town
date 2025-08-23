@@ -1,5 +1,5 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const HealthIndicator = styled.div`
   position: fixed;
@@ -21,7 +21,7 @@ const IndicatorRow = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -47,10 +47,11 @@ const TimeBar = styled.div`
 
 const TimeProgress = styled.div<{ progress: number; warning?: boolean }>`
   height: 100%;
-  background: ${props => props.warning 
-    ? 'linear-gradient(90deg, #d4904a, #e74c3c)' 
-    : 'linear-gradient(90deg, #2ecc71, #d4904a)'};
-  width: ${props => props.progress}%;
+  background: ${(props) =>
+    props.warning
+      ? "linear-gradient(90deg, #d4904a, #e74c3c)"
+      : "linear-gradient(90deg, #2ecc71, #d4904a)"};
+  width: ${(props) => props.progress}%;
   transition: all 0.3s ease;
 `;
 
@@ -71,7 +72,10 @@ export const EyeHealthIndicator: React.FC<EyeHealthIndicatorProps> = ({
   if (!isVisible) return null;
 
   const { readingTimeMinutes, blinkRemindersShown, nextBreakIn } = sessionStats;
-  const breakProgress = Math.max(0, Math.min(100, ((20 - nextBreakIn) / 20) * 100));
+  const breakProgress = Math.max(
+    0,
+    Math.min(100, ((20 - nextBreakIn) / 20) * 100),
+  );
   const isWarning = nextBreakIn <= 2; // Warning when less than 2 minutes until break
 
   return (
@@ -80,17 +84,17 @@ export const EyeHealthIndicator: React.FC<EyeHealthIndicatorProps> = ({
         <Label>👁️ Session:</Label>
         <Value>{readingTimeMinutes}m</Value>
       </IndicatorRow>
-      
+
       <IndicatorRow>
         <Label>💧 Blink reminders:</Label>
         <Value>{blinkRemindersShown}</Value>
       </IndicatorRow>
-      
+
       <IndicatorRow>
         <Label>⏰ Next break:</Label>
         <Value>{nextBreakIn}m</Value>
       </IndicatorRow>
-      
+
       <TimeBar>
         <TimeProgress progress={breakProgress} warning={isWarning} />
       </TimeBar>

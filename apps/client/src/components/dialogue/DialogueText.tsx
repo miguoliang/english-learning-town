@@ -1,5 +1,5 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const TextContainer = styled.div`
   color: rgba(232, 212, 184, 0.95);
@@ -9,7 +9,9 @@ const TextContainer = styled.div`
   letter-spacing: 0.02em;
   margin-bottom: 24px;
   min-height: 70px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", sans-serif;
 `;
 
 const VocabularyHighlight = styled.span`
@@ -26,25 +28,24 @@ interface DialogueTextProps {
 }
 
 // Safe vocabulary highlighting using React components instead of dangerouslySetInnerHTML
-const highlightVocabularyWords = (text: string, vocabulary: string[] = []): React.ReactNode[] => {
+const highlightVocabularyWords = (
+  text: string,
+  vocabulary: string[] = [],
+): React.ReactNode[] => {
   if (!vocabulary.length) return [text];
 
   // Create a regex that matches all vocabulary words
-  const vocabularyRegex = new RegExp(`\\b(${vocabulary.join('|')})\\b`, 'gi');
+  const vocabularyRegex = new RegExp(`\\b(${vocabulary.join("|")})\\b`, "gi");
   const parts = text.split(vocabularyRegex);
 
   return parts.map((part, index) => {
     // Check if this part is a vocabulary word
-    const isVocabulary = vocabulary.some(word => 
-      word.toLowerCase() === part.toLowerCase()
+    const isVocabulary = vocabulary.some(
+      (word) => word.toLowerCase() === part.toLowerCase(),
     );
 
     if (isVocabulary) {
-      return (
-        <VocabularyHighlight key={index}>
-          {part}
-        </VocabularyHighlight>
-      );
+      return <VocabularyHighlight key={index}>{part}</VocabularyHighlight>;
     }
 
     return part;
@@ -55,11 +56,10 @@ export const DialogueText: React.FC<DialogueTextProps> = ({
   text,
   vocabularyHighlights = [],
 }) => {
-  const highlightedContent = highlightVocabularyWords(text, vocabularyHighlights);
-
-  return (
-    <TextContainer>
-      {highlightedContent}
-    </TextContainer>
+  const highlightedContent = highlightVocabularyWords(
+    text,
+    vocabularyHighlights,
   );
+
+  return <TextContainer>{highlightedContent}</TextContainer>;
 };

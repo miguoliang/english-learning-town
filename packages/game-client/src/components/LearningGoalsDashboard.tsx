@@ -3,9 +3,9 @@
  * Allows users to set, track, and manage their learning goals
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
+import React, { useState, useEffect, useCallback } from "react";
+import styled from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
 import {
   LearningGoalEngine,
   GoalPriority,
@@ -13,9 +13,9 @@ import {
   type GoalRecommendation,
   type GoalProgress,
   type LearningAnalytics,
-  LearningAnalyticsEngine
-} from '@elt/learning-analytics';
-import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
+  LearningAnalyticsEngine,
+} from "@elt/learning-analytics";
+import type { VocabularyCard, ReviewSession } from "@elt/learning-algorithms";
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
@@ -33,7 +33,7 @@ const DashboardHeader = styled.div`
 
 const DashboardTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -51,9 +51,15 @@ const TabContainer = styled.div`
 `;
 
 const TabButton = styled(Button)<{ isActive: boolean }>`
-  background: ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.surface};
-  color: ${props => props.isActive ? props.theme.colors.surface : props.theme.colors.text};
-  border: 2px solid ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.surfaceLight};
+  background: ${(props) =>
+    props.isActive ? props.theme.colors.primary : props.theme.colors.surface};
+  color: ${(props) =>
+    props.isActive ? props.theme.colors.surface : props.theme.colors.text};
+  border: 2px solid
+    ${(props) =>
+      props.isActive
+        ? props.theme.colors.primary
+        : props.theme.colors.surfaceLight};
 `;
 
 const Section = styled.div`
@@ -62,7 +68,7 @@ const Section = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
@@ -86,7 +92,7 @@ const StatCard = styled.div`
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
@@ -109,20 +115,26 @@ const GoalCard = styled.div<{ priority: GoalPriority; isCompleted: boolean }>`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing[5]};
   box-shadow: ${({ theme }) => theme.shadows.medium};
-  border-left: 4px solid ${props => {
-    if (props.isCompleted) return props.theme.colors.success;
-    switch (props.priority) {
-      case 'CRITICAL': return props.theme.colors.error;
-      case 'HIGH': return props.theme.colors.warning;
-      case 'MEDIUM': return props.theme.colors.accent;
-      case 'LOW': return props.theme.colors.textSecondary;
-      default: return props.theme.colors.accent;
-    }
-  }};
-  opacity: ${props => props.isCompleted ? 0.8 : 1};
+  border-left: 4px solid
+    ${(props) => {
+      if (props.isCompleted) return props.theme.colors.success;
+      switch (props.priority) {
+        case "CRITICAL":
+          return props.theme.colors.error;
+        case "HIGH":
+          return props.theme.colors.warning;
+        case "MEDIUM":
+          return props.theme.colors.accent;
+        case "LOW":
+          return props.theme.colors.textSecondary;
+        default:
+          return props.theme.colors.accent;
+      }
+    }};
+  opacity: ${(props) => (props.isCompleted ? 0.8 : 1)};
   position: relative;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadows.large};
@@ -148,14 +160,20 @@ const GoalTitle = styled.h3`
 `;
 
 const GoalCategoryBadge = styled.span<{ category: string }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.category) {
-      case 'VOCABULARY': return '#3498DB';
-      case 'ACCURACY': return '#27AE60';
-      case 'CONSISTENCY': return '#E74C3C';
-      case 'SPEED': return '#F39C12';
-      case 'MASTERY': return '#9B59B6';
-      default: return props.theme.colors.textSecondary;
+      case "VOCABULARY":
+        return "#3498DB";
+      case "ACCURACY":
+        return "#27AE60";
+      case "CONSISTENCY":
+        return "#E74C3C";
+      case "SPEED":
+        return "#F39C12";
+      case "MASTERY":
+        return "#9B59B6";
+      default:
+        return props.theme.colors.textSecondary;
     }
   }};
   color: ${({ theme }) => theme.colors.surface};
@@ -167,13 +185,18 @@ const GoalCategoryBadge = styled.span<{ category: string }>`
 `;
 
 const PriorityBadge = styled.div<{ priority: GoalPriority }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.priority) {
-      case 'CRITICAL': return props.theme.colors.error;
-      case 'HIGH': return props.theme.colors.warning;
-      case 'MEDIUM': return props.theme.colors.accent;
-      case 'LOW': return props.theme.colors.textSecondary;
-      default: return props.theme.colors.accent;
+      case "CRITICAL":
+        return props.theme.colors.error;
+      case "HIGH":
+        return props.theme.colors.warning;
+      case "MEDIUM":
+        return props.theme.colors.accent;
+      case "LOW":
+        return props.theme.colors.textSecondary;
+      default:
+        return props.theme.colors.accent;
     }
   }};
   color: ${({ theme }) => theme.colors.surface};
@@ -209,7 +232,8 @@ const ProgressText = styled.div`
 const ProgressPercentage = styled.div<{ isOnTrack: boolean }>`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  color: ${props => props.isOnTrack ? props.theme.colors.success : props.theme.colors.warning};
+  color: ${(props) =>
+    props.isOnTrack ? props.theme.colors.success : props.theme.colors.warning};
 `;
 
 const ProgressBar = styled.div`
@@ -221,12 +245,12 @@ const ProgressBar = styled.div`
 `;
 
 const ProgressFill = styled.div<{ progress: number; isOnTrack: boolean }>`
-  background: ${props => props.isOnTrack 
-    ? 'linear-gradient(90deg, #27AE60, #2ECC71)'
-    : 'linear-gradient(90deg, #F39C12, #E67E22)'
-  };
+  background: ${(props) =>
+    props.isOnTrack
+      ? "linear-gradient(90deg, #27AE60, #2ECC71)"
+      : "linear-gradient(90deg, #F39C12, #E67E22)"};
   height: 100%;
-  width: ${props => Math.min(props.progress, 100)}%;
+  width: ${(props) => Math.min(props.progress, 100)}%;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   transition: width 0.5s ease;
 `;
@@ -267,7 +291,7 @@ const RecommendationCard = styled.div`
   padding: ${({ theme }) => theme.spacing[5]};
   text-align: center;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-style: solid;
     transform: translateY(-2px);
@@ -294,17 +318,19 @@ interface LearningGoalsDashboardProps {
   onClose: () => void;
 }
 
-type TabType = 'active' | 'completed' | 'recommendations' | 'stats';
+type TabType = "active" | "completed" | "recommendations" | "stats";
 
 export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
   vocabularyCards,
   reviewSessions,
-  onClose
+  onClose,
 }) => {
   const [goals, setGoals] = useState<LearningGoal[]>([]);
-  const [activeTab, setActiveTab] = useState<TabType>('active');
+  const [activeTab, setActiveTab] = useState<TabType>("active");
   const [analytics, setAnalytics] = useState<LearningAnalytics | null>(null);
-  const [recommendations, setRecommendations] = useState<GoalRecommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<GoalRecommendation[]>(
+    [],
+  );
   const [goalProgress, setGoalProgress] = useState<GoalProgress[]>([]);
   const [stats, setStats] = useState<any>(null);
 
@@ -312,17 +338,17 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
     // Generate analytics
     const generatedAnalytics = LearningAnalyticsEngine.generateAnalytics(
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
     setAnalytics(generatedAnalytics);
 
     // Load existing goals (in real app, this would come from storage)
     const existingGoals: LearningGoal[] = [];
-    
+
     // Generate recommendations
     const goalRecommendations = LearningGoalEngine.generateRecommendations(
       generatedAnalytics,
-      existingGoals
+      existingGoals,
     );
     setRecommendations(goalRecommendations);
 
@@ -330,7 +356,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
     const updatedGoals = LearningGoalEngine.updateGoalProgress(
       existingGoals,
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
     setGoals(updatedGoals);
 
@@ -343,42 +369,64 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
     setStats(goalStats);
   }, [vocabularyCards, reviewSessions]);
 
-  const handleCreateGoal = useCallback((recommendation: GoalRecommendation) => {
-    const newGoal = LearningGoalEngine.createGoal(recommendation.goalTemplate);
-    const updatedGoals = [...goals, newGoal];
-    setGoals(updatedGoals);
-    
-    // Remove this recommendation
-    setRecommendations(prev => prev.filter(rec => rec !== recommendation));
-    
-    // Recalculate progress
-    const progress = LearningGoalEngine.getGoalProgress(updatedGoals);
-    setGoalProgress(progress);
-  }, [goals]);
+  const handleCreateGoal = useCallback(
+    (recommendation: GoalRecommendation) => {
+      const newGoal = LearningGoalEngine.createGoal(
+        recommendation.goalTemplate,
+      );
+      const updatedGoals = [...goals, newGoal];
+      setGoals(updatedGoals);
 
-  const activeGoals = goals.filter(goal => goal.isActive && !goal.isCompleted);
-  const completedGoals = goals.filter(goal => goal.isCompleted);
+      // Remove this recommendation
+      setRecommendations((prev) =>
+        prev.filter((rec) => rec !== recommendation),
+      );
+
+      // Recalculate progress
+      const progress = LearningGoalEngine.getGoalProgress(updatedGoals);
+      setGoalProgress(progress);
+    },
+    [goals],
+  );
+
+  const activeGoals = goals.filter(
+    (goal) => goal.isActive && !goal.isCompleted,
+  );
+  const completedGoals = goals.filter((goal) => goal.isCompleted);
 
   const getPriorityIcon = (priority: GoalPriority): string => {
     switch (priority) {
-      case GoalPriority.CRITICAL: return '🔥';
-      case GoalPriority.HIGH: return '⭐';
-      case GoalPriority.MEDIUM: return '📌';
-      case GoalPriority.LOW: return '📝';
-      default: return '🎯';
+      case GoalPriority.CRITICAL:
+        return "🔥";
+      case GoalPriority.HIGH:
+        return "⭐";
+      case GoalPriority.MEDIUM:
+        return "📌";
+      case GoalPriority.LOW:
+        return "📝";
+      default:
+        return "🎯";
     }
   };
 
   const getCategoryIcon = (category: string): string => {
     switch (category) {
-      case 'VOCABULARY': return '📚';
-      case 'ACCURACY': return '🎯';
-      case 'CONSISTENCY': return '🔥';
-      case 'SPEED': return '⚡';
-      case 'MASTERY': return '🧠';
-      case 'REVIEW': return '🔄';
-      case 'TIME': return '⏰';
-      default: return '🎯';
+      case "VOCABULARY":
+        return "📚";
+      case "ACCURACY":
+        return "🎯";
+      case "CONSISTENCY":
+        return "🔥";
+      case "SPEED":
+        return "⚡";
+      case "MASTERY":
+        return "🧠";
+      case "REVIEW":
+        return "🔄";
+      case "TIME":
+        return "⏰";
+      default:
+        return "🎯";
     }
   };
 
@@ -401,41 +449,43 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
           Learning Goals
           <AnimatedEmoji emoji="🚀" mood="floating" />
         </DashboardTitle>
-        <Button variant="ghost" onClick={onClose}>← Back to Dashboard</Button>
+        <Button variant="ghost" onClick={onClose}>
+          ← Back to Dashboard
+        </Button>
       </DashboardHeader>
 
       <TabContainer>
         <TabButton
           variant="outline"
-          isActive={activeTab === 'active'}
-          onClick={() => setActiveTab('active')}
+          isActive={activeTab === "active"}
+          onClick={() => setActiveTab("active")}
         >
           Active Goals ({activeGoals.length})
         </TabButton>
         <TabButton
           variant="outline"
-          isActive={activeTab === 'completed'}
-          onClick={() => setActiveTab('completed')}
+          isActive={activeTab === "completed"}
+          onClick={() => setActiveTab("completed")}
         >
           Completed ({completedGoals.length})
         </TabButton>
         <TabButton
           variant="outline"
-          isActive={activeTab === 'recommendations'}
-          onClick={() => setActiveTab('recommendations')}
+          isActive={activeTab === "recommendations"}
+          onClick={() => setActiveTab("recommendations")}
         >
           Recommendations ({recommendations.length})
         </TabButton>
         <TabButton
           variant="outline"
-          isActive={activeTab === 'stats'}
-          onClick={() => setActiveTab('stats')}
+          isActive={activeTab === "stats"}
+          onClick={() => setActiveTab("stats")}
         >
           Statistics
         </TabButton>
       </TabContainer>
 
-      {activeTab === 'stats' && (
+      {activeTab === "stats" && (
         <Section>
           <SectionTitle>
             <AnimatedEmoji emoji="📊" mood="happy" />
@@ -470,7 +520,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
         </Section>
       )}
 
-      {activeTab === 'active' && (
+      {activeTab === "active" && (
         <Section>
           <SectionTitle>
             <AnimatedEmoji emoji="🎯" mood="excited" />
@@ -478,8 +528,10 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
           </SectionTitle>
           {activeGoals.length > 0 ? (
             <GoalsGrid>
-              {activeGoals.map(goal => {
-                const progress = goalProgress.find(gp => gp.goal.id === goal.id);
+              {activeGoals.map((goal) => {
+                const progress = goalProgress.find(
+                  (gp) => gp.goal.id === goal.id,
+                );
                 return (
                   <GoalCard
                     key={goal.id}
@@ -497,15 +549,17 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
                         {getPriorityIcon(goal.priority)} {goal.priority}
                       </PriorityBadge>
                     </GoalHeader>
-                    
+
                     <GoalDescription>{goal.description}</GoalDescription>
-                    
+
                     <ProgressSection>
                       <ProgressHeader>
                         <ProgressText>
                           {goal.currentProgress} / {goal.target}
                         </ProgressText>
-                        <ProgressPercentage isOnTrack={progress?.isOnTrack || false}>
+                        <ProgressPercentage
+                          isOnTrack={progress?.isOnTrack || false}
+                        >
                           {progress?.progressPercentage.toFixed(0)}%
                         </ProgressPercentage>
                       </ProgressHeader>
@@ -529,9 +583,10 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
               <AnimatedEmoji emoji="🎯" mood="thinking" />
               <RecommendationTitle>No Active Goals</RecommendationTitle>
               <RecommendationReason>
-                Check out our recommendations to get started on your learning journey!
+                Check out our recommendations to get started on your learning
+                journey!
               </RecommendationReason>
-              <Button onClick={() => setActiveTab('recommendations')}>
+              <Button onClick={() => setActiveTab("recommendations")}>
                 View Recommendations
               </Button>
             </RecommendationCard>
@@ -539,7 +594,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
         </Section>
       )}
 
-      {activeTab === 'completed' && (
+      {activeTab === "completed" && (
         <Section>
           <SectionTitle>
             <AnimatedEmoji emoji="🏆" mood="excited" />
@@ -547,7 +602,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
           </SectionTitle>
           {completedGoals.length > 0 ? (
             <GoalsGrid>
-              {completedGoals.map(goal => (
+              {completedGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
                   priority={goal.priority}
@@ -557,7 +612,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
                     <AnimatedEmoji emoji="✅" mood="excited" />
                     Completed
                   </CompletedBadge>
-                  
+
                   <GoalHeader>
                     <GoalInfo>
                       <GoalTitle>{goal.title}</GoalTitle>
@@ -566,11 +621,13 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
                       </GoalCategoryBadge>
                     </GoalInfo>
                   </GoalHeader>
-                  
+
                   <GoalDescription>{goal.description}</GoalDescription>
-                  
+
                   <GoalStatus>
-                    <span>🎉 Completed {goal.completedAt?.toLocaleDateString()}</span>
+                    <span>
+                      🎉 Completed {goal.completedAt?.toLocaleDateString()}
+                    </span>
                   </GoalStatus>
                 </GoalCard>
               ))}
@@ -587,7 +644,7 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
         </Section>
       )}
 
-      {activeTab === 'recommendations' && (
+      {activeTab === "recommendations" && (
         <Section>
           <SectionTitle>
             <AnimatedEmoji emoji="💡" mood="thinking" />
@@ -597,15 +654,22 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
             <RecommendationsGrid>
               {recommendations.map((recommendation, index) => (
                 <RecommendationCard key={index}>
-                  <AnimatedEmoji emoji={getCategoryIcon(recommendation.goalTemplate.category!)} mood="happy" />
+                  <AnimatedEmoji
+                    emoji={getCategoryIcon(
+                      recommendation.goalTemplate.category!,
+                    )}
+                    mood="happy"
+                  />
                   <RecommendationTitle>
                     {recommendation.goalTemplate.title}
                   </RecommendationTitle>
                   <RecommendationReason>
                     {recommendation.reason}
                   </RecommendationReason>
-                  <div style={{ marginBottom: '16px' }}>
-                    <GoalCategoryBadge category={recommendation.goalTemplate.category!}>
+                  <div style={{ marginBottom: "16px" }}>
+                    <GoalCategoryBadge
+                      category={recommendation.goalTemplate.category!}
+                    >
                       {recommendation.goalTemplate.category}
                     </GoalCategoryBadge>
                   </div>
@@ -620,7 +684,8 @@ export const LearningGoalsDashboard: React.FC<LearningGoalsDashboardProps> = ({
               <AnimatedEmoji emoji="🎉" mood="excited" />
               <RecommendationTitle>All Set!</RecommendationTitle>
               <RecommendationReason>
-                You have all the goals you need right now. Keep working on your current goals!
+                You have all the goals you need right now. Keep working on your
+                current goals!
               </RecommendationReason>
             </RecommendationCard>
           )}

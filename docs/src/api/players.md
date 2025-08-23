@@ -9,6 +9,7 @@ Player endpoints manage user accounts, authentication, and player progression da
 Create a new player account.
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required, 2-50 characters)",
@@ -17,6 +18,7 @@ Create a new player account.
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "success": true,
@@ -35,6 +37,7 @@ Create a new player account.
 ```
 
 **Error Responses:**
+
 - `400` - Name already exists or invalid input
 - `422` - Validation errors
 
@@ -47,9 +50,11 @@ Create a new player account.
 Retrieve player information by ID.
 
 **Parameters:**
+
 - `player_id` (path, required): Player UUID
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -74,6 +79,7 @@ Retrieve player information by ID.
 ```
 
 **Error Responses:**
+
 - `404` - Player not found
 - `401` - Unauthorized access
 
@@ -86,9 +92,11 @@ Retrieve player information by ID.
 Update player information and progress.
 
 **Parameters:**
+
 - `player_id` (path, required): Player UUID
 
 **Request Body:**
+
 ```json
 {
   "level": "integer (optional)",
@@ -105,6 +113,7 @@ Update player information and progress.
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -128,6 +137,7 @@ Update player information and progress.
 ```
 
 **Error Responses:**
+
 - `400` - Invalid input data
 - `404` - Player not found
 - `401` - Unauthorized access
@@ -141,10 +151,12 @@ Update player information and progress.
 Retrieve detailed player statistics and progress analytics.
 
 **Parameters:**
+
 - `player_id` (path, required): Player UUID
 - `period` (query, optional): Time period for stats ('week', 'month', 'all')
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -217,6 +229,7 @@ Retrieve detailed player statistics and progress analytics.
 ```
 
 **Error Responses:**
+
 - `404` - Player not found
 - `401` - Unauthorized access
 
@@ -229,6 +242,7 @@ Retrieve detailed player statistics and progress analytics.
 Authenticate player and receive JWT token.
 
 **Request Body:**
+
 ```json
 {
   "player_id": "uuid (required)"
@@ -236,6 +250,7 @@ Authenticate player and receive JWT token.
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -252,6 +267,7 @@ Authenticate player and receive JWT token.
 ```
 
 **Error Responses:**
+
 - `400` - Invalid player ID format
 - `404` - Player not found
 - `401` - Authentication failed

@@ -4,18 +4,18 @@
  */
 
 /* Import base tokens from UI package */
-@import '@elt/ui/tokens.css';
+@import "@elt/ui/tokens.css";
 
 :root {
   /* Game-specific colors */
-  --elt-game-color-xp: #FFD700;        /* XP gold */
-  --elt-game-color-xp-bg: #FFA500;     /* XP background */
-  --elt-game-color-quest: #4ECDC4;     /* Quest tracker accent */
-  --elt-game-color-achievement: #9B59B6; /* Achievement purple */
-  --elt-game-color-motivation: #E74C3C; /* Motivation red */
-  --elt-game-color-learning: #27AE60;  /* Learning green */
-  --elt-game-color-vocab: #3498DB;     /* Vocabulary blue */
-  
+  --elt-game-color-xp: #ffd700; /* XP gold */
+  --elt-game-color-xp-bg: #ffa500; /* XP background */
+  --elt-game-color-quest: #4ecdc4; /* Quest tracker accent */
+  --elt-game-color-achievement: #9b59b6; /* Achievement purple */
+  --elt-game-color-motivation: #e74c3c; /* Motivation red */
+  --elt-game-color-learning: #27ae60; /* Learning green */
+  --elt-game-color-vocab: #3498db; /* Vocabulary blue */
+
   /* Game UI specific spacing */
   --elt-game-spacing-xs: 4px;
   --elt-game-spacing-sm: 8px;
@@ -23,27 +23,27 @@
   --elt-game-spacing-lg: 16px;
   --elt-game-spacing-xl: 20px;
   --elt-game-spacing-2xl: 24px;
-  
+
   /* Game component sizes */
   --elt-game-progress-height-sm: 6px;
   --elt-game-progress-height-md: 12px;
   --elt-game-progress-height-lg: 18px;
-  
+
   --elt-game-badge-size-sm: 32px;
   --elt-game-badge-size-md: 40px;
   --elt-game-badge-size-lg: 48px;
-  
+
   /* Game-specific z-indexes */
   --elt-game-z-hud: 100;
   --elt-game-z-tracker: 200;
   --elt-game-z-modal: 1000;
-  
+
   /* Game shadows */
   --elt-game-shadow-progress: 0 2px 8px rgba(0, 0, 0, 0.15);
   --elt-game-shadow-tracker: 0 8px 32px rgba(0, 0, 0, 0.3);
   --elt-game-shadow-badge: 0 4px 12px rgba(255, 215, 0, 0.3);
   --elt-game-shadow-glow: 0 0 15px rgba(255, 215, 0, 0.6);
-  
+
   /* Game component borders */
   --elt-game-border-width: 2px;
   --elt-game-border-color: rgba(255, 255, 255, 0.2);
@@ -51,17 +51,21 @@
   --elt-game-border-radius-md: 16px;
   --elt-game-border-radius-lg: 20px;
   --elt-game-border-radius-xl: 25px;
-  
+
   /* Game typography */
   --elt-game-font-size-xs: 0.75rem;
   --elt-game-font-size-sm: 0.875rem;
   --elt-game-font-size-md: 1rem;
   --elt-game-font-size-lg: 1.125rem;
   --elt-game-font-size-xl: 1.25rem;
-  
+
   /* Game gradients */
-  --elt-game-gradient-xp: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  --elt-game-gradient-quest: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-  --elt-game-gradient-achievement: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
+  --elt-game-gradient-xp: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  --elt-game-gradient-quest: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  --elt-game-gradient-achievement: linear-gradient(
+    135deg,
+    #9b59b6 0%,
+    #8e44ad 100%
+  );
   --elt-game-gradient-overlay: rgba(0, 0, 0, 0.85);
 }

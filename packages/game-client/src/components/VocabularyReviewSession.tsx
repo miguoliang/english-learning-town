@@ -3,17 +3,17 @@
  * Interactive spaced repetition learning session
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
+import React, { useState, useEffect, useCallback } from "react";
+import styled, { keyframes } from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
 import {
   ReviewSessionManager,
   SpacedRepetitionEngine,
   ReviewResult,
   type VocabularyCard,
   type SessionQuestion,
-  type ReviewSession
-} from '@elt/learning-algorithms';
+  type ReviewSession,
+} from "@elt/learning-algorithms";
 
 const slideIn = keyframes`
   from {
@@ -59,7 +59,7 @@ const ProgressText = styled.div`
 `;
 
 const AccuracyBadge = styled.div<{ accuracy: number }>`
-  background: ${props => {
+  background: ${(props) => {
     if (props.accuracy >= 80) return props.theme.colors.success;
     if (props.accuracy >= 60) return props.theme.colors.warning;
     return props.theme.colors.error;
@@ -82,7 +82,7 @@ const ProgressBarContainer = styled.div`
 const ProgressBarFill = styled.div<{ progress: number }>`
   background: ${({ theme }) => theme.gradients.primary};
   height: 100%;
-  width: ${props => props.progress}%;
+  width: ${(props) => props.progress}%;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   transition: width 0.3s ease;
 `;
@@ -108,7 +108,7 @@ const QuestionTypeDisplay = styled.div`
 
 const QuestionText = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing[6]};
   line-height: 1.4;
@@ -125,35 +125,41 @@ const MultipleChoiceGrid = styled.div`
   margin: 0 auto;
 `;
 
-const ChoiceButton = styled.button<{ isSelected?: boolean; isCorrect?: boolean; isWrong?: boolean }>`
-  background: ${props => {
+const ChoiceButton = styled.button<{
+  isSelected?: boolean;
+  isCorrect?: boolean;
+  isWrong?: boolean;
+}>`
+  background: ${(props) => {
     if (props.isCorrect) return props.theme.colors.success;
     if (props.isWrong) return props.theme.colors.error;
     if (props.isSelected) return props.theme.colors.accent;
     return props.theme.colors.surface;
   }};
-  color: ${props => {
-    if (props.isCorrect || props.isWrong || props.isSelected) return props.theme.colors.surface;
+  color: ${(props) => {
+    if (props.isCorrect || props.isWrong || props.isSelected)
+      return props.theme.colors.surface;
     return props.theme.colors.text;
   }};
-  border: 2px solid ${props => {
-    if (props.isCorrect) return props.theme.colors.success;
-    if (props.isWrong) return props.theme.colors.error;
-    if (props.isSelected) return props.theme.colors.accent;
-    return props.theme.colors.surfaceLight;
-  }};
+  border: 2px solid
+    ${(props) => {
+      if (props.isCorrect) return props.theme.colors.success;
+      if (props.isWrong) return props.theme.colors.error;
+      if (props.isSelected) return props.theme.colors.accent;
+      return props.theme.colors.surfaceLight;
+    }};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing[4]};
   font-size: ${({ theme }) => theme.fontSizes.lg};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadows.medium};
   }
-  
+
   &:disabled {
     cursor: not-allowed;
   }
@@ -168,7 +174,7 @@ const TextInput = styled.input`
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   text-align: center;
   font-family: ${({ theme }) => theme.fonts.body};
-  
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.accent};
@@ -183,8 +189,8 @@ const FeedbackSection = styled.div<{ isVisible: boolean }>`
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   text-align: center;
   color: ${({ theme }) => theme.colors.surface};
-  opacity: ${props => props.isVisible ? 1 : 0};
-  transform: translateY(${props => props.isVisible ? 0 : 20}px);
+  opacity: ${(props) => (props.isVisible ? 1 : 0)};
+  transform: translateY(${(props) => (props.isVisible ? 0 : 20)}px);
   transition: all 0.3s ease;
 `;
 
@@ -216,7 +222,7 @@ const CompletionScreen = styled.div`
 
 const CompletionTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
@@ -240,7 +246,7 @@ const StatCard = styled.div`
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.primary};
 `;
@@ -253,29 +259,37 @@ const StatLabel = styled.div`
 
 interface VocabularyReviewSessionProps {
   vocabularyCards: VocabularyCard[];
-  onSessionComplete: (session: ReviewSession, updatedCards: VocabularyCard[]) => void;
+  onSessionComplete: (
+    session: ReviewSession,
+    updatedCards: VocabularyCard[],
+  ) => void;
   onExit: () => void;
 }
 
-export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = ({
-  vocabularyCards,
-  onSessionComplete,
-  onExit
-}) => {
+export const VocabularyReviewSession: React.FC<
+  VocabularyReviewSessionProps
+> = ({ vocabularyCards, onSessionComplete, onExit }) => {
   const [sessionManager] = useState(() => new ReviewSessionManager());
-  const [currentSession, setCurrentSession] = useState<ReviewSession | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<SessionQuestion | null>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [currentSession, setCurrentSession] = useState<ReviewSession | null>(
+    null,
+  );
+  const [currentQuestion, setCurrentQuestion] =
+    useState<SessionQuestion | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showFeedback, setShowFeedback] = useState(false);
-  const [feedback, setFeedback] = useState<{ correct: boolean; explanation?: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    correct: boolean;
+    explanation?: string;
+  } | null>(null);
   const [isComplete, setIsComplete] = useState(false);
-  const [completedSession, setCompletedSession] = useState<ReviewSession | null>(null);
+  const [completedSession, setCompletedSession] =
+    useState<ReviewSession | null>(null);
 
   useEffect(() => {
     // Start the session
     const session = sessionManager.startSession(vocabularyCards);
     setCurrentSession(session);
-    
+
     const question = sessionManager.getCurrentQuestion();
     setCurrentQuestion(question);
   }, [vocabularyCards, sessionManager]);
@@ -287,29 +301,36 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
       const result = sessionManager.submitAnswer(selectedAnswer);
       setFeedback(result);
       setShowFeedback(true);
-      
+
       // Update the vocabulary card based on the result
-      const cardIndex = vocabularyCards.findIndex(card => card.id === currentQuestion.cardId);
+      const cardIndex = vocabularyCards.findIndex(
+        (card) => card.id === currentQuestion.cardId,
+      );
       if (cardIndex !== -1) {
         const card = vocabularyCards[cardIndex];
-        const reviewResult = result.correct ? 
-          (currentQuestion.responseTime! < 3000 ? ReviewResult.EASY : ReviewResult.GOOD) :
-          ReviewResult.FORGOT;
-        
-        const updatedCard = SpacedRepetitionEngine.reviewCard(card, reviewResult, currentQuestion.responseTime || 5000);
+        const reviewResult = result.correct
+          ? currentQuestion.responseTime! < 3000
+            ? ReviewResult.EASY
+            : ReviewResult.GOOD
+          : ReviewResult.FORGOT;
+
+        const updatedCard = SpacedRepetitionEngine.reviewCard(
+          card,
+          reviewResult,
+          currentQuestion.responseTime || 5000,
+        );
         vocabularyCards[cardIndex] = updatedCard;
       }
-
     } catch (error) {
-      console.error('Error submitting answer:', error);
+      console.error("Error submitting answer:", error);
     }
   }, [selectedAnswer, currentQuestion, vocabularyCards, sessionManager]);
 
   const handleNextQuestion = useCallback(() => {
     setShowFeedback(false);
     setFeedback(null);
-    setSelectedAnswer('');
-    
+    setSelectedAnswer("");
+
     const nextQuestion = sessionManager.getCurrentQuestion();
     if (nextQuestion) {
       setCurrentQuestion(nextQuestion);
@@ -338,29 +359,38 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
             Session Complete!
             <AnimatedEmoji emoji="⭐" mood="floating" />
           </CompletionTitle>
-          
+
           <CompletionStats>
             <StatCard>
               <StatValue>{completedSession.cardsReviewed}</StatValue>
               <StatLabel>Cards Reviewed</StatLabel>
             </StatCard>
-            
+
             <StatCard>
               <StatValue>{completedSession.cardsCorrect}</StatValue>
               <StatLabel>Correct Answers</StatLabel>
             </StatCard>
-            
+
             <StatCard>
-              <StatValue>{Math.round((completedSession.cardsCorrect / completedSession.cardsReviewed) * 100)}%</StatValue>
+              <StatValue>
+                {Math.round(
+                  (completedSession.cardsCorrect /
+                    completedSession.cardsReviewed) *
+                    100,
+                )}
+                %
+              </StatValue>
               <StatLabel>Accuracy</StatLabel>
             </StatCard>
-            
+
             <StatCard>
-              <StatValue>{Math.round(completedSession.averageTime / 1000)}s</StatValue>
+              <StatValue>
+                {Math.round(completedSession.averageTime / 1000)}s
+              </StatValue>
               <StatLabel>Avg. Time</StatLabel>
             </StatCard>
           </CompletionStats>
-          
+
           <ActionButtons>
             <Button variant="primary" size="lg" onClick={handleSessionComplete}>
               Continue Learning 🚀
@@ -384,7 +414,8 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
     );
   }
 
-  const isMultipleChoice = currentQuestion.options && currentQuestion.options.length > 1;
+  const isMultipleChoice =
+    currentQuestion.options && currentQuestion.options.length > 1;
 
   return (
     <SessionContainer>
@@ -407,9 +438,11 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
       </ProgressBarContainer>
 
       <QuestionCard>
-        <QuestionTypeDisplay>{currentQuestion.questionType.replace('_', ' ')}</QuestionTypeDisplay>
+        <QuestionTypeDisplay>
+          {currentQuestion.questionType.replace("_", " ")}
+        </QuestionTypeDisplay>
         <QuestionText>{currentQuestion.question}</QuestionText>
-        
+
         <AnswerSection>
           {isMultipleChoice ? (
             <MultipleChoiceGrid>
@@ -417,8 +450,14 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
                 <ChoiceButton
                   key={index}
                   isSelected={selectedAnswer === option}
-                  isCorrect={showFeedback && option === currentQuestion.correctAnswer}
-                  isWrong={showFeedback && selectedAnswer === option && option !== currentQuestion.correctAnswer}
+                  isCorrect={
+                    showFeedback && option === currentQuestion.correctAnswer
+                  }
+                  isWrong={
+                    showFeedback &&
+                    selectedAnswer === option &&
+                    option !== currentQuestion.correctAnswer
+                  }
                   onClick={() => !showFeedback && setSelectedAnswer(option)}
                   disabled={showFeedback}
                 >
@@ -433,13 +472,15 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
               onChange={(e) => setSelectedAnswer(e.target.value)}
               placeholder="Type your answer..."
               disabled={showFeedback}
-              onKeyPress={(e) => e.key === 'Enter' && handleSubmitAnswer()}
+              onKeyPress={(e) => e.key === "Enter" && handleSubmitAnswer()}
             />
           )}
         </AnswerSection>
 
         {currentQuestion.hint && !showFeedback && (
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+          <div
+            style={{ fontSize: "14px", color: "#666", marginBottom: "16px" }}
+          >
             💡 Hint: {currentQuestion.hint}
           </div>
         )}
@@ -449,15 +490,19 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
         {feedback && (
           <>
             <FeedbackTitle>
-              <AnimatedEmoji emoji={feedback.correct ? "✅" : "❌"} mood="excited" />
-              {feedback.correct ? 'Correct!' : 'Not quite right'}
+              <AnimatedEmoji
+                emoji={feedback.correct ? "✅" : "❌"}
+                mood="excited"
+              />
+              {feedback.correct ? "Correct!" : "Not quite right"}
             </FeedbackTitle>
             {feedback.explanation && (
               <FeedbackText>{feedback.explanation}</FeedbackText>
             )}
             {!feedback.correct && (
               <FeedbackText>
-                The correct answer is: <strong>{currentQuestion.correctAnswer}</strong>
+                The correct answer is:{" "}
+                <strong>{currentQuestion.correctAnswer}</strong>
               </FeedbackText>
             )}
           </>
@@ -466,9 +511,9 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
 
       <ActionButtons>
         {!showFeedback ? (
-          <Button 
-            variant="primary" 
-            size="lg" 
+          <Button
+            variant="primary"
+            size="lg"
             onClick={handleSubmitAnswer}
             disabled={!selectedAnswer.trim()}
           >
@@ -476,7 +521,10 @@ export const VocabularyReviewSession: React.FC<VocabularyReviewSessionProps> = (
           </Button>
         ) : (
           <Button variant="primary" size="lg" onClick={handleNextQuestion}>
-            {progress.current + 1 < progress.total ? 'Next Question' : 'Finish Session'} →
+            {progress.current + 1 < progress.total
+              ? "Next Question"
+              : "Finish Session"}{" "}
+            →
           </Button>
         )}
       </ActionButtons>

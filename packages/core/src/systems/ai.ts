@@ -3,36 +3,57 @@
  * Handles NPC artificial intelligence, pathfinding, and behavioral patterns
  */
 
-import type { System, Entity, ComponentManager } from '../core';
-import type { Emitter, ECSEvents } from '../events';
+import type { System, Entity, ComponentManager } from "../core";
+import type { Emitter, ECSEvents } from "../events";
 import type {
   PositionComponent,
   VelocityComponent,
-  AIComponent
-} from '../components';
+  AIComponent,
+} from "../components";
 
 /**
  * AI System - Handles NPC artificial intelligence and behavior
  */
 export class AISystem implements System {
-  readonly name = 'AISystem';
-  readonly requiredComponents = ['position', 'ai', 'velocity'] as const;
+  readonly name = "AISystem";
+  readonly requiredComponents = ["position", "ai", "velocity"] as const;
 
-  update(_entities: Entity[], components: ComponentManager, _deltaTime: number, _events: Emitter<ECSEvents>): void {
-    const aiEntities = components.getEntitiesWithComponents(this.requiredComponents);
+  update(
+    _entities: Entity[],
+    components: ComponentManager,
+    _deltaTime: number,
+    _events: Emitter<ECSEvents>,
+  ): void {
+    const aiEntities = components.getEntitiesWithComponents(
+      this.requiredComponents,
+    );
     const currentTime = Date.now();
 
     for (const entityId of aiEntities) {
-      const position = components.getComponent<PositionComponent>(entityId, 'position');
-      const ai = components.getComponent<AIComponent>(entityId, 'ai');
-      const velocity = components.getComponent<VelocityComponent>(entityId, 'velocity');
+      const position = components.getComponent<PositionComponent>(
+        entityId,
+        "position",
+      );
+      const ai = components.getComponent<AIComponent>(entityId, "ai");
+      const velocity = components.getComponent<VelocityComponent>(
+        entityId,
+        "velocity",
+      );
 
       if (!position || !ai || !velocity) continue;
 
       // Check if enough time has passed for next decision
       if (currentTime - ai.lastDecisionTime < ai.decisionCooldown) continue;
 
-      this.updateAIBehavior(entityId, position, ai, velocity, _entities, components, _events);
+      this.updateAIBehavior(
+        entityId,
+        position,
+        ai,
+        velocity,
+        _entities,
+        components,
+        _events,
+      );
       ai.lastDecisionTime = currentTime;
     }
   }
@@ -48,26 +69,54 @@ export class AISystem implements System {
     velocity: VelocityComponent,
     entities: Entity[],
     components: ComponentManager,
-    _events: Emitter<ECSEvents>
+    _events: Emitter<ECSEvents>,
   ): void {
     switch (ai.behaviorType) {
-      case 'idle':
+      case "idle":
         this.handleIdleBehavior(velocity);
         break;
-      case 'patrol':
+      case "patrol":
         this.handlePatrolBehavior(position, ai, velocity);
         break;
-      case 'chase':
-        this.handleChaseBehavior(entityId, position, ai, velocity, entities, components);
+      case "chase":
+        this.handleChaseBehavior(
+          entityId,
+          position,
+          ai,
+          velocity,
+          entities,
+          components,
+        );
         break;
-      case 'flee':
-        this.handleFleeBehavior(entityId, position, ai, velocity, entities, components);
+      case "flee":
+        this.handleFleeBehavior(
+          entityId,
+          position,
+          ai,
+          velocity,
+          entities,
+          components,
+        );
         break;
-      case 'guard':
-        this.handleGuardBehavior(entityId, position, ai, velocity, entities, components);
+      case "guard":
+        this.handleGuardBehavior(
+          entityId,
+          position,
+          ai,
+          velocity,
+          entities,
+          components,
+        );
         break;
-      case 'follow':
-        this.handleFollowBehavior(entityId, position, ai, velocity, entities, components);
+      case "follow":
+        this.handleFollowBehavior(
+          entityId,
+          position,
+          ai,
+          velocity,
+          entities,
+          components,
+        );
         break;
     }
   }
@@ -77,7 +126,11 @@ export class AISystem implements System {
     velocity.y = 0;
   }
 
-  private handlePatrolBehavior(position: PositionComponent, ai: AIComponent, velocity: VelocityComponent): void {
+  private handlePatrolBehavior(
+    position: PositionComponent,
+    ai: AIComponent,
+    velocity: VelocityComponent,
+  ): void {
     if (!ai.patrolPoints || ai.patrolPoints.length === 0) {
       this.handleIdleBehavior(velocity);
       return;
@@ -86,7 +139,8 @@ export class AISystem implements System {
     const currentIndex = ai.currentPatrolIndex || 0;
     const targetPoint = ai.patrolPoints[currentIndex];
     const distance = Math.sqrt(
-      Math.pow(targetPoint.x - position.x, 2) + Math.pow(targetPoint.y - position.y, 2)
+      Math.pow(targetPoint.x - position.x, 2) +
+        Math.pow(targetPoint.y - position.y, 2),
     );
 
     if (distance < 1) {
@@ -96,7 +150,7 @@ export class AISystem implements System {
       // Move towards current patrol point
       const direction = {
         x: (targetPoint.x - position.x) / distance,
-        y: (targetPoint.y - position.y) / distance
+        y: (targetPoint.y - position.y) / distance,
       };
       velocity.x = direction.x * ai.speed;
       velocity.y = direction.y * ai.speed;
@@ -109,22 +163,33 @@ export class AISystem implements System {
     ai: AIComponent,
     velocity: VelocityComponent,
     entities: Entity[],
-    components: ComponentManager
+    components: ComponentManager,
   ): void {
-    const target = this.findNearestTarget(entityId, position, ai.detectionRange, entities, components, 'player');
-    
+    const target = this.findNearestTarget(
+      entityId,
+      position,
+      ai.detectionRange,
+      entities,
+      components,
+      "player",
+    );
+
     if (target) {
       ai.target = target.id;
-      const targetPos = components.getComponent<PositionComponent>(target.id, 'position');
+      const targetPos = components.getComponent<PositionComponent>(
+        target.id,
+        "position",
+      );
       if (targetPos) {
         const distance = Math.sqrt(
-          Math.pow(targetPos.x - position.x, 2) + Math.pow(targetPos.y - position.y, 2)
+          Math.pow(targetPos.x - position.x, 2) +
+            Math.pow(targetPos.y - position.y, 2),
         );
-        
+
         if (distance > 0.5) {
           const direction = {
             x: (targetPos.x - position.x) / distance,
-            y: (targetPos.y - position.y) / distance
+            y: (targetPos.y - position.y) / distance,
           };
           velocity.x = direction.x * ai.speed;
           velocity.y = direction.y * ai.speed;
@@ -142,21 +207,32 @@ export class AISystem implements System {
     ai: AIComponent,
     velocity: VelocityComponent,
     entities: Entity[],
-    components: ComponentManager
+    components: ComponentManager,
   ): void {
-    const threat = this.findNearestTarget(entityId, position, ai.detectionRange, entities, components, 'player');
-    
+    const threat = this.findNearestTarget(
+      entityId,
+      position,
+      ai.detectionRange,
+      entities,
+      components,
+      "player",
+    );
+
     if (threat) {
-      const threatPos = components.getComponent<PositionComponent>(threat.id, 'position');
+      const threatPos = components.getComponent<PositionComponent>(
+        threat.id,
+        "position",
+      );
       if (threatPos) {
         const distance = Math.sqrt(
-          Math.pow(threatPos.x - position.x, 2) + Math.pow(threatPos.y - position.y, 2)
+          Math.pow(threatPos.x - position.x, 2) +
+            Math.pow(threatPos.y - position.y, 2),
         );
-        
+
         // Flee in opposite direction
         const direction = {
           x: (position.x - threatPos.x) / distance,
-          y: (position.y - threatPos.y) / distance
+          y: (position.y - threatPos.y) / distance,
         };
         velocity.x = direction.x * ai.speed;
         velocity.y = direction.y * ai.speed;
@@ -172,16 +248,30 @@ export class AISystem implements System {
     ai: AIComponent,
     velocity: VelocityComponent,
     entities: Entity[],
-    components: ComponentManager
+    components: ComponentManager,
   ): void {
-    const intruder = this.findNearestTarget(entityId, position, ai.detectionRange, entities, components, 'player');
-    
+    const intruder = this.findNearestTarget(
+      entityId,
+      position,
+      ai.detectionRange,
+      entities,
+      components,
+      "player",
+    );
+
     if (intruder) {
       // Switch to chase behavior temporarily
-      ai.state = 'alerting';
-      this.handleChaseBehavior(entityId, position, ai, velocity, entities, components);
+      ai.state = "alerting";
+      this.handleChaseBehavior(
+        entityId,
+        position,
+        ai,
+        velocity,
+        entities,
+        components,
+      );
     } else {
-      ai.state = 'guarding';
+      ai.state = "guarding";
       this.handleIdleBehavior(velocity);
     }
   }
@@ -192,20 +282,24 @@ export class AISystem implements System {
     ai: AIComponent,
     velocity: VelocityComponent,
     _entities: Entity[],
-    components: ComponentManager
+    components: ComponentManager,
   ): void {
     if (ai.target) {
-      const targetPos = components.getComponent<PositionComponent>(ai.target, 'position');
+      const targetPos = components.getComponent<PositionComponent>(
+        ai.target,
+        "position",
+      );
       if (targetPos) {
         const distance = Math.sqrt(
-          Math.pow(targetPos.x - position.x, 2) + Math.pow(targetPos.y - position.y, 2)
+          Math.pow(targetPos.x - position.x, 2) +
+            Math.pow(targetPos.y - position.y, 2),
         );
-        
+
         // Follow at a distance
         if (distance > 3) {
           const direction = {
             x: (targetPos.x - position.x) / distance,
-            y: (targetPos.y - position.y) / distance
+            y: (targetPos.y - position.y) / distance,
           };
           velocity.x = direction.x * ai.speed;
           velocity.y = direction.y * ai.speed;
@@ -222,22 +316,26 @@ export class AISystem implements System {
     range: number,
     entities: Entity[],
     components: ComponentManager,
-    targetType: string
+    targetType: string,
   ): Entity | null {
     let nearestTarget: Entity | null = null;
     let nearestDistance = range;
 
     for (const entity of entities) {
       if (entity.id === entityId) continue;
-      
+
       // Check if entity has the target component type
       if (!components.hasComponent(entity.id, targetType)) continue;
-      
-      const targetPos = components.getComponent<PositionComponent>(entity.id, 'position');
+
+      const targetPos = components.getComponent<PositionComponent>(
+        entity.id,
+        "position",
+      );
       if (!targetPos) continue;
 
       const distance = Math.sqrt(
-        Math.pow(targetPos.x - position.x, 2) + Math.pow(targetPos.y - position.y, 2)
+        Math.pow(targetPos.x - position.x, 2) +
+          Math.pow(targetPos.y - position.y, 2),
       );
 
       if (distance < nearestDistance) {

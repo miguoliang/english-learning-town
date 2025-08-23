@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-import type { Achievement, AchievementRarity } from '../../types';
-import { AnimatedEmoji } from '@elt/ui';
+import React, { useState } from "react";
+import styled, { keyframes, css } from "styled-components";
+import type { Achievement, AchievementRarity } from "../../types";
+import { AnimatedEmoji } from "@elt/ui";
 
 const shimmer = keyframes`
   0% { transform: translateX(-100%); }
@@ -36,47 +36,48 @@ interface BadgeContainerProps {
 
 const getBadgeColors = (rarity: AchievementRarity) => {
   switch (rarity) {
-    case 'COMMON':
+    case "COMMON":
       return {
-        primary: '#4ecdc4',
-        secondary: '#26de81',
-        glow: 'rgba(78, 205, 196, 0.6)'
+        primary: "#4ecdc4",
+        secondary: "#26de81",
+        glow: "rgba(78, 205, 196, 0.6)",
       };
-    case 'UNCOMMON':
+    case "UNCOMMON":
       return {
-        primary: '#45b7d1',
-        secondary: '#3742fa',
-        glow: 'rgba(69, 183, 209, 0.6)'
+        primary: "#45b7d1",
+        secondary: "#3742fa",
+        glow: "rgba(69, 183, 209, 0.6)",
       };
-    case 'RARE':
+    case "RARE":
       return {
-        primary: '#a29bfe',
-        secondary: '#6c5ce7',
-        glow: 'rgba(162, 155, 254, 0.6)'
+        primary: "#a29bfe",
+        secondary: "#6c5ce7",
+        glow: "rgba(162, 155, 254, 0.6)",
       };
-    case 'EPIC':
+    case "EPIC":
       return {
-        primary: '#fd79a8',
-        secondary: '#e84393',
-        glow: 'rgba(253, 121, 168, 0.6)'
+        primary: "#fd79a8",
+        secondary: "#e84393",
+        glow: "rgba(253, 121, 168, 0.6)",
       };
-    case 'LEGENDARY':
+    case "LEGENDARY":
       return {
-        primary: '#fdcb6e',
-        secondary: '#e17055',
-        glow: 'rgba(253, 203, 110, 0.8)'
+        primary: "#fdcb6e",
+        secondary: "#e17055",
+        glow: "rgba(253, 203, 110, 0.8)",
       };
     default:
       return {
-        primary: '#ddd',
-        secondary: '#999',
-        glow: 'rgba(221, 221, 221, 0.4)'
+        primary: "#ddd",
+        secondary: "#999",
+        glow: "rgba(221, 221, 221, 0.4)",
       };
   }
 };
 
 const BadgeContainer = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['rarity', 'isUnlocked', 'isHovered'].includes(prop),
+  shouldForwardProp: (prop) =>
+    !["rarity", "isUnlocked", "isHovered"].includes(prop),
 })<BadgeContainerProps>`
   position: relative;
   width: 120px;
@@ -85,48 +86,57 @@ const BadgeContainer = styled.div.withConfig({
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   overflow: hidden;
-  
-  ${props => {
+
+  ${(props) => {
     const colors = getBadgeColors(props.rarity);
     return css`
-      background: ${props.isUnlocked 
+      background: ${props.isUnlocked
         ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`
-        : 'linear-gradient(135deg, #636e72 0%, #2d3436 100%)'
-      };
-      
-      border: 4px solid ${props.isUnlocked ? colors.primary : '#636e72'};
-      
-      ${props.isUnlocked && css`
-        box-shadow: 
+        : "linear-gradient(135deg, #636e72 0%, #2d3436 100%)"};
+
+      border: 4px solid ${props.isUnlocked ? colors.primary : "#636e72"};
+
+      ${props.isUnlocked &&
+      css`
+        box-shadow:
           0 8px 25px ${colors.glow},
           0 0 0 0 ${colors.glow};
         animation: ${unlockGlow} 3s ease-in-out infinite;
       `}
-      
-      ${!props.isUnlocked && css`
+
+      ${!props.isUnlocked &&
+      css`
         opacity: 0.4;
         filter: grayscale(100%);
         animation: ${lockedPulse} 2s ease-in-out infinite;
       `}
       
-      ${props.isHovered && props.isUnlocked && css`
+      ${props.isHovered &&
+      props.isUnlocked &&
+      css`
         transform: scale(1.1) translateY(-5px);
-        box-shadow: 
+        box-shadow:
           0 12px 35px ${colors.glow},
           0 0 0 8px rgba(255, 255, 255, 0.1);
       `}
     `;
   }}
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: ${props => props.isUnlocked ? shimmer : 'none'} 3s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    animation: ${(props) => (props.isUnlocked ? shimmer : "none")} 3s
+      ease-in-out infinite;
     animation-delay: 1s;
   }
 `;
@@ -150,11 +160,12 @@ const BadgeIcon = styled.div`
 `;
 
 const BadgeTitle = styled.div<{ isUnlocked: boolean }>`
-  font-family: 'Comic Neue', 'Fredoka One', sans-serif;
+  font-family: "Comic Neue", "Fredoka One", sans-serif;
   font-size: 0.7rem;
   font-weight: 700;
-  color: ${props => props.isUnlocked ? '#ffffff' : '#999999'};
-  text-shadow: ${props => props.isUnlocked ? '0 1px 2px rgba(0, 0, 0, 0.5)' : 'none'};
+  color: ${(props) => (props.isUnlocked ? "#ffffff" : "#999999")};
+  text-shadow: ${(props) =>
+    props.isUnlocked ? "0 1px 2px rgba(0, 0, 0, 0.5)" : "none"};
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -163,7 +174,10 @@ const BadgeTitle = styled.div<{ isUnlocked: boolean }>`
   -webkit-box-orient: vertical;
 `;
 
-const RarityIndicator = styled.div<{ rarity: AchievementRarity; isUnlocked: boolean }>`
+const RarityIndicator = styled.div<{
+  rarity: AchievementRarity;
+  isUnlocked: boolean;
+}>`
   position: absolute;
   top: -8px;
   right: -8px;
@@ -180,26 +194,31 @@ const RarityIndicator = styled.div<{ rarity: AchievementRarity; isUnlocked: bool
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   z-index: 3;
-  
-  ${props => {
+
+  ${(props) => {
     const colors = getBadgeColors(props.rarity);
     return css`
-      background: ${props.isUnlocked 
+      background: ${props.isUnlocked
         ? `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`
-        : 'linear-gradient(135deg, #636e72 0%, #2d3436 100%)'
-      };
+        : "linear-gradient(135deg, #636e72 0%, #2d3436 100%)"};
     `;
   }}
 `;
 
 const getRaritySymbol = (rarity: AchievementRarity): string => {
   switch (rarity) {
-    case 'COMMON': return '●';
-    case 'UNCOMMON': return '◆';
-    case 'RARE': return '★';
-    case 'EPIC': return '♦';
-    case 'LEGENDARY': return '♛';
-    default: return '●';
+    case "COMMON":
+      return "●";
+    case "UNCOMMON":
+      return "◆";
+    case "RARE":
+      return "★";
+    case "EPIC":
+      return "♦";
+    case "LEGENDARY":
+      return "♛";
+    default:
+      return "●";
   }
 };
 
@@ -222,21 +241,22 @@ const Tooltip = styled.div<{ isVisible: boolean }>`
   color: ${({ theme }) => theme.colors.surface};
   padding: 12px 16px;
   border-radius: 12px;
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
-  box-shadow: 
+  box-shadow:
     ${({ theme }) => theme.shadows.fun},
     0 6px 20px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
   z-index: 10;
-  opacity: ${props => props.isVisible ? 1 : 0};
-  transform: translateX(-50%) ${props => props.isVisible ? 'translateY(0)' : 'translateY(10px)'};
+  opacity: ${(props) => (props.isVisible ? 1 : 0)};
+  transform: translateX(-50%)
+    ${(props) => (props.isVisible ? "translateY(0)" : "translateY(10px)")};
   transition: all 0.3s ease;
   pointer-events: none;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -8px;
     left: 50%;
@@ -264,7 +284,7 @@ interface AchievementBadgeProps {
 export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
   achievement,
   isUnlocked,
-  onClick
+  onClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -286,11 +306,11 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
       <RarityIndicator rarity={achievement.rarity} isUnlocked={isUnlocked}>
         {getRaritySymbol(achievement.rarity)}
       </RarityIndicator>
-      
+
       <BadgeContent>
         <BadgeIcon>
           {isUnlocked ? (
-            <AnimatedEmoji 
+            <AnimatedEmoji
               emoji={achievement.icon}
               mood="happy"
               size="2.5rem"
@@ -300,26 +320,22 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
             achievement.icon
           )}
         </BadgeIcon>
-        <BadgeTitle isUnlocked={isUnlocked}>
-          {achievement.title}
-        </BadgeTitle>
-        {isUnlocked && (
-          <XPReward>+{achievement.xpReward} XP</XPReward>
-        )}
+        <BadgeTitle isUnlocked={isUnlocked}>{achievement.title}</BadgeTitle>
+        {isUnlocked && <XPReward>+{achievement.xpReward} XP</XPReward>}
       </BadgeContent>
-      
+
       {!isUnlocked && !achievement.isSecret && (
         <LockedOverlay>🔒</LockedOverlay>
       )}
-      
-      {!isUnlocked && achievement.isSecret && (
-        <LockedOverlay>❓</LockedOverlay>
-      )}
-      
+
+      {!isUnlocked && achievement.isSecret && <LockedOverlay>❓</LockedOverlay>}
+
       <Tooltip isVisible={isHovered}>
-        {isUnlocked ? achievement.description : 
-         achievement.isSecret ? "Secret Achievement - Keep exploring!" : 
-         achievement.description}
+        {isUnlocked
+          ? achievement.description
+          : achievement.isSecret
+            ? "Secret Achievement - Keep exploring!"
+            : achievement.description}
       </Tooltip>
     </BadgeContainer>
   );

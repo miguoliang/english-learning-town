@@ -25,11 +25,5 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": false
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "**/*.test.*",
-    "**/*.spec.*"
-  ]
+  "exclude": ["node_modules", "dist", "build", "**/*.test.*", "**/*.spec.*"]
 }

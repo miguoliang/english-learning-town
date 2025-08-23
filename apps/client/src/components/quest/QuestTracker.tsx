@@ -1,9 +1,9 @@
 // Refactored Quest Tracker Component - Single Responsibility: Quest Display Management
 
-import React from 'react';
-import styled from 'styled-components';
-import { useQuestDisplay } from '../../hooks/useQuestDisplay';
-import { QuestItem } from './QuestItem';
+import React from "react";
+import styled from "styled-components";
+import { useQuestDisplay } from "../../hooks/useQuestDisplay";
+import { QuestItem } from "./QuestItem";
 
 const TrackerContainer = styled.div`
   position: fixed;
@@ -35,20 +35,19 @@ const Title = styled.h3`
   font-weight: 600;
 `;
 
-
 const QuestList = styled.div`
   max-height: 400px;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     width: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #4a90e2;
     border-radius: 2px;
@@ -84,28 +83,30 @@ export const QuestTracker: React.FC<QuestTrackerProps> = ({ className }) => {
       </Header>
 
       <QuestList>
-            {displayQuests.length === 0 ? (
-              <EmptyState>No active quests</EmptyState>
-            ) : (
-              displayQuests.map((quest) => {
-                const isPrimary = currentActiveQuest?.id === quest.id;
-                const progress = calculateProgress(quest);
-                const completedCount = quest.objectives.filter(obj => obj.isCompleted).length;
+        {displayQuests.length === 0 ? (
+          <EmptyState>No active quests</EmptyState>
+        ) : (
+          displayQuests.map((quest) => {
+            const isPrimary = currentActiveQuest?.id === quest.id;
+            const progress = calculateProgress(quest);
+            const completedCount = quest.objectives.filter(
+              (obj) => obj.isCompleted,
+            ).length;
 
-                return (
-                  <QuestItem
-                    key={quest.id}
-                    quest={quest}
-                    isPrimary={isPrimary}
-                    progress={progress}
-                    completedCount={completedCount}
-                    icon={getQuestIcon(quest.questType)}
-                    currentObjectiveText={getCurrentObjectiveText(quest)}
-                    onClick={() => handleQuestClick(quest)}
-                  />
-                );
-              })
-            )}
+            return (
+              <QuestItem
+                key={quest.id}
+                quest={quest}
+                isPrimary={isPrimary}
+                progress={progress}
+                completedCount={completedCount}
+                icon={getQuestIcon(quest.questType)}
+                currentObjectiveText={getCurrentObjectiveText(quest)}
+                onClick={() => handleQuestClick(quest)}
+              />
+            );
+          })
+        )}
       </QuestList>
     </TrackerContainer>
   );

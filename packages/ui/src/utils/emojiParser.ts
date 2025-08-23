@@ -14,17 +14,17 @@ export interface ParsedContent {
  * @returns Object with emoji and cleaned text
  */
 export const parseEmojiContent = (
-  content: React.ReactNode, 
-  fallbackEmoji: string = '🎮'
+  content: React.ReactNode,
+  fallbackEmoji: string = "🎮",
 ): ParsedContent => {
   const text = String(content);
   const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
   const detectedEmoji = text.match(emojiRegex)?.[0] || fallbackEmoji;
-  const cleanText = text.replace(emojiRegex, '').replace(/\s+/g, ' ').trim();
-  
-  return { 
-    emoji: detectedEmoji, 
-    text: cleanText 
+  const cleanText = text.replace(emojiRegex, "").replace(/\s+/g, " ").trim();
+
+  return {
+    emoji: detectedEmoji,
+    text: cleanText,
   };
 };
 

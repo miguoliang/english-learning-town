@@ -3,7 +3,7 @@
  * Entity pooling, component caching, and query optimization
  */
 
-import type { ComponentManager, Component } from '../core';
+import type { ComponentManager, Component } from "../core";
 
 /**
  * Entity Pool - Reusable entity ID pool for performance
@@ -51,14 +51,17 @@ export class ComponentCache {
     this.maxSize = maxSize;
   }
 
-  get<T extends Component>(entityId: string, componentType: string): T | undefined {
+  get<T extends Component>(
+    entityId: string,
+    componentType: string,
+  ): T | undefined {
     const key = `${entityId}:${componentType}`;
     return this.cache.get(key) as T | undefined;
   }
 
   set(entityId: string, componentType: string, component: Component): void {
     const key = `${entityId}:${componentType}`;
-    
+
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
       // Remove least recently used item
       const firstKey = this.cacheKeys.values().next().value;
@@ -96,22 +99,22 @@ export class QueryManager {
   getEntitiesWithComponents(
     components: ComponentManager,
     requiredComponents: readonly string[],
-    useCache = true
+    useCache = true,
   ): string[] {
-    const queryKey = requiredComponents.slice().sort().join(':');
+    const queryKey = requiredComponents.slice().sort().join(":");
     const now = Date.now();
 
     if (useCache) {
       const cachedResult = this.queryCache.get(queryKey);
       const cacheTime = this.cacheValidTime.get(queryKey);
-      
-      if (cachedResult && cacheTime && (now - cacheTime) < this.cacheTimeout) {
+
+      if (cachedResult && cacheTime && now - cacheTime < this.cacheTimeout) {
         return cachedResult;
       }
     }
 
     const result = components.getEntitiesWithComponents(requiredComponents);
-    
+
     if (useCache) {
       this.queryCache.set(queryKey, result);
       this.cacheValidTime.set(queryKey, now);
@@ -126,7 +129,7 @@ export class QueryManager {
   }
 
   invalidateQuery(requiredComponents: readonly string[]): void {
-    const queryKey = requiredComponents.slice().sort().join(':');
+    const queryKey = requiredComponents.slice().sort().join(":");
     this.queryCache.delete(queryKey);
     this.cacheValidTime.delete(queryKey);
   }

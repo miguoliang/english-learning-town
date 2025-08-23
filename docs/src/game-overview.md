@@ -6,7 +6,7 @@
 
 ## Vision Statement
 
-*"Making English learning as addictive as your favorite RPG game"*
+_"Making English learning as addictive as your favorite RPG game"_
 
 We believe that language learning should be fun, engaging, and rewarding. By combining the mechanics of role-playing games with structured English education, we create an environment where players naturally develop their language skills while having genuine fun.
 
@@ -27,21 +27,25 @@ We believe that language learning should be fun, engaging, and rewarding. By com
 ## Key Features
 
 ### 🏰 Town Exploration
+
 - Open-world 2D environment with multiple districts
 - Interactive buildings: library, school, shops, park
 - Hidden areas unlocked through language achievements
 
 ### 👥 Character System
+
 - Customizable avatars with progression mechanics
 - Skills improve based on language performance
 - Equipment and rewards tied to learning milestones
 
 ### 📚 Adaptive Learning
+
 - Dynamic question difficulty based on performance
 - Multiple question categories (grammar, vocabulary, reading)
 - Spaced repetition system for optimal retention
 
 ### 🎮 RPG Mechanics
+
 - Experience points earned through correct answers
 - Level progression unlocks new areas and features
 - Virtual currency for purchasing in-game items

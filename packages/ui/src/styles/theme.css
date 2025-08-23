@@ -3,38 +3,44 @@
  * Kid-friendly educational game theme
  */
 
-@import './tokens.css';
-@import './animations.css';
+@import "./tokens.css";
+@import "./animations.css";
 
 /* Override semantic colors for educational theme */
 :root {
   /* Educational brand colors */
-  --elt-color-primary: #FF6B6B;    /* Friendly coral red */
-  --elt-color-secondary: #4ECDC4;  /* Playful turquoise */
-  --elt-color-accent: #45B7D1;     /* Bright sky blue */
-  
+  --elt-color-primary: #ff6b6b; /* Friendly coral red */
+  --elt-color-secondary: #4ecdc4; /* Playful turquoise */
+  --elt-color-accent: #45b7d1; /* Bright sky blue */
+
   /* Educational semantic colors */
-  --elt-color-magical: #9B59B6;    /* Purple magic */
-  --elt-color-ocean: #3498DB;      /* Ocean blue */
-  --elt-color-forest: #27AE60;     /* Forest green */
-  --elt-color-sunset: #E67E22;     /* Sunset orange */
-  
+  --elt-color-magical: #9b59b6; /* Purple magic */
+  --elt-color-ocean: #3498db; /* Ocean blue */
+  --elt-color-forest: #27ae60; /* Forest green */
+  --elt-color-sunset: #e67e22; /* Sunset orange */
+
   /* Typography - Kid-friendly fonts */
-  --elt-font-family-heading: 'Comic Neue', 'Fredoka One', cursive, sans-serif;
-  --elt-font-family-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --elt-font-family-mono: 'Fira Code', 'Monaco', monospace;
-  
+  --elt-font-family-heading: "Comic Neue", "Fredoka One", cursive, sans-serif;
+  --elt-font-family-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --elt-font-family-mono: "Fira Code", "Monaco", monospace;
+
   /* Educational gradients */
-  --elt-gradient-primary: linear-gradient(135deg, #FF6B6B 0%, #FF8787 100%);
-  --elt-gradient-secondary: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-  --elt-gradient-accent: linear-gradient(135deg, #45B7D1 0%, #2980B9 100%);
-  --elt-gradient-magical: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
-  --elt-gradient-success: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
-  --elt-gradient-warning: linear-gradient(135deg, #FAAD14 0%, #D48806 100%);
-  --elt-gradient-error: linear-gradient(135deg, #FF4D4F 0%, #CF1322 100%);
-  --elt-gradient-celebration: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 33%, #45B7D1 66%, #52C41A 100%);
-  --elt-gradient-background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
-  
+  --elt-gradient-primary: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+  --elt-gradient-secondary: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  --elt-gradient-accent: linear-gradient(135deg, #45b7d1 0%, #2980b9 100%);
+  --elt-gradient-magical: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  --elt-gradient-success: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  --elt-gradient-warning: linear-gradient(135deg, #faad14 0%, #d48806 100%);
+  --elt-gradient-error: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+  --elt-gradient-celebration: linear-gradient(
+    135deg,
+    #ff6b6b 0%,
+    #4ecdc4 33%,
+    #45b7d1 66%,
+    #52c41a 100%
+  );
+  --elt-gradient-background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
   /* Fun shadows for kid appeal */
   --elt-shadow-fun: 0 4px 15px rgba(255, 107, 107, 0.4);
   --elt-shadow-magical: 0 4px 15px rgba(155, 89, 182, 0.4);
@@ -226,9 +232,15 @@
   position: relative;
 }
 
-.elt-progress__track--sm { height: 6px; }
-.elt-progress__track--md { height: 10px; }
-.elt-progress__track--lg { height: 16px; }
+.elt-progress__track--sm {
+  height: 6px;
+}
+.elt-progress__track--md {
+  height: 10px;
+}
+.elt-progress__track--lg {
+  height: 16px;
+}
 
 .elt-progress__fill {
   height: 100%;
@@ -254,13 +266,18 @@
 }
 
 .elt-progress__fill--animated::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   animation: elt-shimmer 2s infinite;
 }
 
@@ -401,9 +418,18 @@
   animation: elt-spin 1s linear infinite;
 }
 
-.elt-spinner--sm { width: 20px; height: 20px; }
-.elt-spinner--md { width: 32px; height: 32px; }
-.elt-spinner--lg { width: 48px; height: 48px; }
+.elt-spinner--sm {
+  width: 20px;
+  height: 20px;
+}
+.elt-spinner--md {
+  width: 32px;
+  height: 32px;
+}
+.elt-spinner--lg {
+  width: 48px;
+  height: 48px;
+}
 
 /* Error Boundary styles */
 .elt-error {

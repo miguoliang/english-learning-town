@@ -14,7 +14,8 @@
 }
 
 @keyframes elt-game-level-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: var(--elt-game-shadow-badge);
   }
   50% {
@@ -75,7 +76,11 @@
 }
 
 @keyframes elt-game-badge-bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -111,7 +116,8 @@
 
 /* Motivation animations */
 @keyframes elt-game-motivation-heartbeat {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   25% {

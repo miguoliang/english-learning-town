@@ -3,6 +3,7 @@
 The English Learning Town backend provides a RESTful API for client-server communication. All endpoints return JSON responses and use standard HTTP status codes.
 
 ## Base URL
+
 ```
 Development: http://localhost:3000
 Production: https://api.english-learning-town.com
@@ -17,6 +18,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Authentication Flow
+
 1. **Login/Register**: Get initial JWT token
 2. **Token Usage**: Include token in subsequent requests
 3. **Token Refresh**: Renew tokens before expiration
@@ -25,6 +27,7 @@ Authorization: Bearer <jwt_token>
 ## Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -36,6 +39,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -70,6 +74,7 @@ API requests are rate-limited to ensure fair usage:
 - **Question Endpoints**: 500 requests per hour per user
 
 Rate limit headers are included in responses:
+
 ```http
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
@@ -79,6 +84,7 @@ X-RateLimit-Reset: 1640995200
 ## API Versioning
 
 The API uses URL path versioning:
+
 ```
 /v1/players/
 /v1/questions/
@@ -90,9 +96,11 @@ Current version: `v1`
 ## Health Check
 
 ### GET /health
+
 Check server health and status.
 
 **Response:**
+
 ```json
 {
   "status": "healthy",

@@ -1,0 +1,52 @@
+# Build artifacts
+**/dist/
+**/build/
+**/coverage/
+**/.turbo/
+**/.next/
+**/.vite/
+
+# Dependencies
+**/node_modules/
+**/pnpm-lock.yaml
+**/package-lock.json
+**/yarn.lock
+
+# Generated files
+**/*.min.js
+**/*.min.css
+**/*.bundle.js
+**/*.d.ts.map
+
+# IDE and OS files
+.DS_Store
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Public assets that shouldn't be formatted
+**/public/assets/
+**/static/
+
+# Config files that have strict formatting requirements
+.github/workflows/
+**/.github/workflows/
+
+# Specific files to ignore
+CHANGELOG.md
+LICENSE
+
+# Documentation theme files (Handlebars templates)
+docs/theme/
+**/*.hbs

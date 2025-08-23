@@ -3,16 +3,20 @@
  * Avoids React lifecycle issues with direct store usage
  */
 
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { ECSRendererZustand } from '../../ecs/ECSRendererZustand';
-import { useGameStore } from '../../stores/unifiedGameStore';
-import { getDefaultPlayerPosition, getDefaultScenePath, getCellSize } from '../../config/gameConfig';
-import { DialogueSystem } from '../dialogue/DialogueSystem';
-import { XPProgressBar } from '@elt/game-client';
-import { GameStats } from '../progress/GameStats';
-import { AchievementGrid } from '../achievement/AchievementGrid';
-import { logger } from '../../utils/logger';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { ECSRendererZustand } from "../../ecs/ECSRendererZustand";
+import { useGameStore } from "../../stores/unifiedGameStore";
+import {
+  getDefaultPlayerPosition,
+  getDefaultScenePath,
+  getCellSize,
+} from "../../config/gameConfig";
+import { DialogueSystem } from "../dialogue/DialogueSystem";
+import { XPProgressBar } from "@elt/game-client";
+import { GameStats } from "../progress/GameStats";
+import { AchievementGrid } from "../achievement/AchievementGrid";
+import { logger } from "../../utils/logger";
 
 const SceneContainer = styled.div`
   width: 100vw;
@@ -67,10 +71,10 @@ const Controls = styled.div`
   font-size: 0.9rem;
   color: #2d3436;
   text-align: center;
-  
+
   div {
     margin-bottom: 5px;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -82,7 +86,7 @@ const StatsToggleButton = styled.button`
   border: none;
   border-radius: 25px;
   padding: 10px 20px;
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.surface};
@@ -91,7 +95,7 @@ const StatsToggleButton = styled.button`
   pointer-events: auto;
   transition: all 0.3s ease;
   margin-top: 10px;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -107,7 +111,7 @@ const StatsPanel = styled.div<{ isVisible: boolean }>`
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
   z-index: 1000;
-  display: ${props => props.isVisible ? 'flex' : 'none'};
+  display: ${(props) => (props.isVisible ? "flex" : "none")};
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -137,7 +141,7 @@ const CloseButton = styled.button`
   color: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadows.fun};
   z-index: 10;
-  
+
   &:hover {
     transform: scale(1.1);
   }
@@ -152,7 +156,7 @@ const TabContainer = styled.div`
 `;
 
 const TabButton = styled.button<{ isActive: boolean }>`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   padding: 12px 25px;
@@ -160,22 +164,22 @@ const TabButton = styled.button<{ isActive: boolean }>`
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  
-  ${props => props.isActive 
-    ? `
+
+  ${(props) =>
+    props.isActive
+      ? `
       background: ${props.theme.gradients.primary};
       color: ${props.theme.colors.surface};
       box-shadow: ${props.theme.shadows.fun};
     `
-    : `
+      : `
       background: ${props.theme.colors.surface};
       color: ${props.theme.colors.text};
       
       &:hover {
         background: ${props.theme.colors.background};
       }
-    `
-  }
+    `}
 `;
 
 interface ECSSceneZustandProps {
@@ -189,26 +193,28 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
   playerName,
   scenePath = getDefaultScenePath(),
   showGrid = true,
-  cellSize = getCellSize()
+  cellSize = getCellSize(),
 }) => {
   // Get state and actions from Unified Zustand store
-  const isECSInitialized = useGameStore(state => state.isECSInitialized);
+  const isECSInitialized = useGameStore((state) => state.isECSInitialized);
   // Removed unused currentScene - consolidated in unified store
-  const playerPosition = useGameStore(state => state.playerPosition);
-  const world = useGameStore(state => state.world);
-  const loadScene = useGameStore(state => state.loadScene);
-  const addPlayer = useGameStore(state => state.addPlayer);
-  const startGameLoop = useGameStore(state => state.startGameLoop);
-  const stopGameLoop = useGameStore(state => state.stopGameLoop);
-  
+  const playerPosition = useGameStore((state) => state.playerPosition);
+  const world = useGameStore((state) => state.world);
+  const loadScene = useGameStore((state) => state.loadScene);
+  const addPlayer = useGameStore((state) => state.addPlayer);
+  const startGameLoop = useGameStore((state) => state.startGameLoop);
+  const stopGameLoop = useGameStore((state) => state.stopGameLoop);
+
   // Get player data for XP progress bar
-  const player = useGameStore(state => state.player);
-  const initializePlayerProgress = useGameStore(state => state.initializePlayerProgress);
-  
+  const player = useGameStore((state) => state.player);
+  const initializePlayerProgress = useGameStore(
+    (state) => state.initializePlayerProgress,
+  );
+
   // Initialize player progress if it doesn't exist
   useEffect(() => {
     if (!player.progress) {
-      logger.player('Initializing player progress...');
+      logger.player("Initializing player progress...");
       initializePlayerProgress();
     }
   }, [player.progress, initializePlayerProgress]);
@@ -218,35 +224,35 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
     npcId: string;
     targetId: string;
   } | null>(null);
-  
+
   // Local state for stats panel
   const [showStatsPanel, setShowStatsPanel] = useState(false);
-  const [statsTab, setStatsTab] = useState<'stats' | 'achievements'>('stats');
+  const [statsTab, setStatsTab] = useState<"stats" | "achievements">("stats");
 
   // Load scene and start game when component mounts
   useEffect(() => {
     const initializeGame = async () => {
       try {
         if (!isECSInitialized) {
-          logger.warn('ECS not initialized yet, waiting...');
+          logger.warn("ECS not initialized yet, waiting...");
           return;
         }
 
-        logger.info('ECSSceneZustand: Initializing game...');
-        
+        logger.info("ECSSceneZustand: Initializing game...");
+
         // Load the scene
         await loadScene(scenePath);
-        
+
         // Add player to the configured default position
         const playerPos = getDefaultPlayerPosition();
-        addPlayer('player', playerPos, playerName);
-        
+        addPlayer("player", playerPos, playerName);
+
         // Start the game loop
         startGameLoop();
-        
-        logger.info('ECSSceneZustand: Game initialized successfully');
+
+        logger.info("ECSSceneZustand: Game initialized successfully");
       } catch (error) {
-        logger.error('ECSSceneZustand: Failed to initialize game:', error);
+        logger.error("ECSSceneZustand: Failed to initialize game:", error);
       }
     };
 
@@ -254,40 +260,51 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
 
     // Cleanup on unmount
     return () => {
-      logger.info('🧹 ECSSceneZustand: Component unmounting, stopping game loop');
+      logger.info(
+        "🧹 ECSSceneZustand: Component unmounting, stopping game loop",
+      );
       stopGameLoop();
     };
-  }, [isECSInitialized, scenePath, playerName, loadScene, addPlayer, startGameLoop, stopGameLoop]);
+  }, [
+    isECSInitialized,
+    scenePath,
+    playerName,
+    loadScene,
+    addPlayer,
+    startGameLoop,
+    stopGameLoop,
+  ]);
 
   // Set up dialogue event listener
   useEffect(() => {
     if (!world) return;
 
     const eventBus = world.getEventBus();
-    
-    const handleDialogueStart = (data: { initiatorId: string; targetId: string; dialogueId: string }) => {
+
+    const handleDialogueStart = (data: {
+      initiatorId: string;
+      targetId: string;
+      dialogueId: string;
+    }) => {
       // Use the dialogueId as the npcId for the dialogue system
       setActiveDialogue({
         npcId: data.dialogueId,
-        targetId: data.targetId
+        targetId: data.targetId,
       });
     };
 
-    eventBus.on('dialogue:start', handleDialogueStart);
+    eventBus.on("dialogue:start", handleDialogueStart);
 
     return () => {
-      eventBus.off('dialogue:start', handleDialogueStart);
+      eventBus.off("dialogue:start", handleDialogueStart);
     };
   }, [world]);
 
   return (
     <SceneContainer>
       {/* Game Renderer */}
-      <ECSRendererZustand 
-        cellSize={cellSize} 
-        showGrid={showGrid}
-      />
-      
+      <ECSRendererZustand cellSize={cellSize} showGrid={showGrid} />
+
       {/* HUD */}
       <HUD>
         <PlayerInfo>
@@ -296,7 +313,7 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
             Position: ({playerPosition?.x || 0}, {playerPosition?.y || 0})
           </PositionText>
         </PlayerInfo>
-        
+
         {/* XP Progress Bar */}
         {player.progress && (
           <XPProgressBar
@@ -306,7 +323,7 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
             isCompact={true}
           />
         )}
-        
+
         <Controls>
           <div>🎮 WASD/Arrow keys to move</div>
           <div>🖱️ Click to move</div>
@@ -317,49 +334,47 @@ export const ECSSceneZustand: React.FC<ECSSceneZustandProps> = ({
           </StatsToggleButton>
         </Controls>
       </HUD>
-      
+
       {/* Dialogue System */}
       {activeDialogue && (
-        <DialogueSystem 
-          npcId={activeDialogue.npcId} 
-          onClose={() => setActiveDialogue(null)} 
+        <DialogueSystem
+          npcId={activeDialogue.npcId}
+          onClose={() => setActiveDialogue(null)}
         />
       )}
-      
+
       {/* Stats Panel */}
       <StatsPanel isVisible={showStatsPanel}>
         <StatsContent>
-          <CloseButton onClick={() => setShowStatsPanel(false)}>
-            ✕
-          </CloseButton>
-          
+          <CloseButton onClick={() => setShowStatsPanel(false)}>✕</CloseButton>
+
           <TabContainer>
-            <TabButton 
-              isActive={statsTab === 'stats'} 
-              onClick={() => setStatsTab('stats')}
+            <TabButton
+              isActive={statsTab === "stats"}
+              onClick={() => setStatsTab("stats")}
             >
               📊 Your Progress
             </TabButton>
-            <TabButton 
-              isActive={statsTab === 'achievements'} 
-              onClick={() => setStatsTab('achievements')}
+            <TabButton
+              isActive={statsTab === "achievements"}
+              onClick={() => setStatsTab("achievements")}
             >
               🏆 Achievements
             </TabButton>
           </TabContainer>
-          
-          {statsTab === 'stats' && player.progress && (
+
+          {statsTab === "stats" && player.progress && (
             <GameStats
               progress={player.progress}
               level={player.level}
               achievementCount={{
                 unlocked: player.unlockedAchievements.length,
-                total: player.achievements.length
+                total: player.achievements.length,
               }}
             />
           )}
-          
-          {statsTab === 'achievements' && (
+
+          {statsTab === "achievements" && (
             <AchievementGrid
               achievements={player.achievements}
               unlockedAchievements={player.unlockedAchievements}

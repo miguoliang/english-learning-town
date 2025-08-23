@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
-import { AnimatedEmoji } from './AnimatedEmoji';
-import { parseEmojiContent } from '../../utils/emojiParser';
+import React, { useState } from "react";
+import { AnimatedEmoji } from "./AnimatedEmoji";
+import { parseEmojiContent } from "../../utils/emojiParser";
 
-export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "outline"
+  | "ghost";
+export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps {
   /** Button content */
@@ -19,7 +24,7 @@ export interface ButtonProps {
   /** Whether button should take full width */
   fullWidth?: boolean;
   /** Button type for forms */
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit" | "reset";
   /** Whether to show an emoji with animation */
   showEmoji?: boolean;
   /** Custom emoji to display (auto-detected from children if not provided) */
@@ -30,7 +35,7 @@ export interface ButtonProps {
 
 /**
  * Button - A versatile, animated button component
- * 
+ *
  * Features:
  * - Multiple variants (primary, secondary, accent, outline, ghost)
  * - Three sizes (sm, md, lg)
@@ -41,14 +46,14 @@ export interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   disabled = false,
   fullWidth = false,
-  type = 'button',
+  type = "button",
   showEmoji = true,
   emoji,
-  className = '',
+  className = "",
 }) => {
   const [isClicked, setIsClicked] = useState(false);
 
@@ -66,13 +71,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   // Build CSS classes
   const classes = [
-    'elt-button',
+    "elt-button",
     `elt-button--${variant}`,
     `elt-button--${size}`,
-    fullWidth && 'elt-button--full',
-    isClicked && 'elt-animate-bounce',
-    className
-  ].filter(Boolean).join(' ');
+    fullWidth && "elt-button--full",
+    isClicked && "elt-animate-bounce",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button
@@ -80,12 +87,12 @@ export const Button: React.FC<ButtonProps> = ({
       className={classes}
       onClick={handleClick}
       disabled={disabled}
-      aria-label={typeof children === 'string' ? children : undefined}
+      aria-label={typeof children === "string" ? children : undefined}
     >
       {showEmoji && displayEmoji && (
         <AnimatedEmoji
           emoji={displayEmoji}
-          mood={isClicked ? 'excited' : 'happy'}
+          mood={isClicked ? "excited" : "happy"}
           size="1.2em"
           hoverEffect={false}
         />

@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
+import React, { useState, useRef } from "react";
+import styled from "styled-components";
 /// <reference path="../../types/speech.ts" />
-import { AudioManager } from '../../utils/audioManager';
+import { AudioManager } from "../../utils/audioManager";
 
 const VoiceContainer = styled.div`
   display: flex;
@@ -12,7 +12,7 @@ const VoiceContainer = styled.div`
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(212, 144, 74, 0.2);
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(212, 144, 74, 0.1);
   backdrop-filter: blur(4px);
@@ -25,11 +25,11 @@ const VoiceControls = styled.div`
 `;
 
 const VoiceButton = styled.button<{ isListening?: boolean }>`
-  background: ${props => props.isListening 
-    ? 'rgba(169, 50, 38, 0.9)' 
-    : 'rgba(0, 0, 0, 0.6)'};
-  border: 1px solid ${props => props.isListening ? '#a93226' : 'rgba(212, 144, 74, 0.6)'};
-  color: ${props => props.isListening ? '#ffffff' : '#d4904a'};
+  background: ${(props) =>
+    props.isListening ? "rgba(169, 50, 38, 0.9)" : "rgba(0, 0, 0, 0.6)"};
+  border: 1px solid
+    ${(props) => (props.isListening ? "#a93226" : "rgba(212, 144, 74, 0.6)")};
+  color: ${(props) => (props.isListening ? "#ffffff" : "#d4904a")};
   padding: 14px 20px;
   border-radius: 10px;
   cursor: pointer;
@@ -40,42 +40,47 @@ const VoiceButton = styled.button<{ isListening?: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(212, 144, 74, 0.1);
   position: relative;
   overflow: hidden;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 144, 74, 0.1), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(212, 144, 74, 0.1),
+      transparent
+    );
     transition: left 0.6s;
   }
-  
+
   &:hover {
-    background: ${props => props.isListening 
-      ? 'rgba(169, 50, 38, 1)' 
-      : 'rgba(212, 144, 74, 0.2)'};
-    border-color: ${props => props.isListening ? '#a93226' : 'rgba(212, 144, 74, 0.8)'};
+    background: ${(props) =>
+      props.isListening ? "rgba(169, 50, 38, 1)" : "rgba(212, 144, 74, 0.2)"};
+    border-color: ${(props) =>
+      props.isListening ? "#a93226" : "rgba(212, 144, 74, 0.8)"};
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 6px 16px rgba(0, 0, 0, 0.4),
       0 3px 6px rgba(212, 144, 74, 0.2);
-      
+
     &::before {
       left: 100%;
     }
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -94,11 +99,11 @@ const TranscriptDisplay = styled.div`
   font-weight: 400;
   line-height: 1.6;
   letter-spacing: 0.02em;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 6px rgba(0, 0, 0, 0.3),
     0 1px 0 rgba(212, 144, 74, 0.05);
   transition: border-color 0.3s;
-  
+
   &:focus-within {
     border-color: rgba(212, 144, 74, 0.3);
   }
@@ -132,12 +137,12 @@ interface VoiceInputProps {
 export const VoiceInput: React.FC<VoiceInputProps> = ({
   onTranscript,
   placeholder = "Click 🎤 to speak your response...",
-  disabled = false
+  disabled = false,
 }) => {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [interimTranscript, setInterimTranscript] = useState('');
-  const [status, setStatus] = useState('');
+  const [transcript, setTranscript] = useState("");
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const [status, setStatus] = useState("");
   const recognitionRef = useRef<unknown | null>(null);
 
   const startListening = async () => {
@@ -147,20 +152,20 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     }
 
     setIsListening(true);
-    setTranscript('');
-    setInterimTranscript('');
-    setStatus('Listening... speak now');
+    setTranscript("");
+    setInterimTranscript("");
+    setStatus("Listening... speak now");
 
     try {
       await AudioManager.startListening({
-        language: 'en-US',
+        language: "en-US",
         continuous: false,
         interimResults: true,
         onResult: (text: string, isFinal: boolean) => {
           if (isFinal) {
             setTranscript(text);
-            setInterimTranscript('');
-            setStatus('Processing...');
+            setInterimTranscript("");
+            setStatus("Processing...");
             onTranscript(text);
           } else {
             setInterimTranscript(text);
@@ -173,11 +178,11 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         onEnd: () => {
           setIsListening(false);
           if (transcript) {
-            setStatus('Voice input complete');
+            setStatus("Voice input complete");
           } else {
-            setStatus('No speech detected');
+            setStatus("No speech detected");
           }
-        }
+        },
       });
     } catch (error) {
       setStatus(`Failed to start listening: ${error}`);
@@ -190,42 +195,40 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       (recognitionRef.current as { stop: () => void }).stop();
     }
     setIsListening(false);
-    setStatus('Stopped listening');
+    setStatus("Stopped listening");
   };
 
   const clearTranscript = () => {
-    setTranscript('');
-    setInterimTranscript('');
-    setStatus('');
+    setTranscript("");
+    setInterimTranscript("");
+    setStatus("");
   };
 
   return (
     <VoiceContainer>
       <VoiceControls>
-        <VoiceButton 
-          onClick={startListening} 
+        <VoiceButton
+          onClick={startListening}
           isListening={isListening}
           disabled={disabled}
         >
-          {isListening ? '🔴 Stop' : '🎤 Speak'}
+          {isListening ? "🔴 Stop" : "🎤 Speak"}
         </VoiceButton>
         {transcript && (
-          <VoiceButton onClick={clearTranscript}>
-            🗑️ Clear
-          </VoiceButton>
+          <VoiceButton onClick={clearTranscript}>🗑️ Clear</VoiceButton>
         )}
       </VoiceControls>
-      
+
       <TranscriptDisplay>
         {transcript && <FinalText>{transcript}</FinalText>}
         {interimTranscript && <InterimText>{interimTranscript}</InterimText>}
         {!transcript && !interimTranscript && (
-          <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          <span style={{ color: "rgba(255, 255, 255, 0.5)" }}>
             {placeholder}
           </span>
         )}
       </TranscriptDisplay>
-      
+
       {status && <StatusText>{status}</StatusText>}
     </VoiceContainer>
   );

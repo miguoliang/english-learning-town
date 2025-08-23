@@ -3,16 +3,16 @@
  * Displays educational progress achievements and milestones
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Button, AnimatedEmoji } from '@elt/ui';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { Button, AnimatedEmoji } from "@elt/ui";
 import {
   AchievementEngine,
   AchievementCategory,
   AchievementRarity,
-  type EducationalAchievement
-} from '@elt/learning-analytics';
-import type { VocabularyCard, ReviewSession } from '@elt/learning-algorithms';
+  type EducationalAchievement,
+} from "@elt/learning-analytics";
+import type { VocabularyCard, ReviewSession } from "@elt/learning-algorithms";
 
 const DashboardContainer = styled.div`
   background: ${({ theme }) => theme.gradients.background};
@@ -30,7 +30,7 @@ const DashboardHeader = styled.div`
 
 const DashboardTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  font-size: ${({ theme }) => theme.fontSizes["3xl"]};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing[2]};
   display: flex;
@@ -50,7 +50,7 @@ const StatsSection = styled.div`
 
 const StatsTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
   display: flex;
   align-items: center;
@@ -69,7 +69,7 @@ const StatItem = styled.div`
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: ${({ theme }) => theme.spacing[1]};
 `;
@@ -88,9 +88,15 @@ const FilterSection = styled.div`
 `;
 
 const FilterButton = styled(Button)<{ isActive: boolean }>`
-  background: ${props => props.isActive ? props.theme.colors.accent : props.theme.colors.surface};
-  color: ${props => props.isActive ? props.theme.colors.surface : props.theme.colors.text};
-  border: 2px solid ${props => props.isActive ? props.theme.colors.accent : props.theme.colors.surfaceLight};
+  background: ${(props) =>
+    props.isActive ? props.theme.colors.accent : props.theme.colors.surface};
+  color: ${(props) =>
+    props.isActive ? props.theme.colors.surface : props.theme.colors.text};
+  border: 2px solid
+    ${(props) =>
+      props.isActive
+        ? props.theme.colors.accent
+        : props.theme.colors.surfaceLight};
 `;
 
 const AchievementsGrid = styled.div`
@@ -100,7 +106,7 @@ const AchievementsGrid = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing[8]};
 `;
 
-const AchievementCard = styled.div<{ 
+const AchievementCard = styled.div<{
   rarity: AchievementRarity;
   isUnlocked: boolean;
 }>`
@@ -108,43 +114,56 @@ const AchievementCard = styled.div<{
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing[5]};
   box-shadow: ${({ theme }) => theme.shadows.medium};
-  border: 2px solid ${props => {
-    if (!props.isUnlocked) return props.theme.colors.surfaceLight;
-    switch (props.rarity) {
-      case 'LEGENDARY': return '#FFD700';
-      case 'EPIC': return '#9B59B6';
-      case 'RARE': return '#3498DB';
-      case 'UNCOMMON': return '#27AE60';
-      case 'COMMON': return '#95A5A6';
-      default: return props.theme.colors.surfaceLight;
-    }
-  }};
-  opacity: ${props => props.isUnlocked ? 1 : 0.6};
+  border: 2px solid
+    ${(props) => {
+      if (!props.isUnlocked) return props.theme.colors.surfaceLight;
+      switch (props.rarity) {
+        case "LEGENDARY":
+          return "#FFD700";
+        case "EPIC":
+          return "#9B59B6";
+        case "RARE":
+          return "#3498DB";
+        case "UNCOMMON":
+          return "#27AE60";
+        case "COMMON":
+          return "#95A5A6";
+        default:
+          return props.theme.colors.surfaceLight;
+      }
+    }};
+  opacity: ${(props) => (props.isUnlocked ? 1 : 0.6)};
   position: relative;
   overflow: hidden;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: ${props => {
-      if (!props.isUnlocked) return 'transparent';
+    background: ${(props) => {
+      if (!props.isUnlocked) return "transparent";
       switch (props.rarity) {
-        case 'LEGENDARY': return 'linear-gradient(90deg, #FFD700, #FFA500)';
-        case 'EPIC': return 'linear-gradient(90deg, #9B59B6, #8E44AD)';
-        case 'RARE': return 'linear-gradient(90deg, #3498DB, #2980B9)';
-        case 'UNCOMMON': return 'linear-gradient(90deg, #27AE60, #229954)';
-        case 'COMMON': return 'linear-gradient(90deg, #95A5A6, #7F8C8D)';
-        default: return 'transparent';
+        case "LEGENDARY":
+          return "linear-gradient(90deg, #FFD700, #FFA500)";
+        case "EPIC":
+          return "linear-gradient(90deg, #9B59B6, #8E44AD)";
+        case "RARE":
+          return "linear-gradient(90deg, #3498DB, #2980B9)";
+        case "UNCOMMON":
+          return "linear-gradient(90deg, #27AE60, #229954)";
+        case "COMMON":
+          return "linear-gradient(90deg, #95A5A6, #7F8C8D)";
+        default:
+          return "transparent";
       }
     }};
   }
-  
+
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadows.large};
@@ -159,8 +178,8 @@ const AchievementHeader = styled.div`
 `;
 
 const AchievementIcon = styled.div<{ isUnlocked: boolean }>`
-  font-size: ${({ theme }) => theme.fontSizes['2xl']};
-  filter: ${props => props.isUnlocked ? 'none' : 'grayscale(100%)'};
+  font-size: ${({ theme }) => theme.fontSizes["2xl"]};
+  filter: ${(props) => (props.isUnlocked ? "none" : "grayscale(100%)")};
 `;
 
 const AchievementInfo = styled.div`
@@ -175,14 +194,20 @@ const AchievementTitle = styled.h3`
 `;
 
 const AchievementRarityBadge = styled.span<{ rarity: AchievementRarity }>`
-  background: ${props => {
+  background: ${(props) => {
     switch (props.rarity) {
-      case 'LEGENDARY': return '#FFD700';
-      case 'EPIC': return '#9B59B6';
-      case 'RARE': return '#3498DB';
-      case 'UNCOMMON': return '#27AE60';
-      case 'COMMON': return '#95A5A6';
-      default: return props.theme.colors.textSecondary;
+      case "LEGENDARY":
+        return "#FFD700";
+      case "EPIC":
+        return "#9B59B6";
+      case "RARE":
+        return "#3498DB";
+      case "UNCOMMON":
+        return "#27AE60";
+      case "COMMON":
+        return "#95A5A6";
+      default:
+        return props.theme.colors.textSecondary;
     }
   }};
   color: ${({ theme }) => theme.colors.surface};
@@ -233,19 +258,28 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `;
 
-const ProgressFill = styled.div<{ progress: number; rarity: AchievementRarity }>`
-  background: ${props => {
+const ProgressFill = styled.div<{
+  progress: number;
+  rarity: AchievementRarity;
+}>`
+  background: ${(props) => {
     switch (props.rarity) {
-      case 'LEGENDARY': return 'linear-gradient(90deg, #FFD700, #FFA500)';
-      case 'EPIC': return 'linear-gradient(90deg, #9B59B6, #8E44AD)';
-      case 'RARE': return 'linear-gradient(90deg, #3498DB, #2980B9)';
-      case 'UNCOMMON': return 'linear-gradient(90deg, #27AE60, #229954)';
-      case 'COMMON': return 'linear-gradient(90deg, #95A5A6, #7F8C8D)';
-      default: return props.theme.colors.accent;
+      case "LEGENDARY":
+        return "linear-gradient(90deg, #FFD700, #FFA500)";
+      case "EPIC":
+        return "linear-gradient(90deg, #9B59B6, #8E44AD)";
+      case "RARE":
+        return "linear-gradient(90deg, #3498DB, #2980B9)";
+      case "UNCOMMON":
+        return "linear-gradient(90deg, #27AE60, #229954)";
+      case "COMMON":
+        return "linear-gradient(90deg, #95A5A6, #7F8C8D)";
+      default:
+        return props.theme.colors.accent;
     }
   }};
   height: 100%;
-  width: ${props => Math.min(props.progress, 100)}%;
+  width: ${(props) => Math.min(props.progress, 100)}%;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   transition: width 0.5s ease;
 `;
@@ -271,15 +305,17 @@ interface AchievementDashboardProps {
   onClose: () => void;
 }
 
-type FilterType = 'all' | AchievementCategory | AchievementRarity;
+type FilterType = "all" | AchievementCategory | AchievementRarity;
 
 export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
   vocabularyCards,
   reviewSessions,
-  onClose
+  onClose,
 }) => {
-  const [achievements, setAchievements] = useState<EducationalAchievement[]>([]);
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [achievements, setAchievements] = useState<EducationalAchievement[]>(
+    [],
+  );
+  const [filter, setFilter] = useState<FilterType>("all");
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
@@ -287,20 +323,25 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
     const updatedAchievements = AchievementEngine.calculateProgress(
       defaultAchievements,
       vocabularyCards,
-      reviewSessions
+      reviewSessions,
     );
-    const achievementStats = AchievementEngine.getStatistics(updatedAchievements);
-    
+    const achievementStats =
+      AchievementEngine.getStatistics(updatedAchievements);
+
     setAchievements(updatedAchievements);
     setStats(achievementStats);
   }, [vocabularyCards, reviewSessions]);
 
-  const filteredAchievements = achievements.filter(achievement => {
-    if (filter === 'all') return true;
-    if (Object.values(AchievementCategory).includes(filter as AchievementCategory)) {
+  const filteredAchievements = achievements.filter((achievement) => {
+    if (filter === "all") return true;
+    if (
+      Object.values(AchievementCategory).includes(filter as AchievementCategory)
+    ) {
       return achievement.category === filter;
     }
-    if (Object.values(AchievementRarity).includes(filter as AchievementRarity)) {
+    if (
+      Object.values(AchievementRarity).includes(filter as AchievementRarity)
+    ) {
       return achievement.rarity === filter;
     }
     return true;
@@ -308,12 +349,18 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
 
   const getRarityIcon = (rarity: AchievementRarity): string => {
     switch (rarity) {
-      case AchievementRarity.LEGENDARY: return '👑';
-      case AchievementRarity.EPIC: return '💫';
-      case AchievementRarity.RARE: return '⭐';
-      case AchievementRarity.UNCOMMON: return '🌟';
-      case AchievementRarity.COMMON: return '✨';
-      default: return '🏆';
+      case AchievementRarity.LEGENDARY:
+        return "👑";
+      case AchievementRarity.EPIC:
+        return "💫";
+      case AchievementRarity.RARE:
+        return "⭐";
+      case AchievementRarity.UNCOMMON:
+        return "🌟";
+      case AchievementRarity.COMMON:
+        return "✨";
+      default:
+        return "🏆";
     }
   };
 
@@ -336,7 +383,9 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
           Achievements
           <AnimatedEmoji emoji="🌟" mood="floating" />
         </DashboardTitle>
-        <Button variant="ghost" onClick={onClose}>← Back to Dashboard</Button>
+        <Button variant="ghost" onClick={onClose}>
+          ← Back to Dashboard
+        </Button>
       </DashboardHeader>
 
       <StatsSection>
@@ -375,13 +424,13 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
       <FilterSection>
         <FilterButton
           variant="outline"
-          isActive={filter === 'all'}
-          onClick={() => setFilter('all')}
+          isActive={filter === "all"}
+          onClick={() => setFilter("all")}
         >
           All
         </FilterButton>
-        
-        {Object.values(AchievementCategory).map(category => (
+
+        {Object.values(AchievementCategory).map((category) => (
           <FilterButton
             key={category}
             variant="outline"
@@ -391,23 +440,25 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
             {category.charAt(0) + category.slice(1).toLowerCase()}
           </FilterButton>
         ))}
-        
-        {Object.values(AchievementRarity).map(rarity => (
+
+        {Object.values(AchievementRarity).map((rarity) => (
           <FilterButton
             key={rarity}
             variant="outline"
             isActive={filter === rarity}
             onClick={() => setFilter(rarity)}
           >
-            {getRarityIcon(rarity)} {rarity.charAt(0) + rarity.slice(1).toLowerCase()}
+            {getRarityIcon(rarity)}{" "}
+            {rarity.charAt(0) + rarity.slice(1).toLowerCase()}
           </FilterButton>
         ))}
       </FilterSection>
 
       <AchievementsGrid>
-        {filteredAchievements.map(achievement => {
-          const progressPercentage = (achievement.currentProgress / achievement.targetProgress) * 100;
-          
+        {filteredAchievements.map((achievement) => {
+          const progressPercentage =
+            (achievement.currentProgress / achievement.targetProgress) * 100;
+
           return (
             <AchievementCard
               key={achievement.id}
@@ -420,7 +471,7 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
                   Unlocked
                 </UnlockedBadge>
               )}
-              
+
               <AchievementHeader>
                 <AchievementIcon isUnlocked={achievement.isUnlocked}>
                   {achievement.icon}
@@ -432,11 +483,11 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
                   </AchievementRarityBadge>
                 </AchievementInfo>
               </AchievementHeader>
-              
+
               <AchievementDescription>
                 {achievement.description}
               </AchievementDescription>
-              
+
               <ProgressSection>
                 <ProgressHeader>
                   <ProgressText>
@@ -448,7 +499,7 @@ export const AchievementDashboard: React.FC<AchievementDashboardProps> = ({
                   </XPReward>
                 </ProgressHeader>
                 <ProgressBar>
-                  <ProgressFill 
+                  <ProgressFill
                     progress={progressPercentage}
                     rarity={achievement.rarity}
                   />

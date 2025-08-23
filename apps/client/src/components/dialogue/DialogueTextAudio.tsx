@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { DialogueText } from './DialogueText';
+import React from "react";
+import styled from "styled-components";
+import { DialogueText } from "./DialogueText";
 
 const TextWithAudio = styled.div`
   display: flex;
@@ -20,12 +20,12 @@ const AudioButton = styled.button`
   transition: all 0.3s;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  
+
   &:hover {
     background: rgba(212, 144, 74, 0.2);
     border-color: rgba(212, 144, 74, 0.8);
   }
-  
+
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -47,17 +47,14 @@ export const DialogueTextAudio: React.FC<DialogueTextAudioProps> = ({
 }) => {
   return (
     <TextWithAudio>
-      <DialogueText 
-        text={text} 
-        vocabularyHighlights={vocabularyHighlights} 
-      />
+      <DialogueText text={text} vocabularyHighlights={vocabularyHighlights} />
       {onSpeak && (
-        <AudioButton 
+        <AudioButton
           onClick={() => onSpeak(text)}
           disabled={isSpeaking}
           title="Read this text aloud"
         >
-          {isSpeaking ? '🔇' : '🔊'}
+          {isSpeaking ? "🔇" : "🔊"}
         </AudioButton>
       )}
     </TextWithAudio>

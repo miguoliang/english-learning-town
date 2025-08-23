@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import { AnimatedEmoji } from '@elt/ui';
-import type { PlayerProgress } from '../../types';
+import React from "react";
+import styled from "styled-components";
+import { AnimatedEmoji } from "@elt/ui";
+import type { PlayerProgress } from "../../types";
 
 const StatsContainer = styled.div`
   display: grid;
@@ -20,7 +20,7 @@ const StatCard = styled.div`
   border: 2px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
   }
@@ -32,7 +32,7 @@ const StatIcon = styled.div`
 `;
 
 const StatTitle = styled.h3`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.surface};
@@ -41,16 +41,16 @@ const StatTitle = styled.h3`
 `;
 
 const StatValue = styled.div`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: #FFD700;
+  color: #ffd700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   margin-bottom: 5px;
 `;
 
 const StatDescription = styled.div`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.surface};
@@ -74,7 +74,7 @@ const SkillCard = styled.div`
 `;
 
 const SkillName = styled.div`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.surface};
@@ -83,10 +83,10 @@ const SkillName = styled.div`
 `;
 
 const SkillLevel = styled.div`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.4rem;
   font-weight: 800;
-  color: #FFD700;
+  color: #ffd700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
@@ -96,7 +96,9 @@ const SkillStars = styled.div`
 `;
 
 const StreakCard = styled(StatCard)<{ isActive: boolean }>`
-  ${props => props.isActive && `
+  ${(props) =>
+    props.isActive &&
+    `
     background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
   `}
@@ -116,17 +118,17 @@ const ProgressRing = styled.div<{ progress: number }>`
   height: 60px;
   border-radius: 50%;
   background: conic-gradient(
-    #FFD700 0deg,
-    #FFD700 ${props => props.progress * 3.6}deg,
-    rgba(255, 255, 255, 0.2) ${props => props.progress * 3.6}deg,
+    #ffd700 0deg,
+    #ffd700 ${(props) => props.progress * 3.6}deg,
+    rgba(255, 255, 255, 0.2) ${(props) => props.progress * 3.6}deg,
     rgba(255, 255, 255, 0.2) 360deg
   );
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 40px;
     height: 40px;
@@ -138,7 +140,7 @@ const ProgressRing = styled.div<{ progress: number }>`
 const ProgressText = styled.div`
   position: relative;
   z-index: 1;
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.surface};
@@ -155,20 +157,20 @@ interface GameStatsProps {
 
 const getSkillEmoji = (skill: string): string => {
   const emojiMap: Record<string, string> = {
-    vocabulary: '📚',
-    grammar: '📝',
-    speaking: '🗣️',
-    listening: '👂',
-    reading: '📖',
-    writing: '✏️',
-    pronunciation: '🔊'
+    vocabulary: "📚",
+    grammar: "📝",
+    speaking: "🗣️",
+    listening: "👂",
+    reading: "📖",
+    writing: "✏️",
+    pronunciation: "🔊",
   };
-  return emojiMap[skill] || '📚';
+  return emojiMap[skill] || "📚";
 };
 
 const getSkillStars = (level: number): string => {
   const stars = Math.min(Math.floor(level / 2), 5);
-  return '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+  return "⭐".repeat(stars) + "☆".repeat(5 - stars);
 };
 
 const formatNumber = (num: number): string => {
@@ -179,24 +181,25 @@ const formatNumber = (num: number): string => {
 };
 
 const getStreakMessage = (streak: number): string => {
-  if (streak === 0) return 'Start your streak!';
-  if (streak === 1) return 'Great start!';
-  if (streak < 7) return 'Keep it up!';
-  if (streak < 14) return 'Amazing streak!';
-  if (streak < 30) return 'Incredible dedication!';
-  return 'Legendary streaker!';
+  if (streak === 0) return "Start your streak!";
+  if (streak === 1) return "Great start!";
+  if (streak < 7) return "Keep it up!";
+  if (streak < 14) return "Amazing streak!";
+  if (streak < 30) return "Incredible dedication!";
+  return "Legendary streaker!";
 };
 
 export const GameStats: React.FC<GameStatsProps> = ({
   progress,
-  achievementCount
+  achievementCount,
 }) => {
-  const achievementProgress = achievementCount.total > 0 
-    ? (achievementCount.unlocked / achievementCount.total) * 100 
-    : 0;
-  
+  const achievementProgress =
+    achievementCount.total > 0
+      ? (achievementCount.unlocked / achievementCount.total) * 100
+      : 0;
+
   const hasActiveStreak = progress.currentStreak > 0;
-  
+
   return (
     <StatsContainer>
       {/* Total XP */}
@@ -208,7 +211,7 @@ export const GameStats: React.FC<GameStatsProps> = ({
         <StatValue>{formatNumber(progress.totalXP)}</StatValue>
         <StatDescription>XP earned from learning!</StatDescription>
       </StatCard>
-      
+
       {/* Vocabulary Learned */}
       <StatCard>
         <StatIcon>
@@ -218,7 +221,7 @@ export const GameStats: React.FC<GameStatsProps> = ({
         <StatValue>{progress.vocabularyLearned}</StatValue>
         <StatDescription>English words mastered!</StatDescription>
       </StatCard>
-      
+
       {/* Quests Completed */}
       <StatCard>
         <StatIcon>
@@ -228,7 +231,7 @@ export const GameStats: React.FC<GameStatsProps> = ({
         <StatValue>{progress.questsCompleted}</StatValue>
         <StatDescription>Quests completed!</StatDescription>
       </StatCard>
-      
+
       {/* Conversations */}
       <StatCard>
         <StatIcon>
@@ -238,28 +241,32 @@ export const GameStats: React.FC<GameStatsProps> = ({
         <StatValue>{progress.dialoguesCompleted}</StatValue>
         <StatDescription>Chats with friends!</StatDescription>
       </StatCard>
-      
+
       {/* Daily Streak */}
       <StreakCard isActive={hasActiveStreak}>
         <StatIcon>
-          <AnimatedEmoji 
-            emoji={hasActiveStreak ? "🔥" : "📅"} 
-            mood={hasActiveStreak ? "excited" : "normal"} 
-            size="2.5rem" 
+          <AnimatedEmoji
+            emoji={hasActiveStreak ? "🔥" : "📅"}
+            mood={hasActiveStreak ? "excited" : "normal"}
+            size="2.5rem"
           />
         </StatIcon>
         <StatTitle>Daily Streak</StatTitle>
         <StatValue>{progress.currentStreak}</StatValue>
-        <StatDescription>{getStreakMessage(progress.currentStreak)}</StatDescription>
+        <StatDescription>
+          {getStreakMessage(progress.currentStreak)}
+        </StatDescription>
       </StreakCard>
-      
+
       {/* Achievement Progress */}
       <StatCard>
         <StatIcon>
           <AnimatedEmoji emoji="🏆" mood="floating" size="2.5rem" />
         </StatIcon>
         <StatTitle>Achievements</StatTitle>
-        <StatValue>{achievementCount.unlocked}/{achievementCount.total}</StatValue>
+        <StatValue>
+          {achievementCount.unlocked}/{achievementCount.total}
+        </StatValue>
         <StatDescription>Badges collected!</StatDescription>
         <AchievementProgress>
           <ProgressRing progress={achievementProgress}>
@@ -267,9 +274,9 @@ export const GameStats: React.FC<GameStatsProps> = ({
           </ProgressRing>
         </AchievementProgress>
       </StatCard>
-      
+
       {/* Skills Overview */}
-      <StatCard style={{ gridColumn: 'span 2' }}>
+      <StatCard style={{ gridColumn: "span 2" }}>
         <StatIcon>
           <AnimatedEmoji emoji="🎓" mood="floating" size="2.5rem" />
         </StatIcon>
@@ -278,7 +285,7 @@ export const GameStats: React.FC<GameStatsProps> = ({
         <SkillsGrid>
           {Object.entries(progress.skillLevels).map(([skill, skillLevel]) => (
             <SkillCard key={skill}>
-              <div style={{ fontSize: '1.5rem', marginBottom: '5px' }}>
+              <div style={{ fontSize: "1.5rem", marginBottom: "5px" }}>
                 {getSkillEmoji(skill)}
               </div>
               <SkillName>{skill}</SkillName>

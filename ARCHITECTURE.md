@@ -12,7 +12,7 @@ english-learning-town/
 │   └── client/                 # Main React application
 ├── packages/
 │   ├── core/                   # @elt/core - ECS engine (157 tests)
-│   ├── ui/                     # @elt/ui - Reusable React components  
+│   ├── ui/                     # @elt/ui - Reusable React components
 │   ├── game-client/            # @elt/game-client - Game-specific UI
 │   ├── learning-algorithms/    # @elt/learning-algorithms - Educational algorithms
 │   ├── learning-analytics/     # @elt/learning-analytics - Progress tracking
@@ -35,7 +35,7 @@ classDiagram
         +sendRequest(data) JSON
         +receiveResponse() JSON
     }
-    
+
     class GoBackend {
         +REST API Handlers
         +Player Management
@@ -44,7 +44,7 @@ classDiagram
         +handleRequest(endpoint) Response
         +queryDatabase(sql) Result
     }
-    
+
     class SQLiteDatabase {
         +players table
         +interactions table
@@ -53,10 +53,10 @@ classDiagram
         +select(query) Results
         +update(data)
     }
-    
+
     ReactClient --> GoBackend : HTTP/JSON
     GoBackend --> SQLiteDatabase : SQL Queries
-    
+
     note for ReactClient "Monorepo: apps/client\nwith @elt/* packages"
     note for GoBackend "backend-go/\nREST API endpoints"
     note for SQLiteDatabase "Persistent storage\nfor game state"
@@ -67,7 +67,9 @@ classDiagram
 The system follows a clean layered architecture where each layer depends only on layers below it, ensuring clear separation of concerns and maintainable dependencies.
 
 ### Layer 1: Core Foundation (`@elt/core`)
+
 **Foundation ECS Engine - Zero Dependencies**
+
 - **Purpose**: Pure ECS engine implementation with no external dependencies
 - **Components**: World, Entity, Component, System base classes
 - **Features**: Event bus, component management, system orchestration
@@ -76,25 +78,29 @@ The system follows a clean layered architecture where each layer depends only on
 
 ```typescript
 // Core ECS functionality
-import { World, createPositionComponent, MovementSystem } from '@elt/core';
+import { World, createPositionComponent, MovementSystem } from "@elt/core";
 ```
 
 ### Layer 2: Specialized Learning Systems
+
 **Domain-Specific Learning Algorithms**
 
 #### `@elt/learning-algorithms`
+
 - **Purpose**: Educational algorithms and learning mechanics
 - **Features**: Spaced repetition, difficulty calibration, review sessions
 - **Technologies**: TypeScript, Vitest testing
 - **Dependencies**: `@elt/core`
 
-#### `@elt/learning-analytics` 
+#### `@elt/learning-analytics`
+
 - **Purpose**: Learning progress tracking and analytics
 - **Features**: Learning analytics, goal setting, motivation systems
 - **Technologies**: TypeScript, Vitest testing
 - **Dependencies**: `@elt/core`
 
 #### `@elt/learning-assessment`
+
 - **Purpose**: Content quality and curriculum alignment
 - **Features**: Content quality metrics, CEFR-IELTS curriculum alignment
 - **Technologies**: TypeScript, Vitest testing
@@ -102,13 +108,15 @@ import { World, createPositionComponent, MovementSystem } from '@elt/core';
 
 ```typescript
 // Learning system integration
-import { SpacedRepetitionSystem } from '@elt/learning-algorithms';
-import { LearningAnalytics } from '@elt/learning-analytics';
-import { ContentQualityMetrics } from '@elt/learning-assessment';
+import { SpacedRepetitionSystem } from "@elt/learning-algorithms";
+import { LearningAnalytics } from "@elt/learning-analytics";
+import { ContentQualityMetrics } from "@elt/learning-assessment";
 ```
 
 ### Layer 3: UI Foundation (`@elt/ui`)
+
 **Reusable React Components - Zero Game Logic**
+
 - **Purpose**: Reusable React components for any application
 - **Components**: Button, Input, AnimatedEmoji, Error boundaries, Loading screens
 - **Features**: Theme system, animations, emoji parsing, error handling
@@ -117,11 +125,13 @@ import { ContentQualityMetrics } from '@elt/learning-assessment';
 
 ```typescript
 // Pure UI components
-import { Button, Input, LoadingScreen, ErrorBoundary } from '@elt/ui';
+import { Button, Input, LoadingScreen, ErrorBoundary } from "@elt/ui";
 ```
 
 ### Layer 4: Game-Specific UI (`@elt/game-client`)
+
 **Game-Specific React Components**
+
 - **Purpose**: Game-specific React components that combine UI foundation with game logic
 - **Components**: XPProgressBar, QuestTracker, Achievement dashboards
 - **Features**: Progress visualization, quest management UI, learning dashboards
@@ -130,11 +140,17 @@ import { Button, Input, LoadingScreen, ErrorBoundary } from '@elt/ui';
 
 ```typescript
 // Game-specific UI components
-import { XPProgressBar, QuestTracker, AchievementDashboard } from '@elt/game-client';
+import {
+  XPProgressBar,
+  QuestTracker,
+  AchievementDashboard,
+} from "@elt/game-client";
 ```
 
 ### Layer 5: Application Layer (`apps/client`)
+
 **Complete Game Application with Business Logic**
+
 - **Purpose**: Complete game application orchestrating all lower layers
 - **Components**: Scene management, dialogue system, game state, ECS integration
 - **Features**: Game loop, audio management, state management, complete user experience
@@ -143,14 +159,16 @@ import { XPProgressBar, QuestTracker, AchievementDashboard } from '@elt/game-cli
 
 ```typescript
 // Application-level integration
-import { World } from '@elt/core';
-import { SpacedRepetitionSystem } from '@elt/learning-algorithms';
-import { Button } from '@elt/ui';
-import { XPProgressBar } from '@elt/game-client';
+import { World } from "@elt/core";
+import { SpacedRepetitionSystem } from "@elt/learning-algorithms";
+import { Button } from "@elt/ui";
+import { XPProgressBar } from "@elt/game-client";
 ```
 
 ### Layer 6: Backend Services (`backend-go`)
+
 **Data Persistence and API Services**
+
 - **Purpose**: Server-side data management and API endpoints
 - **Components**: REST API, database management, player data persistence
 - **Features**: Player progress tracking, interaction logging, question management
@@ -167,6 +185,7 @@ GET  /api/questions
 ## 📦 Layer Dependencies & Data Flow
 
 ### Dependency Flow (Bottom-Up)
+
 ```mermaid
 graph TD
     A[Backend Services<br/>Go + SQLite] --> B[HTTP/JSON API]
@@ -177,7 +196,7 @@ graph TD
     E --> G[Core ECS<br/>@elt/core]
     F --> H[React + TypeScript]
     G --> I[Pure TypeScript]
-    
+
     style I fill:#e1f5fe
     style G fill:#f3e5f5
     style E fill:#fff3e0
@@ -188,15 +207,16 @@ graph TD
 ```
 
 ### Data Flow (Top-Down)
+
 ```mermaid
 sequenceDiagram
     participant U as User
     participant A as Application Layer
-    participant G as Game UI Layer  
+    participant G as Game UI Layer
     participant L as Learning Systems
     participant C as Core ECS
     participant B as Backend Services
-    
+
     U->>A: User Interaction
     A->>G: Update Game UI
     A->>L: Process Learning Logic
@@ -209,6 +229,7 @@ sequenceDiagram
 ```
 
 ### Package Import Rules
+
 1. **Upward Dependencies Only**: Packages can only import from layers below
 2. **No Circular Dependencies**: Strict layer separation prevents circular imports
 3. **Interface Boundaries**: Clear contracts between layers
@@ -216,11 +237,11 @@ sequenceDiagram
 
 ```typescript
 // ✅ Allowed: Higher layer importing lower layer
-import { World } from '@elt/core';                    // Layer 5 → Layer 1
-import { Button } from '@elt/ui';                     // Layer 5 → Layer 3
-import { XPProgressBar } from '@elt/game-client';     // Layer 5 → Layer 4
+import { World } from "@elt/core"; // Layer 5 → Layer 1
+import { Button } from "@elt/ui"; // Layer 5 → Layer 3
+import { XPProgressBar } from "@elt/game-client"; // Layer 5 → Layer 4
 
-// ❌ Forbidden: Lower layer importing higher layer  
+// ❌ Forbidden: Lower layer importing higher layer
 // import { GameApp } from '../../../apps/client';    // Layer 1 → Layer 5 (WRONG)
 ```
 
@@ -234,11 +255,11 @@ The game uses a pure **Entity Component System** architecture with **Event-Drive
 
 ```typescript
 // Entities are just IDs
-const entity = world.createEntity('player');
+const entity = world.createEntity("player");
 
 // Components are pure data
 world.addComponent(entity.id, createPositionComponent(10, 10));
-world.addComponent(entity.id, createPlayerComponent('Alex'));
+world.addComponent(entity.id, createPlayerComponent("Alex"));
 
 // Systems contain all logic
 world.addSystem(new MovementSystem());
@@ -251,12 +272,12 @@ Systems communicate through events, not direct calls:
 
 ```typescript
 // Systems emit events instead of direct method calls
-eventBus.emit('dialogue:start', { npcId: 'teacher', dialogueId: 'lesson-1' });
-eventBus.emit('scene:transition', { from: 'town', to: 'school-interior' });
-eventBus.emit('player:moved', { newPosition: { x: 15, y: 10 } });
+eventBus.emit("dialogue:start", { npcId: "teacher", dialogueId: "lesson-1" });
+eventBus.emit("scene:transition", { from: "town", to: "school-interior" });
+eventBus.emit("player:moved", { newPosition: { x: 15, y: 10 } });
 
 // Other systems listen for events
-eventBus.subscribe('dialogue:start', (event) => {
+eventBus.subscribe("dialogue:start", (event) => {
   // Handle dialogue start logic
 });
 ```
@@ -302,15 +323,28 @@ Each system has a single, focused responsibility:
 
 ```typescript
 export class CustomSystem implements System {
-  readonly name = 'CustomSystem';
-  readonly requiredComponents = ['position', 'custom'] as const;
+  readonly name = "CustomSystem";
+  readonly requiredComponents = ["position", "custom"] as const;
 
-  update(entities: Entity[], components: ComponentManager, deltaTime: number, events: EventBus): void {
-    const customEntities = components.getEntitiesWithComponents(this.requiredComponents);
-    
+  update(
+    entities: Entity[],
+    components: ComponentManager,
+    deltaTime: number,
+    events: EventBus,
+  ): void {
+    const customEntities = components.getEntitiesWithComponents(
+      this.requiredComponents,
+    );
+
     for (const entityId of customEntities) {
-      const position = components.getComponent<PositionComponent>(entityId, 'position');
-      const custom = components.getComponent<CustomComponent>(entityId, 'custom');
+      const position = components.getComponent<PositionComponent>(
+        entityId,
+        "position",
+      );
+      const custom = components.getComponent<CustomComponent>(
+        entityId,
+        "custom",
+      );
       // Process entity logic here
     }
   }
@@ -337,16 +371,19 @@ export class CustomSystem implements System {
 ```typescript
 // Components are pure data interfaces
 export interface CustomComponent extends Component {
-  readonly type: 'custom';
+  readonly type: "custom";
   customProperty: string;
   customData: number;
 }
 
 // Factory function for creation
-export const createCustomComponent = (prop: string, data: number): CustomComponent => ({
-  type: 'custom',
+export const createCustomComponent = (
+  prop: string,
+  data: number,
+): CustomComponent => ({
+  type: "custom",
   customProperty: prop,
-  customData: data
+  customData: data,
 });
 ```
 
@@ -354,12 +391,15 @@ export const createCustomComponent = (prop: string, data: number): CustomCompone
 
 ```typescript
 // 1. Create entity
-const entity = world.createEntity('unique-id');
+const entity = world.createEntity("unique-id");
 
 // 2. Add components
 world.addComponent(entity.id, createPositionComponent(10, 5));
-world.addComponent(entity.id, createRenderableComponent('emoji', { icon: '🏫' }));
-world.addComponent(entity.id, createBuildingComponent('School', 'educational'));
+world.addComponent(
+  entity.id,
+  createRenderableComponent("emoji", { icon: "🏫" }),
+);
+world.addComponent(entity.id, createBuildingComponent("School", "educational"));
 
 // 3. Systems automatically process entities with required components
 // No manual registration needed - systems discover entities by components
@@ -370,6 +410,7 @@ world.addComponent(entity.id, createBuildingComponent('School', 'educational'));
 ### Bundle Optimization
 
 **Current Results**: 368KB total, 110KB gzipped
+
 - TypeScript tree shaking eliminates unused code
 - `type` imports prevent unnecessary bundling
 - Focused components reduce coupling
@@ -387,11 +428,13 @@ world.addComponent(entity.id, createBuildingComponent('School', 'educational'));
 ```typescript
 // ✅ Proper Cleanup in Hooks
 useEffect(() => {
-  const handleKeyPress = (event: KeyboardEvent) => { /* ... */ };
-  window.addEventListener('keydown', handleKeyPress);
-  
+  const handleKeyPress = (event: KeyboardEvent) => {
+    /* ... */
+  };
+  window.addEventListener("keydown", handleKeyPress);
+
   return () => {
-    window.removeEventListener('keydown', handleKeyPress); // Cleanup!
+    window.removeEventListener("keydown", handleKeyPress); // Cleanup!
   };
 }, []);
 ```
@@ -407,7 +450,7 @@ useEffect(() => {
 export const ECSScene: React.FC = ({ sceneId, sceneName }) => {
   // Delegate to custom hooks for business logic
   const { world, loadScene } = useECSWorld();
-  
+
   // Compose UI from focused components
   return (
     <SceneContainer>
@@ -427,7 +470,7 @@ Extract business logic from components into reusable hooks:
 export const useECSWorld = (options: UseECSWorldOptions = {}) => {
   const world = useMemo(() => new World(), []);
   const sceneLoader = useMemo(() => new SceneLoader(world), [world]);
-  
+
   const loadScene = async (scenePath: string): Promise<void> => {
     await sceneLoader.loadSceneFromFile(scenePath);
   };
@@ -470,8 +513,8 @@ interface DialogueEntry {
 }
 
 // ✅ Type-Only Imports (Required by our build config)
-import type { QuestData, NPCData, DialogueEntry } from '../types';
-import { QuestStatus, ObjectiveType } from '../types';
+import type { QuestData, NPCData, DialogueEntry } from "../types";
+import { QuestStatus, ObjectiveType } from "../types";
 ```
 
 ## 🎮 Gamification Architecture (2025-01-09)
@@ -481,6 +524,7 @@ The comprehensive gamification system transforms learning into an engaging exper
 ### Core Gamification Components
 
 #### Experience Point (XP) System
+
 ```typescript
 interface PlayerProgress {
   totalXP: number;
@@ -504,6 +548,7 @@ interface PlayerProgress {
 ```
 
 #### Achievement System
+
 ```typescript
 interface Achievement {
   id: string;
@@ -512,16 +557,30 @@ interface Achievement {
   icon: string;
   xpReward: number;
   requirement: {
-    type: 'vocabulary_count' | 'quest_count' | 'dialogue_count' | 'level_reached' | 'streak_count' | 'learning_time';
+    type:
+      | "vocabulary_count"
+      | "quest_count"
+      | "dialogue_count"
+      | "level_reached"
+      | "streak_count"
+      | "learning_time";
     target: number;
     data?: Record<string, unknown>;
   };
-  category: 'vocabulary' | 'quest' | 'social' | 'exploration' | 'streak' | 'time' | 'skill';
+  category:
+    | "vocabulary"
+    | "quest"
+    | "social"
+    | "exploration"
+    | "streak"
+    | "time"
+    | "skill";
   unlockedAt?: Date;
 }
 ```
 
 #### Celebration & Feedback System
+
 - **Visual Celebrations**: Level-up animations, achievement unlocks, progress visualization
 - **Audio Feedback**: Success sounds, achievement chimes, encouraging audio
 - **Progress Tracking**: Real-time XP bars, skill level indicators, streak counters
@@ -530,11 +589,13 @@ interface Achievement {
 ### Gamification Features
 
 #### 1. Progressive Advancement
+
 - **Level System**: 25 levels with exponential XP curve
 - **Skill Progression**: 7 distinct skill trees (vocabulary, grammar, speaking, etc.)
 - **Unlock Mechanics**: New areas and features unlock with progression
 
 #### 2. Achievement Categories
+
 - **Vocabulary Mastery**: Word count milestones (10, 25, 50, 100+ words)
 - **Quest Completion**: Story progression achievements
 - **Social Learning**: Dialogue interaction rewards
@@ -543,6 +604,7 @@ interface Achievement {
 - **Time-Based**: Early bird, night owl learning bonuses
 
 #### 3. Real-Time Feedback
+
 - **Immediate XP Rewards**: Visual +XP notifications for all learning actions
 - **Progress Visualization**: Animated progress bars and level indicators
 - **Achievement Unlocks**: Celebratory animations with sound effects
@@ -551,20 +613,22 @@ interface Achievement {
 ### Educational Integration
 
 #### Learning Activity XP Rewards
+
 ```typescript
 const XP_REWARDS = {
-  vocabularyLearned: 20,     // Per new word learned
-  dialogueCompleted: 50,     // Per NPC conversation
-  questCompleted: 100,       // Per completed quest
-  questObjective: 25,        // Per quest objective
-  correctResponse: 10,       // Per correct dialogue choice
-  pronunciationPractice: 15,  // Per pronunciation attempt
-  dailyStreak: 30,           // Per consecutive day
-  achievementUnlock: 0       // Variable based on achievement
+  vocabularyLearned: 20, // Per new word learned
+  dialogueCompleted: 50, // Per NPC conversation
+  questCompleted: 100, // Per completed quest
+  questObjective: 25, // Per quest objective
+  correctResponse: 10, // Per correct dialogue choice
+  pronunciationPractice: 15, // Per pronunciation attempt
+  dailyStreak: 30, // Per consecutive day
+  achievementUnlock: 0, // Variable based on achievement
 };
 ```
 
 #### Adaptive Difficulty
+
 - **Dynamic XP Scaling**: Rewards adjust based on player skill level
 - **Personalized Goals**: Achievement targets adapt to individual progress
 - **Skill-Based Unlocks**: Advanced content unlocks based on demonstrated proficiency
@@ -572,12 +636,14 @@ const XP_REWARDS = {
 ### UI/UX Design for Kids
 
 #### Visual Design Principles
+
 - **Bright Colors**: Cheerful, engaging color palette
 - **Large Interactive Elements**: Touch-friendly for tablets and mobile
 - **Clear Typography**: Comic Neue font family for readability
 - **Intuitive Icons**: Emoji-based visual language kids understand
 
 #### Accessibility Features
+
 - **Audio Support**: Text-to-speech for all dialogue and instructions
 - **Visual Feedback**: Color is never the only indicator
 - **Simplified Navigation**: Clear, predictable user flows
@@ -588,28 +654,32 @@ const XP_REWARDS = {
 Recent comprehensive codebase cleanup ensures production-ready quality and security.
 
 ### Security Improvements
+
 - **Eliminated XSS Risks**: Replaced `dangerouslySetInnerHTML` with safe React components
 - **Type Safety**: Added comprehensive TypeScript definitions for Web Speech API
 - **Input Sanitization**: Proper handling of user input in dialogue and voice recognition
 - **Development-Only Logging**: Production builds contain no debug information
 
 ### Code Quality Standards
+
 - **Zero Console Statements**: Replaced 30+ `console.log` statements with development-only logger
 - **ESLint Compliance**: Fixed all prefer-const violations and lexical declaration errors
 - **TypeScript Strict Mode**: Zero compilation errors with strict type checking
 - **Component Size**: All components under 200 lines following SRP principles
 
 ### Logger Utility
+
 ```typescript
 // Development-only logging with game-specific methods
-logger.ecs('System initialized');          // ECS-specific logs
-logger.scene('Scene loaded: town');        // Scene management logs
-logger.player('Player leveled up');        // Player action logs
-logger.achievement('Achievement unlocked'); // Gamification logs
-logger.error('Critical error occurred');   // Error logging
+logger.ecs("System initialized"); // ECS-specific logs
+logger.scene("Scene loaded: town"); // Scene management logs
+logger.player("Player leveled up"); // Player action logs
+logger.achievement("Achievement unlocked"); // Gamification logs
+logger.error("Critical error occurred"); // Error logging
 ```
 
 ### Performance Optimizations
+
 - **Bundle Analysis**: 368KB total, 110KB gzipped (production-optimized)
 - **Type-Only Imports**: Eliminates unnecessary bundling of type definitions
 - **Component Memoization**: Strategic use of React.memo for expensive components
@@ -620,16 +690,17 @@ logger.error('Critical error occurred');   // Error logging
 ### Testing Pyramid
 
 #### Unit Tests (Foundation)
+
 **Coverage**: Individual components, utilities, business logic
 
 ```typescript
-describe('ECS Component System', () => {
-  test('should create entity with components correctly', () => {
+describe("ECS Component System", () => {
+  test("should create entity with components correctly", () => {
     const world = new World();
-    const entity = world.createEntity('test-entity');
+    const entity = world.createEntity("test-entity");
     world.addComponent(entity.id, createPositionComponent(10, 5));
-    
-    const position = world.getComponent('test-entity', 'position');
+
+    const position = world.getComponent("test-entity", "position");
     expect(position?.x).toBe(10);
     expect(position?.y).toBe(5);
   });
@@ -637,40 +708,50 @@ describe('ECS Component System', () => {
 ```
 
 #### Integration Tests (Middle Layer)
+
 **Coverage**: System interactions, store integration, component communication
 
 ```typescript
-describe('ECS System Integration', () => {
-  test('should handle player movement with collision detection', async () => {
+describe("ECS System Integration", () => {
+  test("should handle player movement with collision detection", async () => {
     const world = new World();
     const collisionSystem = new CollisionSystem();
     const movementSystem = new MovementSystem();
-    
+
     world.addSystem(collisionSystem);
     world.addSystem(movementSystem);
-    
+
     // Test movement with collision detection
-    const canMove = collisionSystem.canMoveTo('player', 15, 10, entities, components);
+    const canMove = collisionSystem.canMoveTo(
+      "player",
+      15,
+      10,
+      entities,
+      components,
+    );
     expect(canMove).toBe(true);
   });
 });
 ```
 
 #### End-to-End Tests (Top Layer)
+
 **Coverage**: Complete user journeys, critical paths
 
 ```typescript
-test('Player completes first quest and learns vocabulary', async ({ page }) => {
-  await page.goto('/');
+test("Player completes first quest and learns vocabulary", async ({ page }) => {
+  await page.goto("/");
   await page.click('[data-testid="start-game"]');
-  
+
   // Navigate and interact
   await page.click('[data-testid="npc-teacher"]');
   await page.click('[data-testid="dialogue-response-correct"]');
-  
+
   // Verify learning outcomes
   await expect(page.locator('[data-testid="quest-complete"]')).toBeVisible();
-  await expect(page.locator('[data-testid="vocabulary-learned"]')).toContainText('greeting');
+  await expect(
+    page.locator('[data-testid="vocabulary-learned"]'),
+  ).toContainText("greeting");
 });
 ```
 
@@ -680,14 +761,17 @@ test('Player completes first quest and learns vocabulary', async ({ page }) => {
 
 ```typescript
 interface VocabularyTest {
-  preTestScore: number;      // Vocabulary known before playing
-  postTestScore: number;     // Vocabulary known after playing
-  retentionScore: number;    // Vocabulary retained after 1 week
+  preTestScore: number; // Vocabulary known before playing
+  postTestScore: number; // Vocabulary known after playing
+  retentionScore: number; // Vocabulary retained after 1 week
   contextualization: number; // Ability to use words in context
 }
 
 class EducationalValidator {
-  async measureVocabularyGrowth(playerId: string, timeframe: 'session' | 'weekly' | 'monthly') {
+  async measureVocabularyGrowth(
+    playerId: string,
+    timeframe: "session" | "weekly" | "monthly",
+  ) {
     // Track vocabulary learning through gameplay
     // Compare with traditional learning methods
     // Measure retention and practical usage
@@ -700,17 +784,18 @@ class EducationalValidator {
 ```typescript
 // Performance benchmarks
 const performanceThresholds = {
-  initialLoad: 3000,           // < 3 seconds
-  sceneTransition: 500,        // < 500ms between scenes
-  systemUpdate: 16,            // < 16ms per frame (60fps)
-  bundleSize: 150 * 1024,      // < 150KB gzipped
-  memoryUsage: 50 * 1024 * 1024 // < 50MB RAM usage
+  initialLoad: 3000, // < 3 seconds
+  sceneTransition: 500, // < 500ms between scenes
+  systemUpdate: 16, // < 16ms per frame (60fps)
+  bundleSize: 150 * 1024, // < 150KB gzipped
+  memoryUsage: 50 * 1024 * 1024, // < 50MB RAM usage
 };
 ```
 
 ## 📏 Code Quality Standards
 
 ### Component Size Guidelines
+
 - **Maximum**: 200 lines per component
 - **Target**: 100-150 lines for complex components
 - **Extract**: Business logic to custom hooks when over 150 lines
@@ -729,7 +814,7 @@ classDiagram
             +__tests__/ 157 unit tests
         }
     }
-    
+
     namespace LearningLayer {
         class Algorithms["@elt/learning-algorithms"] {
             +spacedRepetition.ts
@@ -738,7 +823,7 @@ classDiagram
             +shared/ validation, types
             +__tests__/ algorithm tests
         }
-        
+
         class Analytics["@elt/learning-analytics"] {
             +analytics.ts
             +goalSetting.ts
@@ -747,7 +832,7 @@ classDiagram
             +shared/ validation, types
             +__tests__/ analytics tests
         }
-        
+
         class Assessment["@elt/learning-assessment"] {
             +contentQualityMetrics.ts
             +curriculumAlignment.ts
@@ -755,7 +840,7 @@ classDiagram
             +__tests__/ assessment tests
         }
     }
-    
+
     namespace UILayer {
         class UI["@elt/ui"] {
             +components/ basic, forms, error
@@ -763,7 +848,7 @@ classDiagram
             +utils/ emoji, error helpers
             +__tests__/ component tests
         }
-        
+
         class GameClient["@elt/game-client"] {
             +components/ progress, quest
             +AchievementDashboard.tsx
@@ -772,7 +857,7 @@ classDiagram
             +__tests__/ game UI tests
         }
     }
-    
+
     namespace ApplicationLayer {
         class ClientApp["apps/client"] {
             +components/ scenes, dialogue, ui
@@ -784,7 +869,7 @@ classDiagram
             +types/ app-specific types
         }
     }
-    
+
     namespace BackendLayer {
         class Backend["backend-go"] {
             +cmd/ main.go
@@ -793,10 +878,10 @@ classDiagram
             +english_learning_town.db
         }
     }
-    
+
     %% Dependencies
     Algorithms --> Core : depends on
-    Analytics --> Core : depends on  
+    Analytics --> Core : depends on
     Assessment --> Core : depends on
     GameClient --> UI : depends on
     GameClient --> Core : depends on
@@ -812,12 +897,13 @@ classDiagram
 ### Monorepo Development Workflow
 
 #### Pre-Development Checklist
+
 1. **Package Placement**: Which package should contain this code?
    - Core ECS logic → @elt/core
    - Educational algorithms → @elt/learning-algorithms
-   - Learning analytics → @elt/learning-analytics  
+   - Learning analytics → @elt/learning-analytics
    - Content assessment → @elt/learning-assessment
-   - Reusable UI components → @elt/ui  
+   - Reusable UI components → @elt/ui
    - Game-specific UI → @elt/game-client
    - Application logic → apps/client
 2. **Dependencies**: Minimize cross-package dependencies
@@ -826,6 +912,7 @@ classDiagram
 5. **Plan Composition**: How will this integrate with ECS?
 
 #### Monorepo Commands
+
 ```bash
 # Development workflow
 pnpm install                    # Install all dependencies
@@ -841,18 +928,20 @@ cd apps/client && pnpm dev
 ```
 
 #### Post-Development Review
+
 1. **Package Boundaries**: Is code in the correct package?
 2. **SRP Compliance**: Does it have a single, clear responsibility?
 3. **Size Check**: Is it under 200 lines?
 4. **Type Safety**: Are all props and state properly typed?
-5. **Dependencies**: Are @elt/* imports used correctly?
+5. **Dependencies**: Are @elt/\* imports used correctly?
 6. **Testability**: Can it be easily unit tested?
 
 ## 📊 Architecture Metrics Dashboard
 
 ### Current Status ✅
+
 - **Monorepo Structure**: Complete pnpm workspaces + Turbo build system
-- **Package Architecture**: 3 focused packages (@elt/core, @elt/ui, @elt/game-client) 
+- **Package Architecture**: 3 focused packages (@elt/core, @elt/ui, @elt/game-client)
 - **Testing Coverage**: 200+ tests across all packages (157 in @elt/core alone)
 - **ECS Compliance**: 100% (pure ECS architecture in @elt/core)
 - **SRP Compliance**: 100% (all systems follow Single Responsibility Principle)
@@ -864,17 +953,18 @@ cd apps/client && pnpm dev
 - **Security**: Zero vulnerabilities (XSS prevention, safe components)
 - **Code Quality**: Zero console statements in production
 - **Gamification**: Comprehensive system for kids aged 7-12
-- **Package Dependencies**: Proper @elt/* imports, zero legacy references
+- **Package Dependencies**: Proper @elt/\* imports, zero legacy references
 
 ### Quality Gates
+
 - ✅ Zero TypeScript compilation errors across all packages
-- ✅ Zero ESLint warnings  
+- ✅ Zero ESLint warnings
 - ✅ Zero security vulnerabilities
 - ✅ Zero production console statements
 - ✅ All systems follow SRP
 - ✅ All business logic in systems/hooks
 - ✅ Package boundaries properly maintained
-- ✅ @elt/* imports used correctly (zero relative imports)
+- ✅ @elt/\* imports used correctly (zero relative imports)
 - ✅ 200+ tests passing across all packages
 - ✅ Event-driven system communication
 - ✅ Data-driven scene configuration
@@ -887,18 +977,21 @@ cd apps/client && pnpm dev
 ### Migration History
 
 **Phase 1**: Range Architecture (Legacy)
+
 - Inheritance-based entity hierarchy
 - Direct method calls between components
 - Hardcoded entity creation
 - Single package structure
 
 **Phase 2**: ECS Architecture (2025-01-09)
+
 - Composition-based entity system
 - Event-driven communication via EventBus
 - Data-driven scene loading from JSON
 - SRP-compliant system design
 
 **Phase 3**: Monorepo Architecture (2025-01-17)
+
 - Complete package separation (@elt/core, @elt/ui, @elt/game-client)
 - Turbo build system with optimal caching
 - 200+ tests across all packages

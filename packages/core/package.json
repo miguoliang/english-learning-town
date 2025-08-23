@@ -18,8 +18,11 @@
     "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsup src/index.ts --format esm --dts --watch",
     "clean": "rimraf dist",
-    "lint": "eslint src --fix",
-    "lint:check": "eslint src",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest"
   },
   "keywords": [

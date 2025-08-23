@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useAdaptiveBrightness } from '../../hooks/useAdaptiveBrightness';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useAdaptiveBrightness } from "../../hooks/useAdaptiveBrightness";
 
 const ControlPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
@@ -11,14 +11,14 @@ const ControlPanel = styled.div<{ isExpanded: boolean }>`
   border-radius: 12px;
   z-index: 3500;
   backdrop-filter: blur(8px);
-  box-shadow: 
+  box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.6),
     0 4px 8px rgba(212, 144, 74, 0.1);
   transition: all 0.3s ease;
   overflow: hidden;
-  
-  width: ${props => props.isExpanded ? '280px' : '60px'};
-  height: ${props => props.isExpanded ? 'auto' : '60px'};
+
+  width: ${(props) => (props.isExpanded ? "280px" : "60px")};
+  height: ${(props) => (props.isExpanded ? "auto" : "60px")};
 `;
 
 const ToggleButton = styled.button`
@@ -33,7 +33,7 @@ const ToggleButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
-  
+
   &:hover {
     background: rgba(212, 144, 74, 0.1);
     color: #e8d4b8;
@@ -41,15 +41,15 @@ const ToggleButton = styled.button`
 `;
 
 const ControlContent = styled.div<{ isExpanded: boolean }>`
-  padding: ${props => props.isExpanded ? '0 20px 20px 20px' : '0'};
-  opacity: ${props => props.isExpanded ? 1 : 0};
-  visibility: ${props => props.isExpanded ? 'visible' : 'hidden'};
+  padding: ${(props) => (props.isExpanded ? "0 20px 20px 20px" : "0")};
+  opacity: ${(props) => (props.isExpanded ? 1 : 0)};
+  visibility: ${(props) => (props.isExpanded ? "visible" : "hidden")};
   transition: all 0.3s ease;
 `;
 
 const ControlSection = styled.div`
   margin-bottom: 20px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -72,7 +72,7 @@ const BrightnessSlider = styled.input`
   background: rgba(0, 0, 0, 0.4);
   outline: none;
   margin: 12px 0;
-  
+
   &::-webkit-slider-thumb {
     appearance: none;
     width: 18px;
@@ -83,12 +83,12 @@ const BrightnessSlider = styled.input`
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     transition: all 0.2s;
   }
-  
+
   &::-webkit-slider-thumb:hover {
     background: #e8d4b8;
     transform: scale(1.1);
   }
-  
+
   &::-moz-range-thumb {
     width: 18px;
     height: 18px;
@@ -100,11 +100,10 @@ const BrightnessSlider = styled.input`
 `;
 
 const AutoModeToggle = styled.button<{ isActive: boolean }>`
-  background: ${props => props.isActive 
-    ? 'rgba(212, 144, 74, 0.8)' 
-    : 'rgba(0, 0, 0, 0.6)'};
+  background: ${(props) =>
+    props.isActive ? "rgba(212, 144, 74, 0.8)" : "rgba(0, 0, 0, 0.6)"};
   border: 1px solid rgba(212, 144, 74, 0.6);
-  color: ${props => props.isActive ? '#0a0906' : '#d4904a'};
+  color: ${(props) => (props.isActive ? "#0a0906" : "#d4904a")};
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -116,11 +115,10 @@ const AutoModeToggle = styled.button<{ isActive: boolean }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  
+
   &:hover {
-    background: ${props => props.isActive 
-      ? 'rgba(212, 144, 74, 1)' 
-      : 'rgba(212, 144, 74, 0.2)'};
+    background: ${(props) =>
+      props.isActive ? "rgba(212, 144, 74, 1)" : "rgba(212, 144, 74, 0.2)"};
   }
 `;
 
@@ -152,16 +150,17 @@ const QuickPresets = styled.div`
 const PresetButton = styled.button<{ brightness: number; current: number }>`
   flex: 1;
   padding: 8px 4px;
-  background: ${props => Math.abs(props.brightness - props.current) <= 5 
-    ? 'rgba(212, 144, 74, 0.6)' 
-    : 'rgba(0, 0, 0, 0.6)'};
+  background: ${(props) =>
+    Math.abs(props.brightness - props.current) <= 5
+      ? "rgba(212, 144, 74, 0.6)"
+      : "rgba(0, 0, 0, 0.6)"};
   border: 1px solid rgba(212, 144, 74, 0.4);
   border-radius: 6px;
   color: rgba(232, 212, 184, 0.9);
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: rgba(212, 144, 74, 0.3);
   }
@@ -171,8 +170,8 @@ interface BrightnessControlProps {
   isVisible?: boolean;
 }
 
-export const BrightnessControl: React.FC<BrightnessControlProps> = ({ 
-  isVisible = true 
+export const BrightnessControl: React.FC<BrightnessControlProps> = ({
+  isVisible = true,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const {
@@ -192,29 +191,27 @@ export const BrightnessControl: React.FC<BrightnessControlProps> = ({
   const recommendation = getRecommendation();
 
   const presets = [
-    { name: 'Night', value: 25, icon: '🌙' },
-    { name: 'Low', value: 50, icon: '🔅' },
-    { name: 'Med', value: 75, icon: '💡' },
-    { name: 'High', value: 100, icon: '🔆' },
+    { name: "Night", value: 25, icon: "🌙" },
+    { name: "Low", value: 50, icon: "🔅" },
+    { name: "Med", value: 75, icon: "💡" },
+    { name: "High", value: 100, icon: "🔆" },
   ];
 
   return (
     <ControlPanel isExpanded={isExpanded}>
       <ToggleButton onClick={() => setIsExpanded(!isExpanded)}>
-        {isExpanded ? '✕' : getBrightnessIcon(brightnessLevel)}
+        {isExpanded ? "✕" : getBrightnessIcon(brightnessLevel)}
       </ToggleButton>
-      
+
       <ControlContent isExpanded={isExpanded}>
         <ControlSection>
-          <SectionTitle>
-            💡 Brightness Control
-          </SectionTitle>
-          
+          <SectionTitle>💡 Brightness Control</SectionTitle>
+
           <BrightnessValue>
             <span>Current: {brightness}%</span>
             <span>{brightnessLevel.toUpperCase()}</span>
           </BrightnessValue>
-          
+
           <BrightnessSlider
             type="range"
             min="20"
@@ -223,7 +220,7 @@ export const BrightnessControl: React.FC<BrightnessControlProps> = ({
             onChange={(e) => setBrightness(Number(e.target.value))}
             disabled={isAutoMode}
           />
-          
+
           <QuickPresets>
             {presets.map((preset) => (
               <PresetButton
@@ -234,29 +231,26 @@ export const BrightnessControl: React.FC<BrightnessControlProps> = ({
                 disabled={isAutoMode}
                 title={`${preset.name}: ${preset.value}%`}
               >
-                {preset.icon}<br />{preset.name}
+                {preset.icon}
+                <br />
+                {preset.name}
               </PresetButton>
             ))}
           </QuickPresets>
         </ControlSection>
 
         <ControlSection>
-          <SectionTitle>
-            🤖 Auto Mode
-          </SectionTitle>
-          
-          <AutoModeToggle 
-            isActive={isAutoMode}
-            onClick={toggleAutoMode}
-          >
-            {isAutoMode ? '🔄 Auto ON' : '⏸️ Manual'}
+          <SectionTitle>🤖 Auto Mode</SectionTitle>
+
+          <AutoModeToggle isActive={isAutoMode} onClick={toggleAutoMode}>
+            {isAutoMode ? "🔄 Auto ON" : "⏸️ Manual"}
           </AutoModeToggle>
-          
+
           {isAutoMode && (
             <StatusDisplay>
               <div>🌡️ Ambient: {Math.round(ambientLight)}%</div>
               <div>🎯 Target: {targetBrightness}%</div>
-              <div style={{ marginTop: '8px', fontSize: '0.75rem' }}>
+              <div style={{ marginTop: "8px", fontSize: "0.75rem" }}>
                 {recommendation}
               </div>
             </StatusDisplay>
@@ -269,9 +263,13 @@ export const BrightnessControl: React.FC<BrightnessControlProps> = ({
 
 const getBrightnessIcon = (level: string): string => {
   switch (level) {
-    case 'high': return '🔆';
-    case 'medium': return '💡';
-    case 'low': return '🔅';
-    default: return '💡';
+    case "high":
+      return "🔆";
+    case "medium":
+      return "💡";
+    case "low":
+      return "🔅";
+    default:
+      return "💡";
   }
 };

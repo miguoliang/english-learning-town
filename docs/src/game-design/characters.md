@@ -3,6 +3,7 @@
 ## Player Character
 
 ### Character Creation
+
 - **Name Selection**: Players choose their in-game name
 - **Gender Options**: Male, Female, or Non-binary representation
 - **Appearance Customization**: Hair, clothing, and accessory options
@@ -11,6 +12,7 @@
 ### Character Statistics
 
 #### Primary Stats
+
 ```
 Level: Overall character progression (1-100)
 Experience: Total XP accumulated
@@ -19,6 +21,7 @@ Money: Virtual currency earned through activities
 ```
 
 #### Language Skills (0-100 each)
+
 ```
 Vocabulary: Word knowledge and usage
 Grammar: Sentence structure and rules
@@ -31,6 +34,7 @@ Culture: Knowledge of English-speaking cultures
 ### Character Progression
 
 #### Level Benefits
+
 - **Level 1-10**: Tutorial area access, basic interactions
 - **Level 11-25**: School district unlock, intermediate content
 - **Level 26-50**: Business district access, advanced materials
@@ -38,6 +42,7 @@ Culture: Knowledge of English-speaking cultures
 - **Level 76-100**: Research facilities, content creation tools
 
 #### Skill Evolution
+
 ```
 Beginner (0-25): Basic understanding, simple questions
 Intermediate (26-50): Conversational ability, context usage
@@ -50,30 +55,35 @@ Expert (76-100): Native-like fluency, teaching capability
 ### Character Archetypes
 
 #### The Mentor Teacher
+
 - **Role**: Guides new players through learning fundamentals
 - **Personality**: Patient, encouraging, knowledgeable
 - **Interactions**: Grammar lessons, study tips, motivation speeches
 - **Special Ability**: Provides personalized learning recommendations
 
 #### The Friendly Shopkeeper
+
 - **Role**: Teaches practical vocabulary through commerce
 - **Personality**: Cheerful, helpful, business-minded
 - **Interactions**: Shopping scenarios, number practice, polite expressions
 - **Special Ability**: Offers discounts for excellent English performance
 
 #### The Curious Student
+
 - **Role**: Peer learning companion, same level as player
 - **Personality**: Enthusiastic, sometimes confused, relatable
 - **Interactions**: Study sessions, mutual help, friendly competition
 - **Special Ability**: Learns alongside player, growing more capable over time
 
 #### The Wise Librarian
+
 - **Role**: Guardian of advanced knowledge and cultural information
 - **Personality**: Intellectual, mysterious, well-traveled
 - **Interactions**: Reading challenges, cultural lessons, historical context
 - **Special Ability**: Unlocks rare books and advanced reading materials
 
 #### The Busy Professional
+
 - **Role**: Represents real-world English usage in work settings
 - **Personality**: Efficient, goal-oriented, sophisticated
 - **Interactions**: Business English, formal communication, interviews
@@ -82,6 +92,7 @@ Expert (76-100): Native-like fluency, teaching capability
 ### NPC Interaction Mechanics
 
 #### Relationship Levels
+
 ```
 Stranger (0-20): Basic interactions, simple quests
 Acquaintance (21-40): Moderate trust, shared activities
@@ -91,6 +102,7 @@ Best Friend (81-100): Exclusive content, mentor status
 ```
 
 #### Dialogue System
+
 - **Contextual Responses**: NPC reactions based on player's language skill level
 - **Memory System**: NPCs remember previous interactions and player progress
 - **Emotional States**: NPCs have moods that affect available interactions
@@ -99,11 +111,13 @@ Best Friend (81-100): Exclusive content, mentor status
 ### Character Development
 
 #### Dynamic Growth
+
 - NPCs evolve based on player interactions and community engagement
 - Successful teaching experiences make NPCs better tutors
 - Popular NPCs receive expanded storylines and content
 
 #### Community Favorites
+
 - Player feedback influences NPC development priorities
 - Most beloved characters get featured in special events
 - Community suggestions can inspire new NPC creation
@@ -113,12 +127,14 @@ Best Friend (81-100): Exclusive content, mentor status
 ### Visual Customization
 
 #### Appearance Options
+
 - **Hair Styles**: Various cuts, colors, and lengths
 - **Clothing**: Casual, formal, cultural, and fantasy options
 - **Accessories**: Glasses, jewelry, hats, and bags
 - **Color Schemes**: Personalized palettes for individual expression
 
 #### Unlock Progression
+
 - **Achievement Rewards**: New options for reaching milestones
 - **Purchase System**: Spend virtual currency on premium items
 - **Event Exclusives**: Limited-time customization during special events
@@ -127,13 +143,16 @@ Best Friend (81-100): Exclusive content, mentor status
 ### Functional Customization
 
 #### Skill Specialization
+
 Players can focus their character development:
+
 - **Academic Path**: Enhanced reading and writing abilities
-- **Social Path**: Improved conversation and cultural skills  
+- **Social Path**: Improved conversation and cultural skills
 - **Professional Path**: Business and formal communication focus
 - **Creative Path**: Storytelling, poetry, and artistic expression
 
 #### Personal Learning Style
+
 - **Visual Learner**: Enhanced graphics and visual aids
 - **Auditory Learner**: More audio content and spoken interactions
 - **Kinesthetic Learner**: Interactive activities and movement-based learning
@@ -144,11 +163,13 @@ Players can focus their character development:
 ### Motivation Systems
 
 #### Intrinsic Motivation
+
 - **Autonomy**: Players choose their learning path and pace
 - **Mastery**: Clear progression and skill development
 - **Purpose**: Meaningful goals connected to real-world benefits
 
 #### Extrinsic Motivation
+
 - **Rewards**: XP, currency, and unlockable content
 - **Recognition**: Achievements, leaderboards, and social status
 - **Competition**: Friendly rivalry with peers and challenges
@@ -156,16 +177,19 @@ Players can focus their character development:
 ### Emotional Design
 
 #### Positive Reinforcement
+
 - Celebration animations for correct answers
 - Encouraging messages from friendly NPCs
 - Visual progress indicators showing improvement
 
 #### Growth Mindset
+
 - Mistakes are learning opportunities, not failures
 - Emphasis on effort and improvement over innate ability
 - Multiple paths to success accommodate different learning styles
 
 #### Social Connection
+
 - Shared experiences with other players
 - Mentorship opportunities for advanced players
 - Community events that bring players together

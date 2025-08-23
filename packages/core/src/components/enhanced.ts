@@ -3,12 +3,12 @@
  * Health, stats, inventory, AI, state, audio, physics, and advanced gameplay features
  */
 
-import type { Component } from '../core';
+import type { Component } from "../core";
 
 // ========== GAMEPLAY COMPONENTS ==========
 
 export interface HealthComponent extends Component {
-  readonly type: 'health';
+  readonly type: "health";
   current: number;
   max: number;
   regenerationRate?: number;
@@ -16,7 +16,7 @@ export interface HealthComponent extends Component {
 }
 
 export interface StatsComponent extends Component {
-  readonly type: 'stats';
+  readonly type: "stats";
   strength: number;
   defense: number;
   speed: number;
@@ -25,7 +25,7 @@ export interface StatsComponent extends Component {
 }
 
 export interface InventoryComponent extends Component {
-  readonly type: 'inventory';
+  readonly type: "inventory";
   items: Array<{
     id: string;
     name: string;
@@ -40,8 +40,15 @@ export interface InventoryComponent extends Component {
 // ========== AI COMPONENTS ==========
 
 export interface AIComponent extends Component {
-  readonly type: 'ai';
-  behaviorType: 'idle' | 'patrol' | 'chase' | 'flee' | 'guard' | 'follow' | 'custom';
+  readonly type: "ai";
+  behaviorType:
+    | "idle"
+    | "patrol"
+    | "chase"
+    | "flee"
+    | "guard"
+    | "follow"
+    | "custom";
   state: string;
   target?: string; // Entity ID
   patrolPoints?: Array<{ x: number; y: number }>;
@@ -53,7 +60,7 @@ export interface AIComponent extends Component {
 }
 
 export interface StateComponent extends Component {
-  readonly type: 'state';
+  readonly type: "state";
   currentState: string;
   previousState?: string;
   stateData: Record<string, any>;
@@ -63,7 +70,7 @@ export interface StateComponent extends Component {
 // ========== AUDIO COMPONENTS ==========
 
 export interface AudioComponent extends Component {
-  readonly type: 'audio';
+  readonly type: "audio";
   soundId: string;
   volume: number;
   loop: boolean;
@@ -75,7 +82,7 @@ export interface AudioComponent extends Component {
 }
 
 export interface AudioListenerComponent extends Component {
-  readonly type: 'audio-listener';
+  readonly type: "audio-listener";
   range: number;
   volume: number;
   isActive: boolean;
@@ -84,7 +91,7 @@ export interface AudioListenerComponent extends Component {
 // ========== PHYSICS COMPONENTS ==========
 
 export interface PhysicsComponent extends Component {
-  readonly type: 'physics';
+  readonly type: "physics";
   mass: number;
   friction: number;
   restitution: number;
@@ -96,17 +103,17 @@ export interface PhysicsComponent extends Component {
 }
 
 export interface ForceComponent extends Component {
-  readonly type: 'force';
+  readonly type: "force";
   forces: Array<{
     x: number;
     y: number;
     duration: number;
-    type: 'impulse' | 'continuous';
+    type: "impulse" | "continuous";
   }>;
 }
 
 export interface TimerComponent extends Component {
-  readonly type: 'timer';
+  readonly type: "timer";
   duration: number;
   elapsed: number;
   isActive: boolean;
@@ -115,7 +122,7 @@ export interface TimerComponent extends Component {
 }
 
 export interface TagComponent extends Component {
-  readonly type: 'tag';
+  readonly type: "tag";
   tags: string[];
 }
 
@@ -124,13 +131,13 @@ export const createHealthComponent = (
   current: number,
   max: number,
   regenerationRate = 0,
-  invulnerable = false
+  invulnerable = false,
 ): HealthComponent => ({
-  type: 'health',
+  type: "health",
   current,
   max,
   regenerationRate,
-  invulnerable
+  invulnerable,
 });
 
 export const createStatsComponent = (
@@ -138,114 +145,121 @@ export const createStatsComponent = (
   defense: number,
   speed: number,
   intelligence: number,
-  luck: number
+  luck: number,
 ): StatsComponent => ({
-  type: 'stats',
+  type: "stats",
   strength,
   defense,
   speed,
   intelligence,
-  luck
+  luck,
 });
 
 export const createInventoryComponent = (
   maxSlots: number = 20,
-  maxWeight: number = 100
+  maxWeight: number = 100,
 ): InventoryComponent => ({
-  type: 'inventory',
+  type: "inventory",
   items: [],
   maxSlots,
   weight: 0,
-  maxWeight
+  maxWeight,
 });
 
 export const createAIComponent = (
-  behaviorType: 'idle' | 'patrol' | 'chase' | 'flee' | 'guard' | 'follow' | 'custom',
+  behaviorType:
+    | "idle"
+    | "patrol"
+    | "chase"
+    | "flee"
+    | "guard"
+    | "follow"
+    | "custom",
   detectionRange: number = 5,
   speed: number = 1,
-  decisionCooldown: number = 1000
+  decisionCooldown: number = 1000,
 ): AIComponent => ({
-  type: 'ai',
+  type: "ai",
   behaviorType,
-  state: 'idle',
+  state: "idle",
   detectionRange,
   speed,
   lastDecisionTime: 0,
-  decisionCooldown
+  decisionCooldown,
 });
 
 export const createStateComponent = (
   initialState: string,
   stateData: Record<string, any> = {},
-  transitions: Record<string, string[]> = {}
+  transitions: Record<string, string[]> = {},
 ): StateComponent => ({
-  type: 'state',
+  type: "state",
   currentState: initialState,
   stateData,
-  transitions
+  transitions,
 });
 
 export const createAudioComponent = (
   soundId: string,
   volume: number = 1,
-  loop: boolean = false
+  loop: boolean = false,
 ): AudioComponent => ({
-  type: 'audio',
+  type: "audio",
   soundId,
   volume,
   loop,
-  isPlaying: false
+  isPlaying: false,
 });
 
 export const createAudioListenerComponent = (
   range: number = 10,
   volume: number = 1,
-  isActive: boolean = true
+  isActive: boolean = true,
 ): AudioListenerComponent => ({
-  type: 'audio-listener',
+  type: "audio-listener",
   range,
   volume,
-  isActive
+  isActive,
 });
 
 export const createPhysicsComponent = (
   mass: number = 1,
   friction: number = 0.5,
   restitution: number = 0.2,
-  isStatic: boolean = false
+  isStatic: boolean = false,
 ): PhysicsComponent => ({
-  type: 'physics',
+  type: "physics",
   mass,
   friction,
   restitution,
   isStatic,
   gravityScale: 1,
   linearDamping: 0.1,
-  angularDamping: 0.1
+  angularDamping: 0.1,
 });
 
 export const createForceComponent = (): ForceComponent => ({
-  type: 'force',
-  forces: []
+  type: "force",
+  forces: [],
 });
 
 export const createTimerComponent = (
   duration: number,
   repeat: boolean = false,
-  onComplete?: string
+  onComplete?: string,
 ): TimerComponent => {
   const component: TimerComponent = {
-    type: 'timer',
+    type: "timer",
     duration,
     elapsed: 0,
     isActive: false,
-    repeat
+    repeat,
   };
   if (onComplete !== undefined) component.onComplete = onComplete;
   return component;
 };
 
 export const createTagComponent = (tags: string[] = []): TagComponent => ({
-  type: 'tag',
-  tags: [...tags]
+  type: "tag",
+  tags: [...tags],
 });

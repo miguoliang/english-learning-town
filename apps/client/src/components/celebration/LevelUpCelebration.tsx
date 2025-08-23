@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { AnimatedEmoji } from '@elt/ui';
+import React, { useEffect, useState } from "react";
+import styled, { keyframes } from "styled-components";
+import { AnimatedEmoji } from "@elt/ui";
 
 const confettiPop = keyframes`
   0% {
@@ -101,8 +101,8 @@ const CelebrationOverlay = styled.div<{ isVisible: boolean }>`
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  opacity: ${props => props.isVisible ? 1 : 0};
-  visibility: ${props => props.isVisible ? 'visible' : 'hidden'};
+  opacity: ${(props) => (props.isVisible ? 1 : 0)};
+  visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
   transition: all 0.3s ease;
   backdrop-filter: blur(5px);
 `;
@@ -113,7 +113,7 @@ const CelebrationContainer = styled.div`
   padding: 40px;
   background: ${({ theme }) => theme.gradients.celebration};
   border-radius: 30px;
-  box-shadow: 
+  box-shadow:
     ${({ theme }) => theme.shadows.fun},
     0 0 50px rgba(255, 215, 0, 0.3);
   max-width: 500px;
@@ -131,15 +131,19 @@ const ConfettiContainer = styled.div`
   overflow: hidden;
 `;
 
-const ConfettiPiece = styled.div<{ delay: number; color: string; left: number }>`
+const ConfettiPiece = styled.div<{
+  delay: number;
+  color: string;
+  left: number;
+}>`
   position: absolute;
   top: 100%;
-  left: ${props => props.left}%;
+  left: ${(props) => props.left}%;
   width: 10px;
   height: 10px;
-  background: ${props => props.color};
+  background: ${(props) => props.color};
   border-radius: 50%;
-  animation: ${confettiPop} 3s ease-out ${props => props.delay}s infinite;
+  animation: ${confettiPop} 3s ease-out ${(props) => props.delay}s infinite;
 `;
 
 const StarContainer = styled.div`
@@ -157,7 +161,7 @@ const LevelIcon = styled.div`
 `;
 
 const CelebrationTitle = styled.h1`
-  font-family: 'Comic Neue', 'Fredoka One', sans-serif;
+  font-family: "Comic Neue", "Fredoka One", sans-serif;
   font-size: 3rem;
   font-weight: 800;
   color: ${({ theme }) => theme.colors.surface};
@@ -166,18 +170,19 @@ const CelebrationTitle = styled.h1`
 `;
 
 const LevelNumber = styled.div`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 4rem;
   font-weight: 900;
-  color: #FFD700;
+  color: #ffd700;
   text-stroke: 2px ${({ theme }) => theme.colors.surface};
   -webkit-text-stroke: 2px ${({ theme }) => theme.colors.surface};
   margin: 20px 0;
-  animation: ${levelBounce} 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both;
+  animation: ${levelBounce} 1.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s
+    both;
 `;
 
 const CelebrationMessage = styled.p`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.4rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.surface};
@@ -195,7 +200,7 @@ const RewardSection = styled.div`
 `;
 
 const RewardTitle = styled.h3`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.3rem;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.surface};
@@ -216,32 +221,32 @@ const RewardItem = styled.div`
   background: rgba(255, 255, 255, 0.2);
   padding: 10px 15px;
   border-radius: 15px;
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.surface};
   font-size: 1.1rem;
 `;
 
 const ContinueButton = styled.button`
-  font-family: 'Comic Neue', sans-serif;
+  font-family: "Comic Neue", sans-serif;
   font-size: 1.3rem;
   font-weight: 700;
   padding: 15px 40px;
   border: none;
   border-radius: 25px;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
   color: ${({ theme }) => theme.colors.surface};
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(255, 165, 0, 0.6);
-    background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
+    background: linear-gradient(135deg, #ffa500 0%, #ffd700 100%);
   }
-  
+
   &:active {
     transform: translateY(-1px);
   }
@@ -258,16 +263,16 @@ const FireworkContainer = styled.div`
 
 const Firework = styled.div<{ delay: number; x: number; y: number }>`
   position: absolute;
-  top: ${props => props.y}%;
-  left: ${props => props.x}%;
+  top: ${(props) => props.y}%;
+  left: ${(props) => props.x}%;
   width: 4px;
   height: 4px;
-  background: radial-gradient(circle, #FFD700, #FFA500);
+  background: radial-gradient(circle, #ffd700, #ffa500);
   border-radius: 50%;
-  animation: ${firework} 2s ease-out ${props => props.delay}s infinite;
-  
+  animation: ${firework} 2s ease-out ${(props) => props.delay}s infinite;
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -2px;
     left: -2px;
@@ -295,38 +300,46 @@ export const LevelUpCelebration: React.FC<LevelUpCelebrationProps> = ({
   newLevel,
   xpGained = 0,
   onContinue,
-  rewards = {}
+  rewards = {},
 }) => {
   const [showFireworks, setShowFireworks] = useState(false);
-  
+
   useEffect(() => {
     if (isVisible) {
       // Start fireworks after initial animation
       const timer = setTimeout(() => {
         setShowFireworks(true);
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     } else {
       setShowFireworks(false);
     }
   }, [isVisible]);
-  
-  const confettiColors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
+
+  const confettiColors = [
+    "#FFD700",
+    "#FFA500",
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#96CEB4",
+    "#FFEAA7",
+  ];
   const confettiPieces = Array.from({ length: 15 }, (_, i) => ({
     id: i,
     delay: Math.random() * 2,
     color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-    left: Math.random() * 100
+    left: Math.random() * 100,
   }));
-  
+
   const fireworks = Array.from({ length: 8 }, (_, i) => ({
     id: i,
     delay: Math.random() * 3,
     x: 10 + Math.random() * 80,
-    y: 10 + Math.random() * 60
+    y: 10 + Math.random() * 60,
   }));
-  
+
   const levelMessages = [
     "You're getting awesome at English!",
     "Amazing progress, superstar!",
@@ -337,21 +350,21 @@ export const LevelUpCelebration: React.FC<LevelUpCelebrationProps> = ({
     "You're a true English champion!",
     "Brilliant work with English!",
     "You're mastering English beautifully!",
-    "Exceptional English learning!"
+    "Exceptional English learning!",
   ];
-  
+
   const getMessage = (level: number): string => {
     const index = (level - 1) % levelMessages.length;
     return levelMessages[index];
   };
-  
+
   if (!isVisible) return null;
-  
+
   return (
     <CelebrationOverlay isVisible={isVisible}>
       <CelebrationContainer>
         <ConfettiContainer>
-          {confettiPieces.map(piece => (
+          {confettiPieces.map((piece) => (
             <ConfettiPiece
               key={piece.id}
               delay={piece.delay}
@@ -360,10 +373,10 @@ export const LevelUpCelebration: React.FC<LevelUpCelebrationProps> = ({
             />
           ))}
         </ConfettiContainer>
-        
+
         {showFireworks && (
           <FireworkContainer>
-            {fireworks.map(firework => (
+            {fireworks.map((firework) => (
               <Firework
                 key={firework.id}
                 delay={firework.delay}
@@ -373,51 +386,51 @@ export const LevelUpCelebration: React.FC<LevelUpCelebrationProps> = ({
             ))}
           </FireworkContainer>
         )}
-        
+
         <StarContainer>
           <AnimatedEmoji emoji="⭐" mood="excited" autoAnimate />
         </StarContainer>
-        
+
         <LevelIcon>
           <AnimatedEmoji emoji="🎉" mood="excited" size="5rem" autoAnimate />
         </LevelIcon>
-        
+
         <CelebrationTitle>LEVEL UP!</CelebrationTitle>
-        
+
         <LevelNumber>Level {newLevel}</LevelNumber>
-        
-        <CelebrationMessage>
-          {getMessage(newLevel)}
-        </CelebrationMessage>
-        
+
+        <CelebrationMessage>{getMessage(newLevel)}</CelebrationMessage>
+
         <RewardSection>
           <RewardTitle>🎁 Level Up Rewards!</RewardTitle>
           <RewardList>
             {xpGained > 0 && (
               <RewardItem>
-                <AnimatedEmoji emoji="⭐" size="1.2rem" mood="floating" />
-                +{xpGained} XP
+                <AnimatedEmoji emoji="⭐" size="1.2rem" mood="floating" />+
+                {xpGained} XP
               </RewardItem>
             )}
             <RewardItem>
               <AnimatedEmoji emoji="🔓" size="1.2rem" mood="floating" />
               New Adventures
             </RewardItem>
-            {rewards.features && rewards.features.map((feature, index) => (
-              <RewardItem key={index}>
-                <AnimatedEmoji emoji="✨" size="1.2rem" mood="floating" />
-                {feature}
-              </RewardItem>
-            ))}
-            {rewards.achievements && rewards.achievements.map((achievement, index) => (
-              <RewardItem key={index}>
-                <AnimatedEmoji emoji="🏆" size="1.2rem" mood="floating" />
-                {achievement}
-              </RewardItem>
-            ))}
+            {rewards.features &&
+              rewards.features.map((feature, index) => (
+                <RewardItem key={index}>
+                  <AnimatedEmoji emoji="✨" size="1.2rem" mood="floating" />
+                  {feature}
+                </RewardItem>
+              ))}
+            {rewards.achievements &&
+              rewards.achievements.map((achievement, index) => (
+                <RewardItem key={index}>
+                  <AnimatedEmoji emoji="🏆" size="1.2rem" mood="floating" />
+                  {achievement}
+                </RewardItem>
+              ))}
           </RewardList>
         </RewardSection>
-        
+
         <ContinueButton onClick={onContinue}>
           Continue Adventure! 🚀
         </ContinueButton>

@@ -1,2 +1,2 @@
-export * from './emojiParser';
-export * from './errorFallbackHelpers';
+export * from "./emojiParser";
+export * from "./errorFallbackHelpers";
