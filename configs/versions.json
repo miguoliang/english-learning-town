@@ -1,0 +1,58 @@
+{
+  "react": {
+    "version": "^18.3.1",
+    "reason": "Stable version used across all packages for consistency"
+  },
+  "react-dom": {
+    "version": "^18.3.1", 
+    "reason": "Must match React version"
+  },
+  "@types/react": {
+    "version": "^18.3.12",
+    "reason": "TypeScript definitions for React 18"
+  },
+  "@types/react-dom": {
+    "version": "^18.3.1",
+    "reason": "TypeScript definitions for ReactDOM 18"
+  },
+  "typescript": {
+    "version": "^5.8.3",
+    "reason": "Latest stable TypeScript with modern features"
+  },
+  "tsup": {
+    "version": "^8.0.0",
+    "reason": "Modern, fast bundler for TypeScript packages"
+  },
+  "vitest": {
+    "version": "^1.0.0",
+    "reason": "Fast test runner with Vite integration"
+  },
+  "eslint": {
+    "version": "^9.30.1",
+    "reason": "Latest ESLint with flat config support"
+  },
+  "typescript-eslint": {
+    "version": "^8.35.1",
+    "reason": "TypeScript support for ESLint 9"
+  },
+  "@vitejs/plugin-react": {
+    "version": "^4.6.0",
+    "reason": "React plugin for Vite and Vitest"
+  },
+  "@testing-library/react": {
+    "version": "^14.0.0",
+    "reason": "React testing utilities"
+  },
+  "@testing-library/jest-dom": {
+    "version": "^6.1.0",
+    "reason": "Custom Jest matchers for DOM testing"
+  },
+  "@testing-library/user-event": {
+    "version": "^14.5.0",
+    "reason": "User interaction simulation for tests"
+  },
+  "jsdom": {
+    "version": "^22.1.0",
+    "reason": "DOM implementation for testing"
+  }
+}

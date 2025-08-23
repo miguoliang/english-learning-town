@@ -1,10 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../configs/tsconfig.node-package.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "declarationMap": true
+    "composite": true
   },
   "include": [
     "src/**/*"
@@ -12,7 +9,7 @@
   "exclude": [
     "dist",
     "node_modules",
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }
