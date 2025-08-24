@@ -1,0 +1,64 @@
+{
+  "town_map": {
+    "id": "town_map",
+    "name": "Town Map",
+    "description": "A helpful map showing all locations in English Learning Town",
+    "type": "tool",
+    "icon": "/icons/map.png",
+    "stackable": false,
+    "value": 0
+  },
+  "library_card": {
+    "id": "library_card",
+    "name": "Library Card",
+    "description": "Allows you to borrow books from the library",
+    "type": "key_item",
+    "icon": "/icons/library_card.png",
+    "stackable": false,
+    "value": 0
+  },
+  "beginner_book": {
+    "id": "beginner_book",
+    "name": "English Basics Book",
+    "description": "A book with fundamental English lessons",
+    "type": "consumable",
+    "icon": "/icons/book.png",
+    "stackable": true,
+    "value": 10,
+    "effect": {
+      "type": "experience",
+      "amount": 50
+    }
+  },
+  "welcome_discount": {
+    "id": "welcome_discount",
+    "name": "Welcome Discount Coupon",
+    "description": "10% off your next purchase at Bob's shop",
+    "type": "consumable",
+    "icon": "/icons/coupon.png",
+    "stackable": false,
+    "value": 5
+  },
+  "apple": {
+    "id": "apple",
+    "name": "Fresh Apple",
+    "description": "A crisp, red apple from the local orchard",
+    "type": "consumable",
+    "icon": "/icons/apple.png",
+    "stackable": true,
+    "value": 2,
+    "effect": {
+      "type": "health",
+      "amount": 10
+    }
+  },
+  "notebook": {
+    "id": "notebook",
+    "name": "Student Notebook",
+    "description": "Perfect for taking notes during your English lessons",
+    "type": "tool",
+    "icon": "/icons/notebook.png",
+    "stackable": false,
+    "value": 8
+  }
+}

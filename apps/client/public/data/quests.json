@@ -1,0 +1,68 @@
+{
+  "welcome_quest": {
+    "id": "welcome_quest",
+    "title": "Welcome to Town",
+    "description": "Meet the mayor and learn basic greetings",
+    "giver": "mayor",
+    "type": "dialogue",
+    "objectives": [
+      {
+        "id": "greet_mayor",
+        "description": "Greet Mayor Johnson properly",
+        "type": "dialogue_completion",
+        "target": "mayor_intro",
+        "completed": false
+      }
+    ],
+    "rewards": {
+      "experience": 25,
+      "items": ["town_map"]
+    },
+    "prerequisites": [],
+    "status": "available"
+  },
+  "reading_quest": {
+    "id": "reading_quest",
+    "title": "Library Etiquette",
+    "description": "Learn proper behavior in the library",
+    "giver": "librarian",
+    "type": "dialogue",
+    "objectives": [
+      {
+        "id": "library_greeting",
+        "description": "Greet the librarian quietly",
+        "type": "dialogue_completion",
+        "target": "librarian_intro",
+        "completed": false
+      }
+    ],
+    "rewards": {
+      "experience": 30,
+      "items": ["library_card", "beginner_book"]
+    },
+    "prerequisites": ["welcome_quest"],
+    "status": "locked"
+  },
+  "shopping_quest": {
+    "id": "shopping_quest",
+    "title": "First Purchase",
+    "description": "Learn how to politely ask to buy something",
+    "giver": "shopkeeper",
+    "type": "dialogue",
+    "objectives": [
+      {
+        "id": "polite_buying",
+        "description": "Use polite language when shopping",
+        "type": "dialogue_completion",
+        "target": "shopkeeper_intro",
+        "completed": false
+      }
+    ],
+    "rewards": {
+      "experience": 20,
+      "items": ["apple", "notebook"]
+    },
+    "prerequisites": ["welcome_quest"],
+    "status": "locked"
+  }
+}

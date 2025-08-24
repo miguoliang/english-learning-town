@@ -1,0 +1,7 @@
+{
+  "moderate": true,
+  "package-manager": "npm",
+  "report-type": "summary",
+  "skip-dev": false,
+  "allowlist": []
+}

@@ -1,0 +1,77 @@
+{
+  "mayor_intro": {
+    "id": "mayor_intro",
+    "character": "mayor",
+    "type": "conversation",
+    "steps": [
+      {
+        "speaker": "mayor",
+        "text": "Welcome to English Learning Town! I'm Mayor Johnson.",
+        "requiresResponse": false
+      },
+      {
+        "speaker": "mayor",
+        "text": "Can you say 'Hello Mayor Johnson' to greet me?",
+        "requiresResponse": true,
+        "expectedResponse": "hello mayor johnson",
+        "responseOptions": ["Hello Mayor Johnson", "Hi Mayor", "Good morning"],
+        "onSuccess": "Great pronunciation! Welcome to our town!",
+        "onRetry": "Try again! Say: Hello Mayor Johnson"
+      }
+    ],
+    "completion": {
+      "experience": 10,
+      "triggers": ["mayor_quest_1"]
+    }
+  },
+  "librarian_intro": {
+    "id": "librarian_intro",
+    "character": "librarian",
+    "type": "conversation",
+    "steps": [
+      {
+        "speaker": "librarian",
+        "text": "Welcome to the library! I'm Ms. Books, the librarian.",
+        "requiresResponse": false
+      },
+      {
+        "speaker": "librarian",
+        "text": "Libraries are quiet places. Can you whisper 'I love reading'?",
+        "requiresResponse": true,
+        "expectedResponse": "i love reading",
+        "responseOptions": ["I love reading", "I like books", "Reading is fun"],
+        "onSuccess": "Perfect whisper! You understand library etiquette.",
+        "onRetry": "Remember to speak softly in the library. Try: I love reading"
+      }
+    ],
+    "completion": {
+      "experience": 15,
+      "items": ["library_card"]
+    }
+  },
+  "shopkeeper_intro": {
+    "id": "shopkeeper_intro",
+    "character": "shopkeeper",
+    "type": "conversation",
+    "steps": [
+      {
+        "speaker": "shopkeeper",
+        "text": "Hello there! Welcome to my shop! I'm Bob.",
+        "requiresResponse": false
+      },
+      {
+        "speaker": "shopkeeper",
+        "text": "When you want to buy something, you say 'I would like to buy'. Can you try that?",
+        "requiresResponse": true,
+        "expectedResponse": "i would like to buy",
+        "responseOptions": ["I would like to buy", "Can I buy", "I want to purchase"],
+        "onSuccess": "Excellent! That's how you politely ask to buy something!",
+        "onRetry": "Try the polite way: I would like to buy"
+      }
+    ],
+    "completion": {
+      "experience": 10,
+      "items": ["welcome_discount"]
+    }
+  }
+}

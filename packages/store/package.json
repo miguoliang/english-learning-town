@@ -1,0 +1,32 @@
+{
+  "name": "@english-learning-town/store",
+  "version": "1.0.0",
+  "description": "Game state management and persistence",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@english-learning-town/types": "workspace:*",
+    "zustand": "^4.4.7",
+    "immer": "^10.0.3"
+  },
+  "devDependencies": {},
+  "peerDependencies": {},
+  "files": [
+    "dist"
+  ]
+}

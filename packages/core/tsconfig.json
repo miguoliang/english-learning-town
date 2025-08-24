@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": [
+    "src/index.ts",
+    "src/EventBus.ts",
+    "src/GameEngine.ts",
+    "src/GameSystem.ts"
+  ],
+  "references": [
+    {
+      "path": "../types"
+    }
+  ]
+}

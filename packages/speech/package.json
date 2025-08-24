@@ -1,0 +1,23 @@
+{
+  "name": "@english-learning-town/speech",
+  "version": "1.0.0",
+  "description": "Speech recognition and synthesis systems",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@english-learning-town/types": "workspace:*",
+    "howler": "^2.2.4"
+  },
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

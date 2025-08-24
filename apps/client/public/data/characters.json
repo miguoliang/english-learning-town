@@ -1,0 +1,35 @@
+{
+  "mayor": {
+    "id": "mayor",
+    "name": "Mayor Johnson",
+    "sprite": "/sprites/characters/mayor.png",
+    "position": { "x": 450, "y": 200 },
+    "location": "town-square",
+    "dialogues": ["mayor_intro", "mayor_quest_1"],
+    "quests": ["welcome_quest"],
+    "personality": "friendly_formal",
+    "description": "The welcoming mayor of English Learning Town"
+  },
+  "librarian": {
+    "id": "librarian",
+    "name": "Ms. Books",
+    "sprite": "/sprites/characters/librarian.png",
+    "position": { "x": 300, "y": 150 },
+    "location": "library",
+    "dialogues": ["librarian_intro", "librarian_help"],
+    "quests": ["reading_quest"],
+    "personality": "helpful_quiet",
+    "description": "The knowledgeable town librarian"
+  },
+  "shopkeeper": {
+    "id": "shopkeeper",
+    "name": "Bob's Shop",
+    "sprite": "/sprites/characters/shopkeeper.png",
+    "position": { "x": 200, "y": 250 },
+    "location": "shop",
+    "dialogues": ["shopkeeper_intro", "shopkeeper_buy", "shopkeeper_sell"],
+    "quests": ["shopping_quest"],
+    "personality": "cheerful_merchant",
+    "description": "The friendly local shopkeeper"
+  }
+}

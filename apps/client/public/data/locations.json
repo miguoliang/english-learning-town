@@ -1,0 +1,71 @@
+{
+  "town-square": {
+    "id": "town-square",
+    "name": "Town Square",
+    "description": "The bustling center of English Learning Town",
+    "background": "/backgrounds/town-square.png",
+    "music": "town_theme.mp3",
+    "connections": {
+      "north": "library",
+      "east": "shop",
+      "south": "residential",
+      "west": "park"
+    },
+    "characters": ["mayor"],
+    "interactables": [
+      {
+        "id": "fountain",
+        "name": "Town Fountain",
+        "x": 400,
+        "y": 350,
+        "action": "examine",
+        "description": "A beautiful fountain in the center of town"
+      }
+    ],
+    "spawn": { "x": 400, "y": 300 }
+  },
+  "library": {
+    "id": "library",
+    "name": "Town Library",
+    "description": "A quiet place filled with books and knowledge",
+    "background": "/backgrounds/library.png",
+    "music": "library_theme.mp3",
+    "connections": {
+      "south": "town-square"
+    },
+    "characters": ["librarian"],
+    "interactables": [
+      {
+        "id": "bookshelf",
+        "name": "Bookshelf",
+        "x": 150,
+        "y": 200,
+        "action": "read",
+        "description": "Shelves filled with English learning books"
+      }
+    ],
+    "spawn": { "x": 400, "y": 400 }
+  },
+  "shop": {
+    "id": "shop",
+    "name": "Bob's General Store",
+    "description": "The local shop where you can buy useful items",
+    "background": "/backgrounds/shop.png",
+    "music": "shop_theme.mp3",
+    "connections": {
+      "west": "town-square"
+    },
+    "characters": ["shopkeeper"],
+    "interactables": [
+      {
+        "id": "counter",
+        "name": "Shop Counter",
+        "x": 250,
+        "y": 200,
+        "action": "buy",
+        "description": "Where you can purchase items"
+      }
+    ],
+    "spawn": { "x": 100, "y": 300 }
+  }
+}
