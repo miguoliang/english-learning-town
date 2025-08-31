@@ -1,26 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import GameWorld from './components/GameWorld';
+import { useGameActions } from '@english-learning-town/store';
 
 function App(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { setGameData } = useGameActions();
 
   useEffect(() => {
     const initializeGame = async (): Promise<void> => {
       try {
         console.log('Loading game content...');
-        
+
         // Load all game data files
-        const [locationsRes, charactersRes, dialoguesRes, questsRes, itemsRes] = await Promise.all([
-          fetch('/data/locations.json'),
-          fetch('/data/characters.json'),
-          fetch('/data/dialogues.json'),
-          fetch('/data/quests.json'),
-          fetch('/data/items.json')
-        ]);
+        const [locationsRes, charactersRes, dialoguesRes, questsRes, itemsRes] =
+          await Promise.all([
+            fetch('/data/locations.json'),
+            fetch('/data/characters.json'),
+            fetch('/data/dialogues.json'),
+            fetch('/data/quests.json'),
+            fetch('/data/items.json'),
+          ]);
 
         // Check if all requests were successful
-        if (!locationsRes.ok || !charactersRes.ok || !dialoguesRes.ok || !questsRes.ok || !itemsRes.ok) {
+        if (
+          !locationsRes.ok ||
+          !charactersRes.ok ||
+          !dialoguesRes.ok ||
+          !questsRes.ok ||
+          !itemsRes.ok
+        ) {
           throw new Error('Failed to fetch game data files');
         }
 
@@ -30,12 +39,12 @@ function App(): JSX.Element {
           characters: await charactersRes.json(),
           dialogues: await dialoguesRes.json(),
           quests: await questsRes.json(),
-          items: await itemsRes.json()
+          items: await itemsRes.json(),
         };
 
-        // Store game data globally for components to access
-        (window as any).gameData = gameData;
-        
+        // Store game data in Zustand store
+        setGameData(gameData);
+
         console.log('Game content loaded successfully:', gameData);
         setIsLoading(false);
       } catch (err) {
@@ -53,9 +62,7 @@ function App(): JSX.Element {
       <div style={errorScreenStyle}>
         <h2>Failed to Load Game</h2>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()}>
-          Retry
-        </button>
+        <button onClick={() => window.location.reload()}>Retry</button>
       </div>
     );
   }
@@ -84,7 +91,7 @@ const appStyle: React.CSSProperties = {
   overflow: 'hidden',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
 };
 
 const loadingScreenStyle: React.CSSProperties = {
@@ -95,7 +102,7 @@ const loadingScreenStyle: React.CSSProperties = {
   height: '100vh',
   backgroundColor: '#2C3E50',
   color: 'white',
-  fontFamily: 'Arial, sans-serif'
+  fontFamily: 'Arial, sans-serif',
 };
 
 const loadingSpinnerStyle: React.CSSProperties = {
@@ -105,7 +112,7 @@ const loadingSpinnerStyle: React.CSSProperties = {
   width: '50px',
   height: '50px',
   animation: 'spin 2s linear infinite',
-  margin: '20px'
+  margin: '20px',
 };
 
 const errorScreenStyle: React.CSSProperties = {
@@ -118,12 +125,12 @@ const errorScreenStyle: React.CSSProperties = {
   color: 'white',
   fontFamily: 'Arial, sans-serif',
   textAlign: 'center',
-  padding: '20px'
+  padding: '20px',
 };
 
 // Add CSS keyframes for spinner animation
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
+const styleSheet = document.createElement('style');
+styleSheet.type = 'text/css';
 styleSheet.innerText = `
   @keyframes spin {
     0% { transform: rotate(0deg); }

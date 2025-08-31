@@ -1,4 +1,7 @@
-// Core Game Types
+// ============================================
+// CORE FOUNDATION TYPES
+// ============================================
+
 export interface Position {
   x: number;
   y: number;
@@ -11,18 +14,54 @@ export interface Size {
 
 export interface Bounds extends Position, Size {}
 
-// Player Types
+export interface Vector2D extends Position {
+  magnitude?: number;
+  angle?: number;
+}
+
+export type Rectangle = Bounds;
+
+export interface Circle extends Position {
+  radius: number;
+}
+
+// Identifier types for type safety
+export type PlayerId = string & { __brand: 'PlayerId' };
+export type CharacterId = string & { __brand: 'CharacterId' };
+export type DialogueId = string & { __brand: 'DialogueId' };
+export type QuestId = string & { __brand: 'QuestId' };
+export type ItemId = string & { __brand: 'ItemId' };
+export type LocationId = string & { __brand: 'LocationId' };
+export type SystemId = string & { __brand: 'SystemId' };
+
+// Utility functions for creating branded types
+export const createPlayerId = (id: string): PlayerId => id as PlayerId;
+export const createCharacterId = (id: string): CharacterId => id as CharacterId;
+export const createDialogueId = (id: string): DialogueId => id as DialogueId;
+export const createQuestId = (id: string): QuestId => id as QuestId;
+export const createItemId = (id: string): ItemId => id as ItemId;
+export const createLocationId = (id: string): LocationId => id as LocationId;
+export const createSystemId = (id: string): SystemId => id as SystemId;
+
+// ============================================
+// PLAYER TYPES
+// ============================================
+
 export interface Player {
-  id: string;
+  id: PlayerId;
   name: string;
   level: number;
   experience: number;
   position: Position;
   inventory: Item[];
-  completedQuests: string[];
-  activeQuests: string[];
-  currentLocation: string;
+  completedQuests: QuestId[];
+  activeQuests: QuestId[];
+  currentLocation: LocationId;
   stats: PlayerStats;
+  preferences: PlayerPreferences;
+  achievements: Achievement[];
+  createdAt: Date;
+  lastActive: Date;
 }
 
 export interface PlayerStats {
@@ -32,18 +71,83 @@ export interface PlayerStats {
   maxEnergy: number;
   vocabulary: number;
   pronunciation: number;
+  listening: number;
+  speaking: number;
+  reading: number;
+  writing: number;
 }
 
-// Game Content Types
-export interface Character {
+export interface PlayerPreferences {
+  language: string;
+  difficulty: QuestDifficulty;
+  autoSave: boolean;
+  notificationsEnabled: boolean;
+  speechRecognitionEnabled: boolean;
+  subtitlesEnabled: boolean;
+  voiceVolume: number;
+  effectsVolume: number;
+  musicVolume: number;
+}
+
+export interface Achievement {
   id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt: Date;
+  rarity: ItemRarity;
+  category: AchievementCategory;
+}
+
+export enum AchievementCategory {
+  PROGRESS = 'progress',
+  SOCIAL = 'social',
+  LEARNING = 'learning',
+  EXPLORATION = 'exploration',
+  CHALLENGE = 'challenge',
+}
+
+// ============================================
+// GAME CONTENT TYPES
+// ============================================
+
+export interface Character {
+  id: CharacterId;
   name: string;
   description: string;
   sprite: string;
   position: Position;
-  dialogues: string[];
-  quests?: string[];
+  dialogues: DialogueId[];
+  quests?: QuestId[];
   personality: CharacterPersonality;
+  currentLocation: LocationId;
+  movementPattern?: MovementPattern;
+  interactionRadius: number;
+  isActive: boolean;
+  voiceProfile?: VoiceProfile;
+}
+
+export interface MovementPattern {
+  type: MovementType;
+  speed: number;
+  waypoints?: Position[];
+  bounds?: Rectangle;
+  pauseDuration?: number;
+}
+
+export enum MovementType {
+  STATIC = 'static',
+  PATROL = 'patrol',
+  WANDER = 'wander',
+  FOLLOW_PLAYER = 'follow_player',
+  SCRIPTED = 'scripted',
+}
+
+export interface VoiceProfile {
+  pitch: number;
+  speed: number;
+  voice: string;
+  accent?: string;
 }
 
 export interface CharacterPersonality {
@@ -68,7 +172,7 @@ export interface Quest {
 export enum QuestDifficulty {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced'
+  ADVANCED = 'advanced',
 }
 
 export enum QuestCategory {
@@ -76,7 +180,7 @@ export enum QuestCategory {
   PRONUNCIATION = 'pronunciation',
   CONVERSATION = 'conversation',
   GRAMMAR = 'grammar',
-  LISTENING = 'listening'
+  LISTENING = 'listening',
 }
 
 export interface QuestObjective {
@@ -95,7 +199,7 @@ export enum ObjectiveType {
   FIND_ITEM = 'find_item',
   TALK_TO_CHARACTER = 'talk_to_character',
   VISIT_LOCATION = 'visit_location',
-  COLLECT_ITEMS = 'collect_items'
+  COLLECT_ITEMS = 'collect_items',
 }
 
 export interface QuestReward {
@@ -107,7 +211,7 @@ export interface QuestReward {
 export enum RewardType {
   EXPERIENCE = 'experience',
   ITEM = 'item',
-  CURRENCY = 'currency'
+  CURRENCY = 'currency',
 }
 
 // Dialogue System Types
@@ -148,14 +252,14 @@ export enum ConditionType {
   QUEST_COMPLETED = 'quest_completed',
   ITEM_IN_INVENTORY = 'item_in_inventory',
   LEVEL_REQUIREMENT = 'level_requirement',
-  STAT_REQUIREMENT = 'stat_requirement'
+  STAT_REQUIREMENT = 'stat_requirement',
 }
 
 export enum ComparisonOperator {
   EQUALS = 'equals',
   GREATER_THAN = 'greater_than',
   LESS_THAN = 'less_than',
-  CONTAINS = 'contains'
+  CONTAINS = 'contains',
 }
 
 export interface DialogueAction {
@@ -169,7 +273,7 @@ export enum ActionType {
   REMOVE_ITEM = 'remove_item',
   START_QUEST = 'start_quest',
   COMPLETE_QUEST = 'complete_quest',
-  MODIFY_STAT = 'modify_stat'
+  MODIFY_STAT = 'modify_stat',
 }
 
 export interface DialogueMetadata {
@@ -195,7 +299,7 @@ export enum SpeechChallengeType {
   WORD_PRONUNCIATION = 'word_pronunciation',
   PHRASE_REPETITION = 'phrase_repetition',
   FREE_RESPONSE = 'free_response',
-  READING_ALOUD = 'reading_aloud'
+  READING_ALOUD = 'reading_aloud',
 }
 
 export interface SpeechRecognitionResult {
@@ -256,7 +360,7 @@ export enum ItemType {
   CONSUMABLE = 'consumable',
   TOOL = 'tool',
   COLLECTIBLE = 'collectible',
-  QUEST_ITEM = 'quest_item'
+  QUEST_ITEM = 'quest_item',
 }
 
 export enum ItemRarity {
@@ -264,7 +368,7 @@ export enum ItemRarity {
   UNCOMMON = 'uncommon',
   RARE = 'rare',
   EPIC = 'epic',
-  LEGENDARY = 'legendary'
+  LEGENDARY = 'legendary',
 }
 
 export interface ItemEffect {
@@ -277,7 +381,7 @@ export enum EffectType {
   HEAL = 'heal',
   ENERGY_RESTORE = 'energy_restore',
   STAT_BOOST = 'stat_boost',
-  EXPERIENCE_BONUS = 'experience_bonus'
+  EXPERIENCE_BONUS = 'experience_bonus',
 }
 
 // Game State Management Types
@@ -348,7 +452,7 @@ export enum GameEventType {
   SPEECH_RECOGNITION_SUCCESS = 'speech_recognition_success',
   SPEECH_RECOGNITION_FAILED = 'speech_recognition_failed',
   LEVEL_UP = 'level_up',
-  LOCATION_CHANGED = 'location_changed'
+  LOCATION_CHANGED = 'location_changed',
 }
 
 // Utility Types

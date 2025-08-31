@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
@@ -34,7 +34,7 @@ module.exports = {
         'config',
         'logger',
         'errors',
-        
+
         // Game systems
         'character',
         'dialogue',
@@ -42,7 +42,7 @@ module.exports = {
         'inventory',
         'progress',
         'game-state',
-        
+
         // Content
         'content',
         'characters',
@@ -50,25 +50,25 @@ module.exports = {
         'quests',
         'locations',
         'items',
-        
+
         // Audio
         'speech',
         'recognition',
         'tts',
         'audio',
-        
+
         // UI
         'ui',
         'components',
         'design-system',
-        
+
         // Tools & Infrastructure
         'build',
         'quality',
         'tests',
         'ci',
         'deps',
-        
+
         // Data & Storage
         'storage',
         'types',

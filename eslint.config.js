@@ -35,6 +35,9 @@ export default [
         KeyboardEvent: 'readonly',
         JSX: 'readonly',
         fetch: 'readonly',
+        performance: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
       },
     },
     plugins: {
@@ -46,7 +49,10 @@ export default [
       ...tsPlugin.configs.recommended.rules,
       'require-jsdoc': 'off',
       'valid-jsdoc': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

@@ -1,14 +1,12 @@
 {
-  "name": "@english-learning-town/core",
+  "name": "@english-learning-town/logger",
   "version": "1.0.0",
-  "description": "Core game engine logic and systems",
+  "description": "Comprehensive logging system with multiple output targets and structured logging",
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
@@ -19,11 +17,7 @@
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "dependencies": {
-    "@english-learning-town/types": "workspace:*",
-    "@english-learning-town/logger": "workspace:*",
-    "mitt": "^3.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "peerDependencies": {},
   "files": [

@@ -8,13 +8,5 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["src/**/*"],
-  "references": [
-    {
-      "path": "../types"
-    },
-    {
-      "path": "../logger"
-    }
-  ]
+  "include": ["src/**/*"]
 }

@@ -20,12 +20,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@english-learning-town/core": "workspace:^",
     "@english-learning-town/types": "workspace:*",
-    "zustand": "^4.4.7",
-    "immer": "^10.0.3"
+    "immer": "^10.0.3",
+    "zustand": "^4.4.7"
   },
-  "devDependencies": {},
-  "peerDependencies": {},
   "files": [
     "dist"
   ]
