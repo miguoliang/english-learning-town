@@ -8,8 +8,6 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
