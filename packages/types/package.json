@@ -2,8 +2,13 @@
   "name": "@english-learning-town/types",
   "version": "1.0.0",
   "description": "Shared TypeScript type definitions",
-  "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -12,6 +17,9 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {},
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "restricted"
   }
