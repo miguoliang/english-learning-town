@@ -12,8 +12,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
+    "test": "echo \"Tests run from monorepo root\"",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },

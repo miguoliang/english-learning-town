@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
+    "test": "echo \"Tests run from monorepo root\"",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {},

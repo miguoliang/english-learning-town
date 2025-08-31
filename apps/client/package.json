@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "../../node_modules/.bin/eslint src",
+    "test": "echo \"Tests run from monorepo root\"",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
