@@ -235,44 +235,6 @@ export const CoreEvents = {
   INFO: 'info',
 } as const;
 
-// Application-specific events (for English Learning Town)
-// TODO: Move this to a separate file or application layer
-export const GameEvents = {
-  ...CoreEvents,
-
-  // Player events
-  PLAYER_MOVED: 'player:moved',
-  PLAYER_STATS_UPDATED: 'player:stats_updated',
-  PLAYER_LEVEL_UP: 'player:level_up',
-  PLAYER_INVENTORY_CHANGED: 'player:inventory_changed',
-
-  // Location events
-  LOCATION_CHANGED: 'location:changed',
-  LOCATION_LOADED: 'location:loaded',
-
-  // Dialogue events
-  DIALOGUE_STARTED: 'dialogue:started',
-  DIALOGUE_ENDED: 'dialogue:ended',
-  DIALOGUE_CHOICE_SELECTED: 'dialogue:choice_selected',
-
-  // Quest events
-  QUEST_STARTED: 'quest:started',
-  QUEST_COMPLETED: 'quest:completed',
-  QUEST_OBJECTIVE_COMPLETED: 'quest:objective_completed',
-
-  // Speech recognition events
-  SPEECH_STARTED: 'speech:started',
-  SPEECH_RESULT: 'speech:result',
-  SPEECH_ERROR: 'speech:error',
-  SPEECH_ENDED: 'speech:ended',
-
-  // Item events
-  ITEM_COLLECTED: 'item:collected',
-  ITEM_USED: 'item:used',
-
-  // UI events
-  UI_MODAL_OPENED: 'ui:modal_opened',
-  UI_MODAL_CLOSED: 'ui:modal_closed',
-} as const;
-
-export type GameEventType = (typeof GameEvents)[keyof typeof GameEvents];
+// Note: Application-specific events have been moved to maintain SRP
+// The core package now only contains generic, reusable events
+// Game-specific events should be defined in the application layer

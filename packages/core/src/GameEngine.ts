@@ -1,9 +1,10 @@
 /**
- * Main game engine for English Learning Town
- * Orchestrates all game systems, manages the game loop, and handles core game state
+ * Pure ECS Game Engine for English Learning Town
+ * Focuses exclusively on game loop and engine lifecycle
+ * All ECS operations are delegated to the World - maintains strict separation of concerns
  */
 
-import { GameSystem, SystemManager, systemManager } from './GameSystem';
+import { world } from './World';
 import { eventBus, CoreEvents } from './EventBus';
 
 export interface GameEngineConfig {
@@ -18,7 +19,7 @@ export interface GameEngineStats {
   deltaTime: number;
   frameCount: number;
   uptime: number;
-  systemStats: ReturnType<SystemManager['getStats']>;
+  worldStats: ReturnType<typeof world.getStats>;
 }
 
 export enum GameState {
@@ -36,7 +37,6 @@ export enum GameState {
 export class GameEngine {
   private config: GameEngineConfig;
   private state: GameState = GameState.UNINITIALIZED;
-  private systemManager: SystemManager;
 
   // Game loop variables
   private animationFrameId: number | null = null;
@@ -64,7 +64,6 @@ export class GameEngine {
     };
 
     this.targetFrameTime = 1000 / this.config.targetFPS;
-    this.systemManager = systemManager;
 
     // Bind methods to preserve context
     this.gameLoop = this.gameLoop.bind(this);
@@ -75,7 +74,7 @@ export class GameEngine {
   }
 
   /**
-   * Initialize the game engine and all systems
+   * Initialize the game engine and the ECS world
    */
   async initialize(): Promise<void> {
     if (this.state !== GameState.UNINITIALIZED) {
@@ -87,8 +86,8 @@ export class GameEngine {
     this.setState(GameState.INITIALIZING);
 
     try {
-      // Initialize all registered systems
-      await this.systemManager.initializeAll();
+      // Initialize the ECS world (which handles all systems)
+      await world.initialize();
 
       this.setState(GameState.INITIALIZED);
 
@@ -118,8 +117,8 @@ export class GameEngine {
     this.setState(GameState.STARTING);
 
     try {
-      // Start all systems
-      this.systemManager.startAll();
+      // Start the ECS world (which handles all systems)
+      world.start();
 
       // Initialize timing
       this.startTime = performance.now();
@@ -198,8 +197,8 @@ export class GameEngine {
       // Stop the game loop
       this.stopGameLoop();
 
-      // Stop all systems
-      this.systemManager.stopAll();
+      // Stop the ECS world (which handles all systems)
+      world.stop();
 
       this.setState(GameState.STOPPED);
 
@@ -215,13 +214,14 @@ export class GameEngine {
   }
 
   /**
-   * Cleanup the game engine and all systems
+   * Cleanup the game engine and the ECS world
    */
   async cleanup(): Promise<void> {
     this.stop();
 
     try {
-      await this.systemManager.cleanupAll();
+      // Cleanup the ECS world (which handles all systems)
+      await world.cleanup();
 
       this.setState(GameState.UNINITIALIZED);
 
@@ -237,24 +237,10 @@ export class GameEngine {
   }
 
   /**
-   * Register a system with the engine
+   * Get the ECS world instance for direct access to entities, components, and systems
    */
-  registerSystem(system: GameSystem): void {
-    this.systemManager.registerSystem(system);
-  }
-
-  /**
-   * Unregister a system from the engine
-   */
-  async unregisterSystem(systemName: string): Promise<void> {
-    await this.systemManager.unregisterSystem(systemName);
-  }
-
-  /**
-   * Get a system by name
-   */
-  getSystem<T extends GameSystem>(systemName: string): T | undefined {
-    return this.systemManager.getSystem<T>(systemName);
+  getWorld() {
+    return world;
   }
 
   /**
@@ -300,7 +286,7 @@ export class GameEngine {
       deltaTime: this.lastDeltaTime,
       frameCount: this.frameCount,
       uptime: this.getUptime(),
-      systemStats: this.systemManager.getStats(),
+      worldStats: world.getStats(),
     };
   }
 
@@ -356,8 +342,8 @@ export class GameEngine {
       this.accumulator += deltaTime;
 
       while (this.accumulator >= this.targetFrameTime) {
-        // Update all systems
-        this.systemManager.updateAll(this.targetFrameTime, currentTime);
+        // Update the ECS world (which handles all systems)
+        world.update(this.targetFrameTime, currentTime);
         this.accumulator -= this.targetFrameTime;
       }
 

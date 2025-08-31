@@ -21,7 +21,8 @@
   "dependencies": {
     "@english-learning-town/types": "workspace:*",
     "@english-learning-town/logger": "workspace:*",
-    "mitt": "^3.0.1"
+    "mitt": "^3.0.1",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {},
   "peerDependencies": {},

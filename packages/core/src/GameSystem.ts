@@ -1,91 +1,359 @@
 /**
- * Base game system architecture for English Learning Town
- * Provides a foundation for modular game systems (rendering, input, dialogue, etc.)
+ * Pure ECS (Entity-Component-System) architecture for English Learning Town
+ * Systems operate exclusively on entities that have specific component combinations
+ * No legacy patterns - pure ECS implementation
+ *
+ * @fileoverview ECS System architecture with pure entity-component processing
+ * @author English Learning Town Team
+ * @version 1.0.0
  */
 
+import { EntityId, entityManager } from './Entity';
+import { ComponentType, Component, componentStorage } from './Component';
 import { eventBus, CoreEvents } from './EventBus';
+import {
+  BaseSystemConfig,
+  ResolvedSystemConfig,
+  CachedQuery,
+} from './types/UtilityTypes';
 
-export interface SystemConfig {
-  name: string;
-  priority: number;
-  enabled: boolean;
-  dependencies?: string[];
-  systemType?: SystemType;
-  updateFrequency?: number; // Updates per second, 0 = every frame
-  autoStart?: boolean; // Whether to start automatically when engine starts
-}
+/**
+ * System configuration type alias for backward compatibility
+ * @typedef {BaseSystemConfig} SystemConfig
+ */
+export type SystemConfig = BaseSystemConfig;
 
+/**
+ * Enumeration of system types for categorization and prioritization
+ * @enum {string}
+ * @readonly
+ */
 export enum SystemType {
-  CORE = 'core', // Essential systems (rendering, input)
-  GAMEPLAY = 'gameplay', // Game logic systems
-  UI = 'ui', // User interface systems
-  AUDIO = 'audio', // Audio systems
-  NETWORK = 'network', // Networking systems
-  DEBUG = 'debug', // Debug and development systems
+  /** Essential systems like rendering and input */
+  CORE = 'core',
+  /** Game logic systems */
+  GAMEPLAY = 'gameplay',
+  /** User interface systems */
+  UI = 'ui',
+  /** Audio systems */
+  AUDIO = 'audio',
+  /** Networking systems */
+  NETWORK = 'network',
+  /** Debug and development systems */
+  DEBUG = 'debug',
 }
 
-export abstract class GameSystem {
-  protected config: SystemConfig;
-  protected initialized = false;
-  protected running = false;
+/**
+ * Generic system state interface using mapped types
+ * @interface SystemStateFlags
+ * @readonly
+ */
+interface SystemStateFlags {
+  /** Whether the system has been initialized */
+  readonly initialized: boolean;
+  /** Whether the system is currently running */
+  readonly running: boolean;
+}
 
-  // Timing control for update frequency
-  private lastUpdateTime = 0;
-  private updateInterval: number;
+/**
+ * Base class for all ECS systems.
+ * Systems contain logic that operates on entities with specific component combinations.
+ *
+ * @abstract
+ * @class GameSystem
+ * @implements {SystemStateFlags}
+ * @example
+ * ```typescript
+ * @GameplaySystem({ priority: 100 })
+ * @RequiresComponents('position', 'velocity')
+ * export class MovementSystem extends GameSystem {
+ *   protected processEntity(entityId: EntityId, deltaTime: number): void {
+ *     const { position, velocity } = this.getComponents(entityId, {
+ *       position: 'position',
+ *       velocity: 'velocity'
+ *     });
+ *
+ *     if (position && velocity) {
+ *       position.x += velocity.x * deltaTime;
+ *       position.y += velocity.y * deltaTime;
+ *     }
+ *   }
+ * }
+ * ```
+ */
+export abstract class GameSystem implements SystemStateFlags {
+  protected readonly config: ResolvedSystemConfig;
+  public initialized = false;
+  public running = false;
 
+  // Optimized query cache using utility types
+  private readonly queryCache = new Map<string, CachedQuery>();
+  private readonly updateInterval: number;
+
+  /**
+   * Creates a new GameSystem instance
+   * @param {SystemConfig} config - System configuration object
+   * @example
+   * ```typescript
+   * constructor() {
+   *   super({
+   *     name: 'MovementSystem',
+   *     priority: 100,
+   *     systemType: SystemType.GAMEPLAY
+   *   });
+   * }
+   * ```
+   */
   constructor(config: SystemConfig) {
     this.config = {
       systemType: SystemType.GAMEPLAY,
-      updateFrequency: 0, // Default to every frame
+      updateFrequency: 0,
       autoStart: true,
+      enabled: true,
+      dependencies: [],
       ...config,
-    };
+    } as ResolvedSystemConfig;
 
-    // Calculate update interval in milliseconds
     this.updateInterval =
-      this.config.updateFrequency! > 0
-        ? 1000 / this.config.updateFrequency!
-        : 0;
+      this.config.updateFrequency > 0 ? 1000 / this.config.updateFrequency : 0;
   }
 
-  get name(): string {
-    return this.config.name;
+  // Use generic accessor pattern to reduce getter boilerplate
+  protected getConfigValue<K extends keyof ResolvedSystemConfig>(
+    key: K
+  ): ResolvedSystemConfig[K] {
+    return this.config[key];
   }
 
-  get priority(): number {
-    return this.config.priority;
+  // Simplified property accessors using the generic pattern
+  get name() {
+    return this.getConfigValue('name');
+  }
+  get priority() {
+    return this.getConfigValue('priority');
+  }
+  get systemType() {
+    return this.getConfigValue('systemType');
+  }
+  get updateFrequency() {
+    return this.getConfigValue('updateFrequency');
+  }
+  get dependencies() {
+    return this.getConfigValue('dependencies');
+  }
+  get shouldAutoStart() {
+    return this.getConfigValue('autoStart');
+  }
+  get isEnabled() {
+    return this.getConfigValue('enabled');
   }
 
-  get isInitialized(): boolean {
+  // State flags (no change needed - simple boolean accessors)
+  get isInitialized() {
     return this.initialized;
   }
-
-  get isRunning(): boolean {
+  get isRunning() {
     return this.running;
   }
 
-  get isEnabled(): boolean {
-    return this.config.enabled;
-  }
+  // ========== ECS Query Methods (Optimized) ==========
 
-  get dependencies(): string[] {
-    return this.config.dependencies || [];
-  }
+  /**
+   * Generic query method with automatic caching
+   * Queries entities that have all specified component types
+   * @template T - Readonly array of component types
+   * @param {T} componentTypes - Array of component types to query for
+   * @param {number} [ttl=16] - Cache time-to-live in milliseconds
+   * @returns {EntityId[]} Array of entity IDs that have all specified components
+   * @example
+   * ```typescript
+   * const movableEntities = this.query(['position', 'velocity'] as const);
+   * movableEntities.forEach(entityId => {
+   *   // Process each movable entity
+   * });
+   * ```
+   */
+  protected query<T extends readonly ComponentType[]>(
+    componentTypes: T,
+    ttl: number = 16
+  ): EntityId[] {
+    const cacheKey = [...componentTypes].sort().join('|');
+    const cached = this.queryCache.get(cacheKey);
+    const now = performance.now();
 
-  get systemType(): SystemType {
-    return this.config.systemType || SystemType.GAMEPLAY;
-  }
+    if (cached && now - cached.timestamp < cached.ttl) {
+      return cached.data;
+    }
 
-  get updateFrequency(): number {
-    return this.config.updateFrequency || 0;
-  }
+    const entities = componentStorage
+      .getEntitiesWithComponents([...componentTypes])
+      .filter((entityId) => entityManager.hasEntity(entityId));
 
-  get shouldAutoStart(): boolean {
-    return this.config.autoStart !== false;
+    this.queryCache.set(cacheKey, {
+      data: entities,
+      timestamp: now,
+      ttl,
+      key: cacheKey,
+    });
+
+    return entities;
   }
 
   /**
+   * Type-safe component accessor with generic constraints
+   */
+  protected getComponent<T extends Component>(
+    entityId: EntityId,
+    componentType: ComponentType
+  ): T | undefined {
+    return componentStorage.getComponent<T>(entityId, componentType);
+  }
+
+  /**
+   * Multi-component getter - reduces multiple getComponent calls
+   * Efficiently retrieves multiple components from an entity in one call
+   * @template T - Record mapping keys to component types
+   * @param {EntityId} entityId - ID of the entity to get components from
+   * @param {T} componentMap - Object mapping keys to component types
+   * @returns {Object} Object with same keys, values are components or undefined
+   * @example
+   * ```typescript
+   * const { position, velocity, health } = this.getComponents(entityId, {
+   *   position: 'position',
+   *   velocity: 'velocity',
+   *   health: 'health'
+   * });
+   *
+   * if (position && velocity) {
+   *   position.x += velocity.x * deltaTime;
+   * }
+   * ```
+   */
+  protected getComponents<T extends Record<string, ComponentType>>(
+    entityId: EntityId,
+    componentMap: T
+  ): { [K in keyof T]: Component | undefined } {
+    const result = {} as { [K in keyof T]: Component | undefined };
+
+    for (const [key, componentType] of Object.entries(componentMap)) {
+      result[key as keyof T] = this.getComponent(entityId, componentType);
+    }
+
+    return result;
+  }
+
+  /**
+   * Batch component existence check
+   */
+  protected hasComponents(
+    entityId: EntityId,
+    componentTypes: readonly ComponentType[]
+  ): boolean {
+    return componentTypes.every((type) =>
+      componentStorage.hasComponent(entityId, type)
+    );
+  }
+
+  /**
+   * Single component existence check
+   */
+  protected hasComponent(
+    entityId: EntityId,
+    componentType: ComponentType
+  ): boolean {
+    return componentStorage.hasComponent(entityId, componentType);
+  }
+
+  /**
+   * Get all components for an entity
+   */
+  protected getEntityComponents(entityId: EntityId): Component[] {
+    return componentStorage.getEntityComponents(entityId);
+  }
+
+  /**
+   * Cache management with granular control
+   */
+  protected invalidateQueryCache(pattern?: string): void {
+    if (pattern) {
+      // Clear specific cache entries matching pattern
+      for (const [key] of this.queryCache.entries()) {
+        if (key.includes(pattern)) {
+          this.queryCache.delete(key);
+        }
+      }
+    } else {
+      this.queryCache.clear();
+    }
+  }
+
+  /**
+   * Process entities that match the system's component requirements.
+   * Override this method to implement your system's core logic.
+   * Called automatically by the update loop with filtered entities.
+   * @param {EntityId[]} entities - Array of entity IDs that match component requirements
+   * @param {number} deltaTime - Time elapsed since last update in milliseconds
+   * @returns {void}
+   * @example
+   * ```typescript
+   * protected processEntities(entities: EntityId[], deltaTime: number): void {
+   *   // Batch process all entities
+   *   entities.forEach(entityId => {
+   *     this.processEntity(entityId, deltaTime);
+   *   });
+   * }
+   * ```
+   */
+  protected processEntities(entities: EntityId[], deltaTime: number): void {
+    // Default implementation processes each entity individually
+    for (const entityId of entities) {
+      this.processEntity(entityId, deltaTime);
+    }
+  }
+
+  /**
+   * Process a single entity
+   * Override this for per-entity logic
+   */
+  protected processEntity(_entityId: EntityId, _deltaTime: number): void {
+    // Override in concrete systems
+  }
+
+  /**
+   * Define which components this system requires.
+   * MUST override this in concrete systems to specify component requirements.
+   * Entities will only be processed if they have ALL these components.
+   * @abstract
+   * @returns {ComponentType[]} Array of component types this system requires
+   * @example
+   * ```typescript
+   * protected getRequiredComponents(): ComponentType[] {
+   *   return ['position', 'velocity', 'renderable'];
+   * }
+   * ```
+   */
+  protected abstract getRequiredComponents(): ComponentType[];
+
+  /**
+   * Define which components this system is interested in (optional components)
+   * Override this in subclasses to specify optional components for optimization
+   */
+  protected getOptionalComponents(): ComponentType[] {
+    return [];
+  }
+
+  // ========== System Lifecycle Methods ==========
+
+  /**
    * Initialize the system
+   * Sets up the system and calls the onInitialize hook
+   * @returns {Promise<void>} Promise that resolves when initialization is complete
+   * @throws {Error} If system is already initialized
+   * @example
+   * ```typescript
+   * await system.initialize();
+   * console.log(system.isInitialized); // true
+   * ```
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
@@ -153,23 +421,34 @@ export abstract class GameSystem {
   }
 
   /**
-   * Update the system (called every frame, but may skip based on updateFrequency)
+   * Update the system - optimized with TypeScript utility types
+   * Called every frame by the game engine to process entities
+   * @param {number} deltaTime - Time elapsed since last update in milliseconds
+   * @param {number} [currentTime=performance.now()] - Current timestamp
+   * @returns {void}
+   * @example
+   * ```typescript
+   * // Called automatically by the engine
+   * system.update(16.67); // 60 FPS
+   * ```
    */
   update(deltaTime: number, currentTime: number = performance.now()): void {
-    if (!this.running || !this.config.enabled) {
-      return;
-    }
+    if (!this.running || !this.isEnabled) return;
 
-    // Check if enough time has passed for systems with limited update frequency
+    // Frequency throttling using config accessor
     if (this.updateInterval > 0) {
-      if (currentTime - this.lastUpdateTime < this.updateInterval) {
-        return;
-      }
+      const timeSinceLastUpdate = currentTime - (this.lastUpdateTime || 0);
+      if (timeSinceLastUpdate < this.updateInterval) return;
       this.lastUpdateTime = currentTime;
     }
 
     try {
-      this.onUpdate(deltaTime);
+      // Pure ECS update using optimized query method
+      const requiredComponents = this.getRequiredComponents();
+      if (requiredComponents.length > 0) {
+        const entities = this.query(requiredComponents);
+        this.processEntities(entities, deltaTime);
+      }
     } catch (error) {
       eventBus.emit(CoreEvents.SYSTEM_ERROR, {
         error,
@@ -179,11 +458,17 @@ export abstract class GameSystem {
     }
   }
 
+  private lastUpdateTime = 0;
+
   /**
    * Cleanup the system
    */
   async cleanup(): Promise<void> {
     this.stop();
+
+    // Clear ECS query cache
+    this.queryCache.clear();
+
     await this.onCleanup();
     this.initialized = false;
     eventBus.emit(CoreEvents.DEBUG_LOG, {
@@ -197,7 +482,8 @@ export abstract class GameSystem {
    * Enable the system
    */
   enable(): void {
-    this.config.enabled = true;
+    // Use object mutation for config changes
+    (this.config as any).enabled = true;
     this.onEnabled();
   }
 
@@ -205,36 +491,45 @@ export abstract class GameSystem {
    * Disable the system
    */
   disable(): void {
-    this.config.enabled = false;
+    // Use object mutation for config changes
+    (this.config as any).enabled = false;
     this.onDisabled();
   }
 
-  // Abstract methods to be implemented by concrete systems
+  // ========== System Lifecycle Hooks ==========
+  // Override these methods in concrete systems for custom behavior
 
   /**
    * Called during system initialization
+   * Override to perform system-specific setup
    */
-  protected abstract onInitialize(): Promise<void>;
+  protected async onInitialize(): Promise<void> {
+    // Override in concrete systems
+  }
 
   /**
    * Called when the system starts
+   * Override to perform system-specific startup logic
    */
-  protected abstract onStart(): void;
+  protected onStart(): void {
+    // Override in concrete systems
+  }
 
   /**
    * Called when the system stops
+   * Override to perform system-specific shutdown logic
    */
-  protected abstract onStop(): void;
-
-  /**
-   * Called every frame with delta time
-   */
-  protected abstract onUpdate(deltaTime: number): void;
+  protected onStop(): void {
+    // Override in concrete systems
+  }
 
   /**
    * Called during system cleanup
+   * Override to perform system-specific cleanup
    */
-  protected abstract onCleanup(): Promise<void>;
+  protected async onCleanup(): Promise<void> {
+    // Override in concrete systems
+  }
 
   /**
    * Called when the system is enabled
@@ -252,16 +547,65 @@ export abstract class GameSystem {
 }
 
 /**
- * System manager to handle multiple game systems
+ * System manager to handle multiple game systems.
+ * Manages system lifecycle, dependencies, and execution order.
+ *
+ * @class SystemManager
+ * @example
+ * ```typescript
+ * const manager = new SystemManager();
+ *
+ * // Register systems
+ * manager.registerSystem(new MovementSystem());
+ * manager.registerSystem(new RenderSystem());
+ *
+ * // Initialize and start all systems
+ * await manager.initializeAll();
+ * manager.startAll();
+ *
+ * // Update systems each frame
+ * manager.updateAll(deltaTime);
+ * ```
  */
 export class SystemManager {
+  /**
+   * Map of system names to system instances
+   * @private
+   * @type {Map<string, GameSystem>}
+   */
   private systems: Map<string, GameSystem> = new Map();
+
+  /**
+   * Array of system names in execution order (sorted by priority)
+   * @private
+   * @type {string[]}
+   */
   private systemOrder: string[] = [];
+
+  /**
+   * Whether the system manager has been initialized
+   * @private
+   * @type {boolean}
+   */
   private initialized = false;
+
+  /**
+   * Whether the system manager is currently running
+   * @private
+   * @type {boolean}
+   */
   private running = false;
 
   /**
-   * Register a new system
+   * Register a new system with the manager
+   * @param {GameSystem} system - System instance to register
+   * @returns {void}
+   * @throws {Error} If system name is already registered
+   * @example
+   * ```typescript
+   * const movementSystem = new MovementSystem();
+   * systemManager.registerSystem(movementSystem);
+   * ```
    */
   registerSystem(system: GameSystem): void {
     if (this.systems.has(system.name)) {
@@ -574,5 +918,21 @@ export class SystemManager {
   }
 }
 
-// Singleton instance
+/**
+ * Singleton instance of SystemManager for global system management
+ * Provides a shared SystemManager across the entire application
+ * @type {SystemManager}
+ * @example
+ * ```typescript
+ * import { systemManager } from '@english-learning-town/core';
+ *
+ * // Register systems with the singleton
+ * systemManager.registerSystem(new MovementSystem());
+ * systemManager.registerSystem(new RenderSystem());
+ *
+ * // Initialize and start all systems
+ * await systemManager.initializeAll();
+ * systemManager.startAll();
+ * ```
+ */
 export const systemManager = new SystemManager();
