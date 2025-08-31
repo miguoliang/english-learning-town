@@ -103,3 +103,6 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Browser automation screenshots
+.playwright-mcp/
