@@ -8,6 +8,10 @@ import {
   DebugState,
   Player,
   Position,
+  LocationId,
+  createPlayerId,
+  createLocationId,
+  QuestDifficulty,
 } from '@english-learning-town/types';
 
 export interface GameStore extends GameState {
@@ -25,7 +29,7 @@ export interface GameStore extends GameState {
   setPlaying: (playing: boolean) => void;
   setPaused: (paused: boolean) => void;
   setCurrentDialogue: (dialogueId: string | null) => void;
-  setCurrentLocation: (locationId: string) => void;
+  setCurrentLocation: (locationId: LocationId) => void;
   updateSettings: (settings: Partial<GameSettings>) => void;
   updateGameTime: (time: Partial<GameTime>) => void;
   updateDebugState: (debug: Partial<DebugState>) => void;
@@ -82,7 +86,7 @@ const initialDebugState: DebugState = {
 };
 
 const initialPlayer: Player = {
-  id: 'player1',
+  id: createPlayerId('player1'),
   name: 'Player',
   level: 1,
   experience: 0,
@@ -90,7 +94,7 @@ const initialPlayer: Player = {
   inventory: [],
   completedQuests: [],
   activeQuests: [],
-  currentLocation: 'town-square',
+  currentLocation: createLocationId('town-square'),
   stats: {
     health: 100,
     maxHealth: 100,
@@ -98,7 +102,25 @@ const initialPlayer: Player = {
     maxEnergy: 100,
     vocabulary: 0,
     pronunciation: 0,
+    listening: 0,
+    speaking: 0,
+    reading: 0,
+    writing: 0,
   },
+  preferences: {
+    language: 'en-US',
+    difficulty: QuestDifficulty.BEGINNER,
+    autoSave: true,
+    notificationsEnabled: true,
+    speechRecognitionEnabled: true,
+    subtitlesEnabled: true,
+    voiceVolume: 1.0,
+    effectsVolume: 0.8,
+    musicVolume: 0.7,
+  },
+  achievements: [],
+  createdAt: new Date(),
+  lastActive: new Date(),
 };
 
 const initialState: GameState = {
@@ -137,7 +159,7 @@ export const useGameStore = create<GameStore>()(
           state.isPaused = dialogueId !== null;
         }),
 
-      setCurrentLocation: (locationId: string) =>
+      setCurrentLocation: (locationId: LocationId) =>
         set((state) => {
           state.currentLocation = locationId;
           state.player.currentLocation = locationId;

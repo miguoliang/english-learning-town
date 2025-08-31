@@ -12,8 +12,8 @@
     }
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "test": "echo \"Tests run from monorepo root\"",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"

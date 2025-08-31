@@ -13,7 +13,7 @@ import {
 } from '@english-learning-town/store';
 
 const GameWorld: React.FC = () => {
-  const stageRef = useRef<any>();
+  const stageRef = useRef<any>(null);
   const [nearbyNPC, setNearbyNPC] = useState<string | null>(null);
 
   // Use Zustand store instead of local state
