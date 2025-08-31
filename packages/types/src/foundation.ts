@@ -18,10 +18,6 @@
  * ```
  */
 
-// ============================================
-// GEOMETRIC TYPES
-// ============================================
-
 /**
  * @interface Position
  * @description Represents a 2D coordinate position in the game world
@@ -103,10 +99,6 @@ export interface Circle extends Position {
   /** Circle radius in pixels */
   radius: number;
 }
-
-// ============================================
-// BRANDED IDENTIFIER TYPES
-// ============================================
 
 /**
  * @description Branded string types for compile-time type safety
@@ -198,10 +190,6 @@ export const createLocationId = (id: string): LocationId => id as LocationId;
  * @returns {SystemId} Branded system identifier
  */
 export const createSystemId = (id: string): SystemId => id as SystemId;
-
-// ============================================
-// UTILITY TYPES
-// ============================================
 
 /**
  * @typedef {T | null} Nullable

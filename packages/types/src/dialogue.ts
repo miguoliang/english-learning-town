@@ -22,10 +22,6 @@
 import type { QuestDifficulty } from './player';
 import type { SpeechChallenge } from './speech';
 
-// ============================================
-// DIALOGUE SYSTEM TYPES
-// ============================================
-
 /**
  * @interface Dialogue
  * @description Complete dialogue tree for a character conversation

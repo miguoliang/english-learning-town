@@ -31,10 +31,6 @@ import type {
 import type { QuestDifficulty, ItemRarity } from './player';
 import type { DialogueCondition } from './dialogue';
 
-// ============================================
-// CHARACTER TYPES
-// ============================================
-
 /**
  * @interface Character
  * @description Represents an NPC character in the game world
@@ -170,10 +166,6 @@ export interface CharacterPersonality {
   /** Character's enthusiasm level (0-10) */
   enthusiasm: number;
 }
-
-// ============================================
-// QUEST TYPES
-// ============================================
 
 /**
  * @interface Quest
@@ -325,10 +317,6 @@ export enum RewardType {
   CURRENCY = 'currency',
 }
 
-// ============================================
-// LOCATION TYPES
-// ============================================
-
 /**
  * @interface Location
  * @description Represents a location or area in the game world
@@ -388,10 +376,6 @@ export interface LocationConnection {
   /** Optional requirements to access this connection */
   requirements?: DialogueCondition[];
 }
-
-// ============================================
-// ITEM TYPES
-// ============================================
 
 /**
  * @interface Item

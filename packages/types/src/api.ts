@@ -19,10 +19,6 @@
  * ```
  */
 
-// ============================================
-// API RESPONSE TYPES
-// ============================================
-
 /**
  * @interface ApiResponse
  * @template T
@@ -54,10 +50,6 @@ export interface ApiResponse<T> {
   /** When the response was generated */
   timestamp: Date;
 }
-
-// ============================================
-// GAME ENGINE INTERFACE TYPES
-// ============================================
 
 /**
  * @interface GameEngine

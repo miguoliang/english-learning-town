@@ -28,9 +28,6 @@
  * @see {@link @english-learning-town/core/types} For ECS framework-specific types
  */
 
-// ============================================
-// FOUNDATION EXPORTS
-// ============================================
 export type {
   // Geometric types
   Position,
@@ -66,9 +63,6 @@ export {
   createSystemId,
 } from './foundation';
 
-// ============================================
-// PLAYER EXPORTS
-// ============================================
 export type {
   Player,
   PlayerStats,
@@ -78,9 +72,6 @@ export type {
 
 export { AchievementCategory, QuestDifficulty, ItemRarity } from './player';
 
-// ============================================
-// GAME CONTENT EXPORTS
-// ============================================
 export type {
   // Character types
   Character,
@@ -116,9 +107,6 @@ export {
   EffectType,
 } from './game-content';
 
-// ============================================
-// DIALOGUE EXPORTS
-// ============================================
 export type {
   Dialogue,
   DialogueNode,
@@ -130,9 +118,6 @@ export type {
 
 export { ConditionType, ComparisonOperator, ActionType } from './dialogue';
 
-// ============================================
-// SPEECH EXPORTS
-// ============================================
 export type {
   SpeechChallenge,
   SpeechRecognitionResult,
@@ -142,9 +127,6 @@ export type {
 
 export { SpeechChallengeType } from './speech';
 
-// ============================================
-// GAME STATE EXPORTS
-// ============================================
 export type {
   GameState,
   GameTime,
@@ -158,7 +140,4 @@ export type {
 
 export { GameEventType } from './game-state';
 
-// ============================================
-// API EXPORTS
-// ============================================
 export type { ApiResponse, GameEngine, GameSystem } from './api';

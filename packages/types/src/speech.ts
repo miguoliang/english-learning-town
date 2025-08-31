@@ -20,10 +20,6 @@
  * ```
  */
 
-// ============================================
-// SPEECH RECOGNITION TYPES
-// ============================================
-
 /**
  * @interface SpeechChallenge
  * @description Speech challenge for pronunciation practice

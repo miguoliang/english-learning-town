@@ -22,10 +22,6 @@
 import type { Position, PlayerId, QuestId, LocationId } from './foundation';
 import type { Item } from './game-content';
 
-// ============================================
-// PLAYER TYPES
-// ============================================
-
 /**
  * @interface Player
  * @description Complete player character data including stats, progress, and preferences

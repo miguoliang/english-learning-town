@@ -21,10 +21,6 @@
 
 import type { SpeechRecognitionConfig } from './speech';
 
-// ============================================
-// GAME STATE MANAGEMENT TYPES
-// ============================================
-
 /**
  * @interface GameState
  * @description Overall state of the game session
@@ -183,10 +179,6 @@ export interface DebugState {
   /** Whether all locations are unlocked for testing */
   unlockAllLocations: boolean;
 }
-
-// ============================================
-// EVENT SYSTEM TYPES
-// ============================================
 
 /**
  * @interface GameEvent
