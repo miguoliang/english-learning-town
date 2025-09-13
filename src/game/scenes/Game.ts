@@ -5,6 +5,21 @@ export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   background: Phaser.GameObjects.Image;
 
+  // Player
+  private player: Phaser.GameObjects.Image;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  private wasdKeys: {
+    W: Phaser.Input.Keyboard.Key;
+    A: Phaser.Input.Keyboard.Key;
+    S: Phaser.Input.Keyboard.Key;
+    D: Phaser.Input.Keyboard.Key;
+  };
+  private playerSpeed: number = 200;
+
+  // Interaction system
+  private interactionPrompt: Phaser.GameObjects.Text;
+  private nearbyInteractable: string | null = null;
+
   // Town buildings
   private school: Phaser.GameObjects.Rectangle;
   private library: Phaser.GameObjects.Rectangle;
@@ -41,7 +56,7 @@ export class Game extends Scene {
 
     // Instructions
     this.add
-      .text(512, 100, 'Click on buildings to explore and learn English!', {
+      .text(512, 100, 'Use Arrow Keys or WASD to move • Click on buildings to explore and learn English!', {
         fontFamily: 'Arial',
         fontSize: 20,
         color: '#2C5F41',
@@ -49,11 +64,233 @@ export class Game extends Scene {
       })
       .setOrigin(0.5);
 
+    this.createPlayer();
     this.createBuildings();
     this.createNPCs();
     this.setupInteractions();
+    this.setupKeyboard();
+    this.createInteractionPrompt();
 
     EventBus.emit('current-scene-ready', this);
+  }
+
+  /**
+   * Creates the player sprite
+   */
+  private createPlayer(): void {
+    // Create player sprite at the bottom center of the screen
+    this.player = this.add.image(512, 550, 'star');
+    this.player.setScale(0.5); // Make it smaller
+    this.player.setTint(0x4169e1); // Royal blue tint to distinguish from other objects
+  }
+
+  /**
+   * Sets up keyboard controls
+   */
+  private setupKeyboard(): void {
+    this.cursors = this.input.keyboard!.createCursorKeys();
+
+    // Add WASD keys for alternate movement
+    this.wasdKeys = this.input.keyboard!.addKeys('W,A,S,D') as {
+      W: Phaser.Input.Keyboard.Key;
+      A: Phaser.Input.Keyboard.Key;
+      S: Phaser.Input.Keyboard.Key;
+      D: Phaser.Input.Keyboard.Key;
+    };
+  }
+
+  /**
+   * Creates the interaction prompt text
+   */
+  private createInteractionPrompt(): void {
+    this.interactionPrompt = this.add
+      .text(512, 150, '', {
+        fontFamily: 'Arial',
+        fontSize: 18,
+        color: '#ffffff',
+        backgroundColor: '#000000',
+        padding: { x: 10, y: 5 },
+        align: 'center',
+      })
+      .setOrigin(0.5)
+      .setVisible(false);
+  }
+
+  /**
+   * Updates the game state every frame
+   */
+  update(_time: number, delta: number): void {
+    this.handlePlayerMovement(delta);
+    this.checkNearbyInteractables();
+  }
+
+  /**
+   * Handles player movement based on keyboard input
+   * @param delta - Time elapsed since last frame in milliseconds
+   */
+  private handlePlayerMovement(delta: number): void {
+    if (!this.player || !this.cursors || !this.wasdKeys) return;
+
+    // Get current position
+    const currentX = this.player.x;
+    const currentY = this.player.y;
+
+    // Calculate movement (delta is in milliseconds, so convert to seconds)
+    const deltaSeconds = delta / 1000;
+    let newX = currentX;
+    let newY = currentY;
+
+    // Check for movement input (arrow keys or WASD)
+    if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
+      newX -= this.playerSpeed * deltaSeconds;
+    }
+    if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
+      newX += this.playerSpeed * deltaSeconds;
+    }
+    if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
+      newY -= this.playerSpeed * deltaSeconds;
+    }
+    if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
+      newY += this.playerSpeed * deltaSeconds;
+    }
+
+    // Clamp player within screen bounds
+    const padding = 25; // Half of player sprite size
+    newX = Phaser.Math.Clamp(newX, padding, 1024 - padding);
+    newY = Phaser.Math.Clamp(newY, padding, 768 - padding);
+
+    // Check for collisions before moving
+    if (!this.checkCollisions(newX, newY)) {
+      this.player.setPosition(newX, newY);
+    }
+  }
+
+  /**
+   * Checks if the player would collide with buildings or NPCs at the given position
+   * @param x - The x coordinate to check
+   * @param y - The y coordinate to check
+   * @returns true if collision detected, false otherwise
+   */
+  private checkCollisions(x: number, y: number): boolean {
+    const playerBounds = new Phaser.Geom.Rectangle(
+      x - 25, // Player sprite half-width
+      y - 25, // Player sprite half-height
+      50,     // Player sprite width
+      50      // Player sprite height
+    );
+
+    // Check collision with buildings
+    const buildings = [this.school, this.library, this.cafe, this.shop];
+    for (const building of buildings) {
+      if (building) {
+        const buildingBounds = new Phaser.Geom.Rectangle(
+          building.x - building.width / 2,
+          building.y - building.height / 2,
+          building.width,
+          building.height
+        );
+
+        if (Phaser.Geom.Rectangle.Overlaps(playerBounds, buildingBounds)) {
+          return true; // Collision detected
+        }
+      }
+    }
+
+    // Check collision with NPCs
+    const npcs = [this.teacher, this.librarian, this.shopkeeper];
+    for (const npc of npcs) {
+      if (npc) {
+        const npcBounds = new Phaser.Geom.Rectangle(
+          npc.x - 30, // NPC radius + padding
+          npc.y - 30,
+          60,         // NPC diameter + padding
+          60
+        );
+
+        if (Phaser.Geom.Rectangle.Overlaps(playerBounds, npcBounds)) {
+          return true; // Collision detected
+        }
+      }
+    }
+
+    return false; // No collision
+  }
+
+  /**
+   * Checks for nearby interactable objects and updates the interaction prompt
+   */
+  private checkNearbyInteractables(): void {
+    if (!this.player) return;
+
+    const interactionDistance = 80; // Distance threshold for interaction
+    const playerX = this.player.x;
+    const playerY = this.player.y;
+    let nearestObject = null;
+    let nearestDistance = Infinity;
+    let interactionText = '';
+
+    // Check distance to buildings
+    const buildingData = [
+      { obj: this.school, name: 'School', text: 'Press CLICK to enter School' },
+      { obj: this.library, name: 'Library', text: 'Press CLICK to enter Library' },
+      { obj: this.cafe, name: 'Cafe', text: 'Press CLICK to enter Cafe' },
+      { obj: this.shop, name: 'Shop', text: 'Press CLICK to enter Shop' },
+    ];
+
+    for (const building of buildingData) {
+      if (building.obj) {
+        const distance = Phaser.Math.Distance.Between(
+          playerX,
+          playerY,
+          building.obj.x,
+          building.obj.y
+        );
+
+        if (distance < interactionDistance && distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestObject = building.name;
+          interactionText = building.text;
+        }
+      }
+    }
+
+    // Check distance to NPCs
+    const npcData = [
+      { obj: this.teacher, name: 'Ms. Smith', text: 'Press CLICK to talk to Ms. Smith' },
+      { obj: this.librarian, name: 'Mr. Johnson', text: 'Press CLICK to talk to Mr. Johnson' },
+      { obj: this.shopkeeper, name: 'Mr. Brown', text: 'Press CLICK to talk to Mr. Brown' },
+    ];
+
+    for (const npc of npcData) {
+      if (npc.obj) {
+        const distance = Phaser.Math.Distance.Between(
+          playerX,
+          playerY,
+          npc.obj.x,
+          npc.obj.y
+        );
+
+        if (distance < interactionDistance && distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestObject = npc.name;
+          interactionText = npc.text;
+        }
+      }
+    }
+
+    // Update interaction prompt
+    if (nearestObject && nearestDistance < interactionDistance) {
+      if (this.nearbyInteractable !== nearestObject) {
+        this.nearbyInteractable = nearestObject;
+        this.interactionPrompt.setText(interactionText);
+        this.interactionPrompt.setVisible(true);
+      }
+    } else {
+      if (this.nearbyInteractable !== null) {
+        this.nearbyInteractable = null;
+        this.interactionPrompt.setVisible(false);
+      }
+    }
   }
 
   /**
