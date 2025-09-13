@@ -1,11 +1,19 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/GameConfig';
+
+interface LearningProgress {
+  grammar: number;
+  vocabulary: number;
+  reading: number;
+  conversation: number;
+}
 import { BasePlayerController } from '../controllers/BasePlayerController';
 import { TownEnvironmentBuilder } from '../builders/TownEnvironmentBuilder';
 import { NPCManager } from '../managers/NPCManager';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { CollisionSystem } from '../systems/CollisionSystem';
+import { GameHUD } from '../ui/GameHUD';
 
 /**
  * Main game scene showing the English Learning Town
@@ -19,6 +27,7 @@ export class Game extends Scene {
   private townBuilder: TownEnvironmentBuilder;
   private npcManager: NPCManager;
   private interactionSystem: InteractionSystem;
+  private gameHUD: GameHUD;
 
   // Game objects for collision detection
   private buildings: (Phaser.GameObjects.Rectangle | null)[] = [];
@@ -37,6 +46,7 @@ export class Game extends Scene {
     this.createInstructions();
     this.setupGameSystems();
     this.createPlayer(data?.exitBuilding);
+    this.initializeHUD();
 
     EventBus.emit('current-scene-ready', this);
   }
@@ -92,13 +102,42 @@ export class Game extends Scene {
    * Creates the player sprite
    */
   private createPlayer(exitBuilding?: string): void {
-    let playerPosition = { x: GameConfig.UI.centerX, y: 580 };
+    let playerPosition: { x: number; y: number } = { x: GameConfig.UI.centerX, y: 580 };
 
     if (exitBuilding) {
       playerPosition = this.playerController.positionPlayerFromBuilding(exitBuilding);
     }
 
     this.playerController.createPlayer(playerPosition.x, playerPosition.y, false);
+  }
+
+  /**
+   * Initializes the HUD system and sets up progress update listeners
+   */
+  private initializeHUD(): void {
+    // Create the HUD
+    this.gameHUD = new GameHUD(this);
+
+    // Set up event listeners for progress updates
+    EventBus.on('update-learning-progress', (data: { skill: string; value: number }) => {
+      if (this.gameHUD) {
+        this.gameHUD.updateProgress(data.skill as keyof LearningProgress, data.value);
+      }
+    });
+
+    // Set up event listener for bulk progress updates
+    EventBus.on('update-all-progress', (progress: Partial<LearningProgress>) => {
+      if (this.gameHUD) {
+        this.gameHUD.updateAllProgress(progress);
+      }
+    });
+
+    // Set up event listener for HUD notifications
+    EventBus.on('show-progress-notification', (data: { message: string; duration?: number }) => {
+      if (this.gameHUD) {
+        this.gameHUD.showNotification(data.message, data.duration);
+      }
+    });
   }
 
   /**
@@ -131,6 +170,14 @@ export class Game extends Scene {
     if (this.interactionSystem) {
       this.interactionSystem.destroy();
     }
+    if (this.gameHUD) {
+      this.gameHUD.destroy();
+    }
+
+    // Clean up event listeners
+    EventBus.removeListener('update-learning-progress');
+    EventBus.removeListener('update-all-progress');
+    EventBus.removeListener('show-progress-notification');
   }
 
   /**

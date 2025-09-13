@@ -41,8 +41,12 @@ interface InteractionStyle extends FontStyle {
  * Using const assertion and proper typing instead of class-only static pattern
  */
 export const GameConfig = {
-  screenWidth: 1024,
-  screenHeight: 768,
+  get screenWidth() {
+    return window.visualViewport?.width ?? window.innerWidth;
+  },
+  get screenHeight() {
+    return window.visualViewport?.height ?? window.innerHeight;
+  },
 
   PLAYER: {
     SPEED: 200,
@@ -195,8 +199,12 @@ export const GameConfig = {
   },
 
   UI: {
-    centerX: 512,
-    centerY: 384,
+    get centerX() {
+      return (window.visualViewport?.width ?? window.innerWidth) / 2;
+    },
+    get centerY() {
+      return (window.visualViewport?.height ?? window.innerHeight) / 2;
+    },
     fontSizes: {
       HUGE: 48,
       LARGE: 32,

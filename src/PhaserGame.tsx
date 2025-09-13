@@ -25,7 +25,20 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(({ currentActiveSce
       }
     }
 
+    const handleResize = () => {
+      if (game.current) {
+        const width = window.visualViewport?.width ?? window.innerWidth;
+        const height = window.visualViewport?.height ?? window.innerHeight;
+        game.current.scale.resize(width, height);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+
     return () => {
+      window.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('resize', handleResize);
       if (game.current) {
         game.current.destroy(true);
         if (game.current !== null) {

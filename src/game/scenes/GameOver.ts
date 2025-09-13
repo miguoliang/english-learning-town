@@ -44,9 +44,9 @@ export class GameOver extends Scene {
   private createUI(): void {
     // Congratulations text
     const congratsText = this.add
-      .text(GameConfig.UI.centerX, 200, 'Congratulations! 🎉', {
+      .text(GameConfig.UI.centerX, GameConfig.screenHeight * 0.25, 'Congratulations! 🎉', {
         fontFamily: 'Arial Black',
-        fontSize: GameConfig.UI.fontSizes.HUGE,
+        fontSize: Math.min(GameConfig.screenWidth / 15, GameConfig.UI.fontSizes.HUGE),
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 6,
@@ -57,14 +57,19 @@ export class GameOver extends Scene {
 
     // Learning completion text
     this.add
-      .text(GameConfig.UI.centerX, 300, "You've made great progress\nin English Learning Town!", {
-        fontFamily: 'Arial',
-        fontSize: GameConfig.UI.fontSizes.LARGE,
-        color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 4,
-        align: 'center',
-      })
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.4,
+        "You've made great progress\nin English Learning Town!",
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 25, GameConfig.UI.fontSizes.LARGE),
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 4,
+          align: 'center',
+        }
+      )
       .setOrigin(0.5)
       .setDepth(100);
 
@@ -72,11 +77,11 @@ export class GameOver extends Scene {
     this.add
       .text(
         GameConfig.UI.centerX,
-        500,
+        GameConfig.screenHeight * 0.65,
         'Click anywhere to return to town\nand continue learning!',
         {
           fontFamily: 'Arial',
-          fontSize: GameConfig.UI.fontSizes.MEDIUM,
+          fontSize: Math.min(GameConfig.screenWidth / 35, GameConfig.UI.fontSizes.MEDIUM),
           color: '#ffffff',
           stroke: '#000000',
           strokeThickness: 3,
@@ -96,10 +101,10 @@ export class GameOver extends Scene {
   private setupCelebrationEffects(): void {
     // Create floating stars
     this.celebrationEffects.createFloatingStars(10, {
-      x: 100,
-      y: 400,
-      width: 824,
-      height: 300,
+      x: GameConfig.screenWidth * 0.1,
+      y: GameConfig.screenHeight * 0.5,
+      width: GameConfig.screenWidth * 0.8,
+      height: GameConfig.screenHeight * 0.4,
     });
 
     // Create confetti effect

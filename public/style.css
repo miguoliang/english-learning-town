@@ -4,29 +4,32 @@ body {
   color: rgba(255, 255, 255, 0.87);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: 'Arial', sans-serif;
-  min-height: 100vh;
+  height: 100svh; /* Small viewport height - excludes browser UI */
+  overflow: hidden;
 }
 
 #app {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  gap: 15px;
+  height: 100svh; /* Small viewport height */
+  width: 100svw; /* Small viewport width */
 }
 
 #game-container {
-  margin: 10px;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   padding: 0;
   border: 0;
   position: relative;
 }
 
 #game-container canvas {
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* Learning Progress Panel */

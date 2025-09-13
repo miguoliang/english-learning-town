@@ -1,6 +1,7 @@
 import { GameObjects, Scene } from 'phaser';
 
 import { EventBus } from '../EventBus';
+import { GameConfig } from '../config/GameConfig';
 
 export class MainMenu extends Scene {
   background: GameObjects.Image;
@@ -13,14 +14,23 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    this.background = this.add.image(512, 384, 'background');
+    const centerX = GameConfig.screenWidth / 2;
+    const centerY = GameConfig.screenHeight / 2;
 
-    this.logo = this.add.image(512, 300, 'logo').setDepth(100);
+    this.background = this.add.image(centerX, centerY, 'background');
+
+    // Scale background to fill screen
+    const scaleX = GameConfig.screenWidth / this.background.width;
+    const scaleY = GameConfig.screenHeight / this.background.height;
+    const scale = Math.max(scaleX, scaleY);
+    this.background.setScale(scale);
+
+    this.logo = this.add.image(centerX, centerY - 100, 'logo').setDepth(100);
 
     this.title = this.add
-      .text(512, 460, 'Welcome to English Learning Town!', {
+      .text(centerX, centerY + 80, 'Welcome to English Learning Town!', {
         fontFamily: 'Arial Black',
-        fontSize: 32,
+        fontSize: Math.min(GameConfig.screenWidth / 20, 32),
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 8,
@@ -31,9 +41,9 @@ export class MainMenu extends Scene {
 
     // Add subtitle
     this.add
-      .text(512, 520, 'Click to Enter the Town', {
+      .text(centerX, centerY + 140, 'Click to Enter the Town', {
         fontFamily: 'Arial',
-        fontSize: 18,
+        fontSize: Math.min(GameConfig.screenWidth / 30, 18),
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 4,
@@ -69,8 +79,8 @@ export class MainMenu extends Scene {
     } else {
       this.logoTween = this.tweens.add({
         targets: this.logo,
-        x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
-        y: { value: 80, duration: 1500, ease: 'Sine.easeOut' },
+        x: { value: GameConfig.screenWidth * 0.75, duration: 3000, ease: 'Back.easeInOut' },
+        y: { value: GameConfig.screenHeight * 0.1, duration: 1500, ease: 'Sine.easeOut' },
         yoyo: true,
         repeat: -1,
         onUpdate: () => {

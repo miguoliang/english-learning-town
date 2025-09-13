@@ -33,9 +33,6 @@ function App() {
     conversation: 0,
   });
 
-  // Current scene tracking
-  const [currentSceneName, setCurrentSceneName] = useState<string>('');
-
   useEffect(() => {
     // Listen for building/location entry events
     EventBus.on('enter-school', handleEnterLocation);
@@ -66,12 +63,28 @@ function App() {
   };
 
   const completeLearningActivity = (activityType: keyof LearningProgress) => {
-    setLearningProgress(prev => ({
-      ...prev,
-      [activityType]: Math.min(prev[activityType] + 10, 100),
-    }));
+    const newProgress = {
+      ...learningProgress,
+      [activityType]: Math.min(learningProgress[activityType] + 10, 100),
+    };
+
+    setLearningProgress(newProgress);
     setShowLearningModule(false);
     setCurrentActivity(null);
+
+    // Update the in-game HUD
+    EventBus.emit('update-learning-progress', {
+      skill: activityType,
+      value: newProgress[activityType],
+    });
+
+    // Show achievement notification if completed a milestone
+    if (newProgress[activityType] % 25 === 0) {
+      EventBus.emit('show-progress-notification', {
+        message: `${activityType.charAt(0).toUpperCase() + activityType.slice(1)} progress: ${newProgress[activityType]}%!`,
+        duration: 3000,
+      });
+    }
   };
 
   const closeLearningModule = () => {
@@ -81,7 +94,10 @@ function App() {
 
   // Event emitted from the PhaserGame component
   const currentScene = (scene: Phaser.Scene) => {
-    setCurrentSceneName(scene.scene.key);
+    // Initialize HUD with current progress when Game scene is ready
+    if (scene.scene.key === 'Game') {
+      EventBus.emit('update-all-progress', learningProgress);
+    }
   };
 
   const renderLearningModule = () => {
@@ -192,68 +208,6 @@ function App() {
   return (
     <div id='app'>
       <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-
-      {/* Learning Progress Panel */}
-      <div className='progress-panel'>
-        <h3>🎓 Learning Progress</h3>
-        <div className='progress-bars'>
-          <div className='progress-item'>
-            <span>📝 Grammar:</span>
-            <div className='progress-bar'>
-              <div
-                className='progress-fill'
-                style={{ width: `${learningProgress.grammar}%` }}
-              ></div>
-            </div>
-            <span>{learningProgress.grammar}%</span>
-          </div>
-          <div className='progress-item'>
-            <span>📚 Reading:</span>
-            <div className='progress-bar'>
-              <div
-                className='progress-fill'
-                style={{ width: `${learningProgress.reading}%` }}
-              ></div>
-            </div>
-            <span>{learningProgress.reading}%</span>
-          </div>
-          <div className='progress-item'>
-            <span>🛒 Vocabulary:</span>
-            <div className='progress-bar'>
-              <div
-                className='progress-fill'
-                style={{ width: `${learningProgress.vocabulary}%` }}
-              ></div>
-            </div>
-            <span>{learningProgress.vocabulary}%</span>
-          </div>
-          <div className='progress-item'>
-            <span>💬 Conversation:</span>
-            <div className='progress-bar'>
-              <div
-                className='progress-fill'
-                style={{ width: `${learningProgress.conversation}%` }}
-              ></div>
-            </div>
-            <span>{learningProgress.conversation}%</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Game Info */}
-      <div className='game-info'>
-        <p>
-          <strong>Current Scene:</strong> {currentSceneName}
-        </p>
-        <p>
-          <strong>Instructions:</strong>{' '}
-          {currentSceneName === 'Game'
-            ? 'Click on buildings and NPCs to start learning!'
-            : currentSceneName === 'MainMenu'
-              ? 'Click anywhere to enter the town'
-              : 'Navigate through the learning experience'}
-        </p>
-      </div>
 
       {/* Learning Module Modal */}
       {showLearningModule && (
