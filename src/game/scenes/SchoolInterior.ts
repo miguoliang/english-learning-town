@@ -234,8 +234,8 @@ export class SchoolInterior extends Scene {
     if (!this.spaceKey || !this.nearExit) return;
 
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-      // Return to main game scene
-      this.scene.start('Game');
+      // Return to main game scene, positioned outside school
+      this.scene.start('Game', { exitBuilding: 'school' });
     }
   }
 }

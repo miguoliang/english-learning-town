@@ -295,7 +295,8 @@ export class ShopInterior extends Scene {
     if (!this.spaceKey || !this.nearExit) return;
 
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-      this.scene.start('Game');
+      // Return to main game scene, positioned outside shop
+      this.scene.start('Game', { exitBuilding: 'shop' });
     }
   }
 }

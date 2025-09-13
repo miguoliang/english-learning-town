@@ -272,7 +272,8 @@ export class CafeInterior extends Scene {
     if (!this.spaceKey || !this.nearExit) return;
 
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-      this.scene.start('Game');
+      // Return to main game scene, positioned outside cafe
+      this.scene.start('Game', { exitBuilding: 'cafe' });
     }
   }
 }

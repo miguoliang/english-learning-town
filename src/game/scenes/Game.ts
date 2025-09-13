@@ -28,7 +28,7 @@ export class Game extends Scene {
   private library: Phaser.GameObjects.Rectangle;
   private cafe: Phaser.GameObjects.Rectangle;
   private shop: Phaser.GameObjects.Rectangle;
-  
+
   // Town center fountain
   private fountain: Phaser.GameObjects.Arc;
 
@@ -41,7 +41,7 @@ export class Game extends Scene {
     super('Game');
   }
 
-  create() {
+  create(data?: { exitBuilding?: string }) {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0x87ceeb); // Sky blue background
 
@@ -73,7 +73,7 @@ export class Game extends Scene {
       })
       .setOrigin(0.5);
 
-    this.createPlayer();
+    this.createPlayer(data?.exitBuilding);
     this.createBuildings();
     this.createNPCs();
     this.setupInteractions();
@@ -85,10 +85,30 @@ export class Game extends Scene {
 
   /**
    * Creates the player sprite
+   * @param exitBuilding - If provided, positions player on south side of this building
    */
-  private createPlayer(): void {
-    // Create player sprite near the town entrance (bottom of main road)
-    this.player = this.add.image(512, 580, 'star');
+  private createPlayer(exitBuilding?: string): void {
+    let playerX = 512;
+    let playerY = 580;
+
+    // Position player on south side of building they just exited from
+    if (exitBuilding) {
+      const buildingPositions = {
+        school: { x: 200, y: 150, height: 100 },
+        library: { x: 824, y: 150, height: 100 },
+        cafe: { x: 300, y: 500, height: 90 },
+        shop: { x: 724, y: 500, height: 90 }
+      };
+
+      const building = buildingPositions[exitBuilding as keyof typeof buildingPositions];
+      if (building) {
+        playerX = building.x;
+        playerY = building.y + (building.height / 2) + 40; // South side + padding
+      }
+    }
+
+    // Create player sprite at calculated position
+    this.player = this.add.image(playerX, playerY, 'star');
     this.player.setScale(0.5); // Make it smaller
     this.player.setTint(0x4169e1); // Royal blue tint to distinguish from other objects
   }
