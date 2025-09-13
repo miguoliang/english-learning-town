@@ -45,6 +45,9 @@ export class Game extends Scene {
     // Create ground
     this.add.rectangle(512, 600, 1024, 336, 0x90ee90); // Light green ground
 
+    // Create town roads/paths
+    this.createTownRoads();
+
     // Create town title
     this.add
       .text(512, 50, 'English Learning Town', {
@@ -81,8 +84,8 @@ export class Game extends Scene {
    * Creates the player sprite
    */
   private createPlayer(): void {
-    // Create player sprite at the bottom center of the screen
-    this.player = this.add.image(512, 550, 'star');
+    // Create player sprite near the town entrance (bottom of main road)
+    this.player = this.add.image(512, 580, 'star');
     this.player.setScale(0.5); // Make it smaller
     this.player.setTint(0x4169e1); // Royal blue tint to distinguish from other objects
   }
@@ -388,51 +391,149 @@ export class Game extends Scene {
   }
 
   /**
+   * Creates town roads and pathways
+   */
+  private createTownRoads(): void {
+    // Main horizontal road through town center
+    this.add.rectangle(512, 400, 1024, 80, 0x696969); // Dark gray road
+    this.add.rectangle(512, 400, 1024, 60, 0x808080); // Lighter gray road surface
+
+    // Main vertical road (town square access)
+    this.add.rectangle(512, 300, 80, 400, 0x696969); // Dark gray road
+    this.add.rectangle(512, 300, 60, 400, 0x808080); // Lighter gray road surface
+
+    // Road to school (upper left)
+    this.add.rectangle(300, 200, 200, 40, 0x696969); // Dark gray road
+    this.add.rectangle(300, 200, 180, 30, 0x808080); // Lighter gray road surface
+
+    // Road to library (upper right)  
+    this.add.rectangle(724, 200, 200, 40, 0x696969); // Dark gray road
+    this.add.rectangle(724, 200, 180, 30, 0x808080); // Lighter gray road surface
+
+    // Town center fountain/plaza
+    this.add.circle(512, 320, 50, 0x4169e1); // Blue fountain base
+    this.add.circle(512, 320, 35, 0x87ceeb); // Light blue water
+    this.add.circle(512, 320, 15, 0x4682b4); // Fountain center
+    this.add
+      .text(512, 320, '⛲', {
+        fontFamily: 'Arial',
+        fontSize: 30,
+      })
+      .setOrigin(0.5);
+
+    // Add some decorative trees and benches around town center
+    this.add
+      .text(450, 280, '🌳', { fontFamily: 'Arial', fontSize: 24 })
+      .setOrigin(0.5);
+    this.add
+      .text(574, 280, '🌳', { fontFamily: 'Arial', fontSize: 24 })
+      .setOrigin(0.5);
+    this.add
+      .text(450, 360, '🪑', { fontFamily: 'Arial', fontSize: 16 })
+      .setOrigin(0.5);
+    this.add
+      .text(574, 360, '🪑', { fontFamily: 'Arial', fontSize: 16 })
+      .setOrigin(0.5);
+
+    // Add street signs
+    this.add.rectangle(400, 380, 4, 40, 0x654321); // Sign post
+    this.add
+      .text(400, 365, '🏫←  →📚', {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#ffffff',
+        backgroundColor: '#2f4f2f',
+        padding: { x: 3, y: 2 },
+      })
+      .setOrigin(0.5);
+
+    this.add.rectangle(624, 380, 4, 40, 0x654321); // Sign post  
+    this.add
+      .text(624, 365, '☕←  →🛒', {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#ffffff',
+        backgroundColor: '#2f4f2f',
+        padding: { x: 3, y: 2 },
+      })
+      .setOrigin(0.5);
+
+    // Welcome sign at town entrance
+    this.add.rectangle(512, 620, 200, 40, 0x8b4513); // Sign base
+    this.add
+      .text(512, 620, '🎓 Welcome to English Learning Town 🎓', {
+        fontFamily: 'Arial',
+        fontSize: 14,
+        color: '#ffffff',
+        align: 'center',
+      })
+      .setOrigin(0.5);
+  }
+
+  /**
    * Creates the town buildings
    */
   private createBuildings(): void {
-    // School (red brick building)
-    this.school = this.add.rectangle(200, 300, 150, 120, 0xb22222);
+    // School (red brick building) - Educational district, upper left
+    this.school = this.add.rectangle(200, 150, 160, 100, 0xb22222);
     this.add
-      .text(200, 300, '🏫\nSCHOOL', {
+      .text(200, 150, '🏫\nSCHOOL', {
         fontFamily: 'Arial',
         fontSize: 16,
         color: '#ffffff',
         align: 'center',
       })
       .setOrigin(0.5);
+    // Add school yard fence
+    this.add.rectangle(200, 220, 180, 20, 0x654321);
 
-    // Library (brown building)
-    this.library = this.add.rectangle(400, 300, 150, 120, 0x8b4513);
+    // Library (brown building) - Educational district, upper right
+    this.library = this.add.rectangle(824, 150, 160, 100, 0x8b4513);
     this.add
-      .text(400, 300, '📚\nLIBRARY', {
+      .text(824, 150, '📚\nLIBRARY', {
         fontFamily: 'Arial',
         fontSize: 16,
         color: '#ffffff',
         align: 'center',
       })
       .setOrigin(0.5);
-
-    // Cafe (orange building)
-    this.cafe = this.add.rectangle(624, 300, 150, 120, 0xff8c00);
+    // Add library garden
     this.add
-      .text(624, 300, '☕\nCAFE', {
+      .text(824, 220, '🌺 🌻 🌺', { fontFamily: 'Arial', fontSize: 14 })
+      .setOrigin(0.5);
+
+    // Cafe (orange building) - Social hub, left side of town center
+    this.cafe = this.add.rectangle(300, 500, 140, 90, 0xff8c00);
+    this.add
+      .text(300, 500, '☕\nCAFE', {
         fontFamily: 'Arial',
         fontSize: 16,
         color: '#ffffff',
         align: 'center',
       })
       .setOrigin(0.5);
-
-    // Shop (purple building)
-    this.shop = this.add.rectangle(824, 300, 150, 120, 0x9370db);
+    // Add outdoor seating
     this.add
-      .text(824, 300, '🛒\nSHOP', {
+      .text(250, 540, '🪑☕🪑', { fontFamily: 'Arial', fontSize: 12 })
+      .setOrigin(0.5);
+    this.add
+      .text(350, 540, '🪑☕🪑', { fontFamily: 'Arial', fontSize: 12 })
+      .setOrigin(0.5);
+
+    // Shop (purple building) - Commercial district, right side of town center
+    this.shop = this.add.rectangle(724, 500, 140, 90, 0x9370db);
+    this.add
+      .text(724, 500, '🛒\nSHOP', {
         fontFamily: 'Arial',
         fontSize: 16,
         color: '#ffffff',
         align: 'center',
       })
+      .setOrigin(0.5);
+    // Add parking area
+    this.add.rectangle(724, 560, 120, 30, 0x2f4f2f);
+    this.add
+      .text(724, 560, '🚗 🚙 🚗', { fontFamily: 'Arial', fontSize: 12 })
       .setOrigin(0.5);
 
     // Make buildings interactive
@@ -453,16 +554,16 @@ export class Game extends Scene {
    * Creates NPCs (Non-Player Characters)
    */
   private createNPCs(): void {
-    // Teacher NPC
-    this.teacher = this.add.arc(200, 450, 25, 0, 360, false, 0xffb6c1);
+    // Teacher NPC - Near school playground area
+    this.teacher = this.add.arc(280, 240, 25, 0, 360, false, 0xffb6c1);
     this.add
-      .text(200, 450, '👩‍🏫', {
+      .text(280, 240, '👩‍🏫', {
         fontFamily: 'Arial',
         fontSize: 24,
       })
       .setOrigin(0.5);
     this.add
-      .text(200, 490, 'Ms. Smith', {
+      .text(280, 275, 'Ms. Smith', {
         fontFamily: 'Arial',
         fontSize: 14,
         color: '#2C5F41',
@@ -470,35 +571,107 @@ export class Game extends Scene {
       })
       .setOrigin(0.5);
 
-    // Librarian NPC
-    this.librarian = this.add.arc(400, 450, 25, 0, 360, false, 0xdda0dd);
+    // Librarian NPC - In library garden area, reading a book
+    this.librarian = this.add.arc(750, 240, 25, 0, 360, false, 0xdda0dd);
     this.add
-      .text(400, 450, '👨‍💼', {
+      .text(750, 240, '👨‍💼', {
         fontFamily: 'Arial',
         fontSize: 24,
       })
       .setOrigin(0.5);
     this.add
-      .text(400, 490, 'Mr. Johnson', {
+      .text(750, 275, 'Mr. Johnson', {
         fontFamily: 'Arial',
         fontSize: 14,
         color: '#2C5F41',
         align: 'center',
       })
       .setOrigin(0.5);
-
-    // Shopkeeper NPC
-    this.shopkeeper = this.add.arc(824, 450, 25, 0, 360, false, 0xf0e68c);
+    // Add a book in his hands
     this.add
-      .text(824, 450, '👨‍💼', {
+      .text(750, 210, '📖', {
+        fontFamily: 'Arial',
+        fontSize: 16,
+      })
+      .setOrigin(0.5);
+
+    // Shopkeeper NPC - Near the shop entrance, organizing goods
+    this.shopkeeper = this.add.arc(650, 520, 25, 0, 360, false, 0xf0e68c);
+    this.add
+      .text(650, 520, '👨‍💼', {
         fontFamily: 'Arial',
         fontSize: 24,
       })
       .setOrigin(0.5);
     this.add
-      .text(824, 490, 'Mr. Brown', {
+      .text(650, 555, 'Mr. Brown', {
         fontFamily: 'Arial',
         fontSize: 14,
+        color: '#2C5F41',
+        align: 'center',
+      })
+      .setOrigin(0.5);
+    // Add some boxes near him
+    this.add
+      .text(620, 540, '📦', {
+        fontFamily: 'Arial',
+        fontSize: 16,
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(680, 540, '📦', {
+        fontFamily: 'Arial',
+        fontSize: 16,
+      })
+      .setOrigin(0.5);
+
+    // Add some additional town folk for realism
+    // Cafe customer
+    this.add.arc(370, 470, 20, 0, 360, false, 0xffd700);
+    this.add
+      .text(370, 470, '👨‍🦱', {
+        fontFamily: 'Arial',
+        fontSize: 20,
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(370, 500, 'Customer', {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#2C5F41',
+        align: 'center',
+      })
+      .setOrigin(0.5);
+
+    // Person walking near fountain
+    this.add.arc(580, 360, 20, 0, 360, false, 0x98fb98);
+    this.add
+      .text(580, 360, '👩‍🦰', {
+        fontFamily: 'Arial',
+        fontSize: 20,
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(580, 390, 'Walker', {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#2C5F41',
+        align: 'center',
+      })
+      .setOrigin(0.5);
+
+    // Child playing near school
+    this.add.arc(150, 200, 15, 0, 360, false, 0xffb6c1);
+    this.add
+      .text(150, 200, '🧒', {
+        fontFamily: 'Arial',
+        fontSize: 18,
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(150, 225, 'Student', {
+        fontFamily: 'Arial',
+        fontSize: 10,
         color: '#2C5F41',
         align: 'center',
       })
