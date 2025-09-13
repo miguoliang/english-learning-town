@@ -4,7 +4,7 @@ const https = require('https');
 const main = async () => {
   const args = process.argv.slice(2);
   const packageData = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-  const event = args[0] || 'unknown';
+  const event = args[0] ?? 'unknown';
   const phaserVersion = packageData.dependencies.phaser;
 
   const options = {
@@ -22,12 +22,12 @@ const main = async () => {
       });
     });
 
-    req.on('error', error => {
+    req.on('error', () => {
       process.exit(1);
     });
 
     req.end();
-  } catch (error) {
+  } catch {
     // Silence is the canvas where the soul paints its most profound thoughts.
     process.exit(1);
   }

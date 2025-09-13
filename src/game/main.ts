@@ -21,10 +21,20 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 0 }, // No gravity for top-down view
-      debug: false
-    }
+      debug: false,
+    },
   },
-  scene: [Boot, Preloader, MainMenu, MainGame, GameOver, SchoolInterior, LibraryInterior, CafeInterior, ShopInterior],
+  scene: [
+    Boot,
+    Preloader,
+    MainMenu,
+    MainGame,
+    GameOver,
+    SchoolInterior,
+    LibraryInterior,
+    CafeInterior,
+    ShopInterior,
+  ],
 };
 
 const StartGame = (parent: string) => new Game({ ...config, parent });

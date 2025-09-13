@@ -1,19 +1,53 @@
-# Phaser React TypeScript Template
+# English Learning Town 🏫
 
-This is a Phaser 3 project template that uses the React framework and Vite for bundling. It includes a bridge for React to Phaser game communication, hot-reloading for quick development workflow and scripts to generate production-ready builds.
+An immersive and interactive English learning game built with Phaser 3, React, and TypeScript. Explore a charming town while mastering English through engaging activities, conversations with NPCs, and hands-on learning experiences.
 
-**[This Template is also available as a JavaScript version.](https://github.com/phaserjs/template-react)**
+## 🎮 Game Features
 
-### Versions
+- **Interactive Town Exploration**: Navigate through a beautifully crafted 2D town with arrow keys or WASD
+- **Educational Buildings**: Visit the school, library, cafe, and shop - each offering unique learning opportunities
+- **Smart NPCs**: Talk to teachers, librarians, and shopkeepers who guide your English learning journey
+- **Comprehensive Learning Activities**:
+  - 📝 Grammar lessons (Present Simple vs. Continuous, etc.)
+  - 🛒 Vocabulary building (shopping, everyday items)
+  - 📚 Reading comprehension exercises
+  - 💬 Interactive conversations
+- **Progress Tracking**: Monitor your advancement across different English skills
+- **Seamless Integration**: React-based UI components blend smoothly with Phaser gameplay
 
-This template has been updated for:
+### Technology Stack
 
-- [Phaser 3.90.0](https://github.com/phaserjs/phaser)
-- [React 19.0.0](https://github.com/facebook/react)
-- [Vite 6.3.1](https://github.com/vitejs/vite)
-- [TypeScript 5.7.2](https://github.com/microsoft/TypeScript)
+Built with modern web technologies for the best learning experience:
+
+- [Phaser 3.90.0](https://github.com/phaserjs/phaser) - Game engine
+- [React 19.0.0](https://github.com/facebook/react) - UI framework
+- [Vite 6.3.1](https://github.com/vitejs/vite) - Build tool
+- [TypeScript 5.7.2](https://github.com/microsoft/TypeScript) - Type safety
 
 ![screenshot](screenshot.png)
+
+## 🎮 How to Play
+
+### Controls
+
+- **Movement**: Use Arrow Keys or WASD to move your character around the town
+- **Interaction**: Press SPACEBAR to enter buildings or talk to NPCs
+- **Navigation**: Explore freely and discover learning opportunities throughout the town
+
+### Gameplay Guide
+
+1. **Start your Journey**: Begin in the town center and explore the different areas
+2. **Visit Buildings**: Enter the school, library, cafe, or shop by walking up to them and pressing SPACEBAR
+3. **Meet NPCs**: Talk to teachers, librarians, and other characters to start learning activities
+4. **Complete Activities**: Engage with grammar lessons, vocabulary exercises, and reading comprehension
+5. **Track Progress**: Watch your English skills improve across grammar, vocabulary, reading, and conversation
+
+### Learning Activities
+
+- **School**: Grammar lessons and structured English exercises with the teacher
+- **Library**: Reading comprehension and literature-based activities with the librarian
+- **Cafe**: Conversational English practice in a relaxed social setting
+- **Shop**: Vocabulary building through practical shopping scenarios with the shopkeeper
 
 ## Requirements
 
@@ -37,107 +71,91 @@ The local development server runs on `http://localhost:8080` by default. Please 
 
 Once the server is running you can edit any of the files in the `src` folder. Vite will automatically recompile your code and then reload the browser.
 
-## Template Project Structure
+## 🏗️ Project Structure
 
-We have provided a default project structure to get you started. This is as follows:
+The English Learning Town game is organized with a clear separation between React UI components and Phaser game scenes:
 
-| Path                   | Description                                                                                         |
-| ---------------------- | --------------------------------------------------------------------------------------------------- |
-| `index.html`           | A basic HTML page to contain the game.                                                              |
-| `src`                  | Contains the React client source code.                                                              |
-| `src/main.tsx`         | The main **React** entry point. This bootstraps the React application.                              |
-| `src/PhaserGame.tsx`   | The React component that initializes the Phaser Game and acts as a bridge between React and Phaser. |
-| `src/vite-env.d.ts`    | Global TypeScript declarations, providing type information.                                         |
-| `src/App.tsx`          | The main React component.                                                                           |
-| `src/game/EventBus.ts` | A simple event bus to communicate between React and Phaser.                                         |
-| `src/game`             | Contains the game source code.                                                                      |
-| `src/game/main.tsx`    | The main **game** entry point. This contains the game configuration and starts the game.            |
-| `src/game/scenes/`     | The folder where Phaser Scenes are located.                                                         |
-| `public/style.css`     | Some simple CSS rules to help with page layout.                                                     |
-| `public/assets`        | Contains the static assets used by the game.                                                        |
+| Path                                 | Description                                                                   |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| `index.html`                         | Main HTML page that hosts the game                                            |
+| `src/App.tsx`                        | React component managing learning modules, progress tracking, and UI overlays |
+| `src/PhaserGame.tsx`                 | Bridge component between React and Phaser, handles game initialization        |
+| `src/main.tsx`                       | React application entry point                                                 |
+| `src/game/main.ts`                   | Phaser game configuration and scene registration                              |
+| `src/game/EventBus.ts`               | Communication system between React components and Phaser scenes               |
+| **Game Scenes**                      |                                                                               |
+| `src/game/scenes/Boot.ts`            | Initial loading and setup scene                                               |
+| `src/game/scenes/Preloader.ts`       | Asset loading scene                                                           |
+| `src/game/scenes/MainMenu.ts`        | Game start menu and introduction                                              |
+| `src/game/scenes/Game.ts`            | Main town exploration scene with NPCs and buildings                           |
+| `src/game/scenes/SchoolInterior.ts`  | Indoor school environment for grammar lessons                                 |
+| `src/game/scenes/LibraryInterior.ts` | Indoor library environment for reading activities                             |
+| `src/game/scenes/CafeInterior.ts`    | Indoor cafe environment for conversation practice                             |
+| `src/game/scenes/ShopInterior.ts`    | Indoor shop environment for vocabulary building                               |
+| `src/game/scenes/GameOver.ts`        | End-of-session summary and progress display                                   |
+| **Assets & Configuration**           |                                                                               |
+| `public/assets/`                     | Game sprites, backgrounds, and visual assets                                  |
+| `public/style.css`                   | CSS styling for React components and learning modules                         |
 
-## React Bridge
+## 🔗 React-Phaser Integration
 
-The `PhaserGame.tsx` component is the bridge between React and Phaser. It initializes the Phaser game and passes events between the two.
+The English Learning Town seamlessly integrates React UI components with Phaser game scenes through a sophisticated event system:
 
-To communicate between React and Phaser, you can use the **EventBus.js** file. This is a simple event bus that allows you to emit and listen for events from both React and Phaser.
+### Learning Activity System
 
-```js
-// In React
-import { EventBus } from './EventBus';
+When players interact with NPCs or enter buildings, the Phaser game scenes emit events that trigger React-based learning modules:
 
-// Emit an event
-EventBus.emit('event-name', data);
+```ts
+// In Phaser scene (e.g., when talking to teacher)
+EventBus.emit('enter-school', {
+  activity: 'grammar-lesson',
+  npc: 'teacher',
+  name: 'Ms. Johnson',
+});
 
-// In Phaser
-// Listen for an event
-EventBus.on('event-name', data => {
-  // Do something with the data
+// In React App.tsx
+EventBus.on('enter-school', data => {
+  setCurrentActivity(data);
+  setShowLearningModule(true);
 });
 ```
 
-In addition to this, the `PhaserGame` component exposes the Phaser game instance along with the most recently active Phaser Scene using React forwardRef.
+### Progress Tracking
 
-Once exposed, you can access them like any regular react reference.
+Learning progress is managed in React state and persists across game sessions, allowing students to track their improvement in:
 
-## Phaser Scene Handling
+- Grammar understanding
+- Vocabulary expansion
+- Reading comprehension
+- Conversation skills
 
-In Phaser, the Scene is the lifeblood of your game. It is where you sprites, game logic and all of the Phaser systems live. You can also have multiple scenes running at the same time. This template provides a way to obtain the current active scene from React.
+## 🎓 Educational Design
 
-You can get the current Phaser Scene from the component event `"current-active-scene"`. In order to do this, you need to emit the event `"current-scene-ready"` from the Phaser Scene class. This event should be emitted when the scene is ready to be used. You can see this done in all of the Scenes in our template.
+English Learning Town is designed with pedagogical principles in mind:
 
-**Important**: When you add a new Scene to your game, make sure you expose to React by emitting the `"current-scene-ready"` event via the `EventBus`, like this:
+- **Contextual Learning**: English skills are taught within meaningful scenarios (shopping, conversations, reading)
+- **Progressive Difficulty**: Activities adapt to learner progress and build upon previous knowledge
+- **Interactive Engagement**: Game mechanics motivate continued learning through exploration and achievement
+- **Multi-Modal Learning**: Combines visual, textual, and interactive elements for different learning styles
+- **Immediate Feedback**: Instant responses help reinforce correct usage and identify areas for improvement
 
-```ts
-class MyScene extends Phaser.Scene {
-  constructor() {
-    super('MyScene');
-  }
+## 🚀 Getting Started
 
-  create() {
-    // Your Game Objects and logic here
+1. **Installation**
 
-    // At the end of create method:
-    EventBus.emit('current-scene-ready', this);
-  }
-}
-```
+   ```bash
+   npm install
+   ```
 
-You don't have to emit this event if you don't need to access the specific scene from React. Also, you don't have to emit it at the end of `create`, you can emit it at any point. For example, should your Scene be waiting for a network request or API call to complete, it could emit the event once that data is ready.
+2. **Start Learning**
 
-### React Component Example
+   ```bash
+   npm run dev
+   ```
 
-Here's an example of how to access Phaser data for use in a React Component:
+3. **Open your browser** to `http://localhost:8080` and begin your English learning adventure!
 
-```ts
-import { useRef } from 'react';
-import { IRefPhaserGame } from "./game/PhaserGame";
-
-// In a parent component
-const ReactComponent = () => {
-
-    const phaserRef = useRef<IRefPhaserGame>(); // you can access to this ref from phaserRef.current
-
-    const onCurrentActiveScene = (scene: Phaser.Scene) => {
-
-        // This is invoked
-
-    }
-
-    return (
-        ...
-        <PhaserGame ref={phaserRef} currentActiveScene={onCurrentActiveScene} />
-        ...
-    );
-
-}
-```
-
-In the code above, you can get a reference to the current Phaser Game instance and the current Scene by creating a reference with `useRef()` and assign to PhaserGame component.
-
-From this state reference, the game instance is available via `phaserRef.current.game` and the most recently active Scene via `phaserRef.current.scene`.
-
-The `onCurrentActiveScene` callback will also be invoked whenever the the Phaser Scene changes, as long as you emit the event via the EventBus, as outlined above.
+4. **Explore the Town**: Use arrow keys or WASD to move around, and press SPACEBAR to interact with buildings and NPCs.
 
 ## Handling Assets
 
@@ -222,21 +240,34 @@ After:
 },
 ```
 
-Either of these will stop `log.js` from running. If you do decide to do this, please could you at least join our Discord and tell us which template you're using! Or send us a quick email. Either will be super-helpful, thank you.
+Either of these will stop `log.js` from running.
 
-## Join the Phaser Community!
+## 🌟 Contributing
 
-We love to see what developers like you create with Phaser! It really motivates us to keep improving. So please join our community and show-off your work 😄
+English Learning Town is an educational project designed to make English learning fun and interactive. Whether you're an educator, developer, or language learning enthusiast, contributions are welcome!
 
-**Visit:** The [Phaser website](https://phaser.io) and follow on [Phaser Twitter](https://twitter.com/phaser_)<br />
-**Play:** Some of the amazing games [#madewithphaser](https://twitter.com/search?q=%23madewithphaser&src=typed_query&f=live)<br />
-**Learn:** [API Docs](https://newdocs.phaser.io), [Support Forum](https://phaser.discourse.group/) and [StackOverflow](https://stackoverflow.com/questions/tagged/phaser-framework)<br />
-**Discord:** Join us on [Discord](https://discord.gg/phaser)<br />
-**Code:** 2000+ [Examples](https://labs.phaser.io)<br />
-**Read:** The [Phaser World](https://phaser.io/community/newsletter) Newsletter<br />
+### Ways to Contribute
 
-Created by [Phaser Studio](mailto:support@phaser.io). Powered by coffee, anime, pixels and love.
+- **Educational Content**: Add new vocabulary sets, grammar exercises, or reading materials
+- **Game Features**: Implement new buildings, NPCs, or interactive elements
+- **Accessibility**: Improve the game for learners with different needs
+- **Localization**: Help translate the interface for international learners
+- **Bug Reports**: Help us identify and fix issues
 
-The Phaser logo and characters are &copy; 2011 - 2025 Phaser Studio Inc.
+## 📚 Educational Resources
 
-All rights reserved.
+This game is built on proven language learning methodologies:
+
+- **Task-Based Learning**: Real-world scenarios provide context for language use
+- **Gamification**: Achievement systems motivate continued engagement
+- **Immersive Environment**: Town exploration creates a memorable learning experience
+
+## 🤝 Acknowledgments
+
+Built with [Phaser 3](https://phaser.io) for robust 2D game development and [React](https://react.dev) for responsive educational interfaces.
+
+Special thanks to educators and language learning researchers whose methodologies inspire this interactive approach to English education.
+
+---
+
+**English Learning Town** - Making English learning an adventure, one building at a time! 🏫✨

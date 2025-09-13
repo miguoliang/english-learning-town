@@ -1,12 +1,15 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { GameConfig } from '../config/GameConfig';
+import { CelebrationEffects } from '../ui/CelebrationEffects';
 
+/**
+ * Game Over scene showing completion message and celebration effects
+ */
 export class GameOver extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   background: Phaser.GameObjects.Image;
-  completionText: Phaser.GameObjects.Text;
-  congratsText: Phaser.GameObjects.Text;
-  restartText: Phaser.GameObjects.Text;
+  private celebrationEffects: CelebrationEffects;
 
   constructor() {
     super('GameOver');
@@ -14,16 +17,36 @@ export class GameOver extends Scene {
 
   create() {
     this.camera = this.cameras.main;
-    this.camera.setBackgroundColor(0x4caf50); // Green background for success
+    this.camera.setBackgroundColor(GameConfig.COLORS.successGreen);
 
-    this.background = this.add.image(512, 384, 'background');
+    // Initialize celebration effects system
+    this.celebrationEffects = new CelebrationEffects(this);
+
+    this.createBackground();
+    this.createUI();
+    this.setupCelebrationEffects();
+    this.setupInteraction();
+
+    EventBus.emit('current-scene-ready', this);
+  }
+
+  /**
+   * Creates the background image
+   */
+  private createBackground(): void {
+    this.background = this.add.image(GameConfig.UI.centerX, GameConfig.UI.centerY, 'background');
     this.background.setAlpha(0.3);
+  }
 
+  /**
+   * Creates all UI elements
+   */
+  private createUI(): void {
     // Congratulations text
-    this.congratsText = this.add
-      .text(512, 200, 'Congratulations! 🎉', {
+    const congratsText = this.add
+      .text(GameConfig.UI.centerX, 200, 'Congratulations! 🎉', {
         fontFamily: 'Arial Black',
-        fontSize: 48,
+        fontSize: GameConfig.UI.fontSizes.HUGE,
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 6,
@@ -33,10 +56,10 @@ export class GameOver extends Scene {
       .setDepth(100);
 
     // Learning completion text
-    this.completionText = this.add
-      .text(512, 300, "You've made great progress\nin English Learning Town!", {
+    this.add
+      .text(GameConfig.UI.centerX, 300, "You've made great progress\nin English Learning Town!", {
         fontFamily: 'Arial',
-        fontSize: 32,
+        fontSize: GameConfig.UI.fontSizes.LARGE,
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 4,
@@ -45,68 +68,70 @@ export class GameOver extends Scene {
       .setOrigin(0.5)
       .setDepth(100);
 
-    // Add some celebration elements
-    this.createCelebrationEffects();
-
     // Restart instruction
-    this.restartText = this.add
-      .text(512, 500, 'Click anywhere to return to town\nand continue learning!', {
-        fontFamily: 'Arial',
-        fontSize: 20,
-        color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 3,
-        align: 'center',
-      })
+    this.add
+      .text(
+        GameConfig.UI.centerX,
+        500,
+        'Click anywhere to return to town\nand continue learning!',
+        {
+          fontFamily: 'Arial',
+          fontSize: GameConfig.UI.fontSizes.MEDIUM,
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 3,
+          align: 'center',
+        }
+      )
       .setOrigin(0.5)
       .setDepth(100);
 
-    // Make scene clickable to restart
-    this.input.once('pointerdown', () => {
-      this.changeScene();
-    });
-
-    EventBus.emit('current-scene-ready', this);
+    // Apply bounce effect to congratulations text
+    this.celebrationEffects.createBounceEffect(congratsText);
   }
 
   /**
-   * Creates celebration visual effects
+   * Sets up celebration effects
    */
-  private createCelebrationEffects(): void {
-    // Create floating stars animation
-    for (let i = 0; i < 10; i++) {
-      const star = this.add.text(
-        Phaser.Math.Between(100, 924),
-        Phaser.Math.Between(400, 700),
-        '⭐',
-        { fontSize: '24px' }
+  private setupCelebrationEffects(): void {
+    // Create floating stars
+    this.celebrationEffects.createFloatingStars(10, {
+      x: 100,
+      y: 400,
+      width: 824,
+      height: 300,
+    });
+
+    // Create confetti effect
+    this.celebrationEffects.createConfettiEffect(5000);
+
+    // Create particle explosion at center after delay
+    this.time.delayedCall(1000, () => {
+      this.celebrationEffects.createParticleExplosion(
+        GameConfig.UI.centerX,
+        GameConfig.UI.centerY,
+        {
+          count: 15,
+          colors: [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0xf0932b],
+          duration: 2500,
+        }
       );
-
-      // Animate stars floating up
-      this.tweens.add({
-        targets: star,
-        y: star.y - 200,
-        alpha: 0,
-        duration: 3000 + Math.random() * 2000,
-        delay: Math.random() * 1000,
-        ease: 'Power2',
-        repeat: -1,
-      });
-    }
-
-    // Create title bounce effect
-    this.tweens.add({
-      targets: this.congratsText,
-      scaleX: 1.1,
-      scaleY: 1.1,
-      duration: 1000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
     });
   }
 
-  changeScene() {
+  /**
+   * Sets up click interaction to restart
+   */
+  private setupInteraction(): void {
+    this.input.once('pointerdown', () => {
+      this.changeScene();
+    });
+  }
+
+  /**
+   * Changes to the main menu scene
+   */
+  changeScene(): void {
     this.scene.start('MainMenu');
   }
 }

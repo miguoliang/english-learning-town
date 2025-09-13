@@ -87,13 +87,13 @@ function App() {
   const renderLearningModule = () => {
     if (!currentActivity) return null;
 
-    const { activity, npc, name, greeting, location } = currentActivity;
+    const { activity, npc, name, greeting } = currentActivity;
 
     switch (activity) {
       case 'grammar-lesson':
         return (
           <div className='learning-module grammar'>
-            <h2>📝 Grammar Lesson with {name || npc}</h2>
+            <h2>📝 Grammar Lesson with {name ?? npc}</h2>
             <p className='greeting'>{greeting}</p>
             <div className='lesson-content'>
               <h3>Present Simple vs Present Continuous</h3>
@@ -115,7 +115,7 @@ function App() {
       case 'vocabulary-shopping':
         return (
           <div className='learning-module vocabulary'>
-            <h2>🛒 Shopping Vocabulary with {name || npc}</h2>
+            <h2>🛒 Shopping Vocabulary with {name ?? npc}</h2>
             <p className='greeting'>{greeting}</p>
             <div className='lesson-content'>
               <h3>Shopping Items</h3>
@@ -136,7 +136,7 @@ function App() {
       case 'reading-comprehension':
         return (
           <div className='learning-module reading'>
-            <h2>📚 Reading Comprehension with {name || npc}</h2>
+            <h2>📚 Reading Comprehension with {name ?? npc}</h2>
             <p className='greeting'>{greeting}</p>
             <div className='lesson-content'>
               <h3>Short Story</h3>
