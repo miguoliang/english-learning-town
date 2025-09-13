@@ -29,11 +29,11 @@ export class LibraryElementsBuilder {
   private createBookshelves(): void {
     const shelfConfig = {
       count: 6,
-      startX: 150,
-      spacing: 120,
-      y: 200,
-      width: 80,
-      height: 120,
+      startX: GameConfig.screenWidth * 0.15,
+      spacing: GameConfig.screenWidth * 0.12,
+      y: GameConfig.screenHeight * 0.26,
+      width: GameConfig.screenWidth * 0.08,
+      height: GameConfig.screenHeight * 0.16,
     };
 
     for (let i = 0; i < shelfConfig.count; i++) {
@@ -49,13 +49,12 @@ export class LibraryElementsBuilder {
       );
 
       // Add books to the shelf
-      this.scene.add
-        .text(x, shelfConfig.y, '📖\n📗\n📘\n📙', {
-          fontFamily: 'Arial',
-          fontSize: 16,
-          align: 'center',
-        })
-        .setOrigin(0.5);
+      for (let j = 0; j < 4; j++) {
+        this.scene.add
+          .image(x, shelfConfig.y - 20 + j * 10, 'item_book')
+          .setScale(0.4)
+          .setOrigin(0.5);
+      }
     }
   }
 
@@ -65,16 +64,22 @@ export class LibraryElementsBuilder {
   private createReadingTables(): void {
     const tableConfig = {
       count: 3,
-      startX: 250,
-      spacing: 200,
-      y: 400,
-      tableSize: { width: 120, height: 80 },
-      chairSize: { width: 30, height: 30 },
+      startX: GameConfig.screenWidth * 0.25,
+      spacing: GameConfig.screenWidth * 0.2,
+      y: GameConfig.screenHeight * 0.52,
+      tableSize: {
+        width: GameConfig.screenWidth * 0.12,
+        height: GameConfig.screenHeight * 0.1,
+      },
+      chairSize: {
+        width: GameConfig.screenWidth * 0.03,
+        height: GameConfig.screenHeight * 0.04,
+      },
       chairOffsets: [
-        { x: -50, y: 0 }, // Left
-        { x: 50, y: 0 }, // Right
-        { x: 0, y: -40 }, // Top
-        { x: 0, y: 40 }, // Bottom
+        { x: -GameConfig.screenWidth * 0.05, y: 0 }, // Left
+        { x: GameConfig.screenWidth * 0.05, y: 0 }, // Right
+        { x: 0, y: -GameConfig.screenHeight * 0.05 }, // Top
+        { x: 0, y: GameConfig.screenHeight * 0.05 }, // Bottom
       ],
     };
 
@@ -104,7 +109,8 @@ export class LibraryElementsBuilder {
 
       // Add books on table
       this.scene.add
-        .text(tableX, tableY, '📚', { fontFamily: 'Arial', fontSize: 20 })
+        .image(tableX, tableY, 'item_book')
+        .setScale(0.6)
         .setOrigin(0.5);
     }
   }
@@ -113,13 +119,25 @@ export class LibraryElementsBuilder {
    * Creates the librarian's service desk
    */
   private createLibrarianDesk(): void {
-    this.createRoomElement(GameConfig.UI.centerX, 300, 120, 80, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.39,
+      GameConfig.screenWidth * 0.12,
+      GameConfig.screenHeight * 0.1,
+      GameConfig.COLORS.brownWall
+    );
 
     this.scene.add
-      .text(GameConfig.UI.centerX, 300, '👨‍💼\nLibrarian', {
+      .image(GameConfig.UI.centerX, GameConfig.screenHeight * 0.39, 'character_librarian')
+      .setScale(0.5)
+      .setOrigin(0.5);
+
+    this.scene.add
+      .text(GameConfig.UI.centerX, GameConfig.screenHeight * 0.45, 'Librarian', {
         fontFamily: 'Arial',
-        fontSize: 18,
+        fontSize: Math.min(GameConfig.screenWidth / 50, 14),
         align: 'center',
+        color: GameConfig.COLORS.textDarkGreen,
       })
       .setOrigin(0.5);
   }
@@ -129,14 +147,19 @@ export class LibraryElementsBuilder {
    */
   private createInformationSign(): void {
     this.scene.add
-      .text(GameConfig.UI.centerX, 500, '📖 Reading Corner 📖\nQuiet Study Area', {
-        fontFamily: 'Arial',
-        fontSize: 16,
-        color: GameConfig.COLORS.textDarkGreen,
-        backgroundColor: '#ffffff',
-        padding: { x: 10, y: 5 },
-        align: 'center',
-      })
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.72,
+        '📖 Reading Corner 📖\nQuiet Study Area',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 50, 16),
+          color: GameConfig.COLORS.textDarkGreen,
+          backgroundColor: '#ffffff',
+          padding: { x: 10, y: 5 },
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 

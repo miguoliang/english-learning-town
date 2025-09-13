@@ -7,9 +7,9 @@ import { GameConfig, type NPCConfigType } from '../config/GameConfig';
 export class NPCManager {
   private scene: Scene;
   private npcs: {
-    teacher: Phaser.GameObjects.Arc | null;
-    librarian: Phaser.GameObjects.Arc | null;
-    shopkeeper: Phaser.GameObjects.Arc | null;
+    teacher: Phaser.GameObjects.Image | null;
+    librarian: Phaser.GameObjects.Image | null;
+    shopkeeper: Phaser.GameObjects.Image | null;
   } = {
     teacher: null,
     librarian: null,
@@ -40,9 +40,7 @@ export class NPCManager {
     this.npcs.teacher = this.createNPC(
       GameConfig.NPCS.TEACHER.x,
       GameConfig.NPCS.TEACHER.y,
-      GameConfig.NPCS.TEACHER.radius,
-      GameConfig.NPCS.TEACHER.color,
-      GameConfig.NPCS.TEACHER.emoji,
+      'character_teacher',
       GameConfig.NPCS.TEACHER.name
     );
 
@@ -50,76 +48,55 @@ export class NPCManager {
     this.npcs.librarian = this.createNPC(
       GameConfig.NPCS.LIBRARIAN.x,
       GameConfig.NPCS.LIBRARIAN.y,
-      GameConfig.NPCS.LIBRARIAN.radius,
-      GameConfig.NPCS.LIBRARIAN.color,
-      GameConfig.NPCS.LIBRARIAN.emoji,
+      'character_librarian',
       GameConfig.NPCS.LIBRARIAN.name
     );
 
     // Add book in librarian's hands
     this.scene.add
-      .text(GameConfig.NPCS.LIBRARIAN.x, GameConfig.NPCS.LIBRARIAN.y - 30, '📖', {
-        fontFamily: 'Arial',
-        fontSize: 16,
-      })
+      .image(GameConfig.NPCS.LIBRARIAN.x, GameConfig.NPCS.LIBRARIAN.y - 40, 'item_book')
+      .setScale(0.8)
       .setOrigin(0.5);
 
     // Shopkeeper NPC
     this.npcs.shopkeeper = this.createNPC(
       GameConfig.NPCS.SHOPKEEPER.x,
       GameConfig.NPCS.SHOPKEEPER.y,
-      GameConfig.NPCS.SHOPKEEPER.radius,
-      GameConfig.NPCS.SHOPKEEPER.color,
-      GameConfig.NPCS.SHOPKEEPER.emoji,
+      'character_shopkeeper',
       GameConfig.NPCS.SHOPKEEPER.name
     );
 
     // Add boxes near shopkeeper
     this.scene.add
-      .text(GameConfig.NPCS.SHOPKEEPER.x - 30, GameConfig.NPCS.SHOPKEEPER.y + 20, '📦', {
-        fontFamily: 'Arial',
-        fontSize: 16,
-      })
+      .image(GameConfig.NPCS.SHOPKEEPER.x - 30, GameConfig.NPCS.SHOPKEEPER.y + 30, 'item_box')
+      .setScale(0.7)
       .setOrigin(0.5);
     this.scene.add
-      .text(GameConfig.NPCS.SHOPKEEPER.x + 30, GameConfig.NPCS.SHOPKEEPER.y + 20, '📦', {
-        fontFamily: 'Arial',
-        fontSize: 16,
-      })
+      .image(GameConfig.NPCS.SHOPKEEPER.x + 30, GameConfig.NPCS.SHOPKEEPER.y + 30, 'item_box')
+      .setScale(0.7)
       .setOrigin(0.5);
   }
 
   /**
-   * Creates a single NPC with emoji and name label
+   * Creates a single NPC with sprite and name label
    * @param x X position
    * @param y Y position
-   * @param radius Circle radius
-   * @param color Circle color
-   * @param emoji Emoji character
+   * @param spriteKey Sprite texture key
    * @param name NPC name
-   * @returns The created NPC arc
+   * @returns The created NPC image
    */
   private createNPC(
     x: number,
     y: number,
-    radius: number,
-    color: number,
-    emoji: string,
+    spriteKey: string,
     name: string
-  ): Phaser.GameObjects.Arc {
-    // Create circular background
-    const npc = this.scene.add.arc(x, y, radius, 0, 360, false, color);
-
-    // Add emoji
-    this.scene.add
-      .text(x, y, emoji, {
-        fontFamily: 'Arial',
-        fontSize: 24,
-      })
-      .setOrigin(0.5);
+  ): Phaser.GameObjects.Image {
+    // Create character sprite
+    const npc = this.scene.add.image(x, y, spriteKey);
+    npc.setScale(0.8);
 
     // Add name label
-    this.scene.add.text(x, y + 35, name, GameConfig.textStyles.npcName).setOrigin(0.5);
+    this.scene.add.text(x, y + 45, name, GameConfig.textStyles.npcName).setOrigin(0.5);
 
     return npc;
   }
@@ -128,52 +105,49 @@ export class NPCManager {
    * Creates background/atmosphere characters
    */
   private createBackgroundCharacters(): void {
-    // Cafe customer
-    this.scene.add.arc(370, 470, 20, 0, 360, false, 0xffd700);
+    // Cafe customer - positioned relative to cafe
+    const cafeCustomerX = GameConfig.BUILDINGS.CAFE.x + 70;
+    const cafeCustomerY = GameConfig.BUILDINGS.CAFE.y - 30;
     this.scene.add
-      .text(370, 470, '👨‍🦱', {
-        fontFamily: 'Arial',
-        fontSize: 20,
-      })
+      .image(cafeCustomerX, cafeCustomerY, 'character_customer')
+      .setScale(0.6)
       .setOrigin(0.5);
     this.scene.add
-      .text(370, 500, 'Customer', {
+      .text(cafeCustomerX, cafeCustomerY + 35, 'Customer', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
         color: GameConfig.COLORS.textDarkGreen,
         align: 'center',
       })
       .setOrigin(0.5);
 
     // Person walking near fountain
-    this.scene.add.arc(580, 360, 20, 0, 360, false, 0x98fb98);
+    const walkerX = GameConfig.UI.centerX + GameConfig.screenWidth * 0.08;
+    const walkerY = GameConfig.screenHeight * 0.47;
     this.scene.add
-      .text(580, 360, '👩‍🦰', {
-        fontFamily: 'Arial',
-        fontSize: 20,
-      })
+      .image(walkerX, walkerY, 'character_walker')
+      .setScale(0.6)
       .setOrigin(0.5);
     this.scene.add
-      .text(580, 390, 'Walker', {
+      .text(walkerX, walkerY + 35, 'Walker', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
         color: GameConfig.COLORS.textDarkGreen,
         align: 'center',
       })
       .setOrigin(0.5);
 
     // Child playing near school
-    this.scene.add.arc(150, 200, 15, 0, 360, false, 0xffb6c1);
+    const studentX = GameConfig.BUILDINGS.SCHOOL.x - 50;
+    const studentY = GameConfig.BUILDINGS.SCHOOL.y + 50;
     this.scene.add
-      .text(150, 200, '🧒', {
-        fontFamily: 'Arial',
-        fontSize: 18,
-      })
+      .image(studentX, studentY, 'character_student')
+      .setScale(0.5)
       .setOrigin(0.5);
     this.scene.add
-      .text(150, 225, 'Student', {
+      .text(studentX, studentY + 30, 'Student', {
         fontFamily: 'Arial',
-        fontSize: 10,
+        fontSize: Math.min(GameConfig.screenWidth / 70, 10),
         color: GameConfig.COLORS.textDarkGreen,
         align: 'center',
       })
@@ -204,14 +178,14 @@ export class NPCManager {
   /**
    * Gets all interactive NPCs as an array for collision detection
    */
-  getNPCsArray(): (Phaser.GameObjects.Arc | null)[] {
+  getNPCsArray(): (Phaser.GameObjects.Image | null)[] {
     return [this.npcs.teacher, this.npcs.librarian, this.npcs.shopkeeper];
   }
 
   /**
    * Gets specific NPC by type
    */
-  getNPC(type: keyof typeof this.npcs): Phaser.GameObjects.Arc | null {
+  getNPC(type: keyof typeof this.npcs): Phaser.GameObjects.Image | null {
     return this.npcs[type];
   }
 

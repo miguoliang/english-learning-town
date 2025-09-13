@@ -67,7 +67,7 @@ export class Game extends Scene {
     this.add
       .text(
         GameConfig.UI.centerX,
-        100,
+        GameConfig.screenHeight * 0.13,
         'Use Arrow Keys or WASD to move • Press SPACEBAR to enter buildings or talk to NPCs!',
         GameConfig.textStyles.INSTRUCTION
       )
@@ -102,7 +102,10 @@ export class Game extends Scene {
    * Creates the player sprite
    */
   private createPlayer(exitBuilding?: string): void {
-    let playerPosition: { x: number; y: number } = { x: GameConfig.UI.centerX, y: 580 };
+    let playerPosition: { x: number; y: number } = {
+      x: GameConfig.UI.centerX,
+      y: GameConfig.screenHeight * 0.76,
+    };
 
     if (exitBuilding) {
       playerPosition = this.playerController.positionPlayerFromBuilding(exitBuilding);

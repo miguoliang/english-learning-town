@@ -27,8 +27,10 @@ export class BasePlayerController {
     y: number,
     usePhysics: boolean = false
   ): Phaser.GameObjects.Image | Phaser.Physics.Arcade.Image {
+    const spriteKey = 'character_player';
+    
     if (usePhysics && this.scene.physics) {
-      this.player = this.scene.physics.add.image(x, y, 'star');
+      this.player = this.scene.physics.add.image(x, y, spriteKey);
       const physicsPlayer = this.player as Phaser.Physics.Arcade.Image;
       physicsPlayer.setCollideWorldBounds(true);
 
@@ -40,11 +42,12 @@ export class BasePlayerController {
 
       physicsPlayer.body.setSize(this.player.width * 0.8, this.player.height * 0.8);
     } else {
-      this.player = this.scene.add.image(x, y, 'star');
+      this.player = this.scene.add.image(x, y, spriteKey);
     }
 
     this.player.setScale(GameConfig.PLAYER.SCALE);
-    this.player.setTint(GameConfig.PLAYER.TINT);
+    // Remove tint since we want to show the natural sprite colors
+    // this.player.setTint(GameConfig.PLAYER.TINT);
 
     return this.player;
   }
@@ -65,7 +68,7 @@ export class BasePlayerController {
     }
 
     // Default position
-    return { x: GameConfig.UI.centerX, y: 580 };
+    return { x: GameConfig.UI.centerX, y: GameConfig.screenHeight * 0.76 };
   }
 
   /**

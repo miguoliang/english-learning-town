@@ -28,20 +28,33 @@ export class ShopElementsBuilder {
    */
   private createCheckoutArea(): void {
     // Checkout counter
-    this.createRoomElement(GameConfig.UI.centerX, 180, 200, 60, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.17,
+      GameConfig.screenHeight * 0.09,
+      GameConfig.COLORS.brownWall
+    );
     this.scene.add
-      .text(GameConfig.UI.centerX, 180, '💳 CHECKOUT COUNTER 💳', {
+      .text(GameConfig.UI.centerX, GameConfig.screenHeight * 0.26, '💳 CHECKOUT COUNTER 💳', {
         fontFamily: 'Arial',
-        fontSize: 16,
+        fontSize: Math.min(GameConfig.screenWidth / 50, 16),
         color: '#ffffff',
         align: 'center',
       })
       .setOrigin(0.5);
 
     // Cash register
-    this.createRoomElement(GameConfig.UI.centerX, 160, 60, 40, 0x000000);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.23,
+      GameConfig.screenWidth * 0.05,
+      GameConfig.screenHeight * 0.06,
+      0x000000
+    );
     this.scene.add
-      .text(GameConfig.UI.centerX, 160, '🖥️', { fontFamily: 'Arial', fontSize: 20 })
+      .image(GameConfig.UI.centerX, GameConfig.screenHeight * 0.23, 'item_computer')
+      .setScale(0.7)
       .setOrigin(0.5);
   }
 
@@ -51,26 +64,26 @@ export class ShopElementsBuilder {
   private createShoppingAisles(): void {
     const aisleData = [
       {
-        x: 200,
-        y: 300,
+        x: GameConfig.screenWidth * 0.17,
+        y: GameConfig.screenHeight * 0.43,
         items: ['🍎', '🍌', '🥕', '🥬'],
         category: 'Fruits & Vegetables',
       },
       {
-        x: 400,
-        y: 300,
+        x: GameConfig.screenWidth * 0.33,
+        y: GameConfig.screenHeight * 0.43,
         items: ['🍞', '🥖', '🧀', '🥛'],
         category: 'Dairy & Bread',
       },
       {
-        x: 624,
-        y: 300,
+        x: GameConfig.screenWidth * 0.52,
+        y: GameConfig.screenHeight * 0.43,
         items: ['📱', '💻', '⌚', '🎧'],
         category: 'Electronics',
       },
       {
-        x: 824,
-        y: 300,
+        x: GameConfig.screenWidth * 0.69,
+        y: GameConfig.screenHeight * 0.43,
         items: ['👕', '👖', '👟', '🧢'],
         category: 'Clothing',
       },
@@ -91,13 +104,19 @@ export class ShopElementsBuilder {
     category: string;
   }): void {
     // Shelf structure
-    this.createRoomElement(aisleData.x, aisleData.y, 120, 100, GameConfig.COLORS.darkBrown);
+    this.createRoomElement(
+      aisleData.x,
+      aisleData.y,
+      GameConfig.screenWidth * 0.1,
+      GameConfig.screenHeight * 0.145,
+      GameConfig.COLORS.darkBrown
+    );
 
     // Category label
     this.scene.add
-      .text(aisleData.x, aisleData.y - 70, aisleData.category, {
+      .text(aisleData.x, aisleData.y - GameConfig.screenHeight * 0.1, aisleData.category, {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 70, 12),
         color: '#000000',
         backgroundColor: '#ffffff',
         padding: { x: 5, y: 2 },
@@ -109,16 +128,16 @@ export class ShopElementsBuilder {
     this.scene.add
       .text(aisleData.x, aisleData.y, aisleData.items.join(' '), {
         fontFamily: 'Arial',
-        fontSize: 20,
+        fontSize: Math.min(GameConfig.screenWidth / 40, 20),
         align: 'center',
       })
       .setOrigin(0.5);
 
     // Price tags
     this.scene.add
-      .text(aisleData.x, aisleData.y + 40, '$2-$50', {
+      .text(aisleData.x, aisleData.y + GameConfig.screenHeight * 0.058, '$2-$50', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 70, 12),
         color: '#ff0000',
         align: 'center',
       })
@@ -130,23 +149,40 @@ export class ShopElementsBuilder {
    */
   private createServiceAreas(): void {
     // Shopping baskets area
-    this.createRoomElement(150, 450, 80, 60, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.screenWidth * 0.125,
+      GameConfig.screenHeight * 0.65,
+      GameConfig.screenWidth * 0.067,
+      GameConfig.screenHeight * 0.087,
+      GameConfig.COLORS.brownWall
+    );
     this.scene.add
-      .text(150, 450, '🛒\nBaskets', {
+      .text(GameConfig.screenWidth * 0.125, GameConfig.screenHeight * 0.65, '🛒\nBaskets', {
         fontFamily: 'Arial',
-        fontSize: 14,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 14),
         align: 'center',
       })
       .setOrigin(0.5);
 
     // Customer service desk
-    this.createRoomElement(824, 450, 120, 80, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.screenWidth * 0.69,
+      GameConfig.screenHeight * 0.65,
+      GameConfig.screenWidth * 0.1,
+      GameConfig.screenHeight * 0.116,
+      GameConfig.COLORS.brownWall
+    );
     this.scene.add
-      .text(824, 450, '🏪\nCustomer\nService', {
-        fontFamily: 'Arial',
-        fontSize: 14,
-        align: 'center',
-      })
+      .text(
+        GameConfig.screenWidth * 0.69,
+        GameConfig.screenHeight * 0.65,
+        '🏪\nCustomer\nService',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 60, 14),
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 
@@ -156,32 +192,48 @@ export class ShopElementsBuilder {
   private createStaffAndPromotions(): void {
     // Shopkeeper/Manager
     this.scene.add
-      .text(GameConfig.UI.centerX, 230, '👨‍💼\nMr. Brown - Manager', {
+      .image(GameConfig.UI.centerX, GameConfig.screenHeight * 0.33, 'character_shopkeeper')
+      .setScale(0.5)
+      .setOrigin(0.5);
+
+    this.scene.add
+      .text(GameConfig.UI.centerX, GameConfig.screenHeight * 0.39, 'Mr. Brown - Manager', {
         fontFamily: 'Arial',
-        fontSize: 16,
+        fontSize: Math.min(GameConfig.screenWidth / 55, 14),
         align: 'center',
+        color: GameConfig.COLORS.textDarkGreen,
       })
       .setOrigin(0.5);
 
     // Special offers sign
     this.scene.add
-      .text(400, 480, '🏷️ SPECIAL OFFERS 🏷️\nBuy 2 Get 1 Free!\nDaily Discounts Available', {
-        fontFamily: 'Arial',
-        fontSize: 14,
-        color: '#ff0000',
-        backgroundColor: '#ffff00',
-        padding: { x: 10, y: 5 },
-        align: 'center',
-      })
+      .text(
+        GameConfig.screenWidth * 0.33,
+        GameConfig.screenHeight * 0.7,
+        '🏷️ SPECIAL OFFERS 🏷️\nBuy 2 Get 1 Free!\nDaily Discounts Available',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 60, 14),
+          color: '#ff0000',
+          backgroundColor: '#ffff00',
+          padding: { x: 10, y: 5 },
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
 
     // Shopping carts
     this.scene.add
-      .text(700, 500, '🛒 🛒 🛒\nShopping Carts', {
-        fontFamily: 'Arial',
-        fontSize: 14,
-        align: 'center',
-      })
+      .text(
+        GameConfig.screenWidth * 0.583,
+        GameConfig.screenHeight * 0.72,
+        '🛒 🛒 🛒\nShopping Carts',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 60, 14),
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 

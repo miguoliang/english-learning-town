@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { SpriteGenerator } from '../utils/SpriteGenerator';
 
 export class Preloader extends Scene {
   constructor() {
@@ -23,11 +24,14 @@ export class Preloader extends Scene {
   }
 
   preload() {
-    //  Load the assets for the game - Replace with your own assets
+    //  Load the assets for the game
     this.load.setPath('assets');
 
     this.load.image('logo', 'logo.png');
     this.load.image('star', 'star.png');
+
+    // Generate character and item sprites programmatically
+    SpriteGenerator.initializeAllSprites(this);
   }
 
   create() {

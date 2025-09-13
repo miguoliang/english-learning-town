@@ -48,9 +48,9 @@ export class TownEnvironmentBuilder {
   private createGround(): void {
     this.scene.add.rectangle(
       GameConfig.UI.centerX,
-      600,
+      GameConfig.screenHeight * 0.78, // 78% from top
       GameConfig.screenWidth,
-      336,
+      GameConfig.screenHeight * 0.44, // 44% of screen height
       GameConfig.COLORS.lightGreen
     );
   }
@@ -59,21 +59,72 @@ export class TownEnvironmentBuilder {
    * Creates town roads and pathways
    */
   private createTownRoads(): void {
+    const centerX = GameConfig.UI.centerX;
+    const centerY = GameConfig.UI.centerY;
+
     // Main horizontal road through town center
-    this.scene.add.rectangle(GameConfig.UI.centerX, 400, GameConfig.screenWidth, 80, 0x696969);
-    this.scene.add.rectangle(GameConfig.UI.centerX, 400, GameConfig.screenWidth, 60, 0x808080);
+    this.scene.add.rectangle(
+      centerX,
+      centerY * 1.05,
+      GameConfig.screenWidth,
+      GameConfig.screenHeight * 0.1,
+      0x696969
+    );
+    this.scene.add.rectangle(
+      centerX,
+      centerY * 1.05,
+      GameConfig.screenWidth,
+      GameConfig.screenHeight * 0.08,
+      0x808080
+    );
 
     // Main vertical road (town square access)
-    this.scene.add.rectangle(GameConfig.UI.centerX, 300, 80, 400, 0x696969);
-    this.scene.add.rectangle(GameConfig.UI.centerX, 300, 60, 400, 0x808080);
+    this.scene.add.rectangle(
+      centerX,
+      centerY * 0.8,
+      GameConfig.screenWidth * 0.08,
+      GameConfig.screenHeight * 0.52,
+      0x696969
+    );
+    this.scene.add.rectangle(
+      centerX,
+      centerY * 0.8,
+      GameConfig.screenWidth * 0.06,
+      GameConfig.screenHeight * 0.52,
+      0x808080
+    );
 
     // Road to school (upper left)
-    this.scene.add.rectangle(300, 200, 200, 40, 0x696969);
-    this.scene.add.rectangle(300, 200, 180, 30, 0x808080);
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.3,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.2,
+      GameConfig.screenHeight * 0.05,
+      0x696969
+    );
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.3,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.18,
+      GameConfig.screenHeight * 0.04,
+      0x808080
+    );
 
     // Road to library (upper right)
-    this.scene.add.rectangle(724, 200, 200, 40, 0x696969);
-    this.scene.add.rectangle(724, 200, 180, 30, 0x808080);
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.7,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.2,
+      GameConfig.screenHeight * 0.05,
+      0x696969
+    );
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.7,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.18,
+      GameConfig.screenHeight * 0.04,
+      0x808080
+    );
 
     this.createTownCenter();
     this.createStreetSigns();
@@ -84,35 +135,91 @@ export class TownEnvironmentBuilder {
    * Creates the town center with fountain
    */
   private createTownCenter(): void {
+    const centerX = GameConfig.UI.centerX;
+    const centerY = GameConfig.screenHeight * 0.42; // 42% from top
+
     // Town center fountain/plaza
-    this.scene.add.circle(GameConfig.UI.centerX, 320, 50, 0x4169e1);
-    this.scene.add.circle(GameConfig.UI.centerX, 320, 35, 0x87ceeb);
-    this.fountain = this.scene.add.circle(GameConfig.UI.centerX, 320, 15, 0x4682b4);
+    this.scene.add.circle(centerX, centerY, GameConfig.screenWidth * 0.05, 0x4169e1);
+    this.scene.add.circle(centerX, centerY, GameConfig.screenWidth * 0.035, 0x87ceeb);
+    this.fountain = this.scene.add.circle(
+      centerX,
+      centerY,
+      GameConfig.screenWidth * 0.015,
+      0x4682b4
+    );
 
     this.scene.add
-      .text(GameConfig.UI.centerX, 320, '⛲', {
+      .text(centerX, centerY, '⛲', {
         fontFamily: 'Arial',
-        fontSize: 30,
+        fontSize: Math.min(GameConfig.screenWidth / 25, 30),
       })
       .setOrigin(0.5);
 
-    // Decorative trees and benches
-    this.scene.add.text(450, 280, '🌳', { fontFamily: 'Arial', fontSize: 24 }).setOrigin(0.5);
-    this.scene.add.text(574, 280, '🌳', { fontFamily: 'Arial', fontSize: 24 }).setOrigin(0.5);
-    this.scene.add.text(450, 360, '🪑', { fontFamily: 'Arial', fontSize: 16 }).setOrigin(0.5);
-    this.scene.add.text(574, 360, '🪑', { fontFamily: 'Arial', fontSize: 16 }).setOrigin(0.5);
+    // Decorative trees and benches - positioned relative to center
+    this.scene.add
+      .text(
+        centerX - GameConfig.screenWidth * 0.06,
+        centerY - GameConfig.screenHeight * 0.05,
+        '🌳',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 30, 24),
+        }
+      )
+      .setOrigin(0.5);
+    this.scene.add
+      .text(
+        centerX + GameConfig.screenWidth * 0.06,
+        centerY - GameConfig.screenHeight * 0.05,
+        '🌳',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 30, 24),
+        }
+      )
+      .setOrigin(0.5);
+    this.scene.add
+      .text(
+        centerX - GameConfig.screenWidth * 0.06,
+        centerY + GameConfig.screenHeight * 0.05,
+        '🪑',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 40, 16),
+        }
+      )
+      .setOrigin(0.5);
+    this.scene.add
+      .text(
+        centerX + GameConfig.screenWidth * 0.06,
+        centerY + GameConfig.screenHeight * 0.05,
+        '🪑',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 40, 16),
+        }
+      )
+      .setOrigin(0.5);
   }
 
   /**
    * Creates street signs
    */
   private createStreetSigns(): void {
+    const centerY = GameConfig.screenHeight * 0.5;
+
     // Left sign
-    this.scene.add.rectangle(400, 380, 4, 40, GameConfig.COLORS.darkBrown);
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.4,
+      centerY,
+      4,
+      GameConfig.screenHeight * 0.05,
+      GameConfig.COLORS.darkBrown
+    );
     this.scene.add
-      .text(400, 365, '🏫←  →📚', {
+      .text(GameConfig.screenWidth * 0.4, centerY - GameConfig.screenHeight * 0.02, '🏫←  →📚', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
         color: '#ffffff',
         backgroundColor: '#2f4f2f',
         padding: { x: 3, y: 2 },
@@ -120,11 +227,17 @@ export class TownEnvironmentBuilder {
       .setOrigin(0.5);
 
     // Right sign
-    this.scene.add.rectangle(624, 380, 4, 40, GameConfig.COLORS.darkBrown);
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.6,
+      centerY,
+      4,
+      GameConfig.screenHeight * 0.05,
+      GameConfig.COLORS.darkBrown
+    );
     this.scene.add
-      .text(624, 365, '☕←  →🛒', {
+      .text(GameConfig.screenWidth * 0.6, centerY - GameConfig.screenHeight * 0.02, '☕←  →🛒', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
         color: '#ffffff',
         backgroundColor: '#2f4f2f',
         padding: { x: 3, y: 2 },
@@ -136,14 +249,25 @@ export class TownEnvironmentBuilder {
    * Creates welcome sign at town entrance
    */
   private createWelcomeSign(): void {
-    this.scene.add.rectangle(GameConfig.UI.centerX, 620, 200, 40, 0x8b4513);
+    this.scene.add.rectangle(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.81,
+      GameConfig.screenWidth * 0.2,
+      GameConfig.screenHeight * 0.05,
+      0x8b4513
+    );
     this.scene.add
-      .text(GameConfig.UI.centerX, 620, '🎓 Welcome to English Learning Town 🎓', {
-        fontFamily: 'Arial',
-        fontSize: 14,
-        color: '#ffffff',
-        align: 'center',
-      })
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.81,
+        '🎓 Welcome to English Learning Town 🎓',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 50, 14),
+          color: '#ffffff',
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 
@@ -166,7 +290,7 @@ export class TownEnvironmentBuilder {
     );
     this.scene.add.rectangle(
       GameConfig.BUILDINGS.SCHOOL.x,
-      220,
+      GameConfig.BUILDINGS.SCHOOL.y + 70,
       180,
       20,
       GameConfig.COLORS.darkBrown
@@ -186,9 +310,9 @@ export class TownEnvironmentBuilder {
       '📚\nLIBRARY'
     );
     this.scene.add
-      .text(GameConfig.BUILDINGS.LIBRARY.x, 220, '🌺 🌻 🌺', {
+      .text(GameConfig.BUILDINGS.LIBRARY.x, GameConfig.BUILDINGS.LIBRARY.y + 70, '🌺 🌻 🌺', {
         fontFamily: 'Arial',
-        fontSize: 14,
+        fontSize: Math.min(GameConfig.screenWidth / 50, 14),
       })
       .setOrigin(0.5);
 
@@ -226,19 +350,35 @@ export class TownEnvironmentBuilder {
    * Adds decorations around the cafe
    */
   private addCafeDecorations(): void {
-    this.scene.add.text(250, 540, '🪑☕🪑', { fontFamily: 'Arial', fontSize: 12 }).setOrigin(0.5);
-    this.scene.add.text(350, 540, '🪑☕🪑', { fontFamily: 'Arial', fontSize: 12 }).setOrigin(0.5);
+    this.scene.add
+      .text(GameConfig.BUILDINGS.CAFE.x - 50, GameConfig.BUILDINGS.CAFE.y + 40, '🪑☕🪑', {
+        fontFamily: 'Arial',
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
+      })
+      .setOrigin(0.5);
+    this.scene.add
+      .text(GameConfig.BUILDINGS.CAFE.x + 50, GameConfig.BUILDINGS.CAFE.y + 40, '🪑☕🪑', {
+        fontFamily: 'Arial',
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
+      })
+      .setOrigin(0.5);
   }
 
   /**
    * Adds decorations around the shop
    */
   private addShopDecorations(): void {
-    this.scene.add.rectangle(GameConfig.BUILDINGS.SHOP.x, 560, 120, 30, 0x2f4f2f);
+    this.scene.add.rectangle(
+      GameConfig.BUILDINGS.SHOP.x,
+      GameConfig.BUILDINGS.SHOP.y + 60,
+      120,
+      30,
+      0x2f4f2f
+    );
     this.scene.add
-      .text(GameConfig.BUILDINGS.SHOP.x, 560, '🚗 🚙 🚗', {
+      .text(GameConfig.BUILDINGS.SHOP.x, GameConfig.BUILDINGS.SHOP.y + 60, '🚗 🚙 🚗', {
         fontFamily: 'Arial',
-        fontSize: 12,
+        fontSize: Math.min(GameConfig.screenWidth / 60, 12),
       })
       .setOrigin(0.5);
   }

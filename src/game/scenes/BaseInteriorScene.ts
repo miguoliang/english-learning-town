@@ -78,7 +78,7 @@ export abstract class BaseInteriorScene extends Scene {
     this.obstacles.add(
       this.add.rectangle(
         GameConfig.UI.centerX,
-        50,
+        GameConfig.INTERIOR.wallThickness / 2,
         GameConfig.screenWidth,
         GameConfig.INTERIOR.wallThickness,
         GameConfig.COLORS.brownWall
@@ -88,7 +88,7 @@ export abstract class BaseInteriorScene extends Scene {
     this.obstacles.add(
       this.add.rectangle(
         GameConfig.UI.centerX,
-        718,
+        GameConfig.screenHeight - GameConfig.INTERIOR.wallThickness / 2,
         GameConfig.screenWidth,
         GameConfig.INTERIOR.wallThickness,
         GameConfig.COLORS.brownWall
@@ -97,7 +97,7 @@ export abstract class BaseInteriorScene extends Scene {
 
     this.obstacles.add(
       this.add.rectangle(
-        50,
+        GameConfig.INTERIOR.wallThickness / 2,
         GameConfig.UI.centerY,
         GameConfig.INTERIOR.wallThickness,
         GameConfig.screenHeight,
@@ -107,7 +107,7 @@ export abstract class BaseInteriorScene extends Scene {
 
     this.obstacles.add(
       this.add.rectangle(
-        974,
+        GameConfig.screenWidth - GameConfig.INTERIOR.wallThickness / 2,
         GameConfig.UI.centerY,
         GameConfig.INTERIOR.wallThickness,
         GameConfig.screenHeight,
@@ -117,14 +117,19 @@ export abstract class BaseInteriorScene extends Scene {
 
     // Scene title
     this.add
-      .text(GameConfig.UI.centerX, 100, `${this.sceneIcon} ${this.sceneTitle}`, {
-        fontFamily: 'Arial Black',
-        fontSize: 32,
-        color: GameConfig.COLORS.textDarkGreen,
-        stroke: '#ffffff',
-        strokeThickness: 2,
-        align: 'center',
-      })
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.13,
+        `${this.sceneIcon} ${this.sceneTitle}`,
+        {
+          fontFamily: 'Arial Black',
+          fontSize: Math.min(GameConfig.screenWidth / 25, 32),
+          color: GameConfig.COLORS.textDarkGreen,
+          stroke: '#ffffff',
+          strokeThickness: 2,
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 
@@ -144,7 +149,7 @@ export abstract class BaseInteriorScene extends Scene {
     this.add
       .text(GameConfig.INTERIOR.exitZone.x, GameConfig.INTERIOR.exitZone.y, '🚪\nEXIT', {
         fontFamily: 'Arial',
-        fontSize: 16,
+        fontSize: Math.min(GameConfig.screenWidth / 50, 16),
         color: '#000000',
         align: 'center',
       })
@@ -156,7 +161,12 @@ export abstract class BaseInteriorScene extends Scene {
    */
   private createInteractionPrompt(): void {
     this.interactionPrompt = this.add
-      .text(GameConfig.UI.centerX, 600, '', GameConfig.INTERACTION.promptStyle)
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.78,
+        '',
+        GameConfig.INTERACTION.promptStyle
+      )
       .setOrigin(0.5)
       .setVisible(false);
   }

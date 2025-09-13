@@ -26,16 +26,22 @@ export class SchoolElementsBuilder {
    * Creates the classroom blackboard
    */
   private createBlackboard(): void {
-    this.createRoomElement(GameConfig.UI.centerX, 200, 300, 100, 0x2f4f2f);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.3,
+      GameConfig.screenHeight * 0.13,
+      0x2f4f2f
+    );
 
     this.scene.add
       .text(
         GameConfig.UI.centerX,
-        200,
+        GameConfig.screenHeight * 0.26,
         'Welcome to English Class!\n🅰️ Grammar Lessons 🅱️ Reading',
         {
           fontFamily: 'Arial',
-          fontSize: 18,
+          fontSize: Math.min(GameConfig.screenWidth / 40, 18),
           color: '#ffffff',
           align: 'center',
         }
@@ -50,13 +56,19 @@ export class SchoolElementsBuilder {
     const deskConfig = {
       rows: 3,
       columns: 4,
-      startX: 200,
-      startY: 320,
-      spacingX: 150,
-      spacingY: 80,
-      deskSize: { width: 60, height: 40 },
-      chairSize: { width: 40, height: 20 },
-      chairOffset: 30,
+      startX: GameConfig.screenWidth * 0.2,
+      startY: GameConfig.screenHeight * 0.42,
+      spacingX: GameConfig.screenWidth * 0.15,
+      spacingY: GameConfig.screenHeight * 0.1,
+      deskSize: {
+        width: GameConfig.screenWidth * 0.06,
+        height: GameConfig.screenHeight * 0.05,
+      },
+      chairSize: {
+        width: GameConfig.screenWidth * 0.04,
+        height: GameConfig.screenHeight * 0.025,
+      },
+      chairOffset: GameConfig.screenHeight * 0.04,
     };
 
     for (let row = 0; row < deskConfig.rows; row++) {
@@ -89,13 +101,17 @@ export class SchoolElementsBuilder {
    * Creates the teacher's desk with teacher icon
    */
   private createTeacherDesk(): void {
-    this.createRoomElement(GameConfig.UI.centerX, 280, 100, 60, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.36,
+      GameConfig.screenWidth * 0.1,
+      GameConfig.screenHeight * 0.08,
+      GameConfig.COLORS.brownWall
+    );
 
     this.scene.add
-      .text(GameConfig.UI.centerX, 280, '👩‍🏫', {
-        fontFamily: 'Arial',
-        fontSize: 24,
-      })
+      .image(GameConfig.UI.centerX, GameConfig.screenHeight * 0.36, 'character_teacher')
+      .setScale(0.5)
       .setOrigin(0.5);
   }
 

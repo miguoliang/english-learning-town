@@ -28,15 +28,26 @@ export class CafeElementsBuilder {
    * Creates the main coffee counter
    */
   private createCoffeeCounter(): void {
-    this.createRoomElement(GameConfig.UI.centerX, 200, 300, 80, GameConfig.COLORS.brownWall);
+    this.createRoomElement(
+      GameConfig.UI.centerX,
+      GameConfig.screenHeight * 0.29,
+      GameConfig.screenWidth * 0.25,
+      GameConfig.screenHeight * 0.12,
+      GameConfig.COLORS.brownWall
+    );
 
     this.scene.add
-      .text(GameConfig.UI.centerX, 200, '☕ Coffee Bar ☕\n🥐 Pastries 🧁 Cakes', {
-        fontFamily: 'Arial',
-        fontSize: 16,
-        color: '#ffffff',
-        align: 'center',
-      })
+      .text(
+        GameConfig.UI.centerX,
+        GameConfig.screenHeight * 0.29,
+        '☕ Coffee Bar ☕\n🥐 Pastries 🧁 Cakes',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 50, 16),
+          color: '#ffffff',
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
   }
 
@@ -45,12 +56,30 @@ export class CafeElementsBuilder {
    */
   private createEquipment(): void {
     // Coffee machine
-    this.createRoomElement(400, 180, 60, 40, 0x2f4f2f);
-    this.scene.add.text(400, 180, '☕', { fontFamily: 'Arial', fontSize: 24 }).setOrigin(0.5);
+    this.createRoomElement(
+      GameConfig.screenWidth * 0.33,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.05,
+      GameConfig.screenHeight * 0.06,
+      0x2f4f2f
+    );
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.33, GameConfig.screenHeight * 0.26, 'item_coffee')
+      .setScale(0.8)
+      .setOrigin(0.5);
 
     // Cash register
-    this.createRoomElement(624, 180, 50, 30, 0x000000);
-    this.scene.add.text(624, 180, '💰', { fontFamily: 'Arial', fontSize: 20 }).setOrigin(0.5);
+    this.createRoomElement(
+      GameConfig.screenWidth * 0.52,
+      GameConfig.screenHeight * 0.26,
+      GameConfig.screenWidth * 0.04,
+      GameConfig.screenHeight * 0.045,
+      0x000000
+    );
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.52, GameConfig.screenHeight * 0.26, 'item_cash')
+      .setScale(0.7)
+      .setOrigin(0.5);
   }
 
   /**
@@ -58,12 +87,12 @@ export class CafeElementsBuilder {
    */
   private createSeatingAreas(): void {
     const tablePositions = [
-      { x: 200, y: 350 },
-      { x: 400, y: 350 },
-      { x: 624, y: 350 },
-      { x: 824, y: 350 },
-      { x: 300, y: 500 },
-      { x: 724, y: 500 },
+      { x: GameConfig.screenWidth * 0.17, y: GameConfig.screenHeight * 0.51 },
+      { x: GameConfig.screenWidth * 0.33, y: GameConfig.screenHeight * 0.51 },
+      { x: GameConfig.screenWidth * 0.52, y: GameConfig.screenHeight * 0.51 },
+      { x: GameConfig.screenWidth * 0.69, y: GameConfig.screenHeight * 0.51 },
+      { x: GameConfig.screenWidth * 0.25, y: GameConfig.screenHeight * 0.72 },
+      { x: GameConfig.screenWidth * 0.6, y: GameConfig.screenHeight * 0.72 },
     ];
 
     tablePositions.forEach(pos => {
@@ -75,24 +104,36 @@ export class CafeElementsBuilder {
    * Creates a round table with surrounding chairs
    */
   private createTableWithChairs(x: number, y: number): void {
+    const tableRadius = Math.min(GameConfig.screenWidth * 0.033, 40);
+    const chairRadius = Math.min(GameConfig.screenWidth * 0.0125, 15);
+    const chairDistance = Math.min(GameConfig.screenWidth * 0.042, 50);
+
     // Round table
-    this.createCircularRoomElement(x, y, 40, GameConfig.COLORS.brownWall);
+    this.createCircularRoomElement(x, y, tableRadius, GameConfig.COLORS.brownWall);
 
     // Chairs around table
     const chairPositions = [
-      { x: x - 50, y }, // Left
-      { x: x + 50, y }, // Right
-      { x, y: y - 50 }, // Top
-      { x, y: y + 50 }, // Bottom
+      { x: x - chairDistance, y }, // Left
+      { x: x + chairDistance, y }, // Right
+      { x, y: y - chairDistance }, // Top
+      { x, y: y + chairDistance }, // Bottom
     ];
 
     chairPositions.forEach(chairPos => {
-      this.createCircularRoomElement(chairPos.x, chairPos.y, 15, GameConfig.COLORS.darkBrown);
+      this.createCircularRoomElement(
+        chairPos.x,
+        chairPos.y,
+        chairRadius,
+        GameConfig.COLORS.darkBrown
+      );
     });
 
     // Coffee cups on some tables (random)
     if (Math.random() > 0.5) {
-      this.scene.add.text(x, y, '☕', { fontFamily: 'Arial', fontSize: 16 }).setOrigin(0.5);
+      this.scene.add
+        .image(x, y, 'item_coffee')
+        .setScale(0.6)
+        .setOrigin(0.5);
     }
   }
 
@@ -101,8 +142,14 @@ export class CafeElementsBuilder {
    */
   private createDecorations(): void {
     // Plants and art
-    this.scene.add.text(200, 280, '🌱', { fontFamily: 'Arial', fontSize: 24 }).setOrigin(0.5);
-    this.scene.add.text(824, 280, '🎨', { fontFamily: 'Arial', fontSize: 24 }).setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.17, GameConfig.screenHeight * 0.41, 'item_plant')
+      .setScale(0.8)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.69, GameConfig.screenHeight * 0.41, 'item_art')
+      .setScale(0.8)
+      .setOrigin(0.5);
   }
 
   /**
@@ -110,22 +157,39 @@ export class CafeElementsBuilder {
    */
   private createMenuAndStaff(): void {
     // Menu board
-    this.scene.add.rectangle(150, 200, 120, 100, 0x2f4f2f);
+    this.scene.add.rectangle(
+      GameConfig.screenWidth * 0.125,
+      GameConfig.screenHeight * 0.29,
+      GameConfig.screenWidth * 0.1,
+      GameConfig.screenHeight * 0.145,
+      0x2f4f2f
+    );
     this.scene.add
-      .text(150, 200, '📋 MENU\n☕ Coffee $3\n🥐 Croissant $2\n🧁 Muffin $2', {
-        fontFamily: 'Arial',
-        fontSize: 12,
-        color: '#ffffff',
-        align: 'center',
-      })
+      .text(
+        GameConfig.screenWidth * 0.125,
+        GameConfig.screenHeight * 0.29,
+        '📋 MENU\n☕ Coffee $3\n🥐 Croissant $2\n🧁 Muffin $2',
+        {
+          fontFamily: 'Arial',
+          fontSize: Math.min(GameConfig.screenWidth / 70, 12),
+          color: '#ffffff',
+          align: 'center',
+        }
+      )
       .setOrigin(0.5);
 
     // Barista
     this.scene.add
-      .text(GameConfig.UI.centerX, 250, '👩‍🍳\nBarista Sarah', {
+      .image(GameConfig.UI.centerX, GameConfig.screenHeight * 0.36, 'character_customer')
+      .setScale(0.5)
+      .setOrigin(0.5);
+
+    this.scene.add
+      .text(GameConfig.UI.centerX, GameConfig.screenHeight * 0.42, 'Barista Sarah', {
         fontFamily: 'Arial',
-        fontSize: 18,
+        fontSize: Math.min(GameConfig.screenWidth / 50, 14),
         align: 'center',
+        color: GameConfig.COLORS.textDarkGreen,
       })
       .setOrigin(0.5);
   }
