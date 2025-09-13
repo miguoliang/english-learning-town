@@ -14,11 +14,13 @@ export class Game extends Scene {
     S: Phaser.Input.Keyboard.Key;
     D: Phaser.Input.Keyboard.Key;
   };
+  private spaceKey: Phaser.Input.Keyboard.Key;
   private playerSpeed: number = 200;
 
   // Interaction system
   private interactionPrompt: Phaser.GameObjects.Text;
   private nearbyInteractable: string | null = null;
+  private nearbyNpcType: string | null = null;
 
   // Town buildings
   private school: Phaser.GameObjects.Rectangle;
@@ -56,7 +58,7 @@ export class Game extends Scene {
 
     // Instructions
     this.add
-      .text(512, 100, 'Use Arrow Keys or WASD to move • Click on buildings to explore and learn English!', {
+      .text(512, 100, 'Use Arrow Keys or WASD to move • Click buildings or press SPACEBAR near NPCs!', {
         fontFamily: 'Arial',
         fontSize: 20,
         color: '#2C5F41',
@@ -97,6 +99,9 @@ export class Game extends Scene {
       S: Phaser.Input.Keyboard.Key;
       D: Phaser.Input.Keyboard.Key;
     };
+
+    // Add spacebar for interactions
+    this.spaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   /**
@@ -122,6 +127,7 @@ export class Game extends Scene {
   update(_time: number, delta: number): void {
     this.handlePlayerMovement(delta);
     this.checkNearbyInteractables();
+    this.handleSpacebarInteraction();
   }
 
   /**
@@ -256,9 +262,9 @@ export class Game extends Scene {
 
     // Check distance to NPCs
     const npcData = [
-      { obj: this.teacher, name: 'Ms. Smith', text: 'Press CLICK to talk to Ms. Smith' },
-      { obj: this.librarian, name: 'Mr. Johnson', text: 'Press CLICK to talk to Mr. Johnson' },
-      { obj: this.shopkeeper, name: 'Mr. Brown', text: 'Press CLICK to talk to Mr. Brown' },
+      { obj: this.teacher, name: 'Ms. Smith', text: 'Press SPACEBAR to talk to Ms. Smith' },
+      { obj: this.librarian, name: 'Mr. Johnson', text: 'Press SPACEBAR to talk to Mr. Johnson' },
+      { obj: this.shopkeeper, name: 'Mr. Brown', text: 'Press SPACEBAR to talk to Mr. Brown' },
     ];
 
     for (const npc of npcData) {
@@ -278,17 +284,67 @@ export class Game extends Scene {
       }
     }
 
-    // Update interaction prompt
+    // Update interaction prompt and track NPC type
     if (nearestObject && nearestDistance < interactionDistance) {
       if (this.nearbyInteractable !== nearestObject) {
         this.nearbyInteractable = nearestObject;
         this.interactionPrompt.setText(interactionText);
         this.interactionPrompt.setVisible(true);
+
+        // Track which NPC type the player is near for spacebar interactions
+        if (nearestObject === 'Ms. Smith') {
+          this.nearbyNpcType = 'teacher';
+        } else if (nearestObject === 'Mr. Johnson') {
+          this.nearbyNpcType = 'librarian';
+        } else if (nearestObject === 'Mr. Brown') {
+          this.nearbyNpcType = 'shopkeeper';
+        } else {
+          this.nearbyNpcType = null; // Building, not NPC
+        }
       }
     } else {
       if (this.nearbyInteractable !== null) {
         this.nearbyInteractable = null;
+        this.nearbyNpcType = null;
         this.interactionPrompt.setVisible(false);
+      }
+    }
+  }
+
+  /**
+   * Handles spacebar interactions with NPCs
+   */
+  private handleSpacebarInteraction(): void {
+    if (!this.spaceKey || !this.nearbyNpcType) return;
+
+    // Check if spacebar was just pressed (not held down)
+    if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+      // Trigger the appropriate NPC interaction based on nearby NPC type
+      switch (this.nearbyNpcType) {
+        case 'teacher':
+          EventBus.emit('talk-to-npc', {
+            npc: 'teacher',
+            name: 'Ms. Smith',
+            greeting: 'Hello! Ready to learn some grammar today?',
+            activity: 'grammar-lesson',
+          });
+          break;
+        case 'librarian':
+          EventBus.emit('talk-to-npc', {
+            npc: 'librarian',
+            name: 'Mr. Johnson',
+            greeting: "Welcome to the library! Let's improve your reading skills.",
+            activity: 'reading-comprehension',
+          });
+          break;
+        case 'shopkeeper':
+          EventBus.emit('talk-to-npc', {
+            npc: 'shopkeeper',
+            name: 'Mr. Brown',
+            greeting: "Welcome to my shop! Let's practice some shopping vocabulary.",
+            activity: 'vocabulary-shopping',
+          });
+          break;
       }
     }
   }
