@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { SpriteGenerator } from '../utils/SpriteGenerator';
+import { initializeAllSprites } from '../utils/SpriteGenerator';
 
 export class Preloader extends Scene {
   constructor() {
@@ -30,8 +30,62 @@ export class Preloader extends Scene {
     this.load.image('logo', 'logo.png');
     this.load.image('star', 'star.png');
 
+    // Load environment props as spritesheets
+    this.load.spritesheet('trees', 'Props/Tree.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('bushes', 'Props/Bush.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('flowers', 'Props/Flower.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('grass_props', 'Props/Grass.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('stones', 'Props/Stone and Rock.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.image('bridge_wood', 'Props/Bridge - wood.png');
+    this.load.spritesheet('other_props', 'Props/Other.png', { frameWidth: 32, frameHeight: 32 });
+
+    // Load animated props as spritesheets
+    this.load.spritesheet('rocks_animated', 'Props/animated/rock 1.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('small_stones_1', 'Props/animated/small stone 1.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('small_stones_2', 'Props/animated/small stone 2.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('stones_animated', 'Props/animated/stone 1.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet('water_lilies_1', 'Props/animated/water lily 1.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('water_lilies_2', 'Props/animated/water lily 2.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('water_plants_1', 'Props/animated/water plant 1.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('water_plants_2', 'Props/animated/water plant 2.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    // Load tilesets
+    this.load.image('dirt', 'Tileset/dirt.png');
+    this.load.image('dirt_wall', 'Tileset/dirt wall.png');
+    this.load.image('sand', 'Tileset/sand.png');
+
+    // Load color palette for reference
+    this.load.image('color_palette', 'color palette.png');
+
     // Generate character and item sprites programmatically
-    SpriteGenerator.initializeAllSprites(this);
+    initializeAllSprites(this);
   }
 
   create() {

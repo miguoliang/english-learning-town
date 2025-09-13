@@ -128,6 +128,7 @@ export class TownEnvironmentBuilder {
 
     this.createTownCenter();
     this.createStreetSigns();
+    this.createEnvironmentalDetails();
     this.createWelcomeSign();
   }
 
@@ -155,50 +156,54 @@ export class TownEnvironmentBuilder {
       })
       .setOrigin(0.5);
 
-    // Decorative trees and benches - positioned relative to center
+    // Decorative trees - using different tree sprites from the spritesheet
     this.scene.add
-      .text(
+      .image(
         centerX - GameConfig.screenWidth * 0.06,
         centerY - GameConfig.screenHeight * 0.05,
-        '🌳',
-        {
-          fontFamily: 'Arial',
-          fontSize: Math.min(GameConfig.screenWidth / 30, 24),
-        }
+        'trees',
+        0 // First tree sprite
       )
+      .setScale(1.5)
       .setOrigin(0.5);
     this.scene.add
-      .text(
+      .image(
         centerX + GameConfig.screenWidth * 0.06,
         centerY - GameConfig.screenHeight * 0.05,
-        '🌳',
-        {
-          fontFamily: 'Arial',
-          fontSize: Math.min(GameConfig.screenWidth / 30, 24),
-        }
+        'trees',
+        1 // Second tree sprite
       )
+      .setScale(1.5)
+      .setOrigin(0.5);
+
+    // Add some bushes and flowers around the fountain
+    this.scene.add
+      .image(
+        centerX - GameConfig.screenWidth * 0.04,
+        centerY + GameConfig.screenHeight * 0.08,
+        'bushes',
+        0 // First bush sprite
+      )
+      .setScale(1.2)
       .setOrigin(0.5);
     this.scene.add
-      .text(
-        centerX - GameConfig.screenWidth * 0.06,
-        centerY + GameConfig.screenHeight * 0.05,
-        '🪑',
-        {
-          fontFamily: 'Arial',
-          fontSize: Math.min(GameConfig.screenWidth / 40, 16),
-        }
+      .image(
+        centerX + GameConfig.screenWidth * 0.04,
+        centerY + GameConfig.screenHeight * 0.08,
+        'bushes',
+        1 // Second bush sprite
       )
+      .setScale(1.2)
+      .setOrigin(0.5);
+
+    // Add decorative flowers
+    this.scene.add
+      .image(centerX - GameConfig.screenWidth * 0.08, centerY, 'flowers', 0)
+      .setScale(1.5)
       .setOrigin(0.5);
     this.scene.add
-      .text(
-        centerX + GameConfig.screenWidth * 0.06,
-        centerY + GameConfig.screenHeight * 0.05,
-        '🪑',
-        {
-          fontFamily: 'Arial',
-          fontSize: Math.min(GameConfig.screenWidth / 40, 16),
-        }
-      )
+      .image(centerX + GameConfig.screenWidth * 0.08, centerY, 'flowers', 1)
+      .setScale(1.5)
       .setOrigin(0.5);
   }
 
@@ -242,6 +247,81 @@ export class TownEnvironmentBuilder {
         backgroundColor: '#2f4f2f',
         padding: { x: 3, y: 2 },
       })
+      .setOrigin(0.5);
+  }
+
+  /**
+   * Creates environmental details and props
+   */
+  private createEnvironmentalDetails(): void {
+    // Add small stones around the roads using the stones spritesheet
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.15, GameConfig.screenHeight * 0.3, 'stones', 0)
+      .setScale(1.2)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.85, GameConfig.screenHeight * 0.3, 'stones', 1)
+      .setScale(1.2)
+      .setOrigin(0.5);
+
+    // Add grass patches for more natural look
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.1, GameConfig.screenHeight * 0.6, 'grass_props', 0)
+      .setScale(1.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.9, GameConfig.screenHeight * 0.6, 'grass_props', 1)
+      .setScale(1.0)
+      .setOrigin(0.5);
+
+    // Add some rocks for variety using animated props spritesheets
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.05, GameConfig.screenHeight * 0.4, 'stones_animated', 0)
+      .setScale(1.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.95, GameConfig.screenHeight * 0.4, 'rocks_animated', 0)
+      .setScale(1.0)
+      .setOrigin(0.5);
+
+    // Add more decorative elements using different frames
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.25, GameConfig.screenHeight * 0.7, 'flowers', 2)
+      .setScale(1.3)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.75, GameConfig.screenHeight * 0.7, 'flowers', 3)
+      .setScale(1.3)
+      .setOrigin(0.5);
+
+    // Add more trees for a richer environment
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.08, GameConfig.screenHeight * 0.25, 'trees', 2)
+      .setScale(1.3)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.92, GameConfig.screenHeight * 0.25, 'trees', 3)
+      .setScale(1.3)
+      .setOrigin(0.5);
+
+    // Add small decorative stones using animated spritesheets
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.12, GameConfig.screenHeight * 0.45, 'small_stones_1', 0)
+      .setScale(1.5)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.88, GameConfig.screenHeight * 0.45, 'small_stones_2', 1)
+      .setScale(1.5)
+      .setOrigin(0.5);
+
+    // Add more varied stones for natural diversity
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.18, GameConfig.screenHeight * 0.65, 'rocks_animated', 2)
+      .setScale(0.9)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.82, GameConfig.screenHeight * 0.65, 'stones_animated', 3)
+      .setScale(0.9)
       .setOrigin(0.5);
   }
 

@@ -108,10 +108,7 @@ export class LibraryElementsBuilder {
       });
 
       // Add books on table
-      this.scene.add
-        .image(tableX, tableY, 'item_book')
-        .setScale(0.6)
-        .setOrigin(0.5);
+      this.scene.add.image(tableX, tableY, 'item_book').setScale(0.6).setOrigin(0.5);
     }
   }
 

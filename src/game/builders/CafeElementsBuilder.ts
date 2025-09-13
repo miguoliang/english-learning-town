@@ -130,10 +130,7 @@ export class CafeElementsBuilder {
 
     // Coffee cups on some tables (random)
     if (Math.random() > 0.5) {
-      this.scene.add
-        .image(x, y, 'item_coffee')
-        .setScale(0.6)
-        .setOrigin(0.5);
+      this.scene.add.image(x, y, 'item_coffee').setScale(0.6).setOrigin(0.5);
     }
   }
 

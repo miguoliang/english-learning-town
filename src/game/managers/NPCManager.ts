@@ -124,10 +124,7 @@ export class NPCManager {
     // Person walking near fountain
     const walkerX = GameConfig.UI.centerX + GameConfig.screenWidth * 0.08;
     const walkerY = GameConfig.screenHeight * 0.47;
-    this.scene.add
-      .image(walkerX, walkerY, 'character_walker')
-      .setScale(0.6)
-      .setOrigin(0.5);
+    this.scene.add.image(walkerX, walkerY, 'character_walker').setScale(0.6).setOrigin(0.5);
     this.scene.add
       .text(walkerX, walkerY + 35, 'Walker', {
         fontFamily: 'Arial',
@@ -140,10 +137,7 @@ export class NPCManager {
     // Child playing near school
     const studentX = GameConfig.BUILDINGS.SCHOOL.x - 50;
     const studentY = GameConfig.BUILDINGS.SCHOOL.y + 50;
-    this.scene.add
-      .image(studentX, studentY, 'character_student')
-      .setScale(0.5)
-      .setOrigin(0.5);
+    this.scene.add.image(studentX, studentY, 'character_student').setScale(0.5).setOrigin(0.5);
     this.scene.add
       .text(studentX, studentY + 30, 'Student', {
         fontFamily: 'Arial',

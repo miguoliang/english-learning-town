@@ -28,7 +28,7 @@ export class BasePlayerController {
     usePhysics: boolean = false
   ): Phaser.GameObjects.Image | Phaser.Physics.Arcade.Image {
     const spriteKey = 'character_player';
-    
+
     if (usePhysics && this.scene.physics) {
       this.player = this.scene.physics.add.image(x, y, spriteKey);
       const physicsPlayer = this.player as Phaser.Physics.Arcade.Image;
