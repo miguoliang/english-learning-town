@@ -2,6 +2,10 @@ import { Boot } from './scenes/Boot';
 import { GameOver } from './scenes/GameOver';
 import { Game as MainGame } from './scenes/Game';
 import { MainMenu } from './scenes/MainMenu';
+import { SchoolInterior } from './scenes/SchoolInterior';
+import { LibraryInterior } from './scenes/LibraryInterior';
+import { CafeInterior } from './scenes/CafeInterior';
+import { ShopInterior } from './scenes/ShopInterior';
 import { AUTO, Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
 
@@ -13,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
   height: 768,
   parent: 'game-container',
   backgroundColor: '#028af8',
-  scene: [Boot, Preloader, MainMenu, MainGame, GameOver],
+  scene: [Boot, Preloader, MainMenu, MainGame, GameOver, SchoolInterior, LibraryInterior, CafeInterior, ShopInterior],
 };
 
 const StartGame = (parent: string) => new Game({ ...config, parent });

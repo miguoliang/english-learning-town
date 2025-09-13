@@ -21,6 +21,7 @@ export class Game extends Scene {
   private interactionPrompt: Phaser.GameObjects.Text;
   private nearbyInteractable: string | null = null;
   private nearbyNpcType: string | null = null;
+  private nearbyBuildingEntry: string | null = null;
 
   // Town buildings
   private school: Phaser.GameObjects.Rectangle;
@@ -58,7 +59,7 @@ export class Game extends Scene {
 
     // Instructions
     this.add
-      .text(512, 100, 'Use Arrow Keys or WASD to move • Click buildings or press SPACEBAR near NPCs!', {
+      .text(512, 100, 'Use Arrow Keys or WASD to move • Press SPACEBAR to enter buildings or talk to NPCs!', {
         fontFamily: 'Arial',
         fontSize: 20,
         color: '#2C5F41',
@@ -234,37 +235,65 @@ export class Game extends Scene {
     let nearestObject = null;
     let nearestDistance = Infinity;
     let interactionText = '';
+    let interactionType = '';
 
-    // Check distance to buildings
-    const buildingData = [
-      { obj: this.school, name: 'School', text: 'Press CLICK to enter School' },
-      { obj: this.library, name: 'Library', text: 'Press CLICK to enter Library' },
-      { obj: this.cafe, name: 'Cafe', text: 'Press CLICK to enter Cafe' },
-      { obj: this.shop, name: 'Shop', text: 'Press CLICK to enter Shop' },
+    // Check distance to building entry zones (south side of buildings)
+    const buildingEntryData = [
+      {
+        obj: this.school,
+        name: 'School',
+        text: 'Press SPACEBAR to enter School',
+        sceneKey: 'SchoolInterior'
+      },
+      {
+        obj: this.library,
+        name: 'Library',
+        text: 'Press SPACEBAR to enter Library',
+        sceneKey: 'LibraryInterior'
+      },
+      {
+        obj: this.cafe,
+        name: 'Cafe',
+        text: 'Press SPACEBAR to enter Cafe',
+        sceneKey: 'CafeInterior'
+      },
+      {
+        obj: this.shop,
+        name: 'Shop',
+        text: 'Press SPACEBAR to enter Shop',
+        sceneKey: 'ShopInterior'
+      },
     ];
 
-    for (const building of buildingData) {
+    for (const building of buildingEntryData) {
       if (building.obj) {
-        const distance = Phaser.Math.Distance.Between(
+        // Check if player is near the south side of the building
+        const buildingSouthY = building.obj.y + building.obj.height / 2;
+        const entryZoneDistance = Phaser.Math.Distance.Between(
           playerX,
           playerY,
           building.obj.x,
-          building.obj.y
+          buildingSouthY
         );
 
-        if (distance < interactionDistance && distance < nearestDistance) {
-          nearestDistance = distance;
+        // Only allow entry from the south side (player must be below the building center)
+        const isOnSouthSide = playerY > building.obj.y;
+
+        if (entryZoneDistance < interactionDistance && entryZoneDistance < nearestDistance && isOnSouthSide) {
+          nearestDistance = entryZoneDistance;
           nearestObject = building.name;
           interactionText = building.text;
+          interactionType = 'building';
+          this.nearbyBuildingEntry = building.sceneKey;
         }
       }
     }
 
     // Check distance to NPCs
     const npcData = [
-      { obj: this.teacher, name: 'Ms. Smith', text: 'Press SPACEBAR to talk to Ms. Smith' },
-      { obj: this.librarian, name: 'Mr. Johnson', text: 'Press SPACEBAR to talk to Mr. Johnson' },
-      { obj: this.shopkeeper, name: 'Mr. Brown', text: 'Press SPACEBAR to talk to Mr. Brown' },
+      { obj: this.teacher, name: 'Ms. Smith', text: 'Press SPACEBAR to talk to Ms. Smith', npcType: 'teacher' },
+      { obj: this.librarian, name: 'Mr. Johnson', text: 'Press SPACEBAR to talk to Mr. Johnson', npcType: 'librarian' },
+      { obj: this.shopkeeper, name: 'Mr. Brown', text: 'Press SPACEBAR to talk to Mr. Brown', npcType: 'shopkeeper' },
     ];
 
     for (const npc of npcData) {
@@ -280,71 +309,80 @@ export class Game extends Scene {
           nearestDistance = distance;
           nearestObject = npc.name;
           interactionText = npc.text;
+          interactionType = 'npc';
+          this.nearbyNpcType = npc.npcType;
+          this.nearbyBuildingEntry = null; // Clear building entry when NPC is closer
         }
       }
     }
 
-    // Update interaction prompt and track NPC type
+    // Update interaction prompt and track interaction type
     if (nearestObject && nearestDistance < interactionDistance) {
       if (this.nearbyInteractable !== nearestObject) {
         this.nearbyInteractable = nearestObject;
         this.interactionPrompt.setText(interactionText);
         this.interactionPrompt.setVisible(true);
 
-        // Track which NPC type the player is near for spacebar interactions
-        if (nearestObject === 'Ms. Smith') {
-          this.nearbyNpcType = 'teacher';
-        } else if (nearestObject === 'Mr. Johnson') {
-          this.nearbyNpcType = 'librarian';
-        } else if (nearestObject === 'Mr. Brown') {
-          this.nearbyNpcType = 'shopkeeper';
-        } else {
-          this.nearbyNpcType = null; // Building, not NPC
+        // Clear the appropriate interaction type when switching
+        if (interactionType === 'npc') {
+          this.nearbyBuildingEntry = null;
+        } else if (interactionType === 'building') {
+          this.nearbyNpcType = null;
         }
       }
     } else {
+      // Clear all interaction states
       if (this.nearbyInteractable !== null) {
         this.nearbyInteractable = null;
         this.nearbyNpcType = null;
+        this.nearbyBuildingEntry = null;
         this.interactionPrompt.setVisible(false);
       }
     }
   }
 
   /**
-   * Handles spacebar interactions with NPCs
+   * Handles spacebar interactions with NPCs and building entries
    */
   private handleSpacebarInteraction(): void {
-    if (!this.spaceKey || !this.nearbyNpcType) return;
+    if (!this.spaceKey) return;
 
     // Check if spacebar was just pressed (not held down)
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-      // Trigger the appropriate NPC interaction based on nearby NPC type
-      switch (this.nearbyNpcType) {
-        case 'teacher':
-          EventBus.emit('talk-to-npc', {
-            npc: 'teacher',
-            name: 'Ms. Smith',
-            greeting: 'Hello! Ready to learn some grammar today?',
-            activity: 'grammar-lesson',
-          });
-          break;
-        case 'librarian':
-          EventBus.emit('talk-to-npc', {
-            npc: 'librarian',
-            name: 'Mr. Johnson',
-            greeting: "Welcome to the library! Let's improve your reading skills.",
-            activity: 'reading-comprehension',
-          });
-          break;
-        case 'shopkeeper':
-          EventBus.emit('talk-to-npc', {
-            npc: 'shopkeeper',
-            name: 'Mr. Brown',
-            greeting: "Welcome to my shop! Let's practice some shopping vocabulary.",
-            activity: 'vocabulary-shopping',
-          });
-          break;
+      // Handle building entry first (higher priority when both are available)
+      if (this.nearbyBuildingEntry) {
+        this.scene.start(this.nearbyBuildingEntry);
+        return;
+      }
+
+      // Handle NPC interactions
+      if (this.nearbyNpcType) {
+        switch (this.nearbyNpcType) {
+          case 'teacher':
+            EventBus.emit('talk-to-npc', {
+              npc: 'teacher',
+              name: 'Ms. Smith',
+              greeting: 'Hello! Ready to learn some grammar today?',
+              activity: 'grammar-lesson',
+            });
+            break;
+          case 'librarian':
+            EventBus.emit('talk-to-npc', {
+              npc: 'librarian',
+              name: 'Mr. Johnson',
+              greeting: "Welcome to the library! Let's improve your reading skills.",
+              activity: 'reading-comprehension',
+            });
+            break;
+          case 'shopkeeper':
+            EventBus.emit('talk-to-npc', {
+              npc: 'shopkeeper',
+              name: 'Mr. Brown',
+              greeting: "Welcome to my shop! Let's practice some shopping vocabulary.",
+              activity: 'vocabulary-shopping',
+            });
+            break;
+        }
       }
     }
   }
