@@ -14,11 +14,12 @@ export class ShopInterior extends Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private spaceKey: Phaser.Input.Keyboard.Key;
-  private player: Phaser.GameObjects.Image;
+  private player: Phaser.Physics.Arcade.Image;
   private playerSpeed: number = 200;
   private exitZone: Phaser.GameObjects.Rectangle;
   private interactionPrompt: Phaser.GameObjects.Text;
   private nearExit: boolean = false;
+  private obstacles: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super('ShopInterior');
@@ -28,14 +29,20 @@ export class ShopInterior extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0xf0f0f0); // Light gray background
 
+    // Enable physics
+    this.physics.world.setBounds(0, 0, 1024, 768);
+
+    // Create static group for obstacles
+    this.obstacles = this.physics.add.staticGroup();
+
     // Create floor
     this.add.rectangle(512, 384, 1024, 768, 0xe6e6fa); // Lavender floor
 
-    // Create walls
-    this.add.rectangle(512, 50, 1024, 100, 0x8b4513); // Brown walls
-    this.add.rectangle(512, 718, 1024, 100, 0x8b4513);
-    this.add.rectangle(50, 384, 100, 768, 0x8b4513);
-    this.add.rectangle(974, 384, 100, 768, 0x8b4513);
+    // Create walls as physics obstacles
+    this.obstacles.add(this.add.rectangle(512, 50, 1024, 100, 0x8b4513)); // Brown walls
+    this.obstacles.add(this.add.rectangle(512, 718, 1024, 100, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(50, 384, 100, 768, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(974, 384, 100, 768, 0x8b4513));
 
     // Shop title
     this.add
@@ -67,6 +74,9 @@ export class ShopInterior extends Scene {
     this.setupKeyboard();
     this.createInteractionPrompt();
 
+    // Set up collision detection
+    this.physics.add.collider(this.player, this.obstacles);
+
     EventBus.emit('current-scene-ready', this);
   }
 
@@ -74,8 +84,9 @@ export class ShopInterior extends Scene {
    * Creates shop elements like shelves, checkout counter, and products
    */
   private createShopElements(): void {
-    // Checkout counter
-    this.add.rectangle(512, 180, 200, 60, 0x8b4513); // Brown counter
+    // Checkout counter (with collision)
+    const checkoutCounter = this.add.rectangle(512, 180, 200, 60, 0x8b4513); // Brown counter
+    this.obstacles.add(checkoutCounter);
     this.add
       .text(512, 180, '💳 CHECKOUT COUNTER 💳', {
         fontFamily: 'Arial',
@@ -85,8 +96,9 @@ export class ShopInterior extends Scene {
       })
       .setOrigin(0.5);
 
-    // Cash register
-    this.add.rectangle(512, 160, 60, 40, 0x000000); // Black cash register
+    // Cash register (with collision)
+    const cashRegister = this.add.rectangle(512, 160, 60, 40, 0x000000); // Black cash register
+    this.obstacles.add(cashRegister);
     this.add
       .text(512, 160, '🖥️', {
         fontFamily: 'Arial',
@@ -103,8 +115,9 @@ export class ShopInterior extends Scene {
     ];
 
     aisleData.forEach(aisle => {
-      // Shelf structure
-      this.add.rectangle(aisle.x, aisle.y, 120, 100, 0x654321); // Dark brown shelf
+      // Shelf structure (with collision)
+      const shelf = this.add.rectangle(aisle.x, aisle.y, 120, 100, 0x654321); // Dark brown shelf
+      this.obstacles.add(shelf);
 
       // Category label
       this.add
@@ -139,8 +152,9 @@ export class ShopInterior extends Scene {
         .setOrigin(0.5);
     });
 
-    // Shopping baskets area
-    this.add.rectangle(150, 450, 80, 60, 0x8b4513);
+    // Shopping baskets area (with collision)
+    const basketsArea = this.add.rectangle(150, 450, 80, 60, 0x8b4513);
+    this.obstacles.add(basketsArea);
     this.add
       .text(150, 450, '🛒\nBaskets', {
         fontFamily: 'Arial',
@@ -149,8 +163,9 @@ export class ShopInterior extends Scene {
       })
       .setOrigin(0.5);
 
-    // Customer service desk
-    this.add.rectangle(824, 450, 120, 80, 0x8b4513);
+    // Customer service desk (with collision)
+    const serviceDesk = this.add.rectangle(824, 450, 120, 80, 0x8b4513);
+    this.obstacles.add(serviceDesk);
     this.add
       .text(824, 450, '🏪\nCustomer\nService', {
         fontFamily: 'Arial',
@@ -191,9 +206,11 @@ export class ShopInterior extends Scene {
   }
 
   private createPlayer(): void {
-    this.player = this.add.image(512, 150, 'star');
+    this.player = this.physics.add.image(512, 150, 'star');
     this.player.setScale(0.5);
     this.player.setTint(0x4169e1);
+    this.player.setCollideWorldBounds(true);
+    this.player.body!.setSize(this.player.width * 0.8, this.player.height * 0.8);
   }
 
   private setupKeyboard(): void {
@@ -227,31 +244,26 @@ export class ShopInterior extends Scene {
     this.handleSpacebarInteraction();
   }
 
-  private handlePlayerMovement(delta: number): void {
+  private handlePlayerMovement(_delta: number): void {
     if (!this.player || !this.cursors || !this.wasdKeys) return;
 
-    const deltaSeconds = delta / 1000;
-    let newX = this.player.x;
-    let newY = this.player.y;
+    let velocityX = 0;
+    let velocityY = 0;
 
     if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
-      newX -= this.playerSpeed * deltaSeconds;
+      velocityX = -this.playerSpeed;
     }
     if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
-      newX += this.playerSpeed * deltaSeconds;
+      velocityX = this.playerSpeed;
     }
     if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
-      newY -= this.playerSpeed * deltaSeconds;
+      velocityY = -this.playerSpeed;
     }
     if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
-      newY += this.playerSpeed * deltaSeconds;
+      velocityY = this.playerSpeed;
     }
 
-    const padding = 25;
-    newX = Phaser.Math.Clamp(newX, padding + 50, 1024 - padding - 50);
-    newY = Phaser.Math.Clamp(newY, padding + 100, 768 - padding - 100);
-
-    this.player.setPosition(newX, newY);
+    this.player.setVelocity(velocityX, velocityY);
   }
 
   private checkExitZone(): void {

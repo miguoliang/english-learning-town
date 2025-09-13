@@ -14,11 +14,12 @@ export class CafeInterior extends Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private spaceKey: Phaser.Input.Keyboard.Key;
-  private player: Phaser.GameObjects.Image;
+  private player: Phaser.Physics.Arcade.Image;
   private playerSpeed: number = 200;
   private exitZone: Phaser.GameObjects.Rectangle;
   private interactionPrompt: Phaser.GameObjects.Text;
   private nearExit: boolean = false;
+  private obstacles: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super('CafeInterior');
@@ -28,14 +29,20 @@ export class CafeInterior extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0xfff8dc); // Cornsilk background
 
+    // Enable physics
+    this.physics.world.setBounds(0, 0, 1024, 768);
+
+    // Create static group for obstacles
+    this.obstacles = this.physics.add.staticGroup();
+
     // Create floor with checkered pattern
     this.add.rectangle(512, 384, 1024, 768, 0xf5deb3); // Wheat colored floor
 
-    // Create walls
-    this.add.rectangle(512, 50, 1024, 100, 0x8b4513); // Brown walls
-    this.add.rectangle(512, 718, 1024, 100, 0x8b4513);
-    this.add.rectangle(50, 384, 100, 768, 0x8b4513);
-    this.add.rectangle(974, 384, 100, 768, 0x8b4513);
+    // Create walls as physics obstacles
+    this.obstacles.add(this.add.rectangle(512, 50, 1024, 100, 0x8b4513)); // Brown walls
+    this.obstacles.add(this.add.rectangle(512, 718, 1024, 100, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(50, 384, 100, 768, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(974, 384, 100, 768, 0x8b4513));
 
     // Cafe title
     this.add
@@ -67,6 +74,9 @@ export class CafeInterior extends Scene {
     this.setupKeyboard();
     this.createInteractionPrompt();
 
+    // Set up collision detection
+    this.physics.add.collider(this.player, this.obstacles);
+
     EventBus.emit('current-scene-ready', this);
   }
 
@@ -74,8 +84,9 @@ export class CafeInterior extends Scene {
    * Creates cafe elements like counter, tables, and decorations
    */
   private createCafeElements(): void {
-    // Coffee counter
-    this.add.rectangle(512, 200, 300, 80, 0x8b4513); // Brown counter
+    // Coffee counter (with collision)
+    const counter = this.add.rectangle(512, 200, 300, 80, 0x8b4513); // Brown counter
+    this.obstacles.add(counter);
     this.add
       .text(512, 200, '☕ Coffee Bar ☕\n🥐 Pastries 🧁 Cakes', {
         fontFamily: 'Arial',
@@ -85,8 +96,9 @@ export class CafeInterior extends Scene {
       })
       .setOrigin(0.5);
 
-    // Coffee machine
-    this.add.rectangle(400, 180, 60, 40, 0x2f4f2f); // Dark green coffee machine
+    // Coffee machine (with collision)
+    const coffeeMachine = this.add.rectangle(400, 180, 60, 40, 0x2f4f2f); // Dark green coffee machine
+    this.obstacles.add(coffeeMachine);
     this.add
       .text(400, 180, '☕', {
         fontFamily: 'Arial',
@@ -94,8 +106,9 @@ export class CafeInterior extends Scene {
       })
       .setOrigin(0.5);
 
-    // Cash register
-    this.add.rectangle(624, 180, 50, 30, 0x000000); // Black cash register
+    // Cash register (with collision)
+    const cashRegister = this.add.rectangle(624, 180, 50, 30, 0x000000); // Black cash register
+    this.obstacles.add(cashRegister);
     this.add
       .text(624, 180, '💰', {
         fontFamily: 'Arial',
@@ -114,14 +127,19 @@ export class CafeInterior extends Scene {
     ];
 
     tablePositions.forEach(pos => {
-      // Round table
-      this.add.arc(pos.x, pos.y, 40, 0, 360, false, 0x8b4513);
+      // Round table (with collision)
+      const table = this.add.arc(pos.x, pos.y, 40, 0, 360, false, 0x8b4513);
+      this.obstacles.add(table);
 
-      // Chairs around table
-      this.add.arc(pos.x - 50, pos.y, 15, 0, 360, false, 0x654321); // Left
-      this.add.arc(pos.x + 50, pos.y, 15, 0, 360, false, 0x654321); // Right
-      this.add.arc(pos.x, pos.y - 50, 15, 0, 360, false, 0x654321); // Top
-      this.add.arc(pos.x, pos.y + 50, 15, 0, 360, false, 0x654321); // Bottom
+      // Chairs around table (with collision)
+      const leftChair = this.add.arc(pos.x - 50, pos.y, 15, 0, 360, false, 0x654321); // Left
+      const rightChair = this.add.arc(pos.x + 50, pos.y, 15, 0, 360, false, 0x654321); // Right
+      const topChair = this.add.arc(pos.x, pos.y - 50, 15, 0, 360, false, 0x654321); // Top
+      const bottomChair = this.add.arc(pos.x, pos.y + 50, 15, 0, 360, false, 0x654321); // Bottom
+      this.obstacles.add(leftChair);
+      this.obstacles.add(rightChair);
+      this.obstacles.add(topChair);
+      this.obstacles.add(bottomChair);
 
       // Coffee cups on some tables
       if (Math.random() > 0.5) {
@@ -165,9 +183,11 @@ export class CafeInterior extends Scene {
   }
 
   private createPlayer(): void {
-    this.player = this.add.image(512, 150, 'star');
+    this.player = this.physics.add.image(512, 150, 'star');
     this.player.setScale(0.5);
     this.player.setTint(0x4169e1);
+    this.player.setCollideWorldBounds(true);
+    this.player.body!.setSize(this.player.width * 0.8, this.player.height * 0.8);
   }
 
   private setupKeyboard(): void {
@@ -201,31 +221,26 @@ export class CafeInterior extends Scene {
     this.handleSpacebarInteraction();
   }
 
-  private handlePlayerMovement(delta: number): void {
+  private handlePlayerMovement(_delta: number): void {
     if (!this.player || !this.cursors || !this.wasdKeys) return;
 
-    const deltaSeconds = delta / 1000;
-    let newX = this.player.x;
-    let newY = this.player.y;
+    let velocityX = 0;
+    let velocityY = 0;
 
     if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
-      newX -= this.playerSpeed * deltaSeconds;
+      velocityX = -this.playerSpeed;
     }
     if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
-      newX += this.playerSpeed * deltaSeconds;
+      velocityX = this.playerSpeed;
     }
     if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
-      newY -= this.playerSpeed * deltaSeconds;
+      velocityY = -this.playerSpeed;
     }
     if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
-      newY += this.playerSpeed * deltaSeconds;
+      velocityY = this.playerSpeed;
     }
 
-    const padding = 25;
-    newX = Phaser.Math.Clamp(newX, padding + 50, 1024 - padding - 50);
-    newY = Phaser.Math.Clamp(newY, padding + 100, 768 - padding - 100);
-
-    this.player.setPosition(newX, newY);
+    this.player.setVelocity(velocityX, velocityY);
   }
 
   private checkExitZone(): void {

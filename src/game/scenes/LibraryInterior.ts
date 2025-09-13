@@ -14,11 +14,12 @@ export class LibraryInterior extends Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private spaceKey: Phaser.Input.Keyboard.Key;
-  private player: Phaser.GameObjects.Image;
+  private player: Phaser.Physics.Arcade.Image;
   private playerSpeed: number = 200;
   private exitZone: Phaser.GameObjects.Rectangle;
   private interactionPrompt: Phaser.GameObjects.Text;
   private nearExit: boolean = false;
+  private obstacles: Phaser.Physics.Arcade.StaticGroup;
 
   constructor() {
     super('LibraryInterior');
@@ -28,14 +29,20 @@ export class LibraryInterior extends Scene {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(0xf0f8ff); // Alice blue background
 
+    // Enable physics
+    this.physics.world.setBounds(0, 0, 1024, 768);
+
+    // Create static group for obstacles
+    this.obstacles = this.physics.add.staticGroup();
+
     // Create floor
     this.add.rectangle(512, 384, 1024, 768, 0xd2b48c); // Tan floor
 
-    // Create walls
-    this.add.rectangle(512, 50, 1024, 100, 0x8b4513); // Brown walls
-    this.add.rectangle(512, 718, 1024, 100, 0x8b4513);
-    this.add.rectangle(50, 384, 100, 768, 0x8b4513);
-    this.add.rectangle(974, 384, 100, 768, 0x8b4513);
+    // Create walls as physics obstacles
+    this.obstacles.add(this.add.rectangle(512, 50, 1024, 100, 0x8b4513)); // Brown walls
+    this.obstacles.add(this.add.rectangle(512, 718, 1024, 100, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(50, 384, 100, 768, 0x8b4513));
+    this.obstacles.add(this.add.rectangle(974, 384, 100, 768, 0x8b4513));
 
     // Library title
     this.add
@@ -67,6 +74,9 @@ export class LibraryInterior extends Scene {
     this.setupKeyboard();
     this.createInteractionPrompt();
 
+    // Set up collision detection
+    this.physics.add.collider(this.player, this.obstacles);
+
     EventBus.emit('current-scene-ready', this);
   }
 
@@ -74,10 +84,11 @@ export class LibraryInterior extends Scene {
    * Creates library elements like bookshelves and reading tables
    */
   private createLibraryElements(): void {
-    // Bookshelves along the walls
+    // Bookshelves along the walls (with collision)
     for (let i = 0; i < 6; i++) {
       const x = 150 + i * 120;
-      this.add.rectangle(x, 200, 80, 120, 0x654321); // Dark brown bookshelf
+      const bookshelf = this.add.rectangle(x, 200, 80, 120, 0x654321); // Dark brown bookshelf
+      this.obstacles.add(bookshelf);
       this.add
         .text(x, 200, '📖\n📗\n📘\n📙', {
           fontFamily: 'Arial',
@@ -87,19 +98,24 @@ export class LibraryInterior extends Scene {
         .setOrigin(0.5);
     }
 
-    // Reading tables in the center
+    // Reading tables in the center (with collision)
     for (let i = 0; i < 3; i++) {
       const x = 250 + i * 200;
       const y = 400;
 
-      // Table
-      this.add.rectangle(x, y, 120, 80, 0x8b4513);
+      // Table (with collision)
+      const table = this.add.rectangle(x, y, 120, 80, 0x8b4513);
+      this.obstacles.add(table);
 
-      // Chairs around table
-      this.add.rectangle(x - 50, y, 30, 30, 0x654321); // Left chair
-      this.add.rectangle(x + 50, y, 30, 30, 0x654321); // Right chair
-      this.add.rectangle(x, y - 40, 30, 30, 0x654321); // Top chair
-      this.add.rectangle(x, y + 40, 30, 30, 0x654321); // Bottom chair
+      // Chairs around table (with collision)
+      const leftChair = this.add.rectangle(x - 50, y, 30, 30, 0x654321); // Left chair
+      const rightChair = this.add.rectangle(x + 50, y, 30, 30, 0x654321); // Right chair
+      const topChair = this.add.rectangle(x, y - 40, 30, 30, 0x654321); // Top chair
+      const bottomChair = this.add.rectangle(x, y + 40, 30, 30, 0x654321); // Bottom chair
+      this.obstacles.add(leftChair);
+      this.obstacles.add(rightChair);
+      this.obstacles.add(topChair);
+      this.obstacles.add(bottomChair);
 
       // Books on table
       this.add
@@ -110,8 +126,9 @@ export class LibraryInterior extends Scene {
         .setOrigin(0.5);
     }
 
-    // Librarian desk
-    this.add.rectangle(512, 300, 120, 80, 0x8b4513);
+    // Librarian desk (with collision)
+    const librarianDesk = this.add.rectangle(512, 300, 120, 80, 0x8b4513);
+    this.obstacles.add(librarianDesk);
     this.add
       .text(512, 300, '👨‍💼\nLibrarian', {
         fontFamily: 'Arial',
@@ -134,9 +151,11 @@ export class LibraryInterior extends Scene {
   }
 
   private createPlayer(): void {
-    this.player = this.add.image(512, 150, 'star');
+    this.player = this.physics.add.image(512, 150, 'star');
     this.player.setScale(0.5);
     this.player.setTint(0x4169e1);
+    this.player.setCollideWorldBounds(true);
+    this.player.body!.setSize(this.player.width * 0.8, this.player.height * 0.8);
   }
 
   private setupKeyboard(): void {
@@ -170,31 +189,26 @@ export class LibraryInterior extends Scene {
     this.handleSpacebarInteraction();
   }
 
-  private handlePlayerMovement(delta: number): void {
+  private handlePlayerMovement(_delta: number): void {
     if (!this.player || !this.cursors || !this.wasdKeys) return;
 
-    const deltaSeconds = delta / 1000;
-    let newX = this.player.x;
-    let newY = this.player.y;
+    let velocityX = 0;
+    let velocityY = 0;
 
     if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
-      newX -= this.playerSpeed * deltaSeconds;
+      velocityX = -this.playerSpeed;
     }
     if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
-      newX += this.playerSpeed * deltaSeconds;
+      velocityX = this.playerSpeed;
     }
     if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
-      newY -= this.playerSpeed * deltaSeconds;
+      velocityY = -this.playerSpeed;
     }
     if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
-      newY += this.playerSpeed * deltaSeconds;
+      velocityY = this.playerSpeed;
     }
 
-    const padding = 25;
-    newX = Phaser.Math.Clamp(newX, padding + 50, 1024 - padding - 50);
-    newY = Phaser.Math.Clamp(newY, padding + 100, 768 - padding - 100);
-
-    this.player.setPosition(newX, newY);
+    this.player.setVelocity(velocityX, velocityY);
   }
 
   private checkExitZone(): void {
