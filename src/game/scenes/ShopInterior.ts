@@ -206,7 +206,8 @@ export class ShopInterior extends Scene {
   }
 
   private createPlayer(): void {
-    this.player = this.physics.add.image(512, 150, 'star');
+    // Place player at the entrance (near the south door where they enter from main town)
+    this.player = this.physics.add.image(512, 600, 'star');
     this.player.setScale(0.5);
     this.player.setTint(0x4169e1);
     this.player.setCollideWorldBounds(true);

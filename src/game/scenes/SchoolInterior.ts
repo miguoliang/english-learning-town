@@ -128,8 +128,8 @@ export class SchoolInterior extends Scene {
    * Creates the player sprite inside the school
    */
   private createPlayer(): void {
-    // Place player at the entrance (north side of the interior)
-    this.player = this.physics.add.image(512, 150, 'star');
+    // Place player at the entrance (near the south door where they enter from main town)
+    this.player = this.physics.add.image(512, 600, 'star');
     this.player.setScale(0.5);
     this.player.setTint(0x4169e1); // Royal blue tint
     this.player.setCollideWorldBounds(true);
