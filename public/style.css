@@ -1,0 +1,344 @@
+body {
+  margin: 0;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.87);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  gap: 15px;
+}
+
+#game-container {
+  margin: 10px;
+  padding: 0;
+  border: 0;
+  position: relative;
+}
+
+#game-container canvas {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Learning Progress Panel */
+.progress-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 10px 0;
+  min-width: 400px;
+  max-width: 600px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.progress-panel h3 {
+  margin: 0 0 15px 0;
+  color: #2c5f41;
+  font-size: 20px;
+  text-align: center;
+}
+
+.progress-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #2c5f41;
+}
+
+.progress-item span:first-child {
+  min-width: 110px;
+  text-align: left;
+}
+
+.progress-item span:last-child {
+  min-width: 40px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #45a049);
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+
+/* Game Info Panel */
+.game-info {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  max-width: 600px;
+  color: #2c5f41;
+  text-align: center;
+}
+
+.game-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Modal Styles for Learning Modules */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin: 20px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+/* Learning Module Styles */
+.learning-module {
+  text-align: left;
+}
+
+.learning-module h2 {
+  color: #2c5f41;
+  margin-bottom: 10px;
+  text-align: center;
+  padding-left: 20px;
+}
+
+.greeting {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.lesson-content {
+  margin-top: 20px;
+}
+
+.lesson-content h3 {
+  color: #2c5f41;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+.vocabulary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.vocab-item {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  border: 2px solid #e9ecef;
+  transition: transform 0.2s;
+}
+
+.vocab-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reading-text {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 15px 0;
+  line-height: 1.6;
+  border-left: 4px solid #4caf50;
+}
+
+.comprehension-questions {
+  margin-top: 20px;
+}
+
+.conversation {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 15px 0;
+  line-height: 1.5;
+}
+
+.conversation p {
+  margin: 10px 0;
+  padding: 8px;
+}
+
+.quiz {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.quiz p {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Button Styles */
+.button,
+.quiz button,
+.lesson-content button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  border: 0;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  outline: transparent;
+  padding: 12px 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  margin: 8px;
+  min-width: 120px;
+}
+
+.button:not([disabled]):focus,
+.quiz button:not([disabled]):focus,
+.lesson-content button:not([disabled]):focus {
+  box-shadow:
+    0 0 0.25rem rgba(0, 0, 0, 0.5),
+    -0.125rem -0.125rem 1rem rgba(66, 110, 234, 0.5),
+    0.125rem 0.125rem 1rem rgba(118, 75, 162, 0.5);
+}
+
+.button:not([disabled]):hover,
+.quiz button:not([disabled]):hover,
+.lesson-content button:not([disabled]):hover {
+  box-shadow:
+    0 0 0.25rem rgba(0, 0, 0, 0.5),
+    -0.125rem -0.125rem 1rem rgba(66, 110, 234, 0.5),
+    0.125rem 0.125rem 1rem rgba(118, 75, 162, 0.5);
+  transform: translateY(-2px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  filter: brightness(80%);
+}
+
+/* Learning module specific styles */
+.grammar h2 {
+  border-left: 4px solid #ff6b6b;
+}
+
+.vocabulary h2 {
+  border-left: 4px solid #4ecdc4;
+}
+
+.reading h2 {
+  border-left: 4px solid #45b7d1;
+}
+
+.conversation h2 {
+  border-left: 4px solid #96ceb4;
+}
+
+.grammar,
+.vocabulary,
+.reading,
+.conversation {
+  padding-left: 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #app {
+    padding: 10px;
+  }
+
+  .progress-panel {
+    min-width: 300px;
+    padding: 15px;
+  }
+
+  .modal-content {
+    margin: 10px;
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .vocabulary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Legacy styles from original template */
+.spritePosition {
+  margin: 10px 0 0 10px;
+  font-size: 0.8em;
+  color: #2c5f41;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+}

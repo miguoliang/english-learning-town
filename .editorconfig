@@ -1,0 +1,34 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+# Matches multiple files with brace expansion notation
+# Set default charset and indentation for source files
+[*.{js,jsx,ts,tsx,html,css,scss,json,md,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Configuration files
+[{package.json,.prettierrc,.eslintrc,*.config.js,*.config.mjs}]
+indent_style = space
+indent_size = 2
+
+# Markdown files (allow trailing spaces for line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# Batch files (Windows)
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# Makefile
+[Makefile]
+indent_style = tab
