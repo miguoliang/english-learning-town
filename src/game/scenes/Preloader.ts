@@ -32,7 +32,7 @@ export class Preloader extends Scene {
 
     // Load environment props as spritesheets
     this.load.spritesheet('trees', 'Props/Tree.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('bushes', 'Props/Bush.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('bushes', 'Props/Bush.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('flowers', 'Props/Flower.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('grass_props', 'Props/Grass.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('stones', 'Props/Stone and Rock.png', {
