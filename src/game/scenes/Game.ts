@@ -28,6 +28,9 @@ export class Game extends Scene {
   private library: Phaser.GameObjects.Rectangle;
   private cafe: Phaser.GameObjects.Rectangle;
   private shop: Phaser.GameObjects.Rectangle;
+  
+  // Town center fountain
+  private fountain: Phaser.GameObjects.Arc;
 
   // NPCs
   private teacher: Phaser.GameObjects.Arc;
@@ -176,7 +179,7 @@ export class Game extends Scene {
   }
 
   /**
-   * Checks if the player would collide with buildings or NPCs at the given position
+   * Checks if the player would collide with buildings, NPCs, or fountain at the given position
    * @param x - The x coordinate to check
    * @param y - The y coordinate to check
    * @returns true if collision detected, false otherwise
@@ -220,6 +223,20 @@ export class Game extends Scene {
         if (Phaser.Geom.Rectangle.Overlaps(playerBounds, npcBounds)) {
           return true; // Collision detected
         }
+      }
+    }
+
+    // Check collision with fountain (town center)
+    if (this.fountain) {
+      const fountainBounds = new Phaser.Geom.Rectangle(
+        this.fountain.x - 40, // Fountain radius + padding (slightly larger than visual for better feel)
+        this.fountain.y - 40,
+        80,                   // Fountain collision diameter
+        80
+      );
+
+      if (Phaser.Geom.Rectangle.Overlaps(playerBounds, fountainBounds)) {
+        return true; // Collision detected
       }
     }
 
@@ -406,14 +423,14 @@ export class Game extends Scene {
     this.add.rectangle(300, 200, 200, 40, 0x696969); // Dark gray road
     this.add.rectangle(300, 200, 180, 30, 0x808080); // Lighter gray road surface
 
-    // Road to library (upper right)  
+    // Road to library (upper right)
     this.add.rectangle(724, 200, 200, 40, 0x696969); // Dark gray road
     this.add.rectangle(724, 200, 180, 30, 0x808080); // Lighter gray road surface
 
     // Town center fountain/plaza
     this.add.circle(512, 320, 50, 0x4169e1); // Blue fountain base
     this.add.circle(512, 320, 35, 0x87ceeb); // Light blue water
-    this.add.circle(512, 320, 15, 0x4682b4); // Fountain center
+    this.fountain = this.add.circle(512, 320, 15, 0x4682b4); // Fountain center (collision object)
     this.add
       .text(512, 320, '⛲', {
         fontFamily: 'Arial',
@@ -447,7 +464,7 @@ export class Game extends Scene {
       })
       .setOrigin(0.5);
 
-    this.add.rectangle(624, 380, 4, 40, 0x654321); // Sign post  
+    this.add.rectangle(624, 380, 4, 40, 0x654321); // Sign post
     this.add
       .text(624, 365, '☕←  →🛒', {
         fontFamily: 'Arial',
