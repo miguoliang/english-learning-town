@@ -82,6 +82,13 @@ export class Preloader extends Scene {
     this.load.image('dirt_wall', 'Tileset/dirt wall.png');
     this.load.image('sand', 'Tileset/sand.png');
 
+    // Load seasonal tilesets as spritesheets
+    this.load.spritesheet('spring_tiles', 'Tileset/Seasonal/spring.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('summer_tiles', 'Tileset/Seasonal/summer.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('fall_tiles', 'Tileset/Seasonal/fall.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('winter_tiles', 'Tileset/Seasonal/winter.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('ice_tiles', 'Tileset/Seasonal/ice.png', { frameWidth: 16, frameHeight: 16 });
+
     // Load color palette for reference
     this.load.image('color_palette', 'color palette.png');
 

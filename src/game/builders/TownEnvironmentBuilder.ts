@@ -47,6 +47,38 @@ const SPRITES = {
   SMALL_STONES_2: {
     PEBBLE_2: 1,
   },
+  SEASONAL_TILES: {
+    SPRING: {
+      GRASS_TILE: 0,
+      FLOWER_TILE: 1,
+      BORDER_TILE: 2,
+      ACCENT_TILE: 3,
+    },
+    SUMMER: {
+      GRASS_TILE: 0,
+      FLOWER_TILE: 1,
+      BORDER_TILE: 2,
+      ACCENT_TILE: 3,
+    },
+    FALL: {
+      GRASS_TILE: 0,
+      LEAF_TILE: 1,
+      BORDER_TILE: 2,
+      ACCENT_TILE: 3,
+    },
+    WINTER: {
+      SNOW_TILE: 0,
+      ICE_TILE: 1,
+      BORDER_TILE: 2,
+      ACCENT_TILE: 3,
+    },
+    ICE: {
+      ICE_TILE: 0,
+      CRACKED_ICE: 1,
+      BORDER_TILE: 2,
+      ACCENT_TILE: 3,
+    },
+  },
 };
 
 /**
@@ -177,6 +209,7 @@ export class TownEnvironmentBuilder {
     this.createTownCenter();
     this.createStreetSigns();
     this.createEnvironmentalDetails();
+    this.createSeasonalTiles();
     this.createWelcomeSign();
   }
 
@@ -380,6 +413,61 @@ export class TownEnvironmentBuilder {
     this.scene.add
       .image(GameConfig.screenWidth * 0.82, GameConfig.screenHeight * 0.65, 'stones_animated', SPRITES.STONES_ANIMATED.STONE_2)
       .setScale(0.9)
+      .setOrigin(0.5);
+  }
+
+  /**
+   * Creates seasonal ground tiles and decorative elements
+   */
+  private createSeasonalTiles(): void {
+    // Add spring seasonal tiles around the left side of the town
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.1, GameConfig.screenHeight * 0.2, 'spring_tiles', SPRITES.SEASONAL_TILES.SPRING.GRASS_TILE)
+      .setScale(2.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.15, GameConfig.screenHeight * 0.35, 'spring_tiles', SPRITES.SEASONAL_TILES.SPRING.FLOWER_TILE)
+      .setScale(1.8)
+      .setOrigin(0.5);
+
+    // Add summer seasonal tiles in the upper area
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.5, GameConfig.screenHeight * 0.1, 'summer_tiles', SPRITES.SEASONAL_TILES.SUMMER.GRASS_TILE)
+      .setScale(2.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.6, GameConfig.screenHeight * 0.15, 'summer_tiles', SPRITES.SEASONAL_TILES.SUMMER.FLOWER_TILE)
+      .setScale(1.8)
+      .setOrigin(0.5);
+
+    // Add fall seasonal tiles around the right side
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.9, GameConfig.screenHeight * 0.2, 'fall_tiles', SPRITES.SEASONAL_TILES.FALL.GRASS_TILE)
+      .setScale(2.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.85, GameConfig.screenHeight * 0.35, 'fall_tiles', SPRITES.SEASONAL_TILES.FALL.LEAF_TILE)
+      .setScale(1.8)
+      .setOrigin(0.5);
+
+    // Add winter seasonal tiles in the lower area
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.2, GameConfig.screenHeight * 0.9, 'winter_tiles', SPRITES.SEASONAL_TILES.WINTER.SNOW_TILE)
+      .setScale(2.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.3, GameConfig.screenHeight * 0.85, 'winter_tiles', SPRITES.SEASONAL_TILES.WINTER.ICE_TILE)
+      .setScale(1.8)
+      .setOrigin(0.5);
+
+    // Add ice seasonal tiles as accents
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.8, GameConfig.screenHeight * 0.9, 'ice_tiles', SPRITES.SEASONAL_TILES.ICE.ICE_TILE)
+      .setScale(2.0)
+      .setOrigin(0.5);
+    this.scene.add
+      .image(GameConfig.screenWidth * 0.7, GameConfig.screenHeight * 0.85, 'ice_tiles', SPRITES.SEASONAL_TILES.ICE.CRACKED_ICE)
+      .setScale(1.8)
       .setOrigin(0.5);
   }
 
