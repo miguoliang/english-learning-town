@@ -17,6 +17,7 @@ export default tseslint.config(
       '*.min.js',
       'vite.config.*',
       '*.config.*',
+      'public/assets/**/*.tsx', // Exclude Tiled tileset definition files
     ],
   },
 

@@ -30,67 +30,15 @@ export class Preloader extends Scene {
     this.load.image('logo', 'logo.png');
     this.load.image('star', 'star.png');
 
-    // Load environment props as spritesheets
-    this.load.spritesheet('trees', 'Props/Tree.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('tree_stumps', 'Props/Tree.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('bushes', 'Props/Bush.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('flowers', 'Props/Flower.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('grass_props', 'Props/Grass.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('stones', 'Props/Stone and Rock.png', {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.image('bridge_wood', 'Props/Bridge - wood.png');
-    this.load.spritesheet('other_props', 'Props/Other.png', { frameWidth: 32, frameHeight: 32 });
-
-    // Load animated props as spritesheets
-    this.load.spritesheet('rocks_animated', 'Props/animated/rock 1.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet('small_stones_1', 'Props/animated/small stone 1.png', {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet('small_stones_2', 'Props/animated/small stone 2.png', {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet('stones_animated', 'Props/animated/stone 1.png', {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet('water_lilies_1', 'Props/animated/water lily 1.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet('water_lilies_2', 'Props/animated/water lily 2.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet('water_plants_1', 'Props/animated/water plant 1.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet('water_plants_2', 'Props/animated/water plant 2.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-
-    // Load tilesets
-    this.load.image('dirt', 'Tileset/dirt.png');
-    this.load.image('dirt_wall', 'Tileset/dirt wall.png');
-    this.load.image('sand', 'Tileset/sand.png');
-
-    // Load seasonal tilesets as spritesheets
-    this.load.spritesheet('spring_tiles', 'Tileset/Seasonal/spring.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('summer_tiles', 'Tileset/Seasonal/summer.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('fall_tiles', 'Tileset/Seasonal/fall.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('winter_tiles', 'Tileset/Seasonal/winter.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('ice_tiles', 'Tileset/Seasonal/ice.png', { frameWidth: 16, frameHeight: 16 });
+    // Load tileset images for embedded TMJ map
+    this.load.image('winter', 'Tileset/Seasonal/winter.png');
+    this.load.image('steps', 'Tileset/Extras/steps.png');
 
     // Load color palette for reference
     this.load.image('color_palette', 'color palette.png');
+
+    // Load TMJ file
+    this.load.tilemapTiledJSON('town_map', 'town.tmj');
 
     // Generate character and item sprites programmatically
     initializeAllSprites(this);
