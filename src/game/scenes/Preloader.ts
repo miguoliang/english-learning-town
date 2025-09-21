@@ -28,9 +28,9 @@ export class Preloader extends Scene {
     this.load.setPath('assets');
 
     // Load UI assets
-    this.load.image('logo', 'scenes/ui/logo.png');
-    this.load.image('star', 'scenes/ui/star.png');
-    this.load.image('background', 'scenes/ui/bg.png');
+    this.load.image('logo', 'shared/ui/logo.png');
+    this.load.image('star', 'shared/ui/star.png');
+    this.load.image('background', 'shared/ui/bg.png');
 
     // Load tileset images for embedded TMJ map
     this.load.image('spring_tileset', 'shared/tilesets/version-2.0/tileset/spring/spring-1.png');
@@ -56,24 +56,24 @@ export class Preloader extends Scene {
 
     // Load interior assets for each scene
     // Cafe assets
-    this.load.image('cafe_wall', 'scenes/interiors/cafe/wall/wall-1.png');
-    this.load.image('cafe_floor', 'scenes/interiors/cafe/floor/floor-1.png');
-    this.load.image('cafe_furniture', 'scenes/interiors/cafe/props/table.png');
+    this.load.image('cafe_wall', 'shared/interiors-wall/wall-1.png');
+    this.load.image('cafe_floor', 'shared/interiors-floor/floor-1.png');
+    this.load.image('cafe_furniture', 'shared/interiors-props/table.png');
 
     // Library assets
-    this.load.image('library_wall', 'scenes/interiors/library/wall/wall-2.png');
-    this.load.image('library_floor', 'scenes/interiors/library/floor/floor-2.png');
-    this.load.image('library_furniture', 'scenes/interiors/library/props/shelf.png');
+    this.load.image('library_wall', 'shared/interiors-wall/wall-2.png');
+    this.load.image('library_floor', 'shared/interiors-floor/floor-2.png');
+    this.load.image('library_furniture', 'shared/interiors-props/shelf.png');
 
     // School assets
-    this.load.image('school_wall', 'scenes/interiors/school/wall/wall-3.png');
-    this.load.image('school_floor', 'scenes/interiors/school/floor/floor-3.png');
-    this.load.image('school_furniture', 'scenes/interiors/school/props/chalkboard.png');
+    this.load.image('school_wall', 'shared/interiors-wall/wall-3.png');
+    this.load.image('school_floor', 'shared/interiors-floor/floor-3.png');
+    this.load.image('school_furniture', 'shared/interiors-props/chalkboard.png');
 
     // Shop assets
-    this.load.image('shop_wall', 'scenes/interiors/shop/wall/wall-4.png');
-    this.load.image('shop_floor', 'scenes/interiors/shop/floor/floor-4.png');
-    this.load.image('shop_furniture', 'scenes/interiors/shop/props/general-store-props.png');
+    this.load.image('shop_wall', 'shared/interiors-wall/wall-4.png');
+    this.load.image('shop_floor', 'shared/interiors-floor/floor-4.png');
+    this.load.image('shop_furniture', 'shared/interiors-props/general-store-props.png');
 
     // Generate character and item sprites programmatically
     initializeAllSprites(this);
