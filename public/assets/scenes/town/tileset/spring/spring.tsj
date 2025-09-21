@@ -169,27 +169,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"basic"
+                 "value":"none"
                 }]
         },
         {
@@ -198,27 +178,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant1"
+                 "value":"none"
                 }]
         },
         {
@@ -227,27 +187,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant3"
+                 "value":"none"
                 }]
         },
         {
@@ -410,27 +350,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"basic"
+                 "value":"none"
                 }]
         },
         {
@@ -439,27 +359,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant1"
+                 "value":"none"
                 }]
         },
         {
@@ -468,27 +368,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant2"
+                 "value":"none"
                 }]
         },
         {
@@ -651,27 +531,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"basic"
+                 "value":"none"
                 }]
         },
         {
@@ -680,27 +540,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant1"
+                 "value":"none"
                 }]
         },
         {
@@ -709,27 +549,7 @@
                 {
                  "name":"type",
                  "type":"string",
-                 "value":"grass"
-                },
-                {
-                 "name":"walkable",
-                 "type":"bool",
-                 "value":true
-                },
-                {
-                 "name":"structure",
-                 "type":"string",
-                 "value":"fill"
-                },
-                {
-                 "name":"orientation",
-                 "type":"string",
-                 "value":"center"
-                },
-                {
-                 "name":"variant",
-                 "type":"string",
-                 "value":"variant2"
+                 "value":"none"
                 }]
         },
         {
