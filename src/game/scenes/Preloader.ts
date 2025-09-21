@@ -46,13 +46,13 @@ export class Preloader extends Scene {
     this.load.image('color_palette', 'shared/tilesets/color-palette.png');
 
     // Load main town map
-    this.load.tilemapTiledJSON('town_map', 'scenes/town/town.tmj');
+    this.load.tilemapTiledJSON('town_map', 'scenes/town.tmj');
 
     // Load interior maps
-    this.load.tilemapTiledJSON('cafe_map', 'scenes/interiors/cafe/cafe.tmj');
-    this.load.tilemapTiledJSON('library_map', 'scenes/interiors/library/library.tmj');
-    this.load.tilemapTiledJSON('school_map', 'scenes/interiors/school/school.tmj');
-    this.load.tilemapTiledJSON('shop_map', 'scenes/interiors/shop/shop.tmj');
+    this.load.tilemapTiledJSON('cafe_map', 'scenes/cafe.tmj');
+    this.load.tilemapTiledJSON('library_map', 'scenes/library.tmj');
+    this.load.tilemapTiledJSON('school_map', 'scenes/school.tmj');
+    this.load.tilemapTiledJSON('shop_map', 'scenes/shop.tmj');
 
     // Load interior assets for each scene
     // Cafe assets
