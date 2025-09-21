@@ -39,7 +39,7 @@ export class Game extends Scene {
     const map = this.make.tilemap({ key: 'town_map' });
 
     // Add tilesets - now they're embedded in the TMJ file
-    const springTileset = map.addTilesetImage('spring_tileset');
+    const springTileset = map.addTilesetImage('spring');
     const grassProps = map.addTilesetImage('grass_props');
     const treeProps = map.addTilesetImage('tree_props');
     const flowerProps = map.addTilesetImage('flower_props');
