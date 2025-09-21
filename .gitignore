@@ -204,3 +204,13 @@ playwright/.cache/
 
 # Tiled Map Editor session files (personal/temporary)
 *.tiled-session
+
+# Generated images
+lcm_lora_*.png
+
+# Python test files
+test.py
+*.safetensors
+
+# Local development directories
+local/
