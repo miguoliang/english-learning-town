@@ -33,8 +33,14 @@ export class Preloader extends Scene {
     this.load.image('background', 'scenes/ui/bg.png');
 
     // Load tileset images for embedded TMJ map
-    this.load.image('winter', 'shared/tilesets/tileset/winter/winter.png');
-    this.load.image('steps', 'shared/tilesets/tileset/extras/steps.png');
+    this.load.image('spring_tileset', 'shared/tilesets/version-2.0/tileset/spring/spring-1.png');
+    this.load.image('grass_props', 'shared/tilesets/version-2.0/props/grass.png');
+    this.load.image('tree_props', 'shared/tilesets/version-2.0/props/tree.png');
+    this.load.image('flower_props', 'shared/tilesets/version-2.0/props/flower.png');
+    this.load.image('pavement_props', 'shared/tilesets/version-2.0/props/pavement.png');
+    this.load.image('house', 'shared/tilesets/version-2.0/house/house-1.png');
+    this.load.image('water_tiles', 'shared/tilesets/version-2.0/water/water-1/color-1/water-1-1-1.png');
+    this.load.image('bridge_props', 'shared/tilesets/version-2.0/props/bridge.png');
 
     // Load color palette for reference
     this.load.image('color_palette', 'shared/tilesets/color-palette.png');
