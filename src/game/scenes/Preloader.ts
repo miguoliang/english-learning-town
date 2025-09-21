@@ -34,6 +34,7 @@ export class Preloader extends Scene {
 
     // Load tileset images for embedded TMJ map
     this.load.image('spring', 'shared/tilesets/tileset/spring/spring.png');
+    this.load.image('dirt', 'shared/tilesets/tileset/dirt/dirt.png');
     this.load.image('grass_props', 'shared/tilesets/version-2.0/props/grass.png');
     this.load.image('tree_props', 'shared/tilesets/version-2.0/props/tree.png');
     this.load.image('flower_props', 'shared/tilesets/version-2.0/props/flower.png');

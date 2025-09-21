@@ -40,6 +40,7 @@ export class Game extends Scene {
 
     // Add tilesets - now they're embedded in the TMJ file
     const springTileset = map.addTilesetImage('spring');
+    const dirtTileset = map.addTilesetImage('dirt');
     const grassProps = map.addTilesetImage('grass_props');
     const treeProps = map.addTilesetImage('tree_props');
     const flowerProps = map.addTilesetImage('flower_props');
@@ -48,16 +49,17 @@ export class Game extends Scene {
     const waterTiles = map.addTilesetImage('water_tiles');
     const bridgeProps = map.addTilesetImage('bridge_props');
 
-    const allTilesets = [springTileset, grassProps, treeProps, flowerProps, pavementProps, house, waterTiles, bridgeProps].filter(Boolean);
+    const allTilesets = [springTileset, dirtTileset, grassProps, treeProps, flowerProps, pavementProps, house, waterTiles, bridgeProps].filter(Boolean);
 
     if (allTilesets.length > 0) {
       // Create layers in proper order
+      const dustLayer = map.createLayer('Dust', allTilesets, 0, 0);
       const groundLayer = map.createLayer('Ground', allTilesets, 0, 0);
       const decorationLayer = map.createLayer('Decoration', allTilesets, 0, 0);
       const structuresLayer = map.createLayer('Structures', allTilesets, 0, 0);
 
       // Scale and position the map
-      const layers = [groundLayer, decorationLayer, structuresLayer].filter(Boolean);
+      const layers = [dustLayer, groundLayer, decorationLayer, structuresLayer].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
           const scaleX = GameConfig.screenWidth / (map.widthInPixels || 480);
