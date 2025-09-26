@@ -33,15 +33,15 @@ export class Preloader extends Scene {
     this.load.image('background', 'shared/ui/bg.png');
 
     // Load tileset images for embedded TMJ map
-    this.load.image('spring', 'shared/tilesets/tileset/spring/spring.png');
-    this.load.image('dirt', 'shared/tilesets/tileset/dirt/dirt.png');
-    this.load.image('grass_props', 'shared/tilesets/version-2.0/props/grass.png');
-    this.load.image('tree_props', 'shared/tilesets/version-2.0/props/tree.png');
-    this.load.image('flower_props', 'shared/tilesets/version-2.0/props/flower.png');
-    this.load.image('pavement_props', 'shared/tilesets/version-2.0/props/pavement.png');
-    this.load.image('house', 'shared/tilesets/version-2.0/house/house-1.png');
-    this.load.image('water_tiles', 'shared/tilesets/version-2.0/water/water-1/color-1/water-1-1-1.png');
-    this.load.image('bridge_props', 'shared/tilesets/version-2.0/props/bridge.png');
+    this.load.image('spring', 'shared/tilesets/spring/spring.png');
+    this.load.image('dirt', 'shared/tilesets/dirt/dirt.png');
+    this.load.image('grass_props', 'shared/tilesets/props/grass.png');
+    this.load.image('tree_props', 'shared/tilesets/props/tree.png');
+    this.load.image('flower_props', 'shared/tilesets/props/flower.png');
+    this.load.image('pavement_props', 'shared/tilesets/props/pavement.png');
+    this.load.image('house', 'shared/tilesets/house/house.png');
+    this.load.image('water_tiles', 'shared/tilesets/water/water-fall-deep-1.png');
+    this.load.image('bridge_props', 'shared/tilesets/props/bridge/bridge-wood.png');
 
     // Load color palette for reference
     this.load.image('color_palette', 'shared/tilesets/color-palette.png');
