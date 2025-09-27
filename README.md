@@ -2,6 +2,12 @@
 
 An immersive and interactive English learning game built with Phaser 3, React, and TypeScript. Explore a charming town while mastering English through engaging activities, conversations with NPCs, and hands-on learning experiences.
 
+## 🌐 Play Online Now!
+
+**🎮 [Play English Learning Town](https://miguoliang.github.io/english-learning-town/)**
+
+Experience the game immediately in your browser - no installation required! The game works on desktop computers with keyboard controls.
+
 ## 🎮 Game Features
 
 - **Interactive Town Exploration**: Navigate through a beautifully crafted 2D town with arrow keys or WASD
@@ -28,6 +34,14 @@ Built with modern web technologies for the best learning experience:
 
 ## 🎮 How to Play
 
+### Quick Start Guide
+
+1. **🌐 Visit the Game**: Go to [https://miguoliang.github.io/english-learning-town/](https://miguoliang.github.io/english-learning-town/)
+2. **🎯 Start Playing**: Click "Start Game" when the page loads
+3. **🚶 Move Around**: Use Arrow Keys or WASD to explore the town
+4. **💬 Interact**: Press SPACEBAR to enter buildings and talk to NPCs
+5. **📚 Learn**: Complete activities to improve your English skills!
+
 ### Controls
 
 - **Movement**: Use Arrow Keys or WASD to move your character around the town
@@ -44,10 +58,16 @@ Built with modern web technologies for the best learning experience:
 
 ### Learning Activities
 
-- **School**: Grammar lessons and structured English exercises with the teacher
-- **Library**: Reading comprehension and literature-based activities with the librarian
-- **Cafe**: Conversational English practice in a relaxed social setting
-- **Shop**: Vocabulary building through practical shopping scenarios with the shopkeeper
+- **🏫 School**: Grammar lessons and structured English exercises with the teacher
+- **📚 Library**: Reading comprehension and literature-based activities with the librarian
+- **☕ Cafe**: Conversational English practice in a relaxed social setting
+- **🛍️ Shop**: Vocabulary building through practical shopping scenarios with the shopkeeper
+
+### System Requirements
+
+- **For Online Play**: Any modern web browser (Chrome, Firefox, Safari, Edge)
+- **Keyboard**: Required for character movement and interactions
+- **Screen**: Desktop or laptop recommended for best experience
 
 ## Requirements
 
@@ -141,21 +161,31 @@ English Learning Town is designed with pedagogical principles in mind:
 
 ## 🚀 Getting Started
 
-1. **Installation**
+### Option 1: Play Online (Recommended)
 
+**🎮 [Click here to play now!](https://miguoliang.github.io/english-learning-town/)**
+
+No installation needed - just open the link in your web browser and start learning English immediately!
+
+### Option 2: Run Locally for Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/miguoliang/english-learning-town.git
+   cd english-learning-town
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Start Learning**
-
+3. **Start development server**
    ```bash
    npm run dev
    ```
 
-3. **Open your browser** to `http://localhost:8080` and begin your English learning adventure!
-
-4. **Explore the Town**: Use arrow keys or WASD to move around, and press SPACEBAR to interact with buildings and NPCs.
+4. **Open your browser** to `http://localhost:8080` and begin your English learning adventure!
 
 ## Handling Assets
 
@@ -184,11 +214,28 @@ preload();
 
 When you issue the `npm run build` command, all static assets are automatically copied to the `dist/assets` folder.
 
-## Deploying to Production
+## 🚀 Deployment
+
+This game is automatically deployed to GitHub Pages and available at:
+**https://miguoliang.github.io/english-learning-town/**
+
+### Automatic Deployment
+
+The project uses GitHub Actions for continuous deployment:
+- Every push to the `main` branch automatically triggers a new deployment
+- The build process creates optimized production files
+- The game is automatically published to GitHub Pages
+
+### Manual Deployment (for contributors)
 
 After you run the `npm run build` command, your code will be built into a single bundle and saved to the `dist` folder, along with any other assets your project imported, or stored in the public assets folder.
 
-In order to deploy your game, you will need to upload _all_ of the contents of the `dist` folder to a public facing web server.
+For manual deployment:
+```bash
+npm run deploy
+```
+
+This command builds the project and deploys it to GitHub Pages (requires appropriate repository permissions).
 
 ## Customizing the Template
 
