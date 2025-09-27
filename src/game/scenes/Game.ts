@@ -68,10 +68,10 @@ export class Game extends Scene {
       // Create layers in proper order (only the layers that exist in the tilemap)
       const earthLayer = this.map.createLayer('Earth', allTilesets, 0, 0);
       const groundLayer = this.map.createLayer('Ground', allTilesets, 0, 0);
-      const entityLayer = this.map.createLayer('Entity', allTilesets, 0, 0);
+      const structureLayer = this.map.createLayer('Structure', allTilesets, 0, 0);
 
       // Scale and position the map
-      const layers = [earthLayer, groundLayer, entityLayer].filter(Boolean);
+      const layers = [earthLayer, groundLayer, structureLayer].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
           const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);

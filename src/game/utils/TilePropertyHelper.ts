@@ -141,12 +141,16 @@ export class TilePropertyHelper {
    * Checks if a tile is walkable at the specified coordinates
    * @param x - X coordinate in tile units
    * @param y - Y coordinate in tile units
-   * @param layerName - Name of the layer to check (default: 'Ground')
-   * @returns True if the tile is walkable, false otherwise
+   * @param layerNames - Name(s) of the layer(s) to check. Can be a single string or array of strings
+   * @returns True if the tile is walkable in all specified layers, false otherwise
    */
-  isTileWalkable(x: number, y: number, layerName: string = 'Ground'): boolean {
-    const properties = this.getTileProperties(x, y, layerName);
-    return properties?.walkable === true;
+  isTileWalkable(x: number, y: number, layerNames: string | string[] = 'Ground'): boolean {
+    const layers = Array.isArray(layerNames) ? layerNames : [layerNames];
+
+    return !layers.some(layerName => {
+      const properties = this.getTileProperties(x, y, layerName);
+      return properties && properties.walkable !== true;
+    });
   }
 
   /**
@@ -255,15 +259,16 @@ export class TilePropertyHelper {
   }
 
   /**
-   * Checks if a world position is walkable
+   * Checks if a world position is walkable by checking multiple layers
+   * A position is walkable only if all layers allow it (no layer blocks it)
    * @param worldX - World X coordinate
    * @param worldY - World Y coordinate
-   * @param layerName - Name of the layer to check (default: 'Ground')
+   * @param layerNames - Optional array of layer names to check (default: ['Ground', 'Structure'])
    * @returns True if the position is walkable, false otherwise
    */
-  isWorldPositionWalkable(worldX: number, worldY: number, layerName: string = 'Ground'): boolean {
+  isWorldPositionWalkable(worldX: number, worldY: number, layerNames: string[] = ['Ground', 'Structure']): boolean {
     const { tileX, tileY } = this.worldToTileCoords(worldX, worldY);
-    return this.isTileWalkable(tileX, tileY, layerName);
+    return this.isTileWalkable(tileX, tileY, layerNames);
   }
 
   /**
