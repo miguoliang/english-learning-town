@@ -2357,7 +2357,7 @@
     {
       "columns": 9,
       "firstgid": 1,
-      "image": "../shared/tilesets/spring/spring.png",
+      "image": "../shared/exteriors-tilesets/spring/spring.png",
       "imageheight": 96,
       "imagewidth": 144,
       "margin": 0,
@@ -3452,7 +3452,7 @@
     {
       "columns": 9,
       "firstgid": 55,
-      "image": "../shared/tilesets/dirt/dirt.png",
+      "image": "../shared/exteriors-tilesets/dirt/dirt.png",
       "imageheight": 96,
       "imagewidth": 144,
       "margin": 0,
@@ -4547,7 +4547,7 @@
     {
       "columns": 5,
       "firstgid": 109,
-      "image": "../shared/tilesets/water-spring-shallow-1.png",
+      "image": "../shared/exteriors-tilesets/water-spring-shallow-1.png",
       "imageheight": 48,
       "imagewidth": 80,
       "margin": 0,
