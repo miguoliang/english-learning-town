@@ -235,6 +235,7 @@ export class TilePropertyHelper {
   /**
    * Converts tile coordinates to world coordinates
    * Uses consistent coordinate system: (0,0) at top-left, X right, Y down
+   * Returns coordinates for sprite with bottom-center origin (0.5, 1)
    * @param tileX - Tile X coordinate
    * @param tileY - Tile Y coordinate
    * @returns Object with worldX and worldY coordinates

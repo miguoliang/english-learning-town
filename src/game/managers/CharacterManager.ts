@@ -31,7 +31,7 @@ export class CharacterManager {
     // Create the sprite
     const character = this.scene.add.sprite(x, y, 'character_idle');
     character.setScale(scale);
-    character.setOrigin(0.5, 0.5);
+    character.setOrigin(0.5, 1); // Bottom-center origin for proper tile alignment
 
     // Set initial animation based on facing direction
     this.setCharacterFacing(character, facingDirection);

@@ -46,6 +46,7 @@ export class BasePlayerController {
     }
 
     this.player.setScale(GameConfig.PLAYER.SCALE);
+    this.player.setOrigin(0.5, 1); // Bottom-center origin for proper tile alignment
     // Remove tint since we want to show the natural sprite colors
     // this.player.setTint(GameConfig.PLAYER.TINT);
 
