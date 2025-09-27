@@ -57,11 +57,13 @@ export class BaseKeyboardHandler {
 
     // Vertical movement
     if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
-      velocityY = -1;
+      velocityY = -1; // UP key = negative Y (screen coordinates)
     }
     if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
-      velocityY = 1;
+      velocityY = 1; // DOWN key = positive Y (screen coordinates)
     }
+
+    // Note: Debug logging removed for production
 
     return { velocityX, velocityY };
   }
