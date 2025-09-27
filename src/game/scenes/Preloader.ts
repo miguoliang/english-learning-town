@@ -1,7 +1,10 @@
 import { Scene } from 'phaser';
 import { initializeAllSprites } from '../utils/SpriteGenerator';
+import { CharacterManager } from '../managers/CharacterManager';
 
 export class Preloader extends Scene {
+  private characterManager: CharacterManager | null = null;
+
   constructor() {
     super('Preloader');
   }
@@ -35,16 +38,13 @@ export class Preloader extends Scene {
     // Load tileset images for embedded TMJ map
     this.load.image('spring', 'shared/tilesets/spring/spring.png');
     this.load.image('dirt', 'shared/tilesets/dirt/dirt.png');
-    this.load.image('grass_props', 'shared/tilesets/props/grass.png');
-    this.load.image('tree_props', 'shared/tilesets/props/tree.png');
-    this.load.image('flower_props', 'shared/tilesets/props/flower.png');
-    this.load.image('pavement_props', 'shared/tilesets/props/pavement.png');
-    this.load.image('house', 'shared/tilesets/house/house.png');
-    this.load.image('water_tiles', 'shared/tilesets/water/water-fall-deep-1.png');
-    this.load.image('bridge_props', 'shared/tilesets/props/bridge/bridge-wood.png');
 
-    // Load color palette for reference
-    this.load.image('color_palette', 'shared/tilesets/color-palette.png');
+    // Load character atlas using JSON atlas
+    this.load.atlas(
+      'character_idle',
+      'shared/characters/basic/idle.png',
+      'shared/characters/basic/idle.json'
+    );
 
     // Load main town map
     this.load.tilemapTiledJSON('town_map', 'scenes/town.tmj');
@@ -84,7 +84,55 @@ export class Preloader extends Scene {
     //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
     //  For example, you can define global animations here, so we can use them in other scenes.
 
+    // Create animations from the loaded atlas
+    this.createCharacterAnimations();
+
+    // Initialize CharacterManager
+    this.characterManager = new CharacterManager(this);
+
+    // Make CharacterManager globally available
+    (this.game as any).characterManager = this.characterManager;
+
     //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
     this.scene.start('MainMenu');
+  }
+
+  /**
+   * Creates character animations from the loaded atlas
+   */
+  private createCharacterAnimations(): void {
+    // Create idle animations for different directions using atlas frames
+    // Right-facing idle animation (frames 0-3)
+    this.anims.create({
+      key: 'character_idle_right',
+      frames: this.anims.generateFrameNames('character_idle', {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 5, // 200ms per frame
+      repeat: -1, // Loop infinitely
+    });
+
+    // Down-facing idle animation (frames 4-7)
+    this.anims.create({
+      key: 'character_idle_down',
+      frames: this.anims.generateFrameNames('character_idle', {
+        start: 4,
+        end: 7,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    // Up-facing idle animation (frames 8-11)
+    this.anims.create({
+      key: 'character_idle_up',
+      frames: this.anims.generateFrameNames('character_idle', {
+        start: 8,
+        end: 11,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
   }
 }

@@ -1,23 +1,26 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/GameConfig';
+import { CharacterManager } from '../managers/CharacterManager';
 
 /**
  * Main game scene showing the English Learning Town
  */
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
+  private characterManager: CharacterManager;
 
   constructor() {
     super('Game');
   }
 
-  create(data?: { exitBuilding?: string }) {
+  create(_data?: { exitBuilding?: string }) {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(GameConfig.COLORS.skyBlue);
 
     this.createSceneTitle();
     this.createTiledMap();
+    this.createCharacters();
 
     EventBus.emit('current-scene-ready', this);
   }
@@ -41,25 +44,16 @@ export class Game extends Scene {
     // Add tilesets - now they're embedded in the TMJ file
     const springTileset = map.addTilesetImage('spring');
     const dirtTileset = map.addTilesetImage('dirt');
-    const grassProps = map.addTilesetImage('grass_props');
-    const treeProps = map.addTilesetImage('tree_props');
-    const flowerProps = map.addTilesetImage('flower_props');
-    const pavementProps = map.addTilesetImage('pavement_props');
-    const house = map.addTilesetImage('house');
-    const waterTiles = map.addTilesetImage('water_tiles');
-    const bridgeProps = map.addTilesetImage('bridge_props');
 
-    const allTilesets = [springTileset, dirtTileset, grassProps, treeProps, flowerProps, pavementProps, house, waterTiles, bridgeProps].filter(Boolean);
+    const allTilesets = [springTileset, dirtTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
 
     if (allTilesets.length > 0) {
-      // Create layers in proper order
+      // Create layers in proper order (only the layers that exist in the tilemap)
       const dustLayer = map.createLayer('Dust', allTilesets, 0, 0);
       const groundLayer = map.createLayer('Ground', allTilesets, 0, 0);
-      const decorationLayer = map.createLayer('Decoration', allTilesets, 0, 0);
-      const structuresLayer = map.createLayer('Structures', allTilesets, 0, 0);
 
       // Scale and position the map
-      const layers = [dustLayer, groundLayer, decorationLayer, structuresLayer].filter(Boolean);
+      const layers = [dustLayer, groundLayer].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
           const scaleX = GameConfig.screenWidth / (map.widthInPixels || 480);
@@ -76,6 +70,60 @@ export class Game extends Scene {
         }
       });
     }
+  }
+
+  /**
+   * Creates and places characters in the town
+   */
+  private createCharacters(): void {
+    // Initialize character manager
+    this.characterManager = new CharacterManager(this);
+
+    // Create NPCs at strategic locations
+    // Teacher near school
+    this.characterManager.createCharacter(
+      'teacher',
+      GameConfig.BUILDINGS.SCHOOL.x + 80,
+      GameConfig.BUILDINGS.SCHOOL.y + 120,
+      'down',
+      3 // Larger scale for visibility
+    );
+
+    // Librarian near library
+    this.characterManager.createCharacter(
+      'librarian',
+      GameConfig.BUILDINGS.LIBRARY.x - 80,
+      GameConfig.BUILDINGS.LIBRARY.y + 120,
+      'right',
+      3
+    );
+
+    // Shopkeeper near shop
+    this.characterManager.createCharacter(
+      'shopkeeper',
+      GameConfig.BUILDINGS.SHOP.x - 80,
+      GameConfig.BUILDINGS.SHOP.y + 20,
+      'left',
+      3
+    );
+
+    // Student walking around
+    this.characterManager.createCharacter(
+      'student',
+      GameConfig.UI.centerX - 100,
+      GameConfig.UI.centerY + 50,
+      'up',
+      2.5
+    );
+
+    // Customer near cafe
+    this.characterManager.createCharacter(
+      'customer',
+      GameConfig.BUILDINGS.CAFE.x + 100,
+      GameConfig.BUILDINGS.CAFE.y + 20,
+      'down',
+      2.5
+    );
   }
 
 }
