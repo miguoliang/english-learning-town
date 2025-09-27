@@ -1,10 +1,10 @@
 /**
- * Creates a simple character sprite programmatically
- * @param scene The Phaser scene
- * @param width Sprite width
- * @param height Sprite height
- * @param character Character configuration
- * @returns Generated sprite texture key
+ * Creates a simple character sprite programmatically using Phaser graphics
+ * @param scene - The Phaser scene instance
+ * @param width - Sprite width in pixels
+ * @param height - Sprite height in pixels
+ * @param character - Character configuration object
+ * @returns The generated sprite texture key
  */
 export function createCharacterSprite(
   scene: Phaser.Scene,
@@ -72,7 +72,12 @@ export function createCharacterSprite(
 }
 
 /**
- * Creates item sprites programmatically
+ * Creates item sprites programmatically using Phaser graphics
+ * @param scene - The Phaser scene instance
+ * @param width - Sprite width in pixels
+ * @param height - Sprite height in pixels
+ * @param item - Item configuration object
+ * @returns The generated sprite texture key
  */
 export function createItemSprite(
   scene: Phaser.Scene,
@@ -142,20 +147,23 @@ export function createItemSprite(
 }
 
 /**
- * Initializes all character sprites for the game
+ * Initializes all character and item sprites for the game
+ * Creates all necessary sprite textures that will be used throughout the game
+ * @param scene - The Phaser scene instance where sprites will be generated
  */
 export function initializeAllSprites(scene: Phaser.Scene): void {
-  const spriteSize = 64;
+  const SPRITE_SIZE = 64;
+  const ITEM_SIZE = 32;
 
   // Create character sprites
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'player',
     skinColor: 0xfdbcb4,
     hairColor: 0x8b4513,
     shirtColor: 0x4169e1,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'teacher',
     skinColor: 0xfdbcb4,
     hairColor: 0x654321,
@@ -163,7 +171,7 @@ export function initializeAllSprites(scene: Phaser.Scene): void {
     hasGlasses: true,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'librarian',
     skinColor: 0xfdbcb4,
     hairColor: 0x2f4f4f,
@@ -171,7 +179,7 @@ export function initializeAllSprites(scene: Phaser.Scene): void {
     hasGlasses: true,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'shopkeeper',
     skinColor: 0xfdbcb4,
     hairColor: 0x8b4513,
@@ -180,21 +188,21 @@ export function initializeAllSprites(scene: Phaser.Scene): void {
     accessoryColor: 0x000080,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'student',
     skinColor: 0xfdbcb4,
     hairColor: 0xdaa520,
     shirtColor: 0x00ced1,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'customer',
     skinColor: 0xfdbcb4,
     hairColor: 0x8b0000,
     shirtColor: 0x9370db,
   });
 
-  createCharacterSprite(scene, spriteSize, spriteSize, {
+  createCharacterSprite(scene, SPRITE_SIZE, SPRITE_SIZE, {
     name: 'walker',
     skinColor: 0xfdbcb4,
     hairColor: 0xff4500,
@@ -202,22 +210,20 @@ export function initializeAllSprites(scene: Phaser.Scene): void {
   });
 
   // Create item sprites
-  const itemSize = 32;
-
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'book',
     primaryColor: 0x8b4513,
     shape: 'book',
   });
 
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'coffee',
     primaryColor: 0x8b4513,
     secondaryColor: 0xd3d3d3,
     shape: 'cup',
   });
 
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'box',
     primaryColor: 0xd2691e,
     secondaryColor: 0x8b4513,
@@ -225,28 +231,28 @@ export function initializeAllSprites(scene: Phaser.Scene): void {
   });
 
   // Additional item sprites for interior scenes
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'plant',
     primaryColor: 0x228b22,
     secondaryColor: 0x8b4513,
     shape: 'circle',
   });
 
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'art',
     primaryColor: 0xffd700,
     secondaryColor: 0x8b4513,
     shape: 'rectangle',
   });
 
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'computer',
     primaryColor: 0x000000,
     secondaryColor: 0x808080,
     shape: 'rectangle',
   });
 
-  createItemSprite(scene, itemSize, itemSize, {
+  createItemSprite(scene, ITEM_SIZE, ITEM_SIZE, {
     name: 'cash',
     primaryColor: 0xffd700,
     secondaryColor: 0x32cd32,
