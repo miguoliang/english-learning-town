@@ -1,0 +1,457 @@
+{
+  "columns": 4,
+  "image": "idle.png",
+  "imageheight": 240,
+  "imagewidth": 320,
+  "margin": 32,
+  "name": "idle",
+  "spacing": 64,
+  "tilecount": 12,
+  "tiledversion": "1.11.2",
+  "tileheight": 16,
+  "tiles": [
+    {
+      "id": 0,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "idle"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "standing"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 200
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    }
+  ],
+  "tilewidth": 16,
+  "type": "tileset",
+  "version": "1.10"
+}
