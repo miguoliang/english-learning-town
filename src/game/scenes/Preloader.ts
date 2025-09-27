@@ -39,6 +39,24 @@ export class Preloader extends Scene {
     this.load.image('spring', 'shared/tilesets/spring/spring.png');
     this.load.image('dirt', 'shared/tilesets/dirt/dirt.png');
 
+    // Load water spring tilesets
+    for (let i = 1; i <= 8; i++) {
+      this.load.image(`water-spring-deep-${i}`, `shared/tilesets/water-spring-deep-${i}.png`);
+      this.load.image(`water-spring-shallow-${i}`, `shared/tilesets/water-spring-shallow-${i}.png`);
+    }
+
+    // Load water summer tilesets
+    for (let i = 1; i <= 8; i++) {
+      this.load.image(`water-summer-deep-${i}`, `shared/tilesets/water-summer-deep-${i}.png`);
+      this.load.image(`water-summer-shallow-${i}`, `shared/tilesets/water-summer-shallow-${i}.png`);
+    }
+
+    // Load water fall tilesets
+    for (let i = 1; i <= 8; i++) {
+      this.load.image(`water-fall-deep-${i}`, `shared/tilesets/water-fall-deep-${i}.png`);
+      this.load.image(`water-fall-shallow-${i}`, `shared/tilesets/water-fall-shallow-${i}.png`);
+    }
+
     // Load character atlases using JSON atlas
     this.load.atlas(
       'character_idle',
