@@ -20,7 +20,7 @@ export class Game extends Scene {
 
     this.createSceneTitle();
     this.createTiledMap();
-    this.createCharacters();
+    this.createPlayer();
 
     EventBus.emit('current-scene-ready', this);
   }
@@ -73,57 +73,56 @@ export class Game extends Scene {
   }
 
   /**
-   * Creates and places characters in the town
+   * Creates the player character at the center of the town map
    */
-  private createCharacters(): void {
+  private createPlayer(): void {
     // Initialize character manager
     this.characterManager = new CharacterManager(this);
 
-    // Create NPCs at strategic locations
-    // Teacher near school
-    this.characterManager.createCharacter(
-      'teacher',
-      GameConfig.BUILDINGS.SCHOOL.x + 80,
-      GameConfig.BUILDINGS.SCHOOL.y + 120,
-      'down',
-      3 // Larger scale for visibility
-    );
+    // Calculate the center of the map in world coordinates
+    const map = this.cache.tilemap.get('town_map');
+    if (map) {
+      // Map dimensions: 32x24 tiles, 16x16 pixels per tile = 512x384 pixels
+      const mapWidthInPixels = 32 * 16; // 512 pixels
+      const mapHeightInPixels = 24 * 16; // 384 pixels
 
-    // Librarian near library
-    this.characterManager.createCharacter(
-      'librarian',
-      GameConfig.BUILDINGS.LIBRARY.x - 80,
-      GameConfig.BUILDINGS.LIBRARY.y + 120,
-      'right',
-      3
-    );
+      // Calculate map center in map coordinates
+      const mapCenterX = mapWidthInPixels / 2; // 256
+      const mapCenterY = mapHeightInPixels / 2; // 192
 
-    // Shopkeeper near shop
-    this.characterManager.createCharacter(
-      'shopkeeper',
-      GameConfig.BUILDINGS.SHOP.x - 80,
-      GameConfig.BUILDINGS.SHOP.y + 20,
-      'left',
-      3
-    );
+      // Calculate the same scaling and positioning used for map layers
+      const scaleX = GameConfig.screenWidth / mapWidthInPixels;
+      const scaleY = GameConfig.screenHeight / mapHeightInPixels;
+      const scale = Math.min(scaleX, scaleY, 2);
 
-    // Student walking around
-    this.characterManager.createCharacter(
-      'student',
-      GameConfig.UI.centerX - 100,
-      GameConfig.UI.centerY + 50,
-      'up',
-      2.5
-    );
+      const scaledMapWidth = mapWidthInPixels * scale;
+      const scaledMapHeight = mapHeightInPixels * scale;
+      const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
+      const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
 
-    // Customer near cafe
-    this.characterManager.createCharacter(
-      'customer',
-      GameConfig.BUILDINGS.CAFE.x + 100,
-      GameConfig.BUILDINGS.CAFE.y + 20,
-      'down',
-      2.5
-    );
+      // Transform map center to world coordinates
+      const worldCenterX = mapOffsetX + (mapCenterX * scale);
+      const worldCenterY = mapOffsetY + (mapCenterY * scale);
+
+      // Create player at the calculated center position
+      this.characterManager.createCharacter(
+        'player',
+        worldCenterX,
+        worldCenterY,
+        'down',
+        3 // Good visibility scale
+      );
+    } else {
+      // Fallback to screen center if map data is unavailable
+      console.warn('Map data not available, using screen center for player position');
+      this.characterManager.createCharacter(
+        'player',
+        GameConfig.UI.centerX,
+        GameConfig.UI.centerY,
+        'down',
+        3
+      );
+    }
   }
 
 }
