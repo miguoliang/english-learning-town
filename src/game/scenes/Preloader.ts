@@ -52,6 +52,12 @@ export class Preloader extends Scene {
       'shared/characters/basic/walk.json'
     );
 
+    this.load.atlas(
+      'character_run',
+      'shared/characters/basic/run.png',
+      'shared/characters/basic/run.json'
+    );
+
     // Load main town map
     this.load.tilemapTiledJSON('town_map', 'scenes/town.tmj');
 
@@ -172,6 +178,40 @@ export class Preloader extends Scene {
         end: 23,
       }),
       frameRate: 6.67, // 150ms per frame as specified in TSJ (1000/150 ≈ 6.67)
+      repeat: -1,
+    });
+
+    // Create run animations for different directions using run atlas frames
+    // Right-facing run animation (frames 0-7)
+    this.anims.create({
+      key: 'character_run_right',
+      frames: this.anims.generateFrameNames('character_run', {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 10, // 100ms per frame as specified in TSJ (1000/100 = 10)
+      repeat: -1,
+    });
+
+    // Down-facing run animation (frames 8-15) - using "bottom" from TSJ
+    this.anims.create({
+      key: 'character_run_down',
+      frames: this.anims.generateFrameNames('character_run', {
+        start: 8,
+        end: 15,
+      }),
+      frameRate: 10, // 100ms per frame as specified in TSJ (1000/100 = 10)
+      repeat: -1,
+    });
+
+    // Up-facing run animation (frames 16-23) - using "top" from TSJ
+    this.anims.create({
+      key: 'character_run_up',
+      frames: this.anims.generateFrameNames('character_run', {
+        start: 16,
+        end: 23,
+      }),
+      frameRate: 10, // 100ms per frame as specified in TSJ (1000/100 = 10)
       repeat: -1,
     });
   }

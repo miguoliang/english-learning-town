@@ -46,7 +46,7 @@ export class CharacterManager {
    * Sets the character's facing direction and plays appropriate animation
    * @param character The character sprite
    * @param direction The facing direction
-   * @param animationType The type of animation (default: 'idle')
+   * @param animationType The type of animation ('idle', 'walk', 'run', etc.) (default: 'idle')
    */
   setCharacterFacing(
     character: Phaser.GameObjects.Sprite,

@@ -50,6 +50,7 @@ export const GameConfig = {
 
   PLAYER: {
     SPEED: 200,
+    RUN_SPEED_MULTIPLIER: 1.75, // Running is 75% faster than walking
     SCALE: 0.5,
     TINT: 0x4169e1, // Royal blue
     SIZE: 50, // Collision box size

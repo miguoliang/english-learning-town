@@ -18,7 +18,7 @@ export class Game extends Scene {
   private debugSystem: DebugSystem;
   private player: Phaser.GameObjects.Sprite | null = null;
   private lastFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
-  private currentAnimationType: 'walk' | 'idle' = 'idle';
+  private currentAnimationType: 'walk' | 'run' | 'idle' = 'idle';
   private map: Phaser.Tilemaps.Tilemap | null = null;
 
   constructor() {
@@ -176,7 +176,7 @@ export class Game extends Scene {
   private updatePlayerMovement(delta: number): void {
     if (!this.player || !this.playerController) return;
 
-    const { deltaX, deltaY } = this.playerController['keyboardHandler'].getDeltaMovement(
+    const { deltaX, deltaY, isRunning } = this.playerController['keyboardHandler'].getDeltaMovement(
       delta,
       GameConfig.PLAYER.SPEED
     );
@@ -203,21 +203,22 @@ export class Game extends Scene {
     }
 
     // Always update animation (handles both moving and idle states)
-    this.updatePlayerAnimation(deltaX, deltaY);
+    this.updatePlayerAnimation(deltaX, deltaY, isRunning);
   }
 
 
   /**
-   * Updates player animation based on movement direction
+   * Updates player animation based on movement direction and Shift key state
    * Only updates animation when direction or type actually changes to prevent unnecessary calls
    * @param deltaX - Horizontal movement delta
    * @param deltaY - Vertical movement delta
+   * @param isRunning - Whether the player is running (Shift key pressed)
    */
-  private updatePlayerAnimation(deltaX: number, deltaY: number): void {
+  private updatePlayerAnimation(deltaX: number, deltaY: number, isRunning: boolean): void {
     if (!this.player || !this.characterManager) return;
 
     const isMoving = deltaX !== 0 || deltaY !== 0;
-    const animationType: 'walk' | 'idle' = isMoving ? 'walk' : 'idle';
+    let animationType: 'walk' | 'run' | 'idle' = 'idle';
     let newDirection = this.lastFacingDirection;
 
     if (isMoving) {
@@ -229,6 +230,9 @@ export class Game extends Scene {
         // Vertical movement is primary
         newDirection = deltaY > 0 ? 'down' : 'up';
       }
+
+      // Use running animation when Shift key is pressed, otherwise use walking
+      animationType = isRunning ? 'run' : 'walk';
     }
 
     // Only update animation if direction or animation type changed

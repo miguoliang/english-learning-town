@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { GameConfig } from '../config/GameConfig';
 
 /**
  * Base keyboard handler that manages input for scenes
@@ -13,6 +14,7 @@ export class BaseKeyboardHandler {
     D: Phaser.Input.Keyboard.Key;
   } | null = null;
   private spaceKey: Phaser.Input.Keyboard.Key | null = null;
+  private shiftKey: Phaser.Input.Keyboard.Key | null = null;
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -33,6 +35,7 @@ export class BaseKeyboardHandler {
       D: Phaser.Input.Keyboard.Key;
     };
     this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.shiftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
   }
 
   /**
@@ -77,18 +80,31 @@ export class BaseKeyboardHandler {
   }
 
   /**
+   * Checks if Shift key is currently pressed
+   * @returns True if Shift key is pressed
+   */
+  isShiftPressed(): boolean {
+    return this.shiftKey ? this.shiftKey.isDown : false;
+  }
+
+  /**
    * Gets the current state of movement keys for delta-based movement
    * @param delta Time elapsed since last frame
    * @param speed Player speed
-   * @returns Object with newX and newY offsets
+   * @returns Object with newX, newY offsets and running state
    */
-  getDeltaMovement(delta: number, speed: number): { deltaX: number; deltaY: number } {
+  getDeltaMovement(delta: number, speed: number): { deltaX: number; deltaY: number; isRunning: boolean } {
     const { velocityX, velocityY } = this.getMovementInput();
     const deltaSeconds = delta / 1000;
+    const isRunning = this.isShiftPressed() && (velocityX !== 0 || velocityY !== 0);
+
+    // Apply running speed multiplier when running
+    const effectiveSpeed = isRunning ? speed * GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : speed;
 
     return {
-      deltaX: velocityX * speed * deltaSeconds,
-      deltaY: velocityY * speed * deltaSeconds,
+      deltaX: velocityX * effectiveSpeed * deltaSeconds,
+      deltaY: velocityY * effectiveSpeed * deltaSeconds,
+      isRunning,
     };
   }
 
@@ -100,5 +116,6 @@ export class BaseKeyboardHandler {
     this.cursors = null;
     this.wasdKeys = null;
     this.spaceKey = null;
+    this.shiftKey = null;
   }
 }

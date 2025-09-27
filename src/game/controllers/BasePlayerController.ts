@@ -79,8 +79,12 @@ export class BasePlayerController {
     if (!this.player || !this.scene.physics || !this.player.body) return;
 
     const { velocityX, velocityY } = this.keyboardHandler.getMovementInput();
+    const isRunning = this.keyboardHandler.isShiftPressed() && (velocityX !== 0 || velocityY !== 0);
 
-    (this.player as Phaser.Physics.Arcade.Image).setVelocity(velocityX * speed, velocityY * speed);
+    // Apply running speed multiplier when running
+    const effectiveSpeed = isRunning ? speed * GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : speed;
+
+    (this.player as Phaser.Physics.Arcade.Image).setVelocity(velocityX * effectiveSpeed, velocityY * effectiveSpeed);
   }
 
   /**
@@ -96,7 +100,7 @@ export class BasePlayerController {
   ): void {
     if (!this.player) return;
 
-    const { deltaX, deltaY } = this.keyboardHandler.getDeltaMovement(delta, speed);
+    const { deltaX, deltaY, isRunning } = this.keyboardHandler.getDeltaMovement(delta, speed);
 
     if (deltaX === 0 && deltaY === 0) return;
 
