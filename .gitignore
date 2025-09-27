@@ -214,3 +214,6 @@ test.py
 
 # Local development directories
 local/
+
+# Playwright MCP debug files
+.playwright-mcp/
