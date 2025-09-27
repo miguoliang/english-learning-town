@@ -18,7 +18,7 @@ const phasermsg = () => {
 };
 
 export default defineConfig({
-  base: './',
+  base: '/english-learning-town/',
   plugins: [react(), phasermsg()],
   logLevel: 'warning',
   build: {

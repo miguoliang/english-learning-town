@@ -5,15 +5,15 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phaserjs/template-react-ts.git"
+    "url": "git+https://github.com/miguoliang/english-learning-town.git"
   },
   "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
   "license": "MIT",
   "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
   "bugs": {
-    "url": "https://github.com/phaserjs/template-react-ts/issues"
+    "url": "https://github.com/miguoliang/english-learning-town/issues"
   },
-  "homepage": "https://github.com/phaserjs/template-react-ts#readme",
+  "homepage": "https://miguoliang.github.io/english-learning-town/",
   "keywords": [
     "phaser",
     "phaser3",
@@ -32,6 +32,7 @@
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run lint",
     "fix": "npm run format && npm run lint:fix",
+    "deploy": "npm run build && gh-pages -d dist",
     "prepare": "husky",
     "commitlint": "commitlint --edit"
   },
