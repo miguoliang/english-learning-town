@@ -60,16 +60,18 @@ export class Game extends Scene {
     // Add tilesets - now they're embedded in the TMJ file
     const springTileset = this.map.addTilesetImage('spring');
     const dirtTileset = this.map.addTilesetImage('dirt');
+    const waterTileset = this.map.addTilesetImage('water-spring-shallow-1');
 
-    const allTilesets = [springTileset, dirtTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
+    const allTilesets = [springTileset, dirtTileset, waterTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
 
     if (allTilesets.length > 0) {
       // Create layers in proper order (only the layers that exist in the tilemap)
-      const dustLayer = this.map.createLayer('Dust', allTilesets, 0, 0);
+      const earthLayer = this.map.createLayer('Earth', allTilesets, 0, 0);
       const groundLayer = this.map.createLayer('Ground', allTilesets, 0, 0);
+      const entityLayer = this.map.createLayer('Entity', allTilesets, 0, 0);
 
       // Scale and position the map
-      const layers = [dustLayer, groundLayer].filter(Boolean);
+      const layers = [earthLayer, groundLayer, entityLayer].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
           const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
