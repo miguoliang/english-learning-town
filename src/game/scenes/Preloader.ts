@@ -119,25 +119,25 @@ export class Preloader extends Scene {
       repeat: -1, // Loop infinitely
     });
 
-    // Down-facing idle animation (frames 4-7)
+    // Down-facing idle animation (frames 4-7) - using "bottom" from TSJ
     this.anims.create({
       key: 'character_idle_down',
       frames: this.anims.generateFrameNames('character_idle', {
         start: 4,
         end: 7,
       }),
-      frameRate: 5,
+      frameRate: 5, // 200ms per frame as specified in TSJ
       repeat: -1,
     });
 
-    // Up-facing idle animation (frames 8-11)
+    // Up-facing idle animation (frames 8-11) - using "top" from TSJ
     this.anims.create({
       key: 'character_idle_up',
       frames: this.anims.generateFrameNames('character_idle', {
         start: 8,
         end: 11,
       }),
-      frameRate: 5,
+      frameRate: 5, // 200ms per frame as specified in TSJ
       repeat: -1,
     });
 
@@ -149,29 +149,29 @@ export class Preloader extends Scene {
         start: 0,
         end: 7,
       }),
-      frameRate: 8, // Faster for walking movement
+      frameRate: 6.67, // 150ms per frame as specified in TSJ (1000/150 ≈ 6.67)
       repeat: -1,
     });
 
-    // Down-facing walk animation (frames 8-15)
+    // Down-facing walk animation (frames 8-15) - using "bottom" from TSJ
     this.anims.create({
       key: 'character_walk_down',
       frames: this.anims.generateFrameNames('character_walk', {
         start: 8,
         end: 15,
       }),
-      frameRate: 8,
+      frameRate: 6.67, // 150ms per frame as specified in TSJ (1000/150 ≈ 6.67)
       repeat: -1,
     });
 
-    // Up-facing walk animation (frames 16-23)
+    // Up-facing walk animation (frames 16-23) - using "top" from TSJ
     this.anims.create({
       key: 'character_walk_up',
       frames: this.anims.generateFrameNames('character_walk', {
         start: 16,
         end: 23,
       }),
-      frameRate: 8,
+      frameRate: 6.67, // 150ms per frame as specified in TSJ (1000/150 ≈ 6.67)
       repeat: -1,
     });
   }

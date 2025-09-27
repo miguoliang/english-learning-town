@@ -13,6 +13,7 @@ export class Game extends Scene {
   private characterManager: CharacterManager;
   private player: Phaser.GameObjects.Sprite | null = null;
   private lastFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
+  private currentAnimationType: 'walk' | 'idle' = 'idle';
 
   constructor() {
     super('Game');
@@ -170,6 +171,7 @@ export class Game extends Scene {
 
   /**
    * Updates player animation based on movement direction
+   * Only updates animation when direction or type actually changes to prevent unnecessary calls
    * @param deltaX Horizontal movement delta
    * @param deltaY Vertical movement delta
    */
@@ -177,32 +179,28 @@ export class Game extends Scene {
     if (!this.player || !this.characterManager) return;
 
     const isMoving = deltaX !== 0 || deltaY !== 0;
-    const animationType = isMoving ? 'walk' : 'idle';
+    const animationType: 'walk' | 'idle' = isMoving ? 'walk' : 'idle';
+    let newDirection = this.lastFacingDirection;
 
     if (isMoving) {
       // Determine primary direction based on larger movement
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         // Horizontal movement is primary
-        if (deltaX > 0) {
-          this.lastFacingDirection = 'right';
-          this.characterManager.setCharacterFacing(this.player, 'right', animationType);
-        } else {
-          this.lastFacingDirection = 'left';
-          this.characterManager.setCharacterFacing(this.player, 'left', animationType);
-        }
+        newDirection = deltaX > 0 ? 'right' : 'left';
       } else {
         // Vertical movement is primary
-        if (deltaY > 0) {
-          this.lastFacingDirection = 'down';
-          this.characterManager.setCharacterFacing(this.player, 'down', animationType);
-        } else {
-          this.lastFacingDirection = 'up';
-          this.characterManager.setCharacterFacing(this.player, 'up', animationType);
-        }
+        newDirection = deltaY > 0 ? 'down' : 'up';
       }
-    } else {
-      // Player stopped moving - switch to idle animation in last direction
-      this.characterManager.setCharacterFacing(this.player, this.lastFacingDirection, 'idle');
+    }
+
+    // Only update animation if direction or animation type changed
+    const directionChanged = newDirection !== this.lastFacingDirection;
+    const animationChanged = animationType !== this.currentAnimationType;
+
+    if (directionChanged || animationChanged) {
+      this.lastFacingDirection = newDirection;
+      this.currentAnimationType = animationType;
+      this.characterManager.setCharacterFacing(this.player, newDirection, animationType);
     }
   }
 
