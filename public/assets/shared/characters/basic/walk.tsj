@@ -1,0 +1,897 @@
+{
+  "columns": 8,
+  "image": "walk.png",
+  "imageheight": 240,
+  "imagewidth": 640,
+  "margin": 32,
+  "name": "walk",
+  "spacing": 64,
+  "tilecount": 24,
+  "tiledversion": "1.11.2",
+  "tileheight": 16,
+  "tiles": [
+    {
+      "id": 0,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "right"
+        },
+        {
+          "name": "mirror_for_left",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "bottom"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "properties": [
+        {
+          "name": "animation_type",
+          "type": "string",
+          "value": "walk"
+        },
+        {
+          "name": "character_state",
+          "type": "string",
+          "value": "walking"
+        },
+        {
+          "name": "facing_direction",
+          "type": "string",
+          "value": "top"
+        },
+        {
+          "name": "frame_duration",
+          "type": "int",
+          "value": 150
+        },
+        {
+          "name": "loop",
+          "type": "bool",
+          "value": true
+        },
+        {
+          "name": "sprite_type",
+          "type": "string",
+          "value": "character"
+        }
+      ]
+    }
+  ],
+  "tilewidth": 16,
+  "type": "tileset",
+  "version": "1.10"
+}

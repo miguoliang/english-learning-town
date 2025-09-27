@@ -10,7 +10,9 @@ import { CharacterManager } from '../managers/CharacterManager';
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   private playerController: BasePlayerController;
+  private characterManager: CharacterManager;
   private player: Phaser.GameObjects.Sprite | null = null;
+  private lastFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
 
   constructor() {
     super('Game');
@@ -35,7 +37,6 @@ export class Game extends Scene {
       .text(GameConfig.UI.centerX, 50, 'English Learning Town', GameConfig.textStyles.TITLE)
       .setOrigin(0.5);
   }
-
 
   /**
    * Creates and displays the Tiled map
@@ -80,7 +81,7 @@ export class Game extends Scene {
   private createPlayer(): void {
     // Initialize controllers
     this.playerController = new BasePlayerController(this);
-    const characterManager = new CharacterManager(this);
+    this.characterManager = new CharacterManager(this);
 
     // Calculate the center of the map in world coordinates
     const map = this.cache.tilemap.get('town_map');
@@ -106,8 +107,8 @@ export class Game extends Scene {
       const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
 
       // Transform map center to world coordinates
-      worldCenterX = mapOffsetX + (mapCenterX * scale);
-      worldCenterY = mapOffsetY + (mapCenterY * scale);
+      worldCenterX = mapOffsetX + mapCenterX * scale;
+      worldCenterY = mapOffsetY + mapCenterY * scale;
     } else {
       // Fallback to screen center if map data is unavailable
       console.warn('Map data not available, using screen center for player position');
@@ -116,7 +117,7 @@ export class Game extends Scene {
     }
 
     // Create player sprite with animations using CharacterManager
-    this.player = characterManager.createCharacter(
+    this.player = this.characterManager.createCharacter(
       'player',
       worldCenterX,
       worldCenterY,
@@ -141,26 +142,29 @@ export class Game extends Scene {
   private updatePlayerMovement(delta: number): void {
     if (!this.player || !this.playerController) return;
 
-    const { deltaX, deltaY } = this.playerController['keyboardHandler'].getDeltaMovement(delta, GameConfig.PLAYER.SPEED);
-
-    if (deltaX === 0 && deltaY === 0) return;
-
-    // Calculate new position with boundaries
-    const newX = Phaser.Math.Clamp(
-      this.player.x + deltaX,
-      50, // Left boundary
-      GameConfig.screenWidth - 50 // Right boundary
-    );
-    const newY = Phaser.Math.Clamp(
-      this.player.y + deltaY,
-      50, // Top boundary
-      GameConfig.screenHeight - 50 // Bottom boundary
+    const { deltaX, deltaY } = this.playerController['keyboardHandler'].getDeltaMovement(
+      delta,
+      GameConfig.PLAYER.SPEED
     );
 
-    // Update player position
-    this.player.setPosition(newX, newY);
+    // Calculate new position with boundaries (only if moving)
+    if (deltaX !== 0 || deltaY !== 0) {
+      const newX = Phaser.Math.Clamp(
+        this.player.x + deltaX,
+        50, // Left boundary
+        GameConfig.screenWidth - 50 // Right boundary
+      );
+      const newY = Phaser.Math.Clamp(
+        this.player.y + deltaY,
+        50, // Top boundary
+        GameConfig.screenHeight - 50 // Bottom boundary
+      );
 
-    // Update animation based on movement direction
+      // Update player position
+      this.player.setPosition(newX, newY);
+    }
+
+    // Always update animation (handles both moving and idle states)
     this.updatePlayerAnimation(deltaX, deltaY);
   }
 
@@ -170,25 +174,35 @@ export class Game extends Scene {
    * @param deltaY Vertical movement delta
    */
   private updatePlayerAnimation(deltaX: number, deltaY: number): void {
-    if (!this.player) return;
+    if (!this.player || !this.characterManager) return;
 
-    const characterManager = new CharacterManager(this);
+    const isMoving = deltaX !== 0 || deltaY !== 0;
+    const animationType = isMoving ? 'walk' : 'idle';
 
-    // Determine primary direction based on larger movement
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Horizontal movement is primary
-      if (deltaX > 0) {
-        characterManager.setCharacterFacing(this.player, 'right');
+    if (isMoving) {
+      // Determine primary direction based on larger movement
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal movement is primary
+        if (deltaX > 0) {
+          this.lastFacingDirection = 'right';
+          this.characterManager.setCharacterFacing(this.player, 'right', animationType);
+        } else {
+          this.lastFacingDirection = 'left';
+          this.characterManager.setCharacterFacing(this.player, 'left', animationType);
+        }
       } else {
-        characterManager.setCharacterFacing(this.player, 'left');
+        // Vertical movement is primary
+        if (deltaY > 0) {
+          this.lastFacingDirection = 'down';
+          this.characterManager.setCharacterFacing(this.player, 'down', animationType);
+        } else {
+          this.lastFacingDirection = 'up';
+          this.characterManager.setCharacterFacing(this.player, 'up', animationType);
+        }
       }
-    } else if (Math.abs(deltaY) > 0) {
-      // Vertical movement is primary
-      if (deltaY > 0) {
-        characterManager.setCharacterFacing(this.player, 'down');
-      } else {
-        characterManager.setCharacterFacing(this.player, 'up');
-      }
+    } else {
+      // Player stopped moving - switch to idle animation in last direction
+      this.characterManager.setCharacterFacing(this.player, this.lastFacingDirection, 'idle');
     }
   }
 
@@ -199,7 +213,9 @@ export class Game extends Scene {
     if (this.playerController) {
       this.playerController.destroy();
     }
+    if (this.characterManager) {
+      this.characterManager.destroy();
+    }
     // Note: Phaser Scene cleanup is handled automatically
   }
-
 }

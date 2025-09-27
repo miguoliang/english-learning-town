@@ -55,15 +55,21 @@ export class CharacterManager {
   ): void {
     const animationKey = `character_${animationType}_${direction}`;
 
+    console.log(`Attempting to play animation: ${animationKey}`);
+    console.log(`Available animations:`, Object.keys(this.scene.anims.anims.entries));
+
     if (this.scene.anims.exists(animationKey)) {
+      console.log(`Playing animation: ${animationKey}`);
       character.play(animationKey);
       character.setFlipX(false);
     } else if (direction === 'left' && this.scene.anims.exists(`character_${animationType}_right`)) {
       // Mirror the right-facing animation for left
+      console.log(`Playing mirrored right animation for left direction: character_${animationType}_right`);
       character.play(`character_${animationType}_right`);
       character.setFlipX(true);
     } else {
       console.warn(`Animation not found for ${animationKey}`);
+      console.warn(`Available animations:`, Object.keys(this.scene.anims.anims.entries));
       // Fallback to first available frame
       character.setFrame(0);
     }

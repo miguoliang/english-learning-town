@@ -39,11 +39,17 @@ export class Preloader extends Scene {
     this.load.image('spring', 'shared/tilesets/spring/spring.png');
     this.load.image('dirt', 'shared/tilesets/dirt/dirt.png');
 
-    // Load character atlas using JSON atlas
+    // Load character atlases using JSON atlas
     this.load.atlas(
       'character_idle',
       'shared/characters/basic/idle.png',
       'shared/characters/basic/idle.json'
+    );
+
+    this.load.atlas(
+      'character_walk',
+      'shared/characters/basic/walk.png',
+      'shared/characters/basic/walk.json'
     );
 
     // Load main town map
@@ -132,6 +138,40 @@ export class Preloader extends Scene {
         end: 11,
       }),
       frameRate: 5,
+      repeat: -1,
+    });
+
+    // Create walk animations for different directions using walk atlas frames
+    // Right-facing walk animation (frames 0-7)
+    this.anims.create({
+      key: 'character_walk_right',
+      frames: this.anims.generateFrameNames('character_walk', {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 8, // Faster for walking movement
+      repeat: -1,
+    });
+
+    // Down-facing walk animation (frames 8-15)
+    this.anims.create({
+      key: 'character_walk_down',
+      frames: this.anims.generateFrameNames('character_walk', {
+        start: 8,
+        end: 15,
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
+    // Up-facing walk animation (frames 16-23)
+    this.anims.create({
+      key: 'character_walk_up',
+      frames: this.anims.generateFrameNames('character_walk', {
+        start: 16,
+        end: 23,
+      }),
+      frameRate: 8,
       repeat: -1,
     });
   }
