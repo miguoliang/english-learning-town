@@ -20,6 +20,7 @@ export class Game extends Scene {
   private lastFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
   private currentAnimationType: 'walk' | 'run' | 'idle' = 'idle';
   private map: Phaser.Tilemaps.Tilemap | null = null;
+  private collisionLayers: Phaser.Tilemaps.TilemapLayer[] = [];
 
   constructor() {
     super('Game');
@@ -99,6 +100,28 @@ export class Game extends Scene {
           );
         }
       });
+
+      // Set up collision detection for building layers
+      // Only building structure layers should have collision, not decoration layers
+      const collisionLayers = [
+        homeHouseLayer,
+        schoolHouseLayer,
+        shopHouseLayer,
+        libraryHouseLayer
+      ].filter(Boolean);
+
+      // Add collision tiles to building layers
+      collisionLayers.forEach(layer => {
+        if (layer) {
+          // Set collision based on collision shapes defined in Tiled tileset
+          // This reads the objectgroup collision data from the tileset
+          layer.setCollisionFromCollisionGroup();
+          console.log(`✅ Collision enabled for layer: ${layer.name} using collision shapes from tileset`);
+        }
+      });
+
+      // Store collision layers for later use when player is created
+      this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
     }
 
     // Initialize tile property helper
@@ -154,6 +177,25 @@ export class Game extends Scene {
         'down',
         scale // Match map scale for coordinate system consistency
       );
+
+      // Add physics body to player for collision detection
+      if (this.player) {
+        this.physics.add.existing(this.player);
+        const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+        playerBody.setSize(16, 16); // Set collision box size
+        playerBody.setOffset(0, 8); // Center the collision box
+        playerBody.setCollideWorldBounds(false); // Allow movement beyond world bounds
+
+        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with scale ${scale}`);
+
+        // Set up collision detection between player and tilemap layers
+        this.collisionLayers.forEach(layer => {
+          if (layer && this.player) {
+            this.physics.add.collider(this.player, layer);
+            console.log(`✅ Collider added between player and layer: ${layer.name} at scale ${layer.scaleX}`);
+          }
+        });
+      }
     } else {
       // Fallback to screen center if map data is unavailable
       console.warn('Map data not available, using screen center for player position');
@@ -168,6 +210,23 @@ export class Game extends Scene {
         'down',
         2 // Fallback scale when map data is unavailable
       );
+
+      // Add physics body to player for collision detection (fallback)
+      if (this.player) {
+        this.physics.add.existing(this.player);
+        const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+        playerBody.setSize(16, 16); // Set collision box size
+        playerBody.setOffset(0, 8); // Center the collision box
+        playerBody.setCollideWorldBounds(false); // Allow movement beyond world bounds
+
+        // Set up collision detection between player and tilemap layers (fallback)
+        this.collisionLayers.forEach(layer => {
+          if (layer && this.player) {
+            this.physics.add.collider(this.player, layer);
+            console.log(`✅ Collider added between player and layer: ${layer.name} (fallback)`);
+          }
+        });
+      }
     }
 
     // Player creation complete
@@ -184,7 +243,7 @@ export class Game extends Scene {
   }
 
   /**
-   * Handles player movement with keyboard controls
+   * Handles player movement with keyboard controls using Phaser physics
    * @param delta - Time elapsed since last frame
    */
   private updatePlayerMovement(delta: number): void {
@@ -195,26 +254,27 @@ export class Game extends Scene {
       GameConfig.PLAYER.SPEED
     );
 
-    // Calculate new position and check if it's walkable (only if moving)
-    if (deltaX !== 0 || deltaY !== 0) {
-      const newX = this.player.x + deltaX;
-      const newY = this.player.y + deltaY;
+    // Get player physics body
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    if (!playerBody) return;
 
-      // Get tile coordinates for movement validation
-      const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(newX, newY);
-      const currentTileCoords = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
+    // Calculate movement speed based on delta and running state
+    const speed = GameConfig.PLAYER.SPEED * (isRunning ? 1.5 : 1);
+    const velocityX = deltaX * speed;
+    const velocityY = deltaY * speed;
 
-      // Check if the new position is walkable using tile properties
-      const isWalkable = this.tilePropertyHelper && this.tilePropertyHelper.isWorldPositionWalkable(newX, newY);
+    // Set player velocity for physics-based movement
+    playerBody.setVelocity(velocityX, velocityY);
 
-      // Log movement debugging through DebugSystem
-      this.debugSystem.logMovement(deltaX, deltaY, currentTileCoords, { tileX, tileY }, isWalkable);
+    // Get tile coordinates for movement validation and debugging
+    const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
+    const currentTileCoords = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
 
-      if (isWalkable) {
-        // Update player position only if the tile is walkable
-        this.player.setPosition(newX, newY);
-      }
-    }
+    // Check if the current position is walkable using tile properties
+    const isWalkable = this.tilePropertyHelper && this.tilePropertyHelper.isWorldPositionWalkable(this.player.x, this.player.y);
+
+    // Log movement debugging through DebugSystem
+    this.debugSystem.logMovement(deltaX, deltaY, currentTileCoords, { tileX, tileY }, isWalkable);
 
     // Always update animation (handles both moving and idle states)
     this.updatePlayerAnimation(deltaX, deltaY, isRunning);

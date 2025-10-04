@@ -23,7 +23,7 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 0 }, // No gravity for top-down view
-      debug: false,
+      debug: true, // Enable physics debug to see collision boxes
     },
   },
   scene: [
