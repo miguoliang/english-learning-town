@@ -11,8 +11,7 @@ Experience the game immediately in your browser - no installation required! The 
 ## 🎮 Game Features
 
 - **Interactive Town Exploration**: Navigate through a beautifully crafted 2D town with arrow keys or WASD
-- **Educational Buildings**: Visit the school, library, cafe, and shop - each offering unique learning opportunities
-- **Smart NPCs**: Talk to teachers, librarians, and shopkeepers who guide your English learning journey
+- **Interactive Town**: Explore the charming English Learning Town environment
 - **Comprehensive Learning Activities**:
   - 📝 Grammar lessons (Present Simple vs. Continuous, etc.)
   - 🛒 Vocabulary building (shopping, everyday items)
@@ -39,29 +38,25 @@ Built with modern web technologies for the best learning experience:
 1. **🌐 Visit the Game**: Go to [https://miguoliang.github.io/english-learning-town/](https://miguoliang.github.io/english-learning-town/)
 2. **🎯 Start Playing**: Click "Start Game" when the page loads
 3. **🚶 Move Around**: Use Arrow Keys or WASD to explore the town
-4. **💬 Interact**: Press SPACEBAR to enter buildings and talk to NPCs
-5. **📚 Learn**: Complete activities to improve your English skills!
+4. **📚 Learn**: Complete activities to improve your English skills!
 
 ### Controls
 
 - **Movement**: Use Arrow Keys or WASD to move your character around the town
-- **Interaction**: Press SPACEBAR to enter buildings or talk to NPCs
 - **Navigation**: Explore freely and discover learning opportunities throughout the town
 
 ### Gameplay Guide
 
 1. **Start your Journey**: Begin in the town center and explore the different areas
-2. **Visit Buildings**: Enter the school, library, cafe, or shop by walking up to them and pressing SPACEBAR
-3. **Meet NPCs**: Talk to teachers, librarians, and other characters to start learning activities
-4. **Complete Activities**: Engage with grammar lessons, vocabulary exercises, and reading comprehension
-5. **Track Progress**: Watch your English skills improve across grammar, vocabulary, reading, and conversation
+2. **Complete Activities**: Engage with grammar lessons, vocabulary exercises, and reading comprehension
+3. **Track Progress**: Watch your English skills improve across grammar, vocabulary, reading, and conversation
 
 ### Learning Activities
 
-- **🏫 School**: Grammar lessons and structured English exercises with the teacher
-- **📚 Library**: Reading comprehension and literature-based activities with the librarian
-- **☕ Cafe**: Conversational English practice in a relaxed social setting
-- **🛍️ Shop**: Vocabulary building through practical shopping scenarios with the shopkeeper
+- **📝 Grammar Lessons**: Present Simple vs. Continuous and other grammar topics
+- **🛒 Vocabulary Building**: Shopping and everyday item vocabulary
+- **📚 Reading Comprehension**: Literature-based activities and exercises
+- **💬 Interactive Conversations**: Practice conversational English skills
 
 ### System Requirements
 
@@ -107,11 +102,7 @@ The English Learning Town game is organized with a clear separation between Reac
 | `src/game/scenes/Boot.ts`            | Initial loading and setup scene                                               |
 | `src/game/scenes/Preloader.ts`       | Asset loading scene                                                           |
 | `src/game/scenes/MainMenu.ts`        | Game start menu and introduction                                              |
-| `src/game/scenes/Game.ts`            | Main town exploration scene with NPCs and buildings                           |
-| `src/game/scenes/SchoolInterior.ts`  | Indoor school environment for grammar lessons                                 |
-| `src/game/scenes/LibraryInterior.ts` | Indoor library environment for reading activities                             |
-| `src/game/scenes/CafeInterior.ts`    | Indoor cafe environment for conversation practice                             |
-| `src/game/scenes/ShopInterior.ts`    | Indoor shop environment for vocabulary building                               |
+| `src/game/scenes/Game.ts`            | Main town exploration scene                                                   |
 | `src/game/scenes/GameOver.ts`        | End-of-session summary and progress display                                   |
 | **Assets & Configuration**           |                                                                               |
 | `public/assets/`                     | Game sprites, backgrounds, and visual assets                                  |

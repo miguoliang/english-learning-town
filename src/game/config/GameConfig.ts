@@ -73,104 +73,7 @@ export const GameConfig = {
     textDarkGreen: '#2C5F41',
   },
 
-  BUILDINGS: {
-    SCHOOL: {
-      get x() {
-        return (window.visualViewport?.width ?? window.innerWidth) * 0.2; // 20% from left
-      },
-      get y() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.2; // 20% from top
-      },
-      width: 160,
-      height: 100,
-      color: 0xb22222, // Red brick
-      sceneKey: 'SchoolInterior',
-    },
-    LIBRARY: {
-      get x() {
-        return (window.visualViewport?.width ?? window.innerWidth) * 0.8; // 80% from left
-      },
-      get y() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.2; // 20% from top
-      },
-      width: 160,
-      height: 100,
-      color: 0x8b4513, // Brown
-      sceneKey: 'LibraryInterior',
-    },
-    CAFE: {
-      get x() {
-        return (window.visualViewport?.width ?? window.innerWidth) * 0.3; // 30% from left
-      },
-      get y() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.65; // 65% from top
-      },
-      width: 140,
-      height: 90,
-      color: 0xff8c00, // Orange
-      sceneKey: 'CafeInterior',
-    },
-    SHOP: {
-      get x() {
-        return (window.visualViewport?.width ?? window.innerWidth) * 0.7; // 70% from left
-      },
-      get y() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.65; // 65% from top
-      },
-      width: 140,
-      height: 90,
-      color: 0x9370db, // Purple
-      sceneKey: 'ShopInterior',
-    },
-  },
 
-  NPCS: {
-    TEACHER: {
-      get x() {
-        return GameConfig.BUILDINGS.SCHOOL.x + 80; // Near school building
-      },
-      get y() {
-        return GameConfig.BUILDINGS.SCHOOL.y + 90; // South of school
-      },
-      radius: 25,
-      color: 0xffb6c1,
-      emoji: '👩‍🏫',
-      name: 'Ms. Smith',
-      type: 'teacher',
-      greeting: 'Hello! Ready to learn some grammar today?',
-      activity: 'grammar-lesson',
-    },
-    LIBRARIAN: {
-      get x() {
-        return GameConfig.BUILDINGS.LIBRARY.x - 70; // Near library building
-      },
-      get y() {
-        return GameConfig.BUILDINGS.LIBRARY.y + 90; // South of library
-      },
-      radius: 25,
-      color: 0xdda0dd,
-      emoji: '👨‍💼',
-      name: 'Mr. Johnson',
-      type: 'librarian',
-      greeting: "Welcome to the library! Let's improve your reading skills.",
-      activity: 'reading-comprehension',
-    },
-    SHOPKEEPER: {
-      get x() {
-        return GameConfig.BUILDINGS.SHOP.x - 70; // Near shop building
-      },
-      get y() {
-        return GameConfig.BUILDINGS.SHOP.y + 20; // Slightly south of shop center
-      },
-      radius: 25,
-      color: 0xf0e68c,
-      emoji: '👨‍💼',
-      name: 'Mr. Brown',
-      type: 'shopkeeper',
-      greeting: "Welcome to my shop! Let's practice some shopping vocabulary.",
-      activity: 'vocabulary-shopping',
-    },
-  },
 
   INTERACTION: {
     DISTANCE: 80,
@@ -214,33 +117,6 @@ export const GameConfig = {
     } as const satisfies FontStyle,
   },
 
-  INTERIOR: {
-    get playerStartY() {
-      return (window.visualViewport?.height ?? window.innerHeight) * 0.78; // 78% from top
-    },
-    exitZone: {
-      get x() {
-        return (window.visualViewport?.width ?? window.innerWidth) / 2; // Center X
-      },
-      get y() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.85; // 85% from top
-      },
-      get width() {
-        return (window.visualViewport?.width ?? window.innerWidth) * 0.1; // 10% of screen width
-      },
-      get height() {
-        return (window.visualViewport?.height ?? window.innerHeight) * 0.08; // 8% of screen height
-      },
-      color: 0xff0000,
-      alpha: 0.3,
-    },
-    get wallThickness() {
-      return Math.min(
-        (window.visualViewport?.width ?? window.innerWidth) * 0.1,
-        (window.visualViewport?.height ?? window.innerHeight) * 0.13
-      ); // Adaptive thickness
-    },
-  },
 
   UI: {
     get centerX() {

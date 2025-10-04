@@ -36,21 +36,8 @@ export class Preloader extends Scene {
     this.load.image('background', 'shared/ui/bg.png');
 
     // Load tileset images for embedded TMJ map
-    this.load.image('spring', 'shared/exteriors-tilesets/spring/spring.png');
-    this.load.image('dirt', 'shared/exteriors-tilesets/dirt/dirt.png');
-
-    // Load water tilesets for all seasons and depths
-    const waterSeasons = ['spring', 'summer', 'fall'];
-    const waterDepths = ['deep', 'shallow'];
-
-    waterSeasons.forEach(season => {
-      waterDepths.forEach(depth => {
-        for (let i = 1; i <= 8; i++) {
-          const tilesetName = `water-${season}-${depth}-${i}`;
-          this.load.image(tilesetName, `shared/exteriors-tilesets/${tilesetName}.png`);
-        }
-      });
-    });
+    this.load.image('house', 'shared/tilesets/house/house.png');
+    this.load.image('dirt1', 'shared/tilesets/dirt/dirt1.png');
 
     // Load character atlases using JSON atlas
     this.load.atlas(
@@ -73,33 +60,6 @@ export class Preloader extends Scene {
 
     // Load main town map
     this.load.tilemapTiledJSON('town_map', 'scenes/town.tmj');
-
-    // Load interior maps
-    this.load.tilemapTiledJSON('cafe_map', 'scenes/cafe.tmj');
-    this.load.tilemapTiledJSON('library_map', 'scenes/library.tmj');
-    this.load.tilemapTiledJSON('school_map', 'scenes/school.tmj');
-    this.load.tilemapTiledJSON('shop_map', 'scenes/shop.tmj');
-
-    // Load interior assets for each scene
-    // Cafe assets
-    this.load.image('cafe_wall', 'shared/interiors-wall/wall-1.png');
-    this.load.image('cafe_floor', 'shared/interiors-floor/floor-1.png');
-    this.load.image('cafe_furniture', 'shared/farm-props/table.png');
-
-    // Library assets
-    this.load.image('library_wall', 'shared/interiors-wall/wall-2.png');
-    this.load.image('library_floor', 'shared/interiors-floor/floor-2.png');
-    this.load.image('library_furniture', 'shared/farm-props/shelf.png');
-
-    // School assets
-    this.load.image('school_wall', 'shared/interiors-wall/wall-3.png');
-    this.load.image('school_floor', 'shared/interiors-floor/floor-3.png');
-    this.load.image('school_furniture', 'shared/farm-props/chalkboard.png');
-
-    // Shop assets
-    this.load.image('shop_wall', 'shared/interiors-wall/wall-4.png');
-    this.load.image('shop_floor', 'shared/interiors-floor/floor-4.png');
-    this.load.image('shop_furniture', 'shared/farm-props/general-store-props.png');
 
     // Generate character and item sprites programmatically
     initializeAllSprites(this);
