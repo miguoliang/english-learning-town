@@ -38,6 +38,7 @@ export class Preloader extends Scene {
     // Load tileset images for embedded TMJ map
     this.load.image('house', 'shared/tilesets/house/house.png');
     this.load.image('dirt1', 'shared/tilesets/dirt/dirt1.png');
+    this.load.image('props-all', 'shared/tilesets/props-all.png');
 
     // Load character atlases using JSON atlas
     this.load.atlas(

@@ -57,21 +57,33 @@ export class Game extends Scene {
   private createTiledMap(): void {
     this.map = this.make.tilemap({ key: 'town_map' });
 
-    // Add tilesets - now they're embedded in the TMJ file
-    const springTileset = this.map.addTilesetImage('spring');
-    const dirtTileset = this.map.addTilesetImage('dirt');
-    const waterTileset = this.map.addTilesetImage('water-spring-shallow-1');
+    // Add tilesets - match the names from town.tmj
+    const houseTileset = this.map.addTilesetImage('House', 'house');
+    const dirtTileset = this.map.addTilesetImage('Dirt1', 'dirt1');
+    const propsTileset = this.map.addTilesetImage('Props-All', 'props-all');
 
-    const allTilesets = [springTileset, dirtTileset, waterTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
+    const allTilesets = [houseTileset, dirtTileset, propsTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
 
     if (allTilesets.length > 0) {
-      // Create layers in proper order (only the layers that exist in the tilemap)
-      const earthLayer = this.map.createLayer('Earth', allTilesets, 0, 0);
-      const groundLayer = this.map.createLayer('Ground', allTilesets, 0, 0);
-      const structureLayer = this.map.createLayer('Structure', allTilesets, 0, 0);
+      // Create layers in proper order (use the actual layer names from town.tmj)
+      const groundLayer = this.map.createLayer('Ground/Dirt', allTilesets, 0, 0);
+      const homeHouseLayer = this.map.createLayer('Home/House', allTilesets, 0, 0);
+      const homeDecoLayer = this.map.createLayer('Home/House Deco', allTilesets, 0, 0);
+      const schoolHouseLayer = this.map.createLayer('School/House', allTilesets, 0, 0);
+      const schoolDecoLayer = this.map.createLayer('School/House Deco', allTilesets, 0, 0);
+      const shopHouseLayer = this.map.createLayer('Shop/House', allTilesets, 0, 0);
+      const shopDecoLayer = this.map.createLayer('Shop/House Deco', allTilesets, 0, 0);
+      const libraryHouseLayer = this.map.createLayer('Library/House', allTilesets, 0, 0);
+      const libraryDecoLayer = this.map.createLayer('Library/House Deco', allTilesets, 0, 0);
 
       // Scale and position the map
-      const layers = [earthLayer, groundLayer, structureLayer].filter(Boolean);
+      const layers = [
+        groundLayer,
+        homeHouseLayer, homeDecoLayer,
+        schoolHouseLayer, schoolDecoLayer,
+        shopHouseLayer, shopDecoLayer,
+        libraryHouseLayer, libraryDecoLayer
+      ].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
           const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
