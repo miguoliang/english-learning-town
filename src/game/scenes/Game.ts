@@ -164,7 +164,8 @@ export class Game extends Scene {
                       obj.height * scale,
                       {
                         isStatic: true,
-                        friction: 0.8,
+                        friction: 0.1,
+                        restitution: 0, // No bouncing
                         label: `tile_collision_${layer.name}`
                       }
                     );
@@ -243,9 +244,11 @@ export class Game extends Scene {
             width: 16,
             height: 16
           },
-          frictionAir: 0.15, // Add some air resistance to stop movement smoothly
-          friction: 0, // No friction with surfaces
-          frictionStatic: 0
+          frictionAir: 0.5, // High air resistance for immediate stopping
+          friction: 0.1,
+          frictionStatic: 0,
+          restitution: 0, // No bouncing off walls
+          inertia: Infinity // Prevent rotation when colliding with corners
         });
 
         console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with scale ${scale}`);
@@ -276,9 +279,11 @@ export class Game extends Scene {
             width: 16,
             height: 16
           },
-          frictionAir: 0.15, // Add some air resistance to stop movement smoothly
-          friction: 0, // No friction with surfaces
-          frictionStatic: 0
+          frictionAir: 0.5, // High air resistance for immediate stopping
+          friction: 0.1,
+          frictionStatic: 0,
+          restitution: 0, // No bouncing off walls
+          inertia: Infinity // Prevent rotation when colliding with corners
         });
 
         // Collision layers were already converted in createTiledMap() (fallback path)
@@ -301,24 +306,27 @@ export class Game extends Scene {
 
   /**
    * Handles player movement with keyboard controls using Matter.js physics
-   * @param delta - Time elapsed since last frame
+   * @param _delta - Time elapsed since last frame (unused for velocity-based movement)
    */
-  private updatePlayerMovement(delta: number): void {
+  private updatePlayerMovement(_delta: number): void {
     if (!this.player || !this.playerController) return;
-
-    const { deltaX, deltaY, isRunning } = this.playerController['keyboardHandler'].getDeltaMovement(
-      delta,
-      GameConfig.PLAYER.SPEED
-    );
 
     // Get player Matter.js physics body
     const playerBody = this.player.body as MatterJS.BodyType;
     if (!playerBody) return;
 
-    // Calculate movement speed based on delta and running state
-    const speed = GameConfig.PLAYER.SPEED * (isRunning ? 1.5 : 1);
-    const velocityX = deltaX * speed;
-    const velocityY = deltaY * speed;
+    // Get normalized movement input (-1, 0, or 1 for each axis)
+    const { velocityX: dirX, velocityY: dirY } = this.playerController['keyboardHandler'].getMovementInput();
+    const isRunning = this.playerController['keyboardHandler'].isShiftPressed() && (dirX !== 0 || dirY !== 0);
+
+    // Calculate movement speed based on running state
+    // Matter.js velocity is in pixels per frame (assuming 60 FPS), so divide by 60
+    const baseSpeed = GameConfig.PLAYER.SPEED / 60;
+    const speed = baseSpeed * (isRunning ? GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : 1);
+
+    // Calculate velocity for Matter.js (pixels per frame)
+    const velocityX = dirX * speed;
+    const velocityY = dirY * speed;
 
     // Set player velocity for physics-based movement using Matter.js
     this.matter.setVelocity(playerBody, velocityX, velocityY);
@@ -331,10 +339,10 @@ export class Game extends Scene {
     const isWalkable = this.tilePropertyHelper && this.tilePropertyHelper.isWorldPositionWalkable(this.player.x, this.player.y);
 
     // Log movement debugging through DebugSystem
-    this.debugSystem.logMovement(deltaX, deltaY, currentTileCoords, { tileX, tileY }, isWalkable);
+    this.debugSystem.logMovement(dirX, dirY, currentTileCoords, { tileX, tileY }, isWalkable);
 
     // Always update animation (handles both moving and idle states)
-    this.updatePlayerAnimation(deltaX, deltaY, isRunning);
+    this.updatePlayerAnimation(dirX, dirY, isRunning);
   }
 
 
