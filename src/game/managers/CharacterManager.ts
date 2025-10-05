@@ -55,9 +55,11 @@ export class CharacterManager {
   ): void {
     const animationKey = `character_${animationType}_${direction}`;
 
+    // Always reset flip state first to avoid stale flip from previous direction
+    character.setFlipX(false);
+
     if (this.scene.anims.exists(animationKey)) {
       character.play(animationKey);
-      character.setFlipX(false);
     } else if (direction === 'left' && this.scene.anims.exists(`character_${animationType}_right`)) {
       // Mirror the right-facing animation for left
       character.play(`character_${animationType}_right`);

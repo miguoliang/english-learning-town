@@ -77,7 +77,28 @@ export class Game extends Scene {
       const libraryHouseLayer = this.map.createLayer('Library/House', allTilesets, 0, 0);
       const libraryDecoLayer = this.map.createLayer('Library/House Deco', allTilesets, 0, 0);
 
-      // Scale and position the map
+      // Set up collision detection for building layers BEFORE scaling
+      // Only building structure layers should have collision, not decoration layers
+      const collisionLayers = [
+        homeHouseLayer,
+        schoolHouseLayer,
+        shopHouseLayer,
+        libraryHouseLayer
+      ].filter(Boolean);
+
+      // Store collision layers for later use
+      this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
+
+      // Calculate scaling and positioning FIRST
+      const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
+      const scaleY = GameConfig.screenHeight / (this.map!.heightInPixels || 320);
+      const scale = Math.min(scaleX, scaleY, 2);
+      const mapWidth = (this.map!.widthInPixels || 480) * scale;
+      const mapHeight = (this.map!.heightInPixels || 320) * scale;
+      const mapOffsetX = (GameConfig.screenWidth - mapWidth) / 2;
+      const mapOffsetY = (GameConfig.screenHeight - mapHeight) / 2;
+
+      // Scale and position all layers
       const layers = [
         groundLayer,
         homeHouseLayer, homeDecoLayer,
@@ -87,41 +108,77 @@ export class Game extends Scene {
       ].filter(Boolean);
       layers.forEach(layer => {
         if (layer) {
-          const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
-          const scaleY = GameConfig.screenHeight / (this.map!.heightInPixels || 320);
-          const scale = Math.min(scaleX, scaleY, 2);
           layer.setScale(scale);
-
-          const mapWidth = (this.map!.widthInPixels || 480) * scale;
-          const mapHeight = (this.map!.heightInPixels || 320) * scale;
-          layer.setPosition(
-            (GameConfig.screenWidth - mapWidth) / 2,
-            (GameConfig.screenHeight - mapHeight) / 2
-          );
+          layer.setPosition(mapOffsetX, mapOffsetY);
         }
       });
 
-      // Set up collision detection for building layers
-      // Only building structure layers should have collision, not decoration layers
-      const collisionLayers = [
-        homeHouseLayer,
-        schoolHouseLayer,
-        shopHouseLayer,
-        libraryHouseLayer
-      ].filter(Boolean);
-
-      // Add collision tiles to building layers
+      // Create Matter.js collision bodies AFTER scaling, with scaled coordinates
       collisionLayers.forEach(layer => {
-        if (layer) {
-          // Set collision based on collision shapes defined in Tiled tileset
-          // This reads the objectgroup collision data from the tileset
-          layer.setCollisionFromCollisionGroup();
-          console.log(`✅ Collision enabled for layer: ${layer.name} using collision shapes from tileset`);
+        if (layer && this.map) {
+          let bodiesCreated = 0;
+
+          // Iterate through all tiles in the layer
+          for (let y = 0; y < this.map.height; y++) {
+            for (let x = 0; x < this.map.width; x++) {
+              const tile = layer.getTileAt(x, y);
+
+              if (tile && tile.index !== -1 && tile.tileset) {
+                const tileset = tile.tileset;
+                const localId = tile.index - tileset.firstgid;
+                const tileData = (tileset.tileData as any)[localId];
+
+                // Check if this tile has collision shapes defined
+                if (tileData && tileData.objectgroup && tileData.objectgroup.objects) {
+                  const objects = tileData.objectgroup.objects;
+
+                  // Create Matter.js bodies for each collision object
+                  objects.forEach((obj: any) => {
+                    // Handle tile flipping (Tiled uses flipped coordinates for collision shapes)
+                    const flippedHorizontally = tile.flipX;
+                    const flippedVertically = tile.flipY;
+
+                    // Calculate collision object position accounting for flips
+                    let objX = obj.x;
+                    let objY = obj.y;
+
+                    if (flippedHorizontally) {
+                      // Flip X coordinate: mirror around tile center
+                      objX = tile.width - obj.x - obj.width;
+                    }
+
+                    if (flippedVertically) {
+                      // Flip Y coordinate: mirror around tile center
+                      objY = tile.height - obj.y - obj.height;
+                    }
+
+                    // Calculate world position with scaling and offset
+                    const tileWorldX = (tile.pixelX + objX + obj.width / 2) * scale + mapOffsetX;
+                    const tileWorldY = (tile.pixelY + objY + obj.height / 2) * scale + mapOffsetY;
+
+                    // Create a static rectangle body at the collision shape position
+                    this.matter.add.rectangle(
+                      tileWorldX,
+                      tileWorldY,
+                      obj.width * scale,
+                      obj.height * scale,
+                      {
+                        isStatic: true,
+                        friction: 0.8,
+                        label: `tile_collision_${layer.name}`
+                      }
+                    );
+
+                    bodiesCreated++;
+                  });
+                }
+              }
+            }
+          }
+
+          console.log(`✅ Created ${bodiesCreated} collision bodies for layer: ${layer.name}`);
         }
       });
-
-      // Store collision layers for later use when player is created
-      this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
     }
 
     // Initialize tile property helper
@@ -180,21 +237,21 @@ export class Game extends Scene {
 
       // Add physics body to player for collision detection
       if (this.player) {
-        this.physics.add.existing(this.player);
-        const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
-        playerBody.setSize(16, 16); // Set collision box size
-        playerBody.setOffset(0, 8); // Center the collision box
-        playerBody.setCollideWorldBounds(false); // Allow movement beyond world bounds
+        this.matter.add.gameObject(this.player, {
+          shape: {
+            type: 'rectangle',
+            width: 16,
+            height: 16
+          },
+          frictionAir: 0.15, // Add some air resistance to stop movement smoothly
+          friction: 0, // No friction with surfaces
+          frictionStatic: 0
+        });
 
         console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with scale ${scale}`);
 
-        // Set up collision detection between player and tilemap layers
-        this.collisionLayers.forEach(layer => {
-          if (layer && this.player) {
-            this.physics.add.collider(this.player, layer);
-            console.log(`✅ Collider added between player and layer: ${layer.name} at scale ${layer.scaleX}`);
-          }
-        });
+        // Collision layers were already converted in createTiledMap()
+        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics`);
       }
     } else {
       // Fallback to screen center if map data is unavailable
@@ -213,19 +270,19 @@ export class Game extends Scene {
 
       // Add physics body to player for collision detection (fallback)
       if (this.player) {
-        this.physics.add.existing(this.player);
-        const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
-        playerBody.setSize(16, 16); // Set collision box size
-        playerBody.setOffset(0, 8); // Center the collision box
-        playerBody.setCollideWorldBounds(false); // Allow movement beyond world bounds
-
-        // Set up collision detection between player and tilemap layers (fallback)
-        this.collisionLayers.forEach(layer => {
-          if (layer && this.player) {
-            this.physics.add.collider(this.player, layer);
-            console.log(`✅ Collider added between player and layer: ${layer.name} (fallback)`);
-          }
+        this.matter.add.gameObject(this.player, {
+          shape: {
+            type: 'rectangle',
+            width: 16,
+            height: 16
+          },
+          frictionAir: 0.15, // Add some air resistance to stop movement smoothly
+          friction: 0, // No friction with surfaces
+          frictionStatic: 0
         });
+
+        // Collision layers were already converted in createTiledMap() (fallback path)
+        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics (fallback)`);
       }
     }
 
@@ -243,7 +300,7 @@ export class Game extends Scene {
   }
 
   /**
-   * Handles player movement with keyboard controls using Phaser physics
+   * Handles player movement with keyboard controls using Matter.js physics
    * @param delta - Time elapsed since last frame
    */
   private updatePlayerMovement(delta: number): void {
@@ -254,8 +311,8 @@ export class Game extends Scene {
       GameConfig.PLAYER.SPEED
     );
 
-    // Get player physics body
-    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    // Get player Matter.js physics body
+    const playerBody = this.player.body as MatterJS.BodyType;
     if (!playerBody) return;
 
     // Calculate movement speed based on delta and running state
@@ -263,8 +320,8 @@ export class Game extends Scene {
     const velocityX = deltaX * speed;
     const velocityY = deltaY * speed;
 
-    // Set player velocity for physics-based movement
-    playerBody.setVelocity(velocityX, velocityY);
+    // Set player velocity for physics-based movement using Matter.js
+    this.matter.setVelocity(playerBody, velocityX, velocityY);
 
     // Get tile coordinates for movement validation and debugging
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);

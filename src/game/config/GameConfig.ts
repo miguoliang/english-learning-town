@@ -73,8 +73,6 @@ export const GameConfig = {
     textDarkGreen: '#2C5F41',
   },
 
-
-
   INTERACTION: {
     DISTANCE: 80,
     promptY: 150,
@@ -116,7 +114,6 @@ export const GameConfig = {
       align: 'center',
     } as const satisfies FontStyle,
   },
-
 
   UI: {
     get centerX() {

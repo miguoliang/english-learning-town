@@ -7,7 +7,7 @@ import { BaseKeyboardHandler } from './BaseKeyboardHandler';
  */
 export class BasePlayerController {
   protected scene: Scene;
-  protected player: Phaser.GameObjects.Image | Phaser.Physics.Arcade.Image | null = null;
+  protected player: Phaser.GameObjects.Image | Phaser.Physics.Matter.Image | null = null;
   protected keyboardHandler: BaseKeyboardHandler;
 
   constructor(scene: Scene) {
@@ -26,13 +26,12 @@ export class BasePlayerController {
     x: number,
     y: number,
     usePhysics: boolean = false
-  ): Phaser.GameObjects.Image | Phaser.Physics.Arcade.Image {
+  ): Phaser.GameObjects.Image | Phaser.Physics.Matter.Image {
     const spriteKey = 'character_player';
 
-    if (usePhysics && this.scene.physics) {
-      this.player = this.scene.physics.add.image(x, y, spriteKey);
-      const physicsPlayer = this.player as Phaser.Physics.Arcade.Image;
-      physicsPlayer.setCollideWorldBounds(true);
+    if (usePhysics && this.scene.matter) {
+      this.player = this.scene.matter.add.image(x, y, spriteKey);
+      const physicsPlayer = this.player as Phaser.Physics.Matter.Image;
 
       if (!physicsPlayer.body) {
         throw new Error(
@@ -40,7 +39,12 @@ export class BasePlayerController {
         );
       }
 
-      physicsPlayer.body.setSize(this.player.width * 0.8, this.player.height * 0.8);
+      // Configure Matter.js physics body
+      physicsPlayer.setBody({
+        type: 'rectangle',
+        width: this.player.width * 0.8,
+        height: this.player.height * 0.8,
+      });
     } else {
       this.player = this.scene.add.image(x, y, spriteKey);
     }
@@ -54,30 +58,11 @@ export class BasePlayerController {
   }
 
   /**
-   * Positions player based on building exit
-   * @param exitBuilding Building name to position player outside of
-   */
-  positionPlayerFromBuilding(exitBuilding: string): { x: number; y: number } {
-    const buildingKey = exitBuilding.toUpperCase() as keyof typeof GameConfig.BUILDINGS;
-    const building = GameConfig.BUILDINGS[buildingKey];
-
-    if (building) {
-      return {
-        x: building.x,
-        y: building.y + building.height / 2 + 40, // South side + padding
-      };
-    }
-
-    // Default position
-    return { x: GameConfig.UI.centerX, y: GameConfig.screenHeight * 0.76 };
-  }
-
-  /**
-   * Handles physics-based player movement
+   * Handles physics-based player movement using Matter.js
    * @param speed Player movement speed
    */
   updatePhysicsMovement(speed: number = GameConfig.PLAYER.SPEED): void {
-    if (!this.player || !this.scene.physics || !this.player.body) return;
+    if (!this.player || !this.scene.matter || !this.player.body) return;
 
     const { velocityX, velocityY } = this.keyboardHandler.getMovementInput();
     const isRunning = this.keyboardHandler.isShiftPressed() && (velocityX !== 0 || velocityY !== 0);
@@ -85,7 +70,9 @@ export class BasePlayerController {
     // Apply running speed multiplier when running
     const effectiveSpeed = isRunning ? speed * GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : speed;
 
-    (this.player as Phaser.Physics.Arcade.Image).setVelocity(velocityX * effectiveSpeed, velocityY * effectiveSpeed);
+    // Use Matter.js to set velocity
+    const body = this.player.body as MatterJS.BodyType;
+    this.scene.matter.setVelocity(body, velocityX * effectiveSpeed, velocityY * effectiveSpeed);
   }
 
   /**
@@ -160,7 +147,7 @@ export class BasePlayerController {
    * Gets the player sprite reference
    * @returns The player sprite or null
    */
-  getPlayer(): Phaser.GameObjects.Image | Phaser.Physics.Arcade.Image | null {
+  getPlayer(): Phaser.GameObjects.Image | Phaser.Physics.Matter.Image | null {
     return this.player;
   }
 
