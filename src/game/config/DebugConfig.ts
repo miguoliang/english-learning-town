@@ -54,7 +54,7 @@ export function getCurrentEnvironment(): keyof typeof DEBUG_CONFIGURATIONS {
   // Check various environment variables
   const nodeEnv = typeof process !== 'undefined' ? process.env.NODE_ENV : '';
   const viteMode = typeof import.meta !== 'undefined' ? import.meta.env?.MODE : '';
-  
+
   // Map common environment values
   if (nodeEnv === 'production' || viteMode === 'production') {
     return 'production';
@@ -65,7 +65,7 @@ export function getCurrentEnvironment(): keyof typeof DEBUG_CONFIGURATIONS {
   if (viteMode === 'demo') {
     return 'demo';
   }
-  
+
   // Default to development
   return 'development';
 }

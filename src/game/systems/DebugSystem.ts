@@ -10,12 +10,12 @@ interface DebugStrategy {
    * Initialize the debug strategy
    */
   initialize(): void;
-  
+
   /**
    * Update the debug visualization
    */
   update(): void;
-  
+
   /**
    * Clean up resources
    */
@@ -38,7 +38,7 @@ class GridDebugStrategy implements DebugStrategy {
   initialize(): void {
     this.graphics = this.scene.add.graphics();
     this.graphics.lineStyle(1, 0xff0000, 0.5); // Red lines, 50% opacity
-    
+
     this.drawGrid();
     this.addCoordinateLabels();
   }
@@ -51,7 +51,7 @@ class GridDebugStrategy implements DebugStrategy {
     const scaleX = GameConfig.screenWidth / mapWidthInPixels;
     const scaleY = GameConfig.screenHeight / mapHeightInPixels;
     const scale = Math.min(scaleX, scaleY, 2);
-    
+
     const scaledMapWidth = mapWidthInPixels * scale;
     const scaledMapHeight = mapHeightInPixels * scale;
     const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
@@ -85,7 +85,7 @@ class GridDebugStrategy implements DebugStrategy {
     const scaleX = GameConfig.screenWidth / mapWidthInPixels;
     const scaleY = GameConfig.screenHeight / mapHeightInPixels;
     const scale = Math.min(scaleX, scaleY, 2);
-    
+
     const scaledMapWidth = mapWidthInPixels * scale;
     const scaledMapHeight = mapHeightInPixels * scale;
     const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
@@ -134,8 +134,8 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
   private indicator: Phaser.GameObjects.Graphics | null = null;
 
   constructor(
-    scene: Scene, 
-    map: Phaser.Tilemaps.Tilemap, 
+    scene: Scene,
+    map: Phaser.Tilemaps.Tilemap,
     player: Phaser.GameObjects.Sprite,
     tilePropertyHelper: TilePropertyHelper
   ) {
@@ -161,7 +161,7 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
     const scaleX = GameConfig.screenWidth / mapWidthInPixels;
     const scaleY = GameConfig.screenHeight / mapHeightInPixels;
     const scale = Math.min(scaleX, scaleY, 2);
-    
+
     const scaledMapWidth = mapWidthInPixels * scale;
     const scaledMapHeight = mapHeightInPixels * scale;
     const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
@@ -215,42 +215,42 @@ class CoordinateTestDebugStrategy implements DebugStrategy {
 
   private runCoordinateSystemTests(): void {
     console.log('\n🧪 === COORDINATE SYSTEM TEST ===');
-    
+
     // Test player starting position
     const playerX = this.player.x;
     const playerY = this.player.y;
     console.log(`Player position: (${playerX.toFixed(1)}, ${playerY.toFixed(1)})`);
-    
-    // Convert to tile coordinates  
+
+    // Convert to tile coordinates
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(playerX, playerY);
     console.log(`Player tile: [${tileX}, ${tileY}]`);
-    
+
     // Convert back to world coordinates
     const { worldX, worldY } = this.tilePropertyHelper.tileToWorldCoords(tileX, tileY);
     console.log(`Tile back to world: (${worldX.toFixed(1)}, ${worldY.toFixed(1)})`);
-    
+
     // Test specific coordinate mappings
     console.log('\n📍 Testing key coordinate points:');
     this.testPoint(0, 0, 'Top-left corner');
     this.testPoint(15, 11, 'Map center');
     this.testPoint(31, 23, 'Bottom-right corner');
-    
+
     console.log('\n🎯 Movement direction test:');
     console.log('Expected behavior:');
     console.log('  UP key    → velocityY=-1 → deltaY<0 → "up" animation');
     console.log('  DOWN key  → velocityY=+1 → deltaY>0 → "down" animation');
     console.log('  LEFT key  → velocityX=-1 → deltaX<0 → "left" animation');
     console.log('  RIGHT key → velocityX=+1 → deltaX>0 → "right" animation');
-    
+
     console.log('=== COORDINATE SYSTEM TEST END ===\n');
   }
-  
+
   private testPoint(tileX: number, tileY: number, label: string): void {
     const { worldX, worldY } = this.tilePropertyHelper.tileToWorldCoords(tileX, tileY);
     const { tileX: backX, tileY: backY } = this.tilePropertyHelper.worldToTileCoords(worldX, worldY);
-    
+
     console.log(`  ${label}: Tile[${tileX},${tileY}] ↔ World(${worldX.toFixed(1)},${worldY.toFixed(1)}) ↔ Tile[${backX},${backY}]`);
-    
+
     // Check for conversion accuracy
     if (Math.abs(tileX - backX) > 0.01 || Math.abs(tileY - backY) > 0.01) {
       console.warn(`    ⚠️ Conversion inaccuracy detected!`);
@@ -345,7 +345,7 @@ export class DebugSystem {
    */
   update(): void {
     if (!this.isInitialized) return;
-    
+
     this.strategies.forEach(strategy => strategy.update());
   }
 
@@ -370,7 +370,7 @@ export class DebugSystem {
       `Current: [Tile: ${currentCoords.tileX}, ${currentCoords.tileY}] | ` +
       `Target: [Tile: ${targetCoords.tileX}, ${targetCoords.tileY}] | ` +
       `Walkable: ${isWalkable ? 'YES' : 'NO'}`);
-    
+
     // Verify coordinate axes alignment
     if (deltaY > 0 && targetCoords.tileY <= currentCoords.tileY) {
       console.warn(`🚨 AXIS MISMATCH: Moving down (deltaY>0) but tile Y decreased or stayed same!`);
@@ -392,7 +392,7 @@ export class DebugSystem {
    */
   updateConfig(newConfig: Partial<DebugConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     // If system is already initialized, we need to reinitialize with new config
     if (this.isInitialized) {
       this.destroy();

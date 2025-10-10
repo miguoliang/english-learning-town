@@ -88,7 +88,7 @@ export class BasePlayerController {
   ): void {
     if (!this.player) return;
 
-    const { deltaX, deltaY, isRunning } = this.keyboardHandler.getDeltaMovement(delta, speed);
+    const { deltaX, deltaY } = this.keyboardHandler.getDeltaMovement(delta, speed);
 
     if (deltaX === 0 && deltaY === 0) return;
 

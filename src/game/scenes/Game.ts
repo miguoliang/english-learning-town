@@ -22,6 +22,9 @@ export class Game extends Scene {
   private map: Phaser.Tilemaps.Tilemap | null = null;
   private collisionLayers: Phaser.Tilemaps.TilemapLayer[] = [];
 
+  /** Depth offset for Y-based depth sorting of player and buildings */
+  private readonly DEPTH_OFFSET = 10000;
+
   constructor() {
     super('Game');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
@@ -77,7 +80,36 @@ export class Game extends Scene {
       const libraryHouseLayer = this.map.createLayer('Library/House', allTilesets, 0, 0);
       const libraryDecoLayer = this.map.createLayer('Library/House Deco', allTilesets, 0, 0);
 
-      // Set up collision detection for building layers BEFORE scaling
+      // Calculate scaling first so we can use it for depth calculations
+      const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
+      const scaleY = GameConfig.screenHeight / (this.map!.heightInPixels || 320);
+      const scale = Math.min(scaleX, scaleY, 2);
+
+      // Set up depth sorting for proper layering
+      // Ground layer should be at the bottom
+      groundLayer?.setDepth(0);
+
+      // Building layers use a depth offset to work with player's Y-based depth
+      // Set each building's depth based on the BOTTOM edge of the building
+      // This is where the player would walk in front of the building
+      const tileHeight = this.map.tileHeight; // 16 pixels
+      const mapOffsetY = (GameConfig.screenHeight - (this.map!.heightInPixels || 320) * scale) / 2;
+
+      // Top buildings (Home at rows 2-5, Shop at rows 1-5) - bottom edge at row 5
+      const topBuildingDepth = this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale);
+      homeHouseLayer?.setDepth(topBuildingDepth);
+      homeDecoLayer?.setDepth(topBuildingDepth);
+      shopHouseLayer?.setDepth(topBuildingDepth);
+      shopDecoLayer?.setDepth(topBuildingDepth);
+
+      // Bottom buildings (School at rows 15-19, Library deco at rows 18-19) - bottom edge at row 19
+      const bottomBuildingDepth = this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale);
+      schoolHouseLayer?.setDepth(bottomBuildingDepth);
+      schoolDecoLayer?.setDepth(bottomBuildingDepth);
+      libraryHouseLayer?.setDepth(bottomBuildingDepth);
+      libraryDecoLayer?.setDepth(bottomBuildingDepth);
+
+      // Set up collision detection for building layers
       // Only building structure layers should have collision, not decoration layers
       const collisionLayers = [
         homeHouseLayer,
@@ -89,14 +121,9 @@ export class Game extends Scene {
       // Store collision layers for later use
       this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
 
-      // Calculate scaling and positioning FIRST
-      const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
-      const scaleY = GameConfig.screenHeight / (this.map!.heightInPixels || 320);
-      const scale = Math.min(scaleX, scaleY, 2);
+      // Calculate remaining positioning values
       const mapWidth = (this.map!.widthInPixels || 480) * scale;
-      const mapHeight = (this.map!.heightInPixels || 320) * scale;
       const mapOffsetX = (GameConfig.screenWidth - mapWidth) / 2;
-      const mapOffsetY = (GameConfig.screenHeight - mapHeight) / 2;
 
       // Scale and position all layers
       const layers = [
@@ -236,6 +263,11 @@ export class Game extends Scene {
         scale // Match map scale for coordinate system consistency
       );
 
+      // Set initial depth based on Y position for proper layering with buildings
+      // Use same depth offset as building layers for consistent sorting
+      // Player depth will be updated each frame in the update loop
+      this.player.setDepth(this.DEPTH_OFFSET + this.player.y);
+
       // Add physics body to player for collision detection
       if (this.player) {
         this.matter.add.gameObject(this.player, {
@@ -330,6 +362,11 @@ export class Game extends Scene {
 
     // Set player velocity for physics-based movement using Matter.js
     this.matter.setVelocity(playerBody, velocityX, velocityY);
+
+    // Update player depth based on Y position for proper layering with buildings
+    // Objects further down the screen (higher Y) should render in front
+    // Use same depth offset as building layers for consistent sorting
+    this.player.setDepth(this.DEPTH_OFFSET + this.player.y);
 
     // Get tile coordinates for movement validation and debugging
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);

@@ -4,9 +4,10 @@ import { GameConfig } from '../config/GameConfig';
 import { CollisionSystem } from './CollisionSystem';
 import { TownEnvironmentBuilder } from '../builders/TownEnvironmentBuilder';
 import { NPCManager } from '../managers/NPCManager';
+import { DoorSystem } from './DoorSystem';
 
 /**
- * System responsible for handling player interactions with NPCs and buildings
+ * System responsible for handling player interactions with NPCs, buildings, and doors
  */
 export class InteractionSystem {
   private scene: Scene;
@@ -14,16 +15,26 @@ export class InteractionSystem {
   private nearbyInteractable: string | null = null;
   private nearbyNpcType: string | null = null;
   private nearbyBuildingEntry: string | null = null;
+  private nearbyDoorKey: string | null = null;
 
   // References to managers
   private townBuilder: TownEnvironmentBuilder;
   private npcManager: NPCManager;
+  private doorSystem: DoorSystem | null = null;
 
   constructor(scene: Scene, townBuilder: TownEnvironmentBuilder, npcManager: NPCManager) {
     this.scene = scene;
     this.townBuilder = townBuilder;
     this.npcManager = npcManager;
     this.createInteractionPrompt();
+  }
+
+  /**
+   * Sets the door system for door interactions
+   * @param doorSystem The door system instance
+   */
+  setDoorSystem(doorSystem: DoorSystem): void {
+    this.doorSystem = doorSystem;
   }
 
   /**
@@ -71,6 +82,31 @@ export class InteractionSystem {
       }
     }
 
+    // Check for nearby doors
+    if (this.doorSystem) {
+      const nearbyDoorKey = this.doorSystem.findNearestDoor(playerX, playerY, interactionDistance);
+
+      if (nearbyDoorKey) {
+        const buildingName = this.doorSystem.getDoorBuilding(nearbyDoorKey);
+        const isDoorOpen = this.doorSystem.isDoorOpen(nearbyDoorKey);
+
+        // Calculate door distance (using doorSystem's internal check)
+        const doorDistance = 0; // Door is within range if found
+
+        if (doorDistance < nearestDistance) {
+          nearestDistance = doorDistance;
+          nearestObject = `${buildingName} Door`;
+          interactionText = `Press SPACE to ${isDoorOpen ? 'close' : 'open'} door`;
+          interactionType = 'door';
+          this.nearbyDoorKey = nearbyDoorKey;
+          // Clear NPC interaction when door is closer
+          this.nearbyNpcType = null;
+        }
+      } else {
+        this.nearbyDoorKey = null;
+      }
+    }
+
     this.updateInteractionPrompt(nearestObject, nearestDistance, interactionText, interactionType);
   }
 
@@ -104,6 +140,7 @@ export class InteractionSystem {
     if (this.nearbyInteractable !== null) {
       this.nearbyInteractable = null;
       this.nearbyNpcType = null;
+      this.nearbyDoorKey = null;
       if (!this.interactionPrompt) {
         throw new Error('Interaction prompt not initialized. Cannot clear interaction.');
       }
@@ -112,9 +149,15 @@ export class InteractionSystem {
   }
 
   /**
-   * Handles spacebar interactions with NPCs
+   * Handles spacebar interactions with NPCs and doors
    */
   handleSpacebarInteraction(): void {
+    // Handle door interactions (priority)
+    if (this.nearbyDoorKey && this.doorSystem) {
+      this.doorSystem.toggleDoor(this.nearbyDoorKey);
+      return;
+    }
+
     // Handle NPC interactions
     if (this.nearbyNpcType) {
       const npcData = this.npcManager.getNPCData(this.nearbyNpcType);
@@ -168,5 +211,6 @@ export class InteractionSystem {
     this.nearbyInteractable = null;
     this.nearbyNpcType = null;
     this.nearbyBuildingEntry = null;
+    this.nearbyDoorKey = null;
   }
 }
