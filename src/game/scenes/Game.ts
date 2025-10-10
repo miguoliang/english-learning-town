@@ -110,12 +110,16 @@ export class Game extends Scene {
       libraryDecoLayer?.setDepth(bottomBuildingDepth);
 
       // Set up collision detection for building layers
-      // Only building structure layers should have collision, not decoration layers
+      // Include both structure and decoration layers for collision
       const collisionLayers = [
         homeHouseLayer,
+        homeDecoLayer,
         schoolHouseLayer,
+        schoolDecoLayer,
         shopHouseLayer,
-        libraryHouseLayer
+        shopDecoLayer,
+        libraryHouseLayer,
+        libraryDecoLayer
       ].filter(Boolean);
 
       // Store collision layers for later use
