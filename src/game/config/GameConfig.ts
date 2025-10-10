@@ -53,8 +53,10 @@ export const GameConfig = {
     RUN_SPEED_MULTIPLIER: 1.75, // Running is 75% faster than walking
     SCALE: 0.5,
     TINT: 0x4169e1, // Royal blue
-    SIZE: 50, // Collision box size
-    collisionPadding: 25,
+    SPRITE_WIDTH: 16, // Actual sprite width from atlas
+    SPRITE_HEIGHT: 16, // Actual sprite height from atlas
+    COLLISION_WIDTH: 10, // Collision box width (smaller for smoother movement)
+    COLLISION_HEIGHT: 10, // Collision box height (smaller for smoother movement)
   },
 
   COLORS: {

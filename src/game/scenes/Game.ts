@@ -274,11 +274,15 @@ export class Game extends Scene {
 
       // Add physics body to player for collision detection
       if (this.player) {
+        // Scale collision box to match sprite scale
+        const scaledCollisionWidth = GameConfig.PLAYER.COLLISION_WIDTH * scale;
+        const scaledCollisionHeight = GameConfig.PLAYER.COLLISION_HEIGHT * scale;
+
         this.matter.add.gameObject(this.player, {
           shape: {
             type: 'rectangle',
-            width: 16,
-            height: 16
+            width: scaledCollisionWidth,
+            height: scaledCollisionHeight
           },
           frictionAir: 0.5, // High air resistance for immediate stopping
           friction: 0.1,
@@ -287,7 +291,7 @@ export class Game extends Scene {
           inertia: Infinity // Prevent rotation when colliding with corners
         });
 
-        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with scale ${scale}`);
+        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with collision box ${scaledCollisionWidth.toFixed(1)}x${scaledCollisionHeight.toFixed(1)} (scale: ${scale.toFixed(2)})`);
 
         // Collision layers were already converted in createTiledMap()
         console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics`);
@@ -309,11 +313,16 @@ export class Game extends Scene {
 
       // Add physics body to player for collision detection (fallback)
       if (this.player) {
+        // Scale collision box to match sprite scale (fallback uses scale = 2)
+        const fallbackScale = 2;
+        const scaledCollisionWidth = GameConfig.PLAYER.COLLISION_WIDTH * fallbackScale;
+        const scaledCollisionHeight = GameConfig.PLAYER.COLLISION_HEIGHT * fallbackScale;
+
         this.matter.add.gameObject(this.player, {
           shape: {
             type: 'rectangle',
-            width: 16,
-            height: 16
+            width: scaledCollisionWidth,
+            height: scaledCollisionHeight
           },
           frictionAir: 0.5, // High air resistance for immediate stopping
           friction: 0.1,
