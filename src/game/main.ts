@@ -4,6 +4,10 @@ import { Game as MainGame } from './scenes/Game';
 import { MainMenu } from './scenes/MainMenu';
 import { AUTO, Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
+import { getCurrentEnvironment } from './config/DebugConfig';
+
+// Check if running in production
+const isProduction = getCurrentEnvironment() === 'production';
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -23,7 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'matter',
     matter: {
       gravity: { x: 0, y: 0 }, // No gravity for top-down view
-      debug: true, // Enable physics debug to see collision shapes
+      debug: !isProduction, // Only show physics debug in development
     },
   },
   scene: [
