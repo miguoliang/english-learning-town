@@ -370,8 +370,16 @@ export class Game extends Scene {
     const speed = baseSpeed * (isRunning ? GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : 1);
 
     // Calculate velocity for Matter.js (pixels per frame)
-    const velocityX = dirX * speed;
-    const velocityY = dirY * speed;
+    // Normalize diagonal movement to prevent faster diagonal speed
+    let velocityX = dirX * speed;
+    let velocityY = dirY * speed;
+
+    // When moving diagonally, normalize the velocity vector to maintain consistent speed
+    if (dirX !== 0 && dirY !== 0) {
+      const magnitude = Math.sqrt(dirX * dirX + dirY * dirY);
+      velocityX = (dirX / magnitude) * speed;
+      velocityY = (dirY / magnitude) * speed;
+    }
 
     // Set player velocity for physics-based movement using Matter.js
     this.matter.setVelocity(playerBody, velocityX, velocityY);
