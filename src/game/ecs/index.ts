@@ -25,6 +25,8 @@ export {
   DoorDefaults,
   DoorLayerRegistry,
   DoorCollisionRegistry,
+  DoorClosedTilesRegistry,
+  DoorOpenTilesRegistry,
 } from './components/DoorComponent';
 export {
   InteractableComponent,

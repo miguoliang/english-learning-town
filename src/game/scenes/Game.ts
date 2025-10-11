@@ -366,7 +366,7 @@ export class Game extends Scene {
   }
 
   /**
-   * Creates door entities for all buildings
+   * Creates door entities from Tiled object layer
    */
   private createDoors(
     scale: number,
@@ -377,73 +377,139 @@ export class Game extends Scene {
   ): void {
     if (!this.ecsWorld || !this.map) return;
 
-    // Helper function to convert tile coords to world coords
-    const tileToWorld = (tileX: number, tileY: number) => ({
-      x: mapOffsetX + (tileX * tileWidth + tileWidth / 2) * scale,
-      y: mapOffsetY + (tileY * tileHeight + tileHeight / 2) * scale,
+    // Get the Interactables object layer
+    const interactablesLayer = this.map.getObjectLayer('Interactables');
+    if (!interactablesLayer) {
+      console.warn('⚠️ No Interactables object layer found in tilemap');
+      return;
+    }
+
+    // Get building DECO layers for door rendering (doors are typically on decoration layers)
+    const buildingLayers = new Map([
+      ['home', this.map.getLayer('Home/House Deco')?.tilemapLayer],
+      ['shop', this.map.getLayer('Shop/House Deco')?.tilemapLayer],
+      ['school', this.map.getLayer('School/House Deco')?.tilemapLayer],
+      ['library', this.map.getLayer('Library/House Deco')?.tilemapLayer],
+    ]);
+
+    console.log(`🚪 Loading doors from Interactables layer (${interactablesLayer.objects.length} objects)`);
+
+    // Process each door object
+    interactablesLayer.objects.forEach(obj => {
+      if (obj.type === 'door' && obj.name) {
+        this.createDoorFromTiledObject(obj, scale, mapOffsetX, mapOffsetY, tileWidth, tileHeight, buildingLayers);
+      }
     });
+  }
 
-    // Get layers from map
-    const homeHouseLayer = this.map.getLayer('Home/House')?.tilemapLayer;
-    const shopHouseLayer = this.map.getLayer('Shop/House')?.tilemapLayer;
-    const schoolHouseLayer = this.map.getLayer('School/House')?.tilemapLayer;
-    const libraryHouseLayer = this.map.getLayer('Library/House')?.tilemapLayer;
+  /**
+   * Creates a door entity from a Tiled object
+   */
+  private createDoorFromTiledObject(
+    obj: Phaser.Types.Tilemaps.TiledObject,
+    scale: number,
+    mapOffsetX: number,
+    mapOffsetY: number,
+    tileWidth: number,
+    tileHeight: number,
+    buildingLayers: Map<string, Phaser.Tilemaps.TilemapLayer | undefined>
+  ): void {
+    if (!this.ecsWorld || !obj.x || !obj.y || !obj.width || !obj.height) return;
 
-    // Define door configurations (you'll need to adjust tile coordinates and IDs based on your tilemap)
-    const doorConfigs = [
-      {
-        buildingName: 'home',
-        tileX: 3,
-        tileY: 5,
-        layer: homeHouseLayer,
-        closedTileId: 221, // Replace with actual tile IDs from your tileset
-        openTileId: 222,
-      },
-      {
-        buildingName: 'shop',
-        tileX: 26,
-        tileY: 5,
-        layer: shopHouseLayer,
-        closedTileId: 221,
-        openTileId: 222,
-      },
-      {
-        buildingName: 'school',
-        tileX: 3,
-        tileY: 19,
-        layer: schoolHouseLayer,
-        closedTileId: 221,
-        openTileId: 222,
-      },
-      {
-        buildingName: 'library',
-        tileX: 26,
-        tileY: 19,
-        layer: libraryHouseLayer,
-        closedTileId: 221,
-        openTileId: 222,
-      },
-    ];
+    // Extract building name from door name (e.g., "home_door" -> "home")
+    const buildingName = obj.name.replace('_door', '');
+    const buildingEid = this.buildingEntities.get(buildingName) ?? 0;
+    const layer = buildingLayers.get(buildingName);
 
-    // Create door entities
-    for (const config of doorConfigs) {
-      if (!config.layer) continue;
+    if (!layer) {
+      console.warn(`⚠️ No building layer found for door: ${obj.name}`);
+      return;
+    }
 
-      const buildingEid = this.buildingEntities.get(config.buildingName) ?? 0;
-      const doorWorldPos = tileToWorld(config.tileX, config.tileY);
+    // Convert Tiled object coordinates to world coordinates
+    const worldX = mapOffsetX + (obj.x + obj.width / 2) * scale;
+    const worldY = mapOffsetY + (obj.y + obj.height / 2) * scale;
 
-      EntityFactory.createDoor(this.ecsWorld, {
-        buildingEntityId: buildingEid,
-        tileX: config.tileX,
-        tileY: config.tileY,
-        x: doorWorldPos.x,
-        y: doorWorldPos.y,
-        closedTileId: config.closedTileId,
-        openTileId: config.openTileId,
-        layer: config.layer,
-        promptText: `Press SPACE to enter ${config.buildingName}`,
+    // Convert to tile coordinates for tilemap operations
+    const tileX = Math.floor(obj.x / tileWidth);
+    const tileY = Math.floor(obj.y / tileHeight);
+
+    // Calculate door dimensions based on Tiled object size
+    const tileWidth_pixels = this.map!.tileWidth;
+    const tileHeight_pixels = this.map!.tileHeight;
+    const doorTileWidth = Math.ceil(obj.width! / tileWidth_pixels);
+    const doorTileHeight = Math.ceil(obj.height! / tileHeight_pixels);
+
+    // Convert Tiled properties array to object for easier access
+    const properties: Record<string, any> = {};
+    if (obj.properties) {
+      obj.properties.forEach((prop: any) => {
+        properties[prop.name] = prop.value;
       });
     }
+
+    const requiresKey = properties.requiresKey || false;
+    const promptText = properties.promptText || `Press SPACE to enter ${buildingName}`;
+    const interactionRange = properties.interactionRange || 80;
+
+    // Parse tile arrays from properties or use defaults
+    let closedTileIds: number[];
+    let openTileIds: number[];
+
+    if (properties.closedTileIds && properties.openTileIds) {
+      // Custom tile arrays provided (support both arrays and comma-separated strings)
+      if (typeof properties.closedTileIds === 'string') {
+        closedTileIds = properties.closedTileIds.split(',').map((id: string) => parseInt(id.trim()));
+      } else if (Array.isArray(properties.closedTileIds)) {
+        closedTileIds = properties.closedTileIds;
+      } else {
+        closedTileIds = [properties.closedTileIds];
+      }
+
+      if (typeof properties.openTileIds === 'string') {
+        openTileIds = properties.openTileIds.split(',').map((id: string) => parseInt(id.trim()));
+      } else if (Array.isArray(properties.openTileIds)) {
+        openTileIds = properties.openTileIds;
+      } else {
+        openTileIds = [properties.openTileIds];
+      }
+    } else {
+      // Generate default tile arrays based on door size
+      // For 2x1 doors: [leftTile, rightTile]
+      // For 1x1 doors: [singleTile]
+      const baseClosed = properties.closedTileId || 221;
+      const baseOpen = properties.openTileId || 222;
+
+      closedTileIds = [];
+      openTileIds = [];
+
+      for (let y = 0; y < doorTileHeight; y++) {
+        for (let x = 0; x < doorTileWidth; x++) {
+          const offset = y * doorTileWidth + x;
+          closedTileIds.push(baseClosed + offset);
+          openTileIds.push(baseOpen + offset);
+        }
+      }
+    }
+
+    // Create door entity
+    const doorEid = EntityFactory.createDoor(this.ecsWorld, {
+      buildingEntityId: buildingEid,
+      tileX,
+      tileY,
+      x: worldX,
+      y: worldY,
+      tileWidth: doorTileWidth,
+      tileHeight: doorTileHeight,
+      closedTileIds,
+      openTileIds,
+      layer,
+      requiresKey,
+      interactionRange,
+      promptText,
+    });
+
+    console.log(`🚪 Created door: ${obj.name} at (${tileX}, ${tileY}) (eid: ${doorEid})`);
   }
 
   /**

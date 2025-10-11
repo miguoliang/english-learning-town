@@ -12,6 +12,8 @@ import {
 import {
   DoorComponent,
   DoorLayerRegistry,
+  DoorClosedTilesRegistry,
+  DoorOpenTilesRegistry,
 } from './components/DoorComponent';
 import {
   InteractableComponent,
@@ -57,8 +59,10 @@ export interface DoorOptions {
   tileY: number;
   x: number;
   y: number;
-  closedTileId: number;
-  openTileId: number;
+  tileWidth?: number;
+  tileHeight?: number;
+  closedTileIds: number[];
+  openTileIds: number[];
   layer: Phaser.Tilemaps.TilemapLayer;
   requiresKey?: boolean;
   interactionRange?: number;
@@ -181,8 +185,8 @@ export class EntityFactory {
     DoorComponent.isOpen[eid] = 0; // Start closed
     DoorComponent.tileX[eid] = options.tileX;
     DoorComponent.tileY[eid] = options.tileY;
-    DoorComponent.closedTileId[eid] = options.closedTileId;
-    DoorComponent.openTileId[eid] = options.openTileId;
+    DoorComponent.tileWidth[eid] = options.tileWidth ?? 1;
+    DoorComponent.tileHeight[eid] = options.tileHeight ?? 1;
     DoorComponent.requiresKey[eid] = options.requiresKey ? 1 : 0;
     DoorComponent.layerIndex[eid] = 0; // Will be set via registry
 
@@ -196,6 +200,23 @@ export class EntityFactory {
 
     // Store layer reference in registry
     DoorLayerRegistry.set(eid, options.layer);
+
+    // Store tile arrays in registries
+    DoorClosedTilesRegistry.set(eid, options.closedTileIds);
+    DoorOpenTilesRegistry.set(eid, options.openTileIds);
+
+    // Initially render the door in closed state
+    const tileWidth = options.tileWidth ?? 1;
+    const tileHeight = options.tileHeight ?? 1;
+    let tileIndex = 0;
+    for (let y = 0; y < tileHeight; y++) {
+      for (let x = 0; x < tileWidth; x++) {
+        if (tileIndex < options.closedTileIds.length) {
+          options.layer.putTileAt(options.closedTileIds[tileIndex], options.tileX + x, options.tileY + y);
+          tileIndex++;
+        }
+      }
+    }
 
     // Store prompt text in registry
     const promptText = options.promptText ?? 'Press SPACE to open door';

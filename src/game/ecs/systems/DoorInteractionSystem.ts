@@ -1,5 +1,5 @@
 import { IWorld, defineQuery } from 'bitecs';
-import { DoorComponent, DoorLayerRegistry, DoorCollisionRegistry } from '../components/DoorComponent';
+import { DoorComponent, DoorLayerRegistry, DoorCollisionRegistry, DoorClosedTilesRegistry, DoorOpenTilesRegistry } from '../components/DoorComponent';
 import { InteractableComponent } from '../components/InteractableComponent';
 import { PositionComponent } from '../components/PositionComponent';
 
@@ -77,7 +77,7 @@ export class DoorInteractionSystem {
   }
 
   /**
-   * Opens a door entity
+   * Opens a door entity (supports multi-tile doors)
    * @param doorEntityId - The door entity ID
    */
   openDoor(doorEntityId: number): void {
@@ -85,16 +85,32 @@ export class DoorInteractionSystem {
 
     const tileX = DoorComponent.tileX[doorEntityId];
     const tileY = DoorComponent.tileY[doorEntityId];
-    const openTileId = DoorComponent.openTileId[doorEntityId];
+    const tileWidth = DoorComponent.tileWidth[doorEntityId];
+    const tileHeight = DoorComponent.tileHeight[doorEntityId];
     const layer = DoorLayerRegistry.get(doorEntityId);
+    const openTileIds = DoorOpenTilesRegistry.get(doorEntityId);
 
     if (!layer) {
       console.warn(`🚪 No layer found for door entity ${doorEntityId}`);
       return;
     }
 
-    // Change tile to open state
-    layer.putTileAt(openTileId, tileX, tileY);
+    if (!openTileIds) {
+      console.warn(`🚪 No open tile IDs found for door entity ${doorEntityId}`);
+      return;
+    }
+
+    // Change all door tiles to open state
+    let tileIndex = 0;
+    for (let y = 0; y < tileHeight; y++) {
+      for (let x = 0; x < tileWidth; x++) {
+        if (tileIndex < openTileIds.length) {
+          layer.putTileAt(openTileIds[tileIndex], tileX + x, tileY + y);
+          tileIndex++;
+        }
+      }
+    }
+
     DoorComponent.isOpen[doorEntityId] = 1;
 
     // Remove collision body
@@ -104,11 +120,11 @@ export class DoorInteractionSystem {
       DoorCollisionRegistry.delete(doorEntityId);
     }
 
-    console.log(`🚪 Opened door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
+    console.log(`🚪 Opened ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
 
   /**
-   * Closes a door entity
+   * Closes a door entity (supports multi-tile doors)
    * @param doorEntityId - The door entity ID
    */
   closeDoor(doorEntityId: number): void {
@@ -116,33 +132,53 @@ export class DoorInteractionSystem {
 
     const tileX = DoorComponent.tileX[doorEntityId];
     const tileY = DoorComponent.tileY[doorEntityId];
-    const closedTileId = DoorComponent.closedTileId[doorEntityId];
+    const tileWidth = DoorComponent.tileWidth[doorEntityId];
+    const tileHeight = DoorComponent.tileHeight[doorEntityId];
     const layer = DoorLayerRegistry.get(doorEntityId);
+    const closedTileIds = DoorClosedTilesRegistry.get(doorEntityId);
 
     if (!layer) {
       console.warn(`🚪 No layer found for door entity ${doorEntityId}`);
       return;
     }
 
-    // Change tile to closed state
-    layer.putTileAt(closedTileId, tileX, tileY);
+    if (!closedTileIds) {
+      console.warn(`🚪 No closed tile IDs found for door entity ${doorEntityId}`);
+      return;
+    }
+
+    // Change all door tiles to closed state
+    let tileIndex = 0;
+    for (let y = 0; y < tileHeight; y++) {
+      for (let x = 0; x < tileWidth; x++) {
+        if (tileIndex < closedTileIds.length) {
+          layer.putTileAt(closedTileIds[tileIndex], tileX + x, tileY + y);
+          tileIndex++;
+        }
+      }
+    }
+
     DoorComponent.isOpen[doorEntityId] = 0;
 
-    // Recreate collision body
+    // Recreate collision body for multi-tile door
     const doorX = PositionComponent.x[doorEntityId];
     const doorY = PositionComponent.y[doorEntityId];
 
     if (this.scene.matter.world) {
       // Get tile size from layer
-      const tileWidth = layer.tilemap ? layer.tilemap.tileWidth : 16;
-      const tileHeight = layer.tilemap ? layer.tilemap.tileHeight : 16;
+      const tileSizeX = layer.tilemap ? layer.tilemap.tileWidth : 16;
+      const tileSizeY = layer.tilemap ? layer.tilemap.tileHeight : 16;
       const scale = layer.scaleX;
+
+      // Create collision body sized for the entire door
+      const collisionWidth = tileWidth * tileSizeX * scale;
+      const collisionHeight = tileHeight * tileSizeY * scale;
 
       const collisionBody = this.scene.matter.add.rectangle(
         doorX,
         doorY,
-        tileWidth * scale,
-        tileHeight * scale,
+        collisionWidth,
+        collisionHeight,
         {
           isStatic: true,
           friction: 0.1,
@@ -154,7 +190,7 @@ export class DoorInteractionSystem {
       DoorCollisionRegistry.set(doorEntityId, collisionBody);
     }
 
-    console.log(`🚪 Closed door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
+    console.log(`🚪 Closed ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
 
   /**
