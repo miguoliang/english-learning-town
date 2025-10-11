@@ -130,6 +130,7 @@ export class Game extends Scene {
     if (allTilesets.length > 0) {
       // Create layers in proper order (use the actual layer names from town.tmj)
       const groundLayer = this.map.createLayer('Ground/Dirt', allTilesets, 0, 0);
+      const groundDecoLayer = this.map.createLayer('Ground/Dirt Deco', allTilesets, 0, 0);
       const homeHouseLayer = this.map.createLayer('Home/House', allTilesets, 0, 0);
       const homeDecoLayer = this.map.createLayer('Home/House Deco', allTilesets, 0, 0);
       const schoolHouseLayer = this.map.createLayer('School/House', allTilesets, 0, 0);
@@ -147,6 +148,7 @@ export class Game extends Scene {
       // Set up depth sorting for proper layering
       // Ground layer should be at the bottom
       groundLayer?.setDepth(0);
+      groundDecoLayer?.setDepth(1); // Slightly above ground layer
 
       // Building layers use a depth offset to work with player's Y-based depth
       // Set each building's depth based on the BOTTOM edge of the building
@@ -189,7 +191,7 @@ export class Game extends Scene {
 
       // Scale and position all layers
       const layers = [
-        groundLayer,
+        groundLayer, groundDecoLayer,
         homeHouseLayer, homeDecoLayer,
         schoolHouseLayer, schoolDecoLayer,
         shopHouseLayer, shopDecoLayer,
@@ -274,6 +276,88 @@ export class Game extends Scene {
     // Initialize tile property helper
     this.tilePropertyHelper = new TilePropertyHelper(this);
     this.tilePropertyHelper.setMap(this.map);
+
+    // Initialize custom tile animations
+    this.initializeTileAnimations();
+  }
+
+  /**
+   * Initializes custom tile animations for animated tiles in the tilemap
+   */
+  private initializeTileAnimations(): void {
+    if (!this.map) return;
+
+    // Get the tilemap data from the tilemap cache
+    const tilemapData = this.cache.tilemap.get('town_map');
+    if (!tilemapData) return;
+
+    // The actual map data is in the .data property
+    const mapData = tilemapData.data;
+    if (!mapData?.tilesets) return;
+
+    // Find the Props-All tileset that contains animation data
+    const propsTileset = mapData.tilesets.find((tileset: any) => tileset.name === 'Props-All');
+    if (!propsTileset?.tiles) return;
+
+    // Process each tile with animation data
+    propsTileset.tiles.forEach((tileData: any) => {
+      if (tileData.animation && Array.isArray(tileData.animation)) {
+        const globalTileId = tileData.id + propsTileset.firstgid;
+
+        // Convert animation frames to our format
+        const animationFrames = tileData.animation.map((frame: any) => ({
+          tileId: frame.tileid + propsTileset.firstgid,
+          duration: frame.duration
+        }));
+
+        // Apply animation to all instances of this tile
+        this.animateTilesWithId(globalTileId, animationFrames);
+      }
+    });
+  }
+
+  /**
+   * Finds and animates all tiles with the specified ID across all layers
+   */
+  private animateTilesWithId(tileId: number, frames: Array<{ tileId: number, duration: number }>): void {
+    if (!this.map || frames.length === 0) return;
+
+    // Get the Dirt Deco layer specifically
+    const dirtDecoLayer = this.map.getLayer('Ground/Dirt Deco')?.tilemapLayer;
+    if (!dirtDecoLayer) return;
+
+    // Search for tiles with the specified ID in the Dirt Deco layer
+    for (let y = 0; y < this.map.height; y++) {
+      for (let x = 0; x < this.map.width; x++) {
+        const tile = dirtDecoLayer.getTileAt(x, y);
+
+        if (tile && tile.index === tileId) {
+          this.startTileAnimation(tile, frames);
+        }
+      }
+    }
+  }
+
+  /**
+   * Starts the animation cycle for a specific tile
+   */
+  private startTileAnimation(tile: Phaser.Tilemaps.Tile, frames: Array<{ tileId: number, duration: number }>): void {
+    let currentFrameIndex = 0;
+
+    const animateFrame = () => {
+      // Set the current frame
+      const currentFrame = frames[currentFrameIndex];
+      tile.index = currentFrame.tileId;
+
+      // Move to next frame (loop back to 0 when reaching the end)
+      currentFrameIndex = (currentFrameIndex + 1) % frames.length;
+
+      // Schedule the next frame
+      this.time.delayedCall(currentFrame.duration, animateFrame);
+    };
+
+    // Start the animation
+    animateFrame();
   }
 
   /**
