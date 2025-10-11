@@ -450,7 +450,7 @@ export class Game extends Scene {
 
     const requiresKey = properties.requiresKey || false;
     const promptText = properties.promptText || `Press SPACE to enter ${buildingName}`;
-    const interactionRange = properties.interactionRange || 80;
+    const interactionRange = properties.interactionRange || 40; // Unified range: ~2.5 tiles
 
     // Parse tile arrays from properties or use defaults
     let closedTileIds: number[];

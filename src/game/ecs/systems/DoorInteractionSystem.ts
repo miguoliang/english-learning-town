@@ -113,12 +113,8 @@ export class DoorInteractionSystem {
 
     DoorComponent.isOpen[doorEntityId] = 1;
 
-    // Remove collision body
-    const collisionBody = DoorCollisionRegistry.get(doorEntityId);
-    if (collisionBody && this.scene.matter.world) {
-      this.scene.matter.world.remove(collisionBody);
-      DoorCollisionRegistry.delete(doorEntityId);
-    }
+    // Open doors have no collision - players can walk through the doorway
+    // (No collision body management needed)
 
     console.log(`🚪 Opened ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
@@ -160,35 +156,8 @@ export class DoorInteractionSystem {
 
     DoorComponent.isOpen[doorEntityId] = 0;
 
-    // Recreate collision body for multi-tile door
-    const doorX = PositionComponent.x[doorEntityId];
-    const doorY = PositionComponent.y[doorEntityId];
-
-    if (this.scene.matter.world) {
-      // Get tile size from layer
-      const tileSizeX = layer.tilemap ? layer.tilemap.tileWidth : 16;
-      const tileSizeY = layer.tilemap ? layer.tilemap.tileHeight : 16;
-      const scale = layer.scaleX;
-
-      // Create collision body sized for the entire door
-      const collisionWidth = tileWidth * tileSizeX * scale;
-      const collisionHeight = tileHeight * tileSizeY * scale;
-
-      const collisionBody = this.scene.matter.add.rectangle(
-        doorX,
-        doorY,
-        collisionWidth,
-        collisionHeight,
-        {
-          isStatic: true,
-          friction: 0.1,
-          restitution: 0,
-          label: `door_collision_${doorEntityId}`,
-        }
-      ) as unknown as MatterJS.BodyType;
-
-      DoorCollisionRegistry.set(doorEntityId, collisionBody);
-    }
+    // Closed doors have no collision - players can walk up to them and interact
+    // (No collision body creation needed)
 
     console.log(`🚪 Closed ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
