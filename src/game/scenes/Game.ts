@@ -8,9 +8,12 @@ import { DebugSystem } from '../systems/DebugSystem';
 import { getCurrentDebugConfig } from '../config/DebugConfig';
 import { IWorld } from 'bitecs';
 import { createECSWorld, resetECSWorld } from '../ecs/World';
-import { EntityFactory } from '../ecs/EntityFactory';
+import { EntityFactory, BuildingOptions } from '../ecs/EntityFactory';
 import { depthSortingSystem } from '../ecs/systems/DepthSortingSystem';
+import { DoorInteractionSystem } from '../ecs/systems/DoorInteractionSystem';
+import { BuildingSystem } from '../ecs/systems/BuildingSystem';
 import { PositionComponent } from '../ecs/components/PositionComponent';
+import { BuildingType } from '../ecs/components/BuildingComponent';
 import { SpriteRegistry } from '../ecs/SpriteRegistry';
 
 /**
@@ -37,6 +40,19 @@ export class Game extends Scene {
   /** ECS entity ID for the player */
   private playerEntityId: number | null = null;
 
+  /** ECS systems */
+  private doorInteractionSystem: DoorInteractionSystem | null = null;
+  private buildingSystem: BuildingSystem | null = null;
+
+  /** Building entity IDs */
+  private buildingEntities: Map<string, number> = new Map();
+
+  /** Debug key for toggling door highlights */
+  private doorDebugKey: Phaser.Input.Keyboard.Key | null = null;
+
+  /** UI prompt for interactions */
+  private interactionPrompt: Phaser.GameObjects.Text | null = null;
+
   constructor() {
     super('Game');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
@@ -49,9 +65,37 @@ export class Game extends Scene {
     // Initialize ECS World
     this.ecsWorld = createECSWorld();
 
+    // Initialize ECS systems
+    this.doorInteractionSystem = new DoorInteractionSystem(this);
+    this.buildingSystem = new BuildingSystem(this);
+
     this.createSceneTitle();
     this.createTiledMap();
+    this.createBuildings(); // Create building entities after map is ready
     this.createPlayer();
+
+    // Enable door highlights for debugging (set to true to visualize)
+    if (this.doorInteractionSystem) {
+      this.doorInteractionSystem.setDebugHighlights(true);
+    }
+
+    // Set up keyboard shortcut to toggle door highlights (press 'D')
+    if (this.input.keyboard) {
+      this.doorDebugKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    }
+
+    // Create interaction prompt UI
+    this.interactionPrompt = this.add.text(GameConfig.UI.centerX, GameConfig.screenHeight - 100, '', {
+      fontFamily: 'Arial',
+      fontSize: '18px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 12, y: 8 },
+      align: 'center',
+    });
+    this.interactionPrompt.setOrigin(0.5);
+    this.interactionPrompt.setDepth(10000);
+    this.interactionPrompt.setVisible(false);
 
     // Initialize debug system
     if (this.map && this.player) {
@@ -232,7 +276,175 @@ export class Game extends Scene {
     this.tilePropertyHelper.setMap(this.map);
   }
 
+  /**
+   * Creates building entities for all buildings in the town
+   */
+  private createBuildings(): void {
+    if (!this.ecsWorld || !this.map) return;
 
+    // Calculate map scaling and positioning (same as in createTiledMap)
+    const mapWidthInPixels = this.map.width * this.map.tileWidth;
+    const mapHeightInPixels = this.map.height * this.map.tileHeight;
+    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
+    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
+    const scale = Math.min(scaleX, scaleY, 2);
+    const scaledMapWidth = mapWidthInPixels * scale;
+    const scaledMapHeight = mapHeightInPixels * scale;
+    const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
+    const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+
+    const tileWidth = this.map.tileWidth;
+    const tileHeight = this.map.tileHeight;
+
+    // Helper function to convert tile coords to world coords
+    const tileToWorld = (tileX: number, tileY: number) => ({
+      x: mapOffsetX + (tileX * tileWidth + tileWidth / 2) * scale,
+      y: mapOffsetY + (tileY * tileHeight + tileHeight / 2) * scale,
+    });
+
+    // Define building configurations based on tilemap structure
+    const buildingConfigs: BuildingOptions[] = [
+      {
+        name: 'home',
+        x: tileToWorld(3, 3.5).x, // Center of home building (columns 1-5, rows 2-5)
+        y: tileToWorld(3, 3.5).y,
+        width: 5 * tileWidth * scale,
+        height: 4 * tileHeight * scale,
+        buildingType: BuildingType.RESIDENTIAL,
+        entranceX: tileToWorld(3, 5).x,
+        entranceY: tileToWorld(3, 5).y,
+        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale),
+      },
+      {
+        name: 'shop',
+        x: tileToWorld(26, 3).x, // Center of shop building (columns 24-29, rows 1-5)
+        y: tileToWorld(26, 3).y,
+        width: 6 * tileWidth * scale,
+        height: 5 * tileHeight * scale,
+        buildingType: BuildingType.COMMERCIAL,
+        entranceX: tileToWorld(26, 5).x,
+        entranceY: tileToWorld(26, 5).y,
+        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale),
+      },
+      {
+        name: 'school',
+        x: tileToWorld(3, 17).x, // Center of school building (columns 1-5, rows 15-19)
+        y: tileToWorld(3, 17).y,
+        width: 5 * tileWidth * scale,
+        height: 5 * tileHeight * scale,
+        buildingType: BuildingType.EDUCATIONAL,
+        entranceX: tileToWorld(3, 19).x,
+        entranceY: tileToWorld(3, 19).y,
+        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale),
+      },
+      {
+        name: 'library',
+        x: tileToWorld(26, 17).x, // Center of library building (columns 24-29, rows 15-19)
+        y: tileToWorld(26, 17).y,
+        width: 6 * tileWidth * scale,
+        height: 5 * tileHeight * scale,
+        buildingType: BuildingType.PUBLIC,
+        entranceX: tileToWorld(26, 19).x,
+        entranceY: tileToWorld(26, 19).y,
+        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale),
+      },
+    ];
+
+    // Create building entities
+    for (const config of buildingConfigs) {
+      const buildingEid = EntityFactory.createBuilding(this.ecsWorld, config);
+      this.buildingEntities.set(config.name, buildingEid);
+    }
+
+    // Create door entities for each building
+    this.createDoors(scale, mapOffsetX, mapOffsetY, tileWidth, tileHeight);
+
+    // Log building system info for debugging
+    if (this.buildingSystem) {
+      this.buildingSystem.logBuildingsInfo(this.ecsWorld);
+    }
+  }
+
+  /**
+   * Creates door entities for all buildings
+   */
+  private createDoors(
+    scale: number,
+    mapOffsetX: number,
+    mapOffsetY: number,
+    tileWidth: number,
+    tileHeight: number
+  ): void {
+    if (!this.ecsWorld || !this.map) return;
+
+    // Helper function to convert tile coords to world coords
+    const tileToWorld = (tileX: number, tileY: number) => ({
+      x: mapOffsetX + (tileX * tileWidth + tileWidth / 2) * scale,
+      y: mapOffsetY + (tileY * tileHeight + tileHeight / 2) * scale,
+    });
+
+    // Get layers from map
+    const homeHouseLayer = this.map.getLayer('Home/House')?.tilemapLayer;
+    const shopHouseLayer = this.map.getLayer('Shop/House')?.tilemapLayer;
+    const schoolHouseLayer = this.map.getLayer('School/House')?.tilemapLayer;
+    const libraryHouseLayer = this.map.getLayer('Library/House')?.tilemapLayer;
+
+    // Define door configurations (you'll need to adjust tile coordinates and IDs based on your tilemap)
+    const doorConfigs = [
+      {
+        buildingName: 'home',
+        tileX: 3,
+        tileY: 5,
+        layer: homeHouseLayer,
+        closedTileId: 221, // Replace with actual tile IDs from your tileset
+        openTileId: 222,
+      },
+      {
+        buildingName: 'shop',
+        tileX: 26,
+        tileY: 5,
+        layer: shopHouseLayer,
+        closedTileId: 221,
+        openTileId: 222,
+      },
+      {
+        buildingName: 'school',
+        tileX: 3,
+        tileY: 19,
+        layer: schoolHouseLayer,
+        closedTileId: 221,
+        openTileId: 222,
+      },
+      {
+        buildingName: 'library',
+        tileX: 26,
+        tileY: 19,
+        layer: libraryHouseLayer,
+        closedTileId: 221,
+        openTileId: 222,
+      },
+    ];
+
+    // Create door entities
+    for (const config of doorConfigs) {
+      if (!config.layer) continue;
+
+      const buildingEid = this.buildingEntities.get(config.buildingName) ?? 0;
+      const doorWorldPos = tileToWorld(config.tileX, config.tileY);
+
+      EntityFactory.createDoor(this.ecsWorld, {
+        buildingEntityId: buildingEid,
+        tileX: config.tileX,
+        tileY: config.tileY,
+        x: doorWorldPos.x,
+        y: doorWorldPos.y,
+        closedTileId: config.closedTileId,
+        openTileId: config.openTileId,
+        layer: config.layer,
+        promptText: `Press SPACE to enter ${config.buildingName}`,
+      });
+    }
+  }
 
   /**
    * Creates the player character at the center of the town map
@@ -382,7 +594,44 @@ export class Game extends Scene {
   update(_time: number, delta: number): void {
     this.updatePlayerMovement(delta);
     this.updateECS();
+    this.updateDoorInteractions();
     this.debugSystem.update();
+
+    // Toggle door highlights with 'D' key
+    if (this.doorInteractionSystem && this.doorDebugKey && Phaser.Input.Keyboard.JustDown(this.doorDebugKey)) {
+      const currentState = (this.doorInteractionSystem as any).showDebugHighlights;
+      this.doorInteractionSystem.setDebugHighlights(!currentState);
+      console.log(`🚪 Door highlights ${!currentState ? 'enabled' : 'disabled'}`);
+    }
+  }
+
+  /**
+   * Handles door interactions with the player
+   */
+  private updateDoorInteractions(): void {
+    if (!this.doorInteractionSystem || !this.ecsWorld || !this.player || !this.playerController || !this.interactionPrompt) return;
+
+    // Find nearest door to player
+    const nearestDoor = this.doorInteractionSystem.findNearestDoor(
+      this.ecsWorld,
+      this.player.x,
+      this.player.y
+    );
+
+    // Update interaction prompt
+    if (nearestDoor !== null) {
+      const isOpen = this.doorInteractionSystem.isDoorOpen(nearestDoor);
+      const action = isOpen ? 'close' : 'open';
+      this.interactionPrompt.setText(`Press SPACE to ${action} door`);
+      this.interactionPrompt.setVisible(true);
+
+      // Check if SPACE key was pressed
+      if (this.playerController['keyboardHandler'].isSpaceJustPressed()) {
+        this.doorInteractionSystem.toggleDoor(this.ecsWorld, nearestDoor);
+      }
+    } else {
+      this.interactionPrompt.setVisible(false);
+    }
   }
 
   /**
@@ -397,6 +646,11 @@ export class Game extends Scene {
 
     // Run ECS systems
     depthSortingSystem(this.ecsWorld);
+
+    // Update door interaction system
+    if (this.doorInteractionSystem) {
+      this.doorInteractionSystem.update(this.ecsWorld, this.player.x, this.player.y);
+    }
   }
 
 
@@ -436,16 +690,6 @@ export class Game extends Scene {
     this.matter.setVelocity(playerBody, velocityX, velocityY);
 
     // Player depth is now handled by ECS DepthSortingSystem
-
-    // Get tile coordinates for movement validation and debugging
-    const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
-    const currentTileCoords = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
-
-    // Check if the current position is walkable using tile properties
-    const isWalkable = this.tilePropertyHelper && this.tilePropertyHelper.isWorldPositionWalkable(this.player.x, this.player.y);
-
-    // Log movement debugging through DebugSystem
-    this.debugSystem.logMovement(dirX, dirY, currentTileCoords, { tileX, tileY }, isWalkable);
 
     // Always update animation (handles both moving and idle states)
     this.updatePlayerAnimation(dirX, dirY, isRunning);
@@ -505,11 +749,18 @@ export class Game extends Scene {
     if (this.debugSystem) {
       this.debugSystem.destroy();
     }
+    // Clean up ECS systems
+    if (this.doorInteractionSystem && this.ecsWorld) {
+      this.doorInteractionSystem.cleanup(this.ecsWorld);
+    }
     // Clean up ECS resources
     SpriteRegistry.clear();
     resetECSWorld();
     this.ecsWorld = null;
     this.playerEntityId = null;
+    this.doorInteractionSystem = null;
+    this.buildingSystem = null;
+    this.buildingEntities.clear();
     // Note: Phaser Scene cleanup is handled automatically
   }
 }

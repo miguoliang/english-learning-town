@@ -3,7 +3,7 @@
  * This keeps Phaser objects separate from ECS data for better performance
  */
 
-type PhaserObject = Phaser.GameObjects.Sprite | Phaser.Tilemaps.TilemapLayer;
+type PhaserObject = Phaser.GameObjects.Sprite | Phaser.GameObjects.Image | Phaser.Tilemaps.TilemapLayer;
 
 class SpriteRegistryClass {
   private spriteMap: Map<number, PhaserObject> = new Map();

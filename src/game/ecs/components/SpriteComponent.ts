@@ -11,7 +11,7 @@ export const SpriteComponent = defineComponent({
    * The actual object is stored in a Map outside ECS
    */
   spriteId: Types.ui32,
-  /** Type of sprite: 0 = Sprite, 1 = TilemapLayer */
+  /** Type of sprite: 0 = Sprite, 1 = Image, 2 = TilemapLayer */
   spriteType: Types.ui8,
 });
 
@@ -20,7 +20,8 @@ export const SpriteComponent = defineComponent({
  */
 export const SpriteType = {
   SPRITE: 0,
-  TILEMAP_LAYER: 1,
+  IMAGE: 1,
+  TILEMAP_LAYER: 2,
 } as const;
 
 /**

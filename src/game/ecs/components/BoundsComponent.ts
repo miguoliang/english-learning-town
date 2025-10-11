@@ -1,27 +1,26 @@
 import { defineComponent, Types } from 'bitecs';
 
 /**
- * Component for entities with spatial bounds
- * Used for collision detection, transparency triggers, etc.
+ * Component for storing bounds/collision information for entities
+ * Used for buildings, interactable objects, and collision detection
  */
 export const BoundsComponent = defineComponent({
-  /** Minimum X coordinate in world space */
-  minX: Types.f32,
-  /** Maximum X coordinate in world space */
-  maxX: Types.f32,
-  /** Minimum Y coordinate in world space */
-  minY: Types.f32,
-  /** Maximum Y coordinate in world space */
-  maxY: Types.f32,
+  /** Width of the bounds in pixels */
+  width: Types.f32,
+  /** Height of the bounds in pixels */
+  height: Types.f32,
+  /** X offset from entity position (for non-centered bounds) */
+  offsetX: Types.f32,
+  /** Y offset from entity position (for non-centered bounds) */
+  offsetY: Types.f32,
 });
 
 /**
- * Default values for BoundsComponent
+ * Default values for bounds component
  */
 export const BoundsDefaults = {
-  minX: 0,
-  maxX: 0,
-  minY: 0,
-  maxY: 0,
-};
-
+  width: 32,
+  height: 32,
+  offsetX: 0,
+  offsetY: 0,
+} as const;
