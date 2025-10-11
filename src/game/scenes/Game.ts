@@ -6,6 +6,12 @@ import { CharacterManager } from '../managers/CharacterManager';
 import { TilePropertyHelper } from '../utils/TilePropertyHelper';
 import { DebugSystem } from '../systems/DebugSystem';
 import { getCurrentDebugConfig } from '../config/DebugConfig';
+import { IWorld } from 'bitecs';
+import { createECSWorld, resetECSWorld } from '../ecs/World';
+import { EntityFactory } from '../ecs/EntityFactory';
+import { depthSortingSystem } from '../ecs/systems/DepthSortingSystem';
+import { PositionComponent } from '../ecs/components/PositionComponent';
+import { SpriteRegistry } from '../ecs/SpriteRegistry';
 
 /**
  * Main game scene showing the English Learning Town
@@ -25,6 +31,12 @@ export class Game extends Scene {
   /** Depth offset for Y-based depth sorting of player and buildings */
   private readonly DEPTH_OFFSET = 10000;
 
+  /** ECS World for managing entities and components */
+  private ecsWorld: IWorld | null = null;
+
+  /** ECS entity ID for the player */
+  private playerEntityId: number | null = null;
+
   constructor() {
     super('Game');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
@@ -33,6 +45,9 @@ export class Game extends Scene {
   create(_data?: { exitBuilding?: string }) {
     this.camera = this.cameras.main;
     this.camera.setBackgroundColor(GameConfig.COLORS.skyBlue);
+
+    // Initialize ECS World
+    this.ecsWorld = createECSWorld();
 
     this.createSceneTitle();
     this.createTiledMap();
@@ -93,6 +108,8 @@ export class Game extends Scene {
       // Set each building's depth based on the BOTTOM edge of the building
       // This is where the player would walk in front of the building
       const tileHeight = this.map.tileHeight; // 16 pixels
+      const mapWidth = (this.map!.widthInPixels || 480) * scale;
+      const mapOffsetX = (GameConfig.screenWidth - mapWidth) / 2;
       const mapOffsetY = (GameConfig.screenHeight - (this.map!.heightInPixels || 320) * scale) / 2;
 
       // Top buildings (Home at rows 2-5, Shop at rows 1-5) - bottom edge at row 5
@@ -109,6 +126,7 @@ export class Game extends Scene {
       libraryHouseLayer?.setDepth(bottomBuildingDepth);
       libraryDecoLayer?.setDepth(bottomBuildingDepth);
 
+
       // Set up collision detection for building layers
       // Include both structure and decoration layers for collision
       const collisionLayers = [
@@ -124,10 +142,6 @@ export class Game extends Scene {
 
       // Store collision layers for later use
       this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
-
-      // Calculate remaining positioning values
-      const mapWidth = (this.map!.widthInPixels || 480) * scale;
-      const mapOffsetX = (GameConfig.screenWidth - mapWidth) / 2;
 
       // Scale and position all layers
       const layers = [
@@ -219,6 +233,7 @@ export class Game extends Scene {
   }
 
 
+
   /**
    * Creates the player character at the center of the town map
    */
@@ -271,6 +286,16 @@ export class Game extends Scene {
       // Use same depth offset as building layers for consistent sorting
       // Player depth will be updated each frame in the update loop
       this.player.setDepth(this.DEPTH_OFFSET + this.player.y);
+
+      // Create ECS entity for player
+      if (this.ecsWorld && this.player) {
+        this.playerEntityId = EntityFactory.createPlayer(this.ecsWorld, {
+          sprite: this.player,
+          x: this.player.x,
+          y: this.player.y,
+          baseDepth: this.DEPTH_OFFSET
+        });
+      }
 
       // Add physics body to player for collision detection
       if (this.player) {
@@ -333,6 +358,16 @@ export class Game extends Scene {
 
         // Collision layers were already converted in createTiledMap() (fallback path)
         console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics (fallback)`);
+
+        // Create ECS entity for player (fallback)
+        if (this.ecsWorld && this.player) {
+          this.playerEntityId = EntityFactory.createPlayer(this.ecsWorld, {
+            sprite: this.player,
+            x: this.player.x,
+            y: this.player.y,
+            baseDepth: this.DEPTH_OFFSET
+          });
+        }
       }
     }
 
@@ -346,8 +381,24 @@ export class Game extends Scene {
    */
   update(_time: number, delta: number): void {
     this.updatePlayerMovement(delta);
+    this.updateECS();
     this.debugSystem.update();
   }
+
+  /**
+   * Updates the ECS world and runs all systems
+   */
+  private updateECS(): void {
+    if (!this.ecsWorld || !this.player || this.playerEntityId === null) return;
+
+    // Update player position in ECS
+    PositionComponent.x[this.playerEntityId] = this.player.x;
+    PositionComponent.y[this.playerEntityId] = this.player.y;
+
+    // Run ECS systems
+    depthSortingSystem(this.ecsWorld);
+  }
+
 
   /**
    * Handles player movement with keyboard controls using Matter.js physics
@@ -384,10 +435,7 @@ export class Game extends Scene {
     // Set player velocity for physics-based movement using Matter.js
     this.matter.setVelocity(playerBody, velocityX, velocityY);
 
-    // Update player depth based on Y position for proper layering with buildings
-    // Objects further down the screen (higher Y) should render in front
-    // Use same depth offset as building layers for consistent sorting
-    this.player.setDepth(this.DEPTH_OFFSET + this.player.y);
+    // Player depth is now handled by ECS DepthSortingSystem
 
     // Get tile coordinates for movement validation and debugging
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
@@ -457,6 +505,11 @@ export class Game extends Scene {
     if (this.debugSystem) {
       this.debugSystem.destroy();
     }
+    // Clean up ECS resources
+    SpriteRegistry.clear();
+    resetECSWorld();
+    this.ecsWorld = null;
+    this.playerEntityId = null;
     // Note: Phaser Scene cleanup is handled automatically
   }
 }
