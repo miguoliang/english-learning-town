@@ -74,9 +74,10 @@ export class Game extends Scene {
     this.createBuildings(); // Create building entities after map is ready
     this.createPlayer();
 
-    // Enable door highlights for debugging (set to true to visualize)
+    // Enable door highlights based on debug configuration
     if (this.doorInteractionSystem) {
-      this.doorInteractionSystem.setDebugHighlights(true);
+      const debugConfig = getCurrentDebugConfig();
+      this.doorInteractionSystem.setDebugHighlights(debugConfig.showDoorHighlights);
     }
 
     // Set up keyboard shortcut to toggle door highlights (press 'D')

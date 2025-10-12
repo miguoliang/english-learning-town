@@ -278,6 +278,8 @@ export interface DebugConfig {
   testCoordinates: boolean;
   /** Enable movement debugging */
   debugMovement: boolean;
+  /** Enable door interaction highlights */
+  showDoorHighlights: boolean;
 }
 
 /**

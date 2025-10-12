@@ -10,6 +10,7 @@ export const DEBUG_CONFIGURATIONS = {
     showTileIndicator: true,
     testCoordinates: true,
     debugMovement: true,
+    showDoorHighlights: true,
   } as DebugConfig,
 
   /** Testing mode - minimal debug for testing */
@@ -18,6 +19,7 @@ export const DEBUG_CONFIGURATIONS = {
     showTileIndicator: true,
     testCoordinates: true,
     debugMovement: false,
+    showDoorHighlights: false,
   } as DebugConfig,
 
   /** Production mode - all debug features disabled */
@@ -26,6 +28,7 @@ export const DEBUG_CONFIGURATIONS = {
     showTileIndicator: false,
     testCoordinates: false,
     debugMovement: false,
+    showDoorHighlights: false,
   } as DebugConfig,
 
   /** Demo mode - visual debug only */
@@ -34,6 +37,7 @@ export const DEBUG_CONFIGURATIONS = {
     showTileIndicator: true,
     testCoordinates: false,
     debugMovement: false,
+    showDoorHighlights: false,
   } as DebugConfig,
 } as const;
 
