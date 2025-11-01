@@ -21,6 +21,7 @@ import {
 import { MapManager } from '../managers/MapManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { InteractionManager } from '../managers/InteractionManager';
+import { setupPlayerCamera } from '../utils/CameraUtils';
 
 /**
  * Scene data interface for Home scene
@@ -84,7 +85,6 @@ export class Home extends Scene {
     // Initialize ECS World
     this.ecsWorld = createECSWorld();
 
-    this.createSceneTitle();
     this.createTiledMap();
     this.createPlayer(data);
     this.createExitArea();
@@ -112,20 +112,9 @@ export class Home extends Scene {
   }
 
   /**
-   * Creates the scene title
-   */
-  private createSceneTitle(): void {
-    this.add
-      .text(GameConfig.UI.centerX, 50, 'Home', GameConfig.textStyles.TITLE)
-      .setOrigin(0.5);
-  }
-
-  /**
    * Creates and displays the Tiled map
    */
   private createTiledMap(): void {
-    // Calculate title height (title is at Y=50, with some padding)
-    const titleHeight = 100; // Space for title and padding
 
     // Create map using MapManager
     const mapResult = this.mapManager.createMap({
@@ -141,22 +130,14 @@ export class Home extends Scene {
       ]),
       collisionLayerNames: ['Props'],
       depthOffset: this.DEPTH_OFFSET,
-      topOffset: titleHeight,
+      topOffset: 0,
     });
 
     this.map = mapResult.map;
     this.collisionLayers = mapResult.collisionLayers;
     this.mapTransform = mapResult.transform;
 
-    // Set camera bounds to show the full map
-    if (this.mapTransform) {
-      this.camera.setBounds(
-        this.mapTransform.mapOffsetX,
-        this.mapTransform.mapOffsetY,
-        this.mapTransform.scaledMapWidth,
-        this.mapTransform.scaledMapHeight
-      );
-    }
+    // Camera bounds will be set when player is created (after map transform is available)
 
     // Create collision bodies
     this.collisionManager.createCollisionBodies(this.map, this.collisionLayers, 'home_map');
@@ -209,7 +190,15 @@ export class Home extends Scene {
 
         this.player = result.player;
         this.playerEntityId = result.playerEntityId;
-        console.log(`🎮 Player created in Home scene at (${this.player.x}, ${this.player.y})`);
+
+        // Setup camera to follow player after player is created
+        if (this.mapTransform && this.player) {
+          setupPlayerCamera(this.camera, this.mapTransform, this.player);
+        } else {
+          console.warn('⚠️ Home scene: Cannot setup camera - missing mapTransform or player');
+          if (!this.mapTransform) console.warn('   - mapTransform is missing');
+          if (!this.player) console.warn('   - player is missing');
+        }
 
         // Setup exit interaction after player is created
         if (this.playerController && this.interactionPrompt && this.exitArea) {
@@ -223,27 +212,17 @@ export class Home extends Scene {
         }
       }
     } else {
-      // Fallback to screen center
-      console.warn('Home map data not available, using screen center for player position');
-      spawnX = GameConfig.UI.centerX;
-      spawnY = GameConfig.UI.centerY;
-      scale = 2;
+      // This should never happen if map is created correctly
+      // Fail fast with clear error message
+      const missing: string[] = [];
+      if (!map) missing.push('tilemap cache');
+      if (!this.map) missing.push('this.map');
+      if (!this.mapTransform) missing.push('this.mapTransform');
 
-      if (this.ecsWorld) {
-        const result = createPlayer({
-          scene: this,
-          world: this.ecsWorld,
-          characterManager: this.characterManager,
-          playerController: this.playerController,
-          spawnX,
-          spawnY,
-          scale,
-          depthOffset: this.DEPTH_OFFSET,
-        });
-
-        this.player = result.player;
-        this.playerEntityId = result.playerEntityId;
-      }
+      console.error(`❌ CRITICAL: Cannot create player - map data unavailable!`);
+      console.error(`   Missing: ${missing.join(', ')}`);
+      console.error(`   This indicates the map was not created properly. Check createTiledMap().`);
+      throw new Error(`Cannot create player: Map data unavailable. Missing: ${missing.join(', ')}`);
     }
   }
 

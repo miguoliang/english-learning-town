@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { GameConfig } from '../config/GameConfig';
+import { GameConfig, getGlobalScaleRatio } from '../config/GameConfig';
 import { TilePropertyHelper } from '../utils/TilePropertyHelper';
 import { MapTransform } from '../utils/PlayerUtils';
 
@@ -51,7 +51,10 @@ class GridDebugStrategy implements DebugStrategy {
     if (!this.graphics) return;
 
     // Use the map transform values to ensure grid matches map positioning
-    const { mapOffsetX, mapOffsetY, scaledMapWidth, scaledMapHeight, scale } = this.mapTransform;
+    // Prefer global scale ratio if available, otherwise use map-specific scale
+    const globalScale = getGlobalScaleRatio();
+    const scale = globalScale ?? this.mapTransform.scale;
+    const { mapOffsetX, mapOffsetY, scaledMapWidth, scaledMapHeight } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;
@@ -77,7 +80,10 @@ class GridDebugStrategy implements DebugStrategy {
     if (!this.graphics) return;
 
     // Use the map transform values to ensure labels match map positioning
-    const { mapOffsetX, mapOffsetY, scale } = this.mapTransform;
+    // Prefer global scale ratio if available, otherwise use map-specific scale
+    const globalScale = getGlobalScaleRatio();
+    const scale = globalScale ?? this.mapTransform.scale;
+    const { mapOffsetX, mapOffsetY } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;
@@ -160,7 +166,10 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
 
     // Use the map transform values to ensure indicator matches map positioning
-    const { mapOffsetX, mapOffsetY, scale } = this.mapTransform;
+    // Prefer global scale ratio if available, otherwise use map-specific scale
+    const globalScale = getGlobalScaleRatio();
+    const scale = globalScale ?? this.mapTransform.scale;
+    const { mapOffsetX, mapOffsetY } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;

@@ -37,6 +37,65 @@ interface InteractionStyle extends FontStyle {
 }
 
 /**
+ * Global scale ratio for rendering calculations
+ * Calculated at game start, used globally for consistent scaling
+ */
+let globalScaleRatio: number | null = null;
+
+/**
+ * Standard map width in pixels for scale calculation
+ * Maps are typically 32 tiles wide at 16px per tile = 512px
+ */
+const STANDARD_MAP_WIDTH_PX = 512;
+
+/**
+ * Initialize the global scale ratio
+ * Should be called once at game start (e.g., in Boot or Preloader scene)
+ * @param mapWidthInPixels - Width of the reference map in pixels (optional, defaults to 512px standard map width)
+ */
+export function initializeGlobalScaleRatio(mapWidthInPixels?: number): void {
+  if (globalScaleRatio !== null) {
+    console.warn('Global scale ratio already initialized. Overwriting with new value.');
+  }
+  
+  // Use standard map width (32 tiles * 16px = 512px) as reference
+  // This provides a consistent scale ratio that can be used globally
+  const referenceWidth = mapWidthInPixels ?? STANDARD_MAP_WIDTH_PX;
+  globalScaleRatio = GameConfig.screenWidth / referenceWidth;
+  
+  console.log(`Global scale ratio initialized: ${globalScaleRatio.toFixed(4)} (screen: ${GameConfig.screenWidth}px / map: ${referenceWidth}px)`);
+}
+
+/**
+ * Get the global scale ratio
+ * @returns The global scale ratio, or null if not yet initialized
+ */
+export function getGlobalScaleRatio(): number | null {
+  return globalScaleRatio;
+}
+
+/**
+ * Get the global scale ratio, with fallback to default value if not initialized
+ * @param fallback - Fallback value if scale ratio is not initialized (default: 1.0)
+ * @returns The global scale ratio, or the fallback value
+ */
+export function getGlobalScaleRatioOrDefault(fallback: number = 1.0): number {
+  return globalScaleRatio ?? fallback;
+}
+
+/**
+ * Scale a value by the global scale ratio
+ * Useful for rendering operations that need to scale sizes, positions, etc.
+ * @param value - The value to scale
+ * @param fallbackScale - Fallback scale if global scale not initialized (default: 1.0)
+ * @returns The scaled value
+ */
+export function scaleByGlobalRatio(value: number, fallbackScale: number = 1.0): number {
+  const scale = getGlobalScaleRatioOrDefault(fallbackScale);
+  return value * scale;
+}
+
+/**
  * Centralized configuration for the English Learning Town game
  * Using const assertion and proper typing instead of class-only static pattern
  */
@@ -46,6 +105,14 @@ export const GameConfig = {
   },
   get screenHeight() {
     return window.visualViewport?.height ?? window.innerHeight;
+  },
+
+  /**
+   * Global scale ratio for rendering calculations
+   * Access via getGlobalScaleRatio() - initialized at game start
+   */
+  get globalScaleRatio() {
+    return globalScaleRatio;
   },
 
   PLAYER: {

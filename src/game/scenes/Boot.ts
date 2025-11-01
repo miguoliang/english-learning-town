@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { initializeGlobalScaleRatio } from '../config/GameConfig';
 
 export class Boot extends Scene {
   constructor() {
@@ -13,6 +14,10 @@ export class Boot extends Scene {
   }
 
   create() {
+    // Initialize global scale ratio at game start
+    // Using screen width as reference for consistent scaling across all maps
+    initializeGlobalScaleRatio();
+    
     this.scene.start('Preloader');
   }
 }

@@ -27,6 +27,7 @@ import { CollisionManager } from '../managers/CollisionManager';
 import { TileAnimationManager } from '../managers/TileAnimationManager';
 import { BuildingManager } from '../managers/BuildingManager';
 import { InteractionManager } from '../managers/InteractionManager';
+import { setupPlayerCamera } from '../utils/CameraUtils';
 
 /**
  * Main game scene showing the English Learning Town
@@ -99,7 +100,6 @@ export class Town extends Scene {
     this.buildingSystem = new BuildingSystem(this);
     this.buildingManager = new BuildingManager(this, this.ecsWorld, this.buildingSystem);
 
-    this.createSceneTitle();
     this.createTiledMap();
     this.createBuildings();
     this.createPlayer(_data?.exitBuilding);
@@ -130,22 +130,10 @@ export class Town extends Scene {
   }
 
   /**
-   * Creates the main scene title
-   */
-  private createSceneTitle(): void {
-    this.add
-      .text(GameConfig.UI.centerX, 50, 'English Learning Town', GameConfig.textStyles.TITLE)
-      .setOrigin(0.5);
-  }
-
-  /**
    * Creates and displays the Tiled map
    */
   private createTiledMap(): void {
     const tileHeight = 16; // Tile height in pixels
-
-    // Calculate title height (title is at Y=50, with some padding)
-    const titleHeight = 100; // Space for title and padding
 
     // Define depth configuration for layers
     const depthConfig = new Map<string, number | ((transform: any, depthOffset: number) => number)>();
@@ -212,22 +200,14 @@ export class Town extends Scene {
         'Library/House Deco',
       ],
       depthOffset: this.DEPTH_OFFSET,
-      topOffset: titleHeight,
+      topOffset: 0,
     });
 
     this.map = mapResult.map;
     this.collisionLayers = mapResult.collisionLayers;
     this.mapTransform = mapResult.transform;
 
-    // Set camera bounds to show the full map
-    if (this.mapTransform) {
-      this.camera.setBounds(
-        this.mapTransform.mapOffsetX,
-        this.mapTransform.mapOffsetY,
-        this.mapTransform.scaledMapWidth,
-        this.mapTransform.scaledMapHeight
-      );
-    }
+    // Camera bounds will be set when player is created (after map transform is available)
 
     // Create collision bodies
     this.collisionManager.createCollisionBodies(this.map, this.collisionLayers, 'town_map');
@@ -237,7 +217,7 @@ export class Town extends Scene {
     this.tilePropertyHelper.setMap(this.map, this.mapTransform);
 
     // Initialize tile animations
-    this.tileAnimationManager.initialize(this.map, 'Props-All', 'Ground/Dirt Deco');
+    this.tileAnimationManager.initialize(this.map, 'town_map', 'Props-All', 'Ground/Dirt Deco');
   }
 
   /**
@@ -377,29 +357,28 @@ export class Town extends Scene {
 
         this.player = result.player;
         this.playerEntityId = result.playerEntityId;
+
+        // Setup camera to follow player after player is created
+        if (this.mapTransform && this.player) {
+          setupPlayerCamera(this.camera, this.mapTransform, this.player);
+        } else {
+          console.warn('⚠️ Town scene: Cannot setup camera - missing mapTransform or player');
+          if (!this.mapTransform) console.warn('   - mapTransform is missing');
+          if (!this.player) console.warn('   - player is missing');
+        }
       }
     } else {
-      // Fallback to screen center if map data is unavailable
-      console.warn('Map data not available, using screen center for player position');
-      worldCenterX = GameConfig.UI.centerX;
-      worldCenterY = GameConfig.UI.centerY;
-      scale = 2;
+      // This should never happen if map is created correctly
+      // Fail fast with clear error message
+      const missing: string[] = [];
+      if (!map) missing.push('tilemap cache');
+      if (!this.map) missing.push('this.map');
+      if (!this.mapTransform) missing.push('this.mapTransform');
 
-      if (this.ecsWorld) {
-        const result = createPlayer({
-          scene: this,
-          world: this.ecsWorld,
-          characterManager: this.characterManager,
-          playerController: this.playerController,
-          spawnX: worldCenterX,
-          spawnY: worldCenterY,
-          scale,
-          depthOffset: this.DEPTH_OFFSET,
-        });
-
-        this.player = result.player;
-        this.playerEntityId = result.playerEntityId;
-      }
+      console.error(`❌ CRITICAL: Cannot create player - map data unavailable!`);
+      console.error(`   Missing: ${missing.join(', ')}`);
+      console.error(`   This indicates the map was not created properly. Check createTiledMap().`);
+      throw new Error(`Cannot create player: Map data unavailable. Missing: ${missing.join(', ')}`);
     }
   }
 

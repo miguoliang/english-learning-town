@@ -6,6 +6,7 @@ import { DoorComponent } from '../ecs/components/DoorComponent';
 import { BasePlayerController } from '../controllers/BasePlayerController';
 import { GameConfig } from '../config/GameConfig';
 import { MapTransform } from '../utils/PlayerUtils';
+import { setFixedOnScreen } from '../utils/CameraUtils';
 
 /**
  * Configuration for door interaction handler
@@ -193,6 +194,10 @@ export class InteractionManager {
     prompt.setOrigin(0.5);
     prompt.setDepth(10000);
     prompt.setVisible(false);
+    
+    // Make prompt fixed on screen (doesn't scroll with camera)
+    setFixedOnScreen(prompt);
+    
     return prompt;
   }
 }
