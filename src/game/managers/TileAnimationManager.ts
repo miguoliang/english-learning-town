@@ -95,7 +95,13 @@ export class TileAnimationManager {
    * Updates all tile animations based on elapsed time
    */
   updateAnimations(_time: number, delta: number): void {
-    this.animatedTiles.forEach(animData => {
+    // Filter out any invalid animations (layers that have been destroyed)
+    this.animatedTiles = this.animatedTiles.filter(animData => {
+      // Check if layer is still valid
+      if (!animData.layer || !animData.layer.active || !animData.layer.scene) {
+        return false;
+      }
+
       animData.elapsedTime += delta;
 
       // Loop to advance multiple frames if enough time has elapsed
@@ -109,21 +115,35 @@ export class TileAnimationManager {
 
         // Update the tile
         const newFrame = animData.frames[animData.currentFrameIndex];
-        const tile = animData.layer.getTileAt(animData.tileX, animData.tileY);
 
-        if (tile) {
-          // Use putTileAt to properly update the tile
-          // Parameters: tileIndex, tileX, tileY
-          animData.layer.putTileAt(newFrame.tileId, animData.tileX, animData.tileY);
+        // Ensure coordinates are within bounds
+        // Access map dimensions through the layer's tilemap property or use stored map
+        const map = animData.layer.tilemap || this.map;
+        if (
+          map &&
+          animData.tileX >= 0 &&
+          animData.tileX < map.width &&
+          animData.tileY >= 0 &&
+          animData.tileY < map.height
+        ) {
+          const tile = animData.layer.getTileAt(animData.tileX, animData.tileY);
 
-          // Get the updated tile to verify it changed
-          const updatedTile = animData.layer.getTileAt(animData.tileX, animData.tileY);
-          if (updatedTile && updatedTile.index !== newFrame.tileId) {
-            // If putTileAt didn't work, try direct assignment as fallback
-            updatedTile.index = newFrame.tileId;
+          if (tile) {
+            // Use putTileAt to properly update the tile
+            // Parameters: tileIndex, tileX, tileY
+            animData.layer.putTileAt(newFrame.tileId, animData.tileX, animData.tileY);
+
+            // Get the updated tile to verify it changed
+            const updatedTile = animData.layer.getTileAt(animData.tileX, animData.tileY);
+            if (updatedTile && updatedTile.index !== newFrame.tileId) {
+              // If putTileAt didn't work, try direct assignment as fallback
+              updatedTile.index = newFrame.tileId;
+            }
           }
         }
       }
+
+      return true; // Keep this animation
     });
   }
 
@@ -150,7 +170,7 @@ export class TileAnimationManager {
         const tile = targetLayer.getTileAt(x, y);
 
         if (tile && tile.index === tileId) {
-          this.startTileAnimation(tile, frames, targetLayer);
+          this.startTileAnimation(x, y, frames, targetLayer);
           count++;
         }
       }
@@ -163,14 +183,15 @@ export class TileAnimationManager {
    * Starts the animation cycle for a specific tile
    */
   private startTileAnimation(
-    tile: Phaser.Tilemaps.Tile,
+    tileX: number,
+    tileY: number,
     frames: Array<{ tileId: number; duration: number }>,
     layer: Phaser.Tilemaps.TilemapLayer
   ): void {
     // Store animation data for update loop
     const animData: TileAnimationData = {
-      tileX: tile.x,
-      tileY: tile.y,
+      tileX: tileX,
+      tileY: tileY,
       layer: layer,
       frames: frames,
       currentFrameIndex: 0,
