@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/GameConfig';
+import { MapTransform } from './PlayerUtils';
 
 /**
  * Interface for tile properties as defined in the TMJ file
@@ -22,6 +23,7 @@ export interface TileProperties {
  */
 export class TilePropertyHelper {
   private map: Phaser.Tilemaps.Tilemap | null = null;
+  private mapTransform: MapTransform | null = null;
 
   constructor(_scene: Scene) {
     // Scene parameter kept for potential future use
@@ -29,9 +31,26 @@ export class TilePropertyHelper {
 
   /**
    * Gets consistent map scaling and positioning calculations
-   * This ensures all coordinate conversions use the same values as Game.ts
+   * This ensures all coordinate conversions use the same values as the map
+   * If mapTransform is provided, uses it; otherwise falls back to calculation
    */
   private getMapTransform() {
+    // If mapTransform is provided, use it directly
+    if (this.mapTransform) {
+      return {
+        mapWidthInPixels: this.mapTransform.mapWidthInPixels,
+        mapHeightInPixels: this.mapTransform.mapHeightInPixels,
+        screenWidth: GameConfig.screenWidth,
+        screenHeight: GameConfig.screenHeight,
+        scale: this.mapTransform.scale,
+        scaledMapWidth: this.mapTransform.scaledMapWidth,
+        scaledMapHeight: this.mapTransform.scaledMapHeight,
+        mapOffsetX: this.mapTransform.mapOffsetX,
+        mapOffsetY: this.mapTransform.mapOffsetY,
+      };
+    }
+
+    // Fallback to calculation if mapTransform not provided
     if (!this.map) {
       return null;
     }
@@ -67,9 +86,13 @@ export class TilePropertyHelper {
   /**
    * Sets the map reference for property lookups
    * @param map - The Phaser tilemap instance
+   * @param mapTransform - Optional map transform for correct coordinate conversion
    */
-  setMap(map: Phaser.Tilemaps.Tilemap): void {
+  setMap(map: Phaser.Tilemaps.Tilemap, mapTransform?: MapTransform): void {
     this.map = map;
+    if (mapTransform) {
+      this.mapTransform = mapTransform;
+    }
   }
 
 

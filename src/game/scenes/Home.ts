@@ -104,8 +104,8 @@ export class Home extends Scene {
     }
 
     // Initialize debug system
-    if (this.map && this.player) {
-      this.debugSystem.initialize(this.map, this.player, this.tilePropertyHelper);
+    if (this.map && this.player && this.mapTransform) {
+      this.debugSystem.initialize(this.map, this.mapTransform, this.player, this.tilePropertyHelper);
     }
 
     EventBus.emit('current-scene-ready', this);
@@ -124,6 +124,9 @@ export class Home extends Scene {
    * Creates and displays the Tiled map
    */
   private createTiledMap(): void {
+    // Calculate title height (title is at Y=50, with some padding)
+    const titleHeight = 100; // Space for title and padding
+
     // Create map using MapManager
     const mapResult = this.mapManager.createMap({
       mapKey: 'home_map',
@@ -138,18 +141,29 @@ export class Home extends Scene {
       ]),
       collisionLayerNames: ['Props'],
       depthOffset: this.DEPTH_OFFSET,
+      topOffset: titleHeight,
     });
 
     this.map = mapResult.map;
     this.collisionLayers = mapResult.collisionLayers;
     this.mapTransform = mapResult.transform;
 
+    // Set camera bounds to show the full map
+    if (this.mapTransform) {
+      this.camera.setBounds(
+        this.mapTransform.mapOffsetX,
+        this.mapTransform.mapOffsetY,
+        this.mapTransform.scaledMapWidth,
+        this.mapTransform.scaledMapHeight
+      );
+    }
+
     // Create collision bodies
     this.collisionManager.createCollisionBodies(this.map, this.collisionLayers, 'home_map');
 
     // Initialize tile property helper
     this.tilePropertyHelper = new TilePropertyHelper(this);
-    this.tilePropertyHelper.setMap(this.map);
+    this.tilePropertyHelper.setMap(this.map, this.mapTransform);
   }
 
   /**

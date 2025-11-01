@@ -22,19 +22,28 @@ export interface MapTransform {
 
 /**
  * Calculate map scaling and positioning transform
+ * @param map The tilemap to calculate transform for
+ * @param topOffset Optional offset from top of screen (e.g., for title/HUD space)
  */
-export function calculateMapTransform(map: Phaser.Tilemaps.Tilemap): MapTransform {
+export function calculateMapTransform(map: Phaser.Tilemaps.Tilemap, topOffset: number = 0): MapTransform {
   const mapWidthInPixels = map.width * map.tileWidth;
   const mapHeightInPixels = map.height * map.tileHeight;
 
-  const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-  const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-  const scale = Math.min(scaleX, scaleY, 2);
+  // Calculate available height (screen height minus top offset)
+  const availableHeight = GameConfig.screenHeight - topOffset;
+  
+  // Calculate scale to fill screen width exactly
+  // Screen width equals browser client area, so scale should fill it precisely
+  const scale = GameConfig.screenWidth / mapWidthInPixels;
 
   const scaledMapWidth = mapWidthInPixels * scale;
   const scaledMapHeight = mapHeightInPixels * scale;
-  const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-  const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+  
+  // Map fills width exactly, so offset should be 0
+  const mapOffsetX = 0;
+  
+  // Position map below the top offset, center vertically in available space
+  const mapOffsetY = topOffset + Math.max(0, (availableHeight - scaledMapHeight) / 2);
 
   return {
     scale,

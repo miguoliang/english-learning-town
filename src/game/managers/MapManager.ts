@@ -18,6 +18,8 @@ export interface MapConfig {
   collisionLayerNames?: string[];
   /** Depth offset for Y-based depth sorting */
   depthOffset?: number;
+  /** Top offset in pixels (e.g., for title/HUD space) */
+  topOffset?: number;
 }
 
 /**
@@ -85,8 +87,9 @@ export class MapManager {
       }
     }
 
-    // Calculate map transform
-    const transform = calculateMapTransform(map);
+    // Calculate map transform (with optional top offset for title/HUD space)
+    const topOffset = config.topOffset ?? 0;
+    const transform = calculateMapTransform(map, topOffset);
 
     // Set up depth sorting
     const depthOffset = config.depthOffset ?? 0;

@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/GameConfig';
 import { TilePropertyHelper } from '../utils/TilePropertyHelper';
+import { MapTransform } from '../utils/PlayerUtils';
 
 /**
  * Interface for debug visualization strategies
@@ -28,12 +29,14 @@ interface DebugStrategy {
 class GridDebugStrategy implements DebugStrategy {
   private scene: Scene;
   private map: Phaser.Tilemaps.Tilemap;
+  private mapTransform: MapTransform;
   private graphics: Phaser.GameObjects.Graphics | null = null;
   private labels: Phaser.GameObjects.Text[] = [];
 
-  constructor(scene: Scene, map: Phaser.Tilemaps.Tilemap) {
+  constructor(scene: Scene, map: Phaser.Tilemaps.Tilemap, mapTransform: MapTransform) {
     this.scene = scene;
     this.map = map;
+    this.mapTransform = mapTransform;
   }
 
   initialize(): void {
@@ -47,16 +50,8 @@ class GridDebugStrategy implements DebugStrategy {
   private drawGrid(): void {
     if (!this.graphics) return;
 
-    const mapWidthInPixels = this.map.width * this.map.tileWidth;
-    const mapHeightInPixels = this.map.height * this.map.tileHeight;
-    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-    const scale = Math.min(scaleX, scaleY, 2);
-
-    const scaledMapWidth = mapWidthInPixels * scale;
-    const scaledMapHeight = mapHeightInPixels * scale;
-    const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-    const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+    // Use the map transform values to ensure grid matches map positioning
+    const { mapOffsetX, mapOffsetY, scaledMapWidth, scaledMapHeight, scale } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;
@@ -81,16 +76,8 @@ class GridDebugStrategy implements DebugStrategy {
   private addCoordinateLabels(): void {
     if (!this.graphics) return;
 
-    const mapWidthInPixels = this.map.width * this.map.tileWidth;
-    const mapHeightInPixels = this.map.height * this.map.tileHeight;
-    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-    const scale = Math.min(scaleX, scaleY, 2);
-
-    const scaledMapWidth = mapWidthInPixels * scale;
-    const scaledMapHeight = mapHeightInPixels * scale;
-    const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-    const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+    // Use the map transform values to ensure labels match map positioning
+    const { mapOffsetX, mapOffsetY, scale } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;
@@ -143,6 +130,7 @@ class GridDebugStrategy implements DebugStrategy {
 class TileIndicatorDebugStrategy implements DebugStrategy {
   private scene: Scene;
   private map: Phaser.Tilemaps.Tilemap;
+  private mapTransform: MapTransform;
   private player: Phaser.GameObjects.Sprite;
   private tilePropertyHelper: TilePropertyHelper;
   private indicator: Phaser.GameObjects.Graphics | null = null;
@@ -150,11 +138,13 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
   constructor(
     scene: Scene,
     map: Phaser.Tilemaps.Tilemap,
+    mapTransform: MapTransform,
     player: Phaser.GameObjects.Sprite,
     tilePropertyHelper: TilePropertyHelper
   ) {
     this.scene = scene;
     this.map = map;
+    this.mapTransform = mapTransform;
     this.player = player;
     this.tilePropertyHelper = tilePropertyHelper;
   }
@@ -169,17 +159,8 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
     // Get player's tile coordinates using consistent coordinate conversion
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
 
-    // Use the same scaling calculation as coordinate conversion
-    const mapWidthInPixels = this.map.width * this.map.tileWidth;
-    const mapHeightInPixels = this.map.height * this.map.tileHeight;
-    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-    const scale = Math.min(scaleX, scaleY, 2);
-
-    const scaledMapWidth = mapWidthInPixels * scale;
-    const scaledMapHeight = mapHeightInPixels * scale;
-    const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-    const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+    // Use the map transform values to ensure indicator matches map positioning
+    const { mapOffsetX, mapOffsetY, scale } = this.mapTransform;
 
     const scaledTileWidth = this.map.tileWidth * scale;
     const scaledTileHeight = this.map.tileHeight * scale;
@@ -324,11 +305,13 @@ export class DebugSystem {
   /**
    * Initialize the debug system with game components
    * @param map - The game map
+   * @param mapTransform - The map transform for correct positioning
    * @param player - The player sprite
    * @param tilePropertyHelper - Tile property helper instance
    */
   initialize(
     map: Phaser.Tilemaps.Tilemap,
+    mapTransform: MapTransform,
     player: Phaser.GameObjects.Sprite,
     tilePropertyHelper: TilePropertyHelper
   ): void {
@@ -339,12 +322,12 @@ export class DebugSystem {
 
     // Create debug strategies based on configuration
     if (this.config.showGrid) {
-      const gridStrategy = new GridDebugStrategy(this.scene, map);
+      const gridStrategy = new GridDebugStrategy(this.scene, map, mapTransform);
       this.strategies.push(gridStrategy);
     }
 
     if (this.config.showTileIndicator) {
-      const tileStrategy = new TileIndicatorDebugStrategy(this.scene, map, player, tilePropertyHelper);
+      const tileStrategy = new TileIndicatorDebugStrategy(this.scene, map, mapTransform, player, tilePropertyHelper);
       this.strategies.push(tileStrategy);
     }
 
