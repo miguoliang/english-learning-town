@@ -9,12 +9,21 @@ import { getCurrentDebugConfig } from '../config/DebugConfig';
 import { IWorld } from 'bitecs';
 import { createECSWorld, resetECSWorld } from '../ecs/World';
 import { EntityFactory, BuildingOptions } from '../ecs/EntityFactory';
-import { depthSortingSystem } from '../ecs/systems/DepthSortingSystem';
 import { DoorInteractionSystem } from '../ecs/systems/DoorInteractionSystem';
 import { BuildingSystem } from '../ecs/systems/BuildingSystem';
 import { PositionComponent } from '../ecs/components/PositionComponent';
-import { BuildingType } from '../ecs/components/BuildingComponent';
+import { BuildingType, BuildingComponent } from '../ecs/components/BuildingComponent';
+import { DoorComponent } from '../ecs/components/DoorComponent';
 import { SpriteRegistry } from '../ecs/SpriteRegistry';
+import {
+  calculateMapTransform,
+  createPlayer,
+  createPlayerState,
+  updatePlayerMovement,
+  updatePlayerAnimation,
+  updateECS,
+  type PlayerState,
+} from '../utils/PlayerUtils';
 
 /**
  * Main game scene showing the English Learning Town
@@ -26,8 +35,7 @@ export class Game extends Scene {
   private tilePropertyHelper: TilePropertyHelper;
   private debugSystem: DebugSystem;
   private player: Phaser.GameObjects.Sprite | null = null;
-  private lastFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
-  private currentAnimationType: 'walk' | 'run' | 'idle' = 'idle';
+  private playerState: PlayerState;
   private map: Phaser.Tilemaps.Tilemap | null = null;
   private collisionLayers: Phaser.Tilemaps.TilemapLayer[] = [];
 
@@ -47,6 +55,9 @@ export class Game extends Scene {
   /** Building entity IDs */
   private buildingEntities: Map<string, number> = new Map();
 
+  /** Door entity IDs mapped to building names */
+  private doorToBuilding: Map<number, string> = new Map();
+
   /** Debug key for toggling door highlights */
   private doorDebugKey: Phaser.Input.Keyboard.Key | null = null;
 
@@ -56,6 +67,7 @@ export class Game extends Scene {
   constructor() {
     super('Game');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
+    this.playerState = createPlayerState();
   }
 
   create(_data?: { exitBuilding?: string }) {
@@ -72,7 +84,7 @@ export class Game extends Scene {
     this.createSceneTitle();
     this.createTiledMap();
     this.createBuildings(); // Create building entities after map is ready
-    this.createPlayer();
+    this.createPlayer(_data?.exitBuilding);
 
     // Enable door highlights based on debug configuration
     if (this.doorInteractionSystem) {
@@ -594,13 +606,16 @@ export class Game extends Scene {
       promptText,
     });
 
+    // Store door-to-building mapping for scene transitions
+    this.doorToBuilding.set(doorEid, buildingName);
+
     console.log(`🚪 Created door: ${obj.name} at (${tileX}, ${tileY}) (eid: ${doorEid})`);
   }
 
   /**
-   * Creates the player character at the center of the town map
+   * Creates the player character at the center of the town map or at exit position
    */
-  private createPlayer(): void {
+  private createPlayer(exitBuilding?: string): void {
     // Initialize controllers
     this.playerController = new BasePlayerController(this);
     this.characterManager = new CharacterManager(this);
@@ -608,80 +623,61 @@ export class Game extends Scene {
     // Calculate the center of the map in world coordinates
     const map = this.cache.tilemap.get('town_map');
     let worldCenterX: number, worldCenterY: number;
+    let scale: number;
 
-    if (map) {
-      // Get consistent map dimensions
-      const mapWidthInPixels = this.map!.width * this.map!.tileWidth;
-      const mapHeightInPixels = this.map!.height * this.map!.tileHeight;
-
-      // Calculate map center in map coordinates
-      const mapCenterX = mapWidthInPixels / 2;
-      const mapCenterY = mapHeightInPixels / 2;
-
+    if (map && this.map) {
       // Calculate consistent scaling and positioning
-      const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-      const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-      const scale = Math.min(scaleX, scaleY, 2);
+      const transform = calculateMapTransform(this.map);
+      scale = transform.scale;
 
-      const scaledMapWidth = mapWidthInPixels * scale;
-      const scaledMapHeight = mapHeightInPixels * scale;
-      const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-      const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+      // Check if player is exiting from a building
+      if (exitBuilding === 'home' && this.buildingEntities.has('home')) {
+        // Position player at home door exit (just outside the door)
+        const homeBuildingEid = this.buildingEntities.get('home')!;
+        const homeEntranceX = BuildingComponent.entranceX[homeBuildingEid];
+        const homeEntranceY = BuildingComponent.entranceY[homeBuildingEid];
 
-      // Transform map center to world coordinates
-      worldCenterX = mapOffsetX + mapCenterX * scale;
-      worldCenterY = mapOffsetY + mapCenterY * scale;
+        // Position player slightly outside the door (below the entrance)
+        worldCenterX = homeEntranceX;
+        worldCenterY = homeEntranceY + 40; // Move player slightly forward from door
 
-      console.log(`🎮 Player spawn: Map center (${mapCenterX}, ${mapCenterY}) → World (${worldCenterX.toFixed(1)}, ${worldCenterY.toFixed(1)})`);
-      console.log(`   Scale: ${scale.toFixed(2)}, Offset: (${mapOffsetX.toFixed(1)}, ${mapOffsetY.toFixed(1)})`);
+        console.log(`🚪 Player exiting from home, positioning at door exit (${worldCenterX.toFixed(1)}, ${worldCenterY.toFixed(1)})`);
 
-      // Create player sprite with animations using CharacterManager
-      // Use the same scale as the map for consistency
-      this.player = this.characterManager.createCharacter(
-        'player',
-        worldCenterX,
-        worldCenterY,
-        'down',
-        scale // Match map scale for coordinate system consistency
-      );
+        // Ensure home door is open when returning
+        const homeDoorEid = BuildingComponent.doorEntityId[homeBuildingEid];
+        if (homeDoorEid && this.doorInteractionSystem && this.ecsWorld) {
+          if (!this.doorInteractionSystem.isDoorOpen(homeDoorEid)) {
+            this.doorInteractionSystem.openDoor(homeDoorEid);
+          }
+        }
+      } else {
+        // Default to map center
+        const mapCenterX = transform.mapWidthInPixels / 2;
+        const mapCenterY = transform.mapHeightInPixels / 2;
+        worldCenterX = transform.mapOffsetX + mapCenterX * scale;
+        worldCenterY = transform.mapOffsetY + mapCenterY * scale;
 
-      // Set initial depth based on Y position for proper layering with buildings
-      // Use same depth offset as building layers for consistent sorting
-      // Player depth will be updated each frame in the update loop
-      this.player.setDepth(this.DEPTH_OFFSET + this.player.y);
-
-      // Create ECS entity for player
-      if (this.ecsWorld && this.player) {
-        this.playerEntityId = EntityFactory.createPlayer(this.ecsWorld, {
-          sprite: this.player,
-          x: this.player.x,
-          y: this.player.y,
-          baseDepth: this.DEPTH_OFFSET
-        });
+        console.log(`🎮 Player spawn: Map center (${mapCenterX}, ${mapCenterY}) → World (${worldCenterX.toFixed(1)}, ${worldCenterY.toFixed(1)})`);
+        console.log(`   Scale: ${scale.toFixed(2)}, Offset: (${transform.mapOffsetX.toFixed(1)}, ${transform.mapOffsetY.toFixed(1)})`);
       }
 
-      // Add physics body to player for collision detection
-      if (this.player) {
-        // Scale collision box to match sprite scale
-        const scaledCollisionWidth = GameConfig.PLAYER.COLLISION_WIDTH * scale;
-        const scaledCollisionHeight = GameConfig.PLAYER.COLLISION_HEIGHT * scale;
-
-        this.matter.add.gameObject(this.player, {
-          shape: {
-            type: 'rectangle',
-            width: scaledCollisionWidth,
-            height: scaledCollisionHeight
-          },
-          frictionAir: 0.5, // High air resistance for immediate stopping
-          friction: 0.1,
-          frictionStatic: 0,
-          restitution: 0, // No bouncing off walls
-          inertia: Infinity // Prevent rotation when colliding with corners
+      // Create player using utility function
+      if (this.ecsWorld) {
+        const result = createPlayer({
+          scene: this,
+          world: this.ecsWorld,
+          characterManager: this.characterManager,
+          playerController: this.playerController,
+          spawnX: worldCenterX,
+          spawnY: worldCenterY,
+          scale,
+          depthOffset: this.DEPTH_OFFSET,
         });
 
-        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with collision box ${scaledCollisionWidth.toFixed(1)}x${scaledCollisionHeight.toFixed(1)} (scale: ${scale.toFixed(2)})`);
+        this.player = result.player;
+        this.playerEntityId = result.playerEntityId;
 
-        // Collision layers were already converted in createTiledMap()
+        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with collision box ${GameConfig.PLAYER.COLLISION_WIDTH * scale}x${GameConfig.PLAYER.COLLISION_HEIGHT * scale} (scale: ${scale.toFixed(2)})`);
         console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics`);
       }
     } else {
@@ -689,48 +685,24 @@ export class Game extends Scene {
       console.warn('Map data not available, using screen center for player position');
       worldCenterX = GameConfig.UI.centerX;
       worldCenterY = GameConfig.UI.centerY;
+      scale = 2;
 
-      // Create player sprite with fallback scale
-      this.player = this.characterManager.createCharacter(
-        'player',
-        worldCenterX,
-        worldCenterY,
-        'down',
-        2 // Fallback scale when map data is unavailable
-      );
-
-      // Add physics body to player for collision detection (fallback)
-      if (this.player) {
-        // Scale collision box to match sprite scale (fallback uses scale = 2)
-        const fallbackScale = 2;
-        const scaledCollisionWidth = GameConfig.PLAYER.COLLISION_WIDTH * fallbackScale;
-        const scaledCollisionHeight = GameConfig.PLAYER.COLLISION_HEIGHT * fallbackScale;
-
-        this.matter.add.gameObject(this.player, {
-          shape: {
-            type: 'rectangle',
-            width: scaledCollisionWidth,
-            height: scaledCollisionHeight
-          },
-          frictionAir: 0.5, // High air resistance for immediate stopping
-          friction: 0.1,
-          frictionStatic: 0,
-          restitution: 0, // No bouncing off walls
-          inertia: Infinity // Prevent rotation when colliding with corners
+      if (this.ecsWorld) {
+        const result = createPlayer({
+          scene: this,
+          world: this.ecsWorld,
+          characterManager: this.characterManager,
+          playerController: this.playerController,
+          spawnX: worldCenterX,
+          spawnY: worldCenterY,
+          scale,
+          depthOffset: this.DEPTH_OFFSET,
         });
 
-        // Collision layers were already converted in createTiledMap() (fallback path)
-        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics (fallback)`);
+        this.player = result.player;
+        this.playerEntityId = result.playerEntityId;
 
-        // Create ECS entity for player (fallback)
-        if (this.ecsWorld && this.player) {
-          this.playerEntityId = EntityFactory.createPlayer(this.ecsWorld, {
-            sprite: this.player,
-            x: this.player.x,
-            y: this.player.y,
-            baseDepth: this.DEPTH_OFFSET
-          });
-        }
+        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics (fallback)`);
       }
     }
 
@@ -746,7 +718,11 @@ export class Game extends Scene {
     this.updatePlayerMovement(delta);
     this.updateECS();
     this.updateDoorInteractions();
-    this.debugSystem.update();
+
+    // Only update debug system if player exists
+    if (this.player) {
+      this.debugSystem.update();
+    }
 
     // Toggle door highlights with 'D' key
     if (this.doorInteractionSystem && this.doorDebugKey && Phaser.Input.Keyboard.JustDown(this.doorDebugKey)) {
@@ -772,6 +748,14 @@ export class Game extends Scene {
     // Update interaction prompt
     if (nearestDoor !== null) {
       const isOpen = this.doorInteractionSystem.isDoorOpen(nearestDoor);
+      const buildingName = this.doorToBuilding.get(nearestDoor);
+
+      // Check if player is walking through an open door
+      if (isOpen && this.isPlayerWalkingThroughDoor(nearestDoor)) {
+        this.handleDoorTransition(nearestDoor, buildingName);
+        return;
+      }
+
       const action = isOpen ? 'close' : 'open';
       this.interactionPrompt.setText(`Press SPACE to ${action} door`);
       this.interactionPrompt.setVisible(true);
@@ -786,17 +770,70 @@ export class Game extends Scene {
   }
 
   /**
+   * Checks if player is walking through an open door
+   */
+  private isPlayerWalkingThroughDoor(doorEntityId: number): boolean {
+    if (!this.ecsWorld || !this.player) return false;
+
+    // Get door position and dimensions
+    const doorX = PositionComponent.x[doorEntityId];
+    const doorY = PositionComponent.y[doorEntityId];
+    const doorWidth = DoorComponent.tileWidth[doorEntityId] * (this.map?.tileWidth || 16);
+    const doorHeight = DoorComponent.tileHeight[doorEntityId] * (this.map?.tileHeight || 16);
+
+    // Calculate map scale to determine door size in world coordinates
+    const mapWidthInPixels = this.map!.width * this.map!.tileWidth;
+    const mapHeightInPixels = this.map!.height * this.map!.tileHeight;
+    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
+    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
+    const scale = Math.min(scaleX, scaleY, 2);
+    const scaledDoorWidth = doorWidth * scale;
+    const scaledDoorHeight = doorHeight * scale;
+
+    // Check if player is within the door area (with some tolerance)
+    const threshold = Math.max(scaledDoorWidth, scaledDoorHeight) * 0.6; // 60% of door size
+    const distanceX = Math.abs(this.player.x - doorX);
+    const distanceY = Math.abs(this.player.y - doorY);
+
+    // Player is walking through if they're close to the door center
+    return distanceX < threshold && distanceY < threshold;
+  }
+
+  /**
+   * Handles transition to building interior scene
+   */
+  private handleDoorTransition(doorEntityId: number, buildingName?: string): void {
+    if (!buildingName) return;
+
+    // Only handle home transition for now
+    if (buildingName === 'home') {
+      const doorX = PositionComponent.x[doorEntityId];
+      const doorY = PositionComponent.y[doorEntityId];
+
+      // Calculate entrance position (slightly inside the door)
+      const entranceX = doorX;
+      const entranceY = doorY + 30; // Move player slightly forward from door
+
+      console.log(`🚪 Transitioning to Home scene from door at (${doorX}, ${doorY})`);
+      this.scene.start('Home', {
+        exitBuilding: 'home',
+        entranceX: entranceX,
+        entranceY: entranceY,
+      });
+    }
+  }
+
+  /**
    * Updates the ECS world and runs all systems
    */
   private updateECS(): void {
     if (!this.ecsWorld || !this.player || this.playerEntityId === null) return;
 
-    // Update player position in ECS
-    PositionComponent.x[this.playerEntityId] = this.player.x;
-    PositionComponent.y[this.playerEntityId] = this.player.y;
-
-    // Run ECS systems
-    depthSortingSystem(this.ecsWorld);
+    updateECS({
+      world: this.ecsWorld,
+      player: this.player,
+      playerEntityId: this.playerEntityId,
+    });
 
     // Update door interaction system
     if (this.doorInteractionSystem) {
@@ -812,78 +849,21 @@ export class Game extends Scene {
   private updatePlayerMovement(_delta: number): void {
     if (!this.player || !this.playerController) return;
 
-    // Get player Matter.js physics body
-    const playerBody = this.player.body as MatterJS.BodyType;
-    if (!playerBody) return;
-
-    // Get normalized movement input (-1, 0, or 1 for each axis)
-    const { velocityX: dirX, velocityY: dirY } = this.playerController['keyboardHandler'].getMovementInput();
-    const isRunning = this.playerController['keyboardHandler'].isShiftPressed() && (dirX !== 0 || dirY !== 0);
-
-    // Calculate movement speed based on running state
-    // Matter.js velocity is in pixels per frame (assuming 60 FPS), so divide by 60
-    const baseSpeed = GameConfig.PLAYER.SPEED / 60;
-    const speed = baseSpeed * (isRunning ? GameConfig.PLAYER.RUN_SPEED_MULTIPLIER : 1);
-
-    // Calculate velocity for Matter.js (pixels per frame)
-    // Normalize diagonal movement to prevent faster diagonal speed
-    let velocityX = dirX * speed;
-    let velocityY = dirY * speed;
-
-    // When moving diagonally, normalize the velocity vector to maintain consistent speed
-    if (dirX !== 0 && dirY !== 0) {
-      const magnitude = Math.sqrt(dirX * dirX + dirY * dirY);
-      velocityX = (dirX / magnitude) * speed;
-      velocityY = (dirY / magnitude) * speed;
-    }
-
-    // Set player velocity for physics-based movement using Matter.js
-    this.matter.setVelocity(playerBody, velocityX, velocityY);
-
-    // Player depth is now handled by ECS DepthSortingSystem
+    const { dirX, dirY, isRunning } = updatePlayerMovement({
+      player: this.player,
+      playerController: this.playerController,
+      matter: this.matter,
+    });
 
     // Always update animation (handles both moving and idle states)
-    this.updatePlayerAnimation(dirX, dirY, isRunning);
-  }
-
-
-  /**
-   * Updates player animation based on movement direction and Shift key state
-   * Only updates animation when direction or type actually changes to prevent unnecessary calls
-   * @param deltaX - Horizontal movement delta
-   * @param deltaY - Vertical movement delta
-   * @param isRunning - Whether the player is running (Shift key pressed)
-   */
-  private updatePlayerAnimation(deltaX: number, deltaY: number, isRunning: boolean): void {
-    if (!this.player || !this.characterManager) return;
-
-    const isMoving = deltaX !== 0 || deltaY !== 0;
-    let animationType: 'walk' | 'run' | 'idle' = 'idle';
-    let newDirection = this.lastFacingDirection;
-
-    if (isMoving) {
-      // Determine primary direction based on larger movement
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal movement is primary
-        newDirection = deltaX > 0 ? 'right' : 'left';
-      } else {
-        // Vertical movement is primary
-        newDirection = deltaY > 0 ? 'down' : 'up';
-      }
-
-      // Use running animation when Shift key is pressed, otherwise use walking
-      animationType = isRunning ? 'run' : 'walk';
-    }
-
-    // Only update animation if direction or animation type changed
-    const directionChanged = newDirection !== this.lastFacingDirection;
-    const animationChanged = animationType !== this.currentAnimationType;
-
-    if (directionChanged || animationChanged) {
-      this.lastFacingDirection = newDirection;
-      this.currentAnimationType = animationType;
-      this.characterManager.setCharacterFacing(this.player, newDirection, animationType);
-    }
+    updatePlayerAnimation({
+      player: this.player,
+      characterManager: this.characterManager,
+      deltaX: dirX,
+      deltaY: dirY,
+      isRunning,
+      playerState: this.playerState,
+    });
   }
 
 

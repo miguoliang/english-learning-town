@@ -40,6 +40,10 @@ export class Preloader extends Scene {
     this.load.image('dirt1', 'shared/tilesets/dirt/dirt1.png');
     this.load.image('props-all', 'shared/tilesets/props-all.png');
 
+    // Load tileset images for home interior scene
+    this.load.image('floor-all', 'shared/tilesets/floor-all.png');
+    this.load.image('interior-props-all', 'shared/tilesets/interior-props-all.png');
+
     // Load character atlases using JSON atlas
     this.load.atlas(
       'character_idle',
@@ -61,6 +65,9 @@ export class Preloader extends Scene {
 
     // Load main town map
     this.load.tilemapTiledJSON('town_map', 'scenes/town.tmj');
+
+    // Load home interior map
+    this.load.tilemapTiledJSON('home_map', 'scenes/home.tmj');
 
     // Generate character and item sprites programmatically
     initializeAllSprites(this);

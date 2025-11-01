@@ -150,7 +150,7 @@ class TileIndicatorDebugStrategy implements DebugStrategy {
   }
 
   update(): void {
-    if (!this.indicator) return;
+    if (!this.indicator || !this.player || !this.player.active) return;
 
     // Get player's tile coordinates using consistent coordinate conversion
     const { tileX, tileY } = this.tilePropertyHelper.worldToTileCoords(this.player.x, this.player.y);
