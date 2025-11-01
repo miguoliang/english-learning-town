@@ -94,8 +94,8 @@ function App() {
 
   // Event emitted from the PhaserGame component
   const currentScene = (scene: Phaser.Scene) => {
-    // Initialize HUD with current progress when Game scene is ready
-    if (scene.scene.key === 'Game') {
+    // Initialize HUD with current progress when Town scene is ready
+    if (scene.scene.key === 'Town') {
       EventBus.emit('update-all-progress', learningProgress);
     }
   };

@@ -233,7 +233,7 @@ export class Home extends Scene {
 
       // Use entrance position from scene data if provided, otherwise use map center
       if (data?.entranceX !== undefined && data?.entranceY !== undefined) {
-        // Entrance position is already in world coordinates from Game scene
+        // Entrance position is already in world coordinates from Town scene
         spawnX = data.entranceX;
         spawnY = data.entranceY;
       } else {
@@ -347,11 +347,11 @@ export class Home extends Scene {
   }
 
   /**
-   * Transitions back to the Game scene
+   * Transitions back to the Town scene
    */
   private exitToTown(): void {
     console.log('🚪 Exiting home, returning to town');
-    this.scene.start('Game', { exitBuilding: 'home' });
+    this.scene.start('Town', { exitBuilding: 'home' });
   }
 
   /**

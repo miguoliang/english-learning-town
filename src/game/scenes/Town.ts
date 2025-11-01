@@ -28,7 +28,7 @@ import {
 /**
  * Main game scene showing the English Learning Town
  */
-export class Game extends Scene {
+export class Town extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera;
   private playerController: BasePlayerController;
   private characterManager: CharacterManager;
@@ -65,7 +65,7 @@ export class Game extends Scene {
   private interactionPrompt: Phaser.GameObjects.Text | null = null;
 
   constructor() {
-    super('Game');
+    super('Town');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
     this.playerState = createPlayerState();
   }
