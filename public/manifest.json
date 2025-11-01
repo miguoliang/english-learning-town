@@ -1,0 +1,40 @@
+{
+  "name": "English Learning Town",
+  "short_name": "EL Town",
+  "description": "An interactive English learning game built with Phaser 3 - where players explore a town while learning English.",
+  "start_url": "/english-learning-town/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4a90e2",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "games"],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "short_name": "Start",
+      "description": "Start playing and learning English",
+      "url": "/english-learning-town/",
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
+
