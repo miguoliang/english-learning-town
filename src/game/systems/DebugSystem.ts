@@ -29,6 +29,7 @@ class GridDebugStrategy implements DebugStrategy {
   private scene: Scene;
   private map: Phaser.Tilemaps.Tilemap;
   private graphics: Phaser.GameObjects.Graphics | null = null;
+  private labels: Phaser.GameObjects.Text[] = [];
 
   constructor(scene: Scene, map: Phaser.Tilemaps.Tilemap) {
     this.scene = scene;
@@ -102,13 +103,19 @@ class GridDebugStrategy implements DebugStrategy {
       padding: { x: 2, y: 1 }
     };
 
+    // Store text labels so we can destroy them later
+    const labels: Phaser.GameObjects.Text[] = [];
     for (let x = 0; x < this.map.width; x += 4) {
       for (let y = 0; y < this.map.height; y += 4) {
         const worldX = mapOffsetX + (x + 0.5) * scaledTileWidth;
         const worldY = mapOffsetY + (y + 0.5) * scaledTileHeight;
-        this.scene.add.text(worldX, worldY, `${x},${y}`, textStyle).setOrigin(0.5);
+        const label = this.scene.add.text(worldX, worldY, `${x},${y}`, textStyle).setOrigin(0.5);
+        labels.push(label);
       }
     }
+    
+    // Store labels reference for cleanup
+    this.labels = labels;
   }
 
   update(): void {
@@ -120,6 +127,13 @@ class GridDebugStrategy implements DebugStrategy {
       this.graphics.destroy();
       this.graphics = null;
     }
+    // Destroy coordinate labels
+    this.labels.forEach(label => {
+      if (label && label.active) {
+        label.destroy();
+      }
+    });
+    this.labels = [];
   }
 }
 
@@ -318,7 +332,10 @@ export class DebugSystem {
     player: Phaser.GameObjects.Sprite,
     tilePropertyHelper: TilePropertyHelper
   ): void {
-    if (this.isInitialized) return;
+    // Clean up previous initialization if exists
+    if (this.isInitialized) {
+      this.destroy();
+    }
 
     // Create debug strategies based on configuration
     if (this.config.showGrid) {

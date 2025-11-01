@@ -34,7 +34,7 @@ export const InteractableComponent = defineComponent({
  */
 export const InteractableDefaults = {
   interactionType: InteractionType.DOOR,
-  interactionRange: 80,
+  interactionRange: 32, // 2 tiles (16px each)
   isActive: 1,
   playerInRange: 0,
   cooldown: 0,

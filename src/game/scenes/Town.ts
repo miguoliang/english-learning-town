@@ -8,12 +8,10 @@ import { DebugSystem } from '../systems/DebugSystem';
 import { getCurrentDebugConfig } from '../config/DebugConfig';
 import { IWorld } from 'bitecs';
 import { createECSWorld, resetECSWorld } from '../ecs/World';
-import { EntityFactory, BuildingOptions } from '../ecs/EntityFactory';
 import { DoorInteractionSystem } from '../ecs/systems/DoorInteractionSystem';
 import { BuildingSystem } from '../ecs/systems/BuildingSystem';
 import { PositionComponent } from '../ecs/components/PositionComponent';
-import { BuildingType, BuildingComponent } from '../ecs/components/BuildingComponent';
-import { DoorComponent } from '../ecs/components/DoorComponent';
+import { BuildingComponent, BuildingType } from '../ecs/components/BuildingComponent';
 import { SpriteRegistry } from '../ecs/SpriteRegistry';
 import {
   calculateMapTransform,
@@ -24,6 +22,11 @@ import {
   updateECS,
   type PlayerState,
 } from '../utils/PlayerUtils';
+import { MapManager } from '../managers/MapManager';
+import { CollisionManager } from '../managers/CollisionManager';
+import { TileAnimationManager } from '../managers/TileAnimationManager';
+import { BuildingManager } from '../managers/BuildingManager';
+import { InteractionManager } from '../managers/InteractionManager';
 
 /**
  * Main game scene showing the English Learning Town
@@ -64,10 +67,24 @@ export class Town extends Scene {
   /** UI prompt for interactions */
   private interactionPrompt: Phaser.GameObjects.Text | null = null;
 
+  /** Managers */
+  private mapManager: MapManager;
+  private collisionManager: CollisionManager;
+  private tileAnimationManager: TileAnimationManager;
+  private buildingManager: BuildingManager;
+  private interactionManager: InteractionManager;
+
+  /** Map transform for calculations */
+  private mapTransform: ReturnType<typeof calculateMapTransform> | null = null;
+
   constructor() {
     super('Town');
     this.debugSystem = new DebugSystem(this, getCurrentDebugConfig());
     this.playerState = createPlayerState();
+    this.mapManager = new MapManager(this);
+    this.collisionManager = new CollisionManager(this);
+    this.tileAnimationManager = new TileAnimationManager(this);
+    this.interactionManager = new InteractionManager(this);
   }
 
   create(_data?: { exitBuilding?: string }) {
@@ -80,10 +97,11 @@ export class Town extends Scene {
     // Initialize ECS systems
     this.doorInteractionSystem = new DoorInteractionSystem(this);
     this.buildingSystem = new BuildingSystem(this);
+    this.buildingManager = new BuildingManager(this, this.ecsWorld, this.buildingSystem);
 
     this.createSceneTitle();
     this.createTiledMap();
-    this.createBuildings(); // Create building entities after map is ready
+    this.createBuildings();
     this.createPlayer(_data?.exitBuilding);
 
     // Enable door highlights based on debug configuration
@@ -98,17 +116,10 @@ export class Town extends Scene {
     }
 
     // Create interaction prompt UI
-    this.interactionPrompt = this.add.text(GameConfig.UI.centerX, GameConfig.screenHeight - 100, '', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
-      color: '#ffffff',
-      backgroundColor: '#000000',
-      padding: { x: 12, y: 8 },
-      align: 'center',
-    });
-    this.interactionPrompt.setOrigin(0.5);
-    this.interactionPrompt.setDepth(10000);
-    this.interactionPrompt.setVisible(false);
+    this.interactionPrompt = InteractionManager.createInteractionPrompt(this);
+
+    // Setup interaction manager AFTER player and doors are created
+    this.setupInteractionManager();
 
     // Initialize debug system
     if (this.map && this.player) {
@@ -131,485 +142,168 @@ export class Town extends Scene {
    * Creates and displays the Tiled map
    */
   private createTiledMap(): void {
-    this.map = this.make.tilemap({ key: 'town_map' });
+    const tileHeight = 16; // Tile height in pixels
 
-    // Add tilesets - match the names from town.tmj
-    const houseTileset = this.map.addTilesetImage('House', 'house');
-    const dirtTileset = this.map.addTilesetImage('Dirt1', 'dirt1');
-    const propsTileset = this.map.addTilesetImage('Props-All', 'props-all');
+    // Define depth configuration for layers
+    const depthConfig = new Map<string, number | ((transform: any, depthOffset: number) => number)>();
 
-    const allTilesets = [houseTileset, dirtTileset, propsTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
+    // Ground layers
+    depthConfig.set('Ground/Dirt', 0);
+    depthConfig.set('Ground/Dirt Deco', 1);
 
-    if (allTilesets.length > 0) {
-      // Create layers in proper order (use the actual layer names from town.tmj)
-      const groundLayer = this.map.createLayer('Ground/Dirt', allTilesets, 0, 0);
-      const groundDecoLayer = this.map.createLayer('Ground/Dirt Deco', allTilesets, 0, 0);
-      const homeHouseLayer = this.map.createLayer('Home/House', allTilesets, 0, 0);
-      const homeDecoLayer = this.map.createLayer('Home/House Deco', allTilesets, 0, 0);
-      const schoolHouseLayer = this.map.createLayer('School/House', allTilesets, 0, 0);
-      const schoolDecoLayer = this.map.createLayer('School/House Deco', allTilesets, 0, 0);
-      const shopHouseLayer = this.map.createLayer('Shop/House', allTilesets, 0, 0);
-      const shopDecoLayer = this.map.createLayer('Shop/House Deco', allTilesets, 0, 0);
-      const libraryHouseLayer = this.map.createLayer('Library/House', allTilesets, 0, 0);
-      const libraryDecoLayer = this.map.createLayer('Library/House Deco', allTilesets, 0, 0);
+    // Building layers - use functions to calculate based on transform
+    depthConfig.set('Home/House', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (5 * tileHeight * transform.scale);
+    });
+    depthConfig.set('Home/House Deco', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (5 * tileHeight * transform.scale);
+    });
+    depthConfig.set('Shop/House', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (5 * tileHeight * transform.scale);
+    });
+    depthConfig.set('Shop/House Deco', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (5 * tileHeight * transform.scale);
+    });
+    depthConfig.set('School/House', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (19 * tileHeight * transform.scale);
+    });
+    depthConfig.set('School/House Deco', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (19 * tileHeight * transform.scale);
+    });
+    depthConfig.set('Library/House', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (19 * tileHeight * transform.scale);
+    });
+    depthConfig.set('Library/House Deco', (transform, depthOffset) => {
+      return depthOffset + transform.mapOffsetY + (19 * tileHeight * transform.scale);
+    });
 
-      // Calculate scaling first so we can use it for depth calculations
-      const scaleX = GameConfig.screenWidth / (this.map!.widthInPixels || 480);
-      const scaleY = GameConfig.screenHeight / (this.map!.heightInPixels || 320);
-      const scale = Math.min(scaleX, scaleY, 2);
+    // Create map using MapManager
+    const mapResult = this.mapManager.createMap({
+      mapKey: 'town_map',
+      tilesets: [
+        ['House', 'house'],
+        ['Dirt1', 'dirt1'],
+        ['Props-All', 'props-all'],
+      ],
+      layerNames: [
+        'Ground/Dirt',
+        'Ground/Dirt Deco',
+        'Home/House',
+        'Home/House Deco',
+        'School/House',
+        'School/House Deco',
+        'Shop/House',
+        'Shop/House Deco',
+        'Library/House',
+        'Library/House Deco',
+      ],
+      depthConfig,
+      collisionLayerNames: [
+        'Home/House',
+        'Home/House Deco',
+        'School/House',
+        'School/House Deco',
+        'Shop/House',
+        'Shop/House Deco',
+        'Library/House',
+        'Library/House Deco',
+      ],
+      depthOffset: this.DEPTH_OFFSET,
+    });
 
-      // Set up depth sorting for proper layering
-      // Ground layer should be at the bottom
-      groundLayer?.setDepth(0);
-      groundDecoLayer?.setDepth(1); // Slightly above ground layer
+    this.map = mapResult.map;
+    this.collisionLayers = mapResult.collisionLayers;
+    this.mapTransform = mapResult.transform;
 
-      // Building layers use a depth offset to work with player's Y-based depth
-      // Set each building's depth based on the BOTTOM edge of the building
-      // This is where the player would walk in front of the building
-      const tileHeight = this.map.tileHeight; // 16 pixels
-      const mapWidth = (this.map!.widthInPixels || 480) * scale;
-      const mapOffsetX = (GameConfig.screenWidth - mapWidth) / 2;
-      const mapOffsetY = (GameConfig.screenHeight - (this.map!.heightInPixels || 320) * scale) / 2;
-
-      // Top buildings (Home at rows 2-5, Shop at rows 1-5) - bottom edge at row 5
-      const topBuildingDepth = this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale);
-      homeHouseLayer?.setDepth(topBuildingDepth);
-      homeDecoLayer?.setDepth(topBuildingDepth);
-      shopHouseLayer?.setDepth(topBuildingDepth);
-      shopDecoLayer?.setDepth(topBuildingDepth);
-
-      // Bottom buildings (School at rows 15-19, Library deco at rows 18-19) - bottom edge at row 19
-      const bottomBuildingDepth = this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale);
-      schoolHouseLayer?.setDepth(bottomBuildingDepth);
-      schoolDecoLayer?.setDepth(bottomBuildingDepth);
-      libraryHouseLayer?.setDepth(bottomBuildingDepth);
-      libraryDecoLayer?.setDepth(bottomBuildingDepth);
-
-
-      // Set up collision detection for building layers
-      // Include both structure and decoration layers for collision
-      const collisionLayers = [
-        homeHouseLayer,
-        homeDecoLayer,
-        schoolHouseLayer,
-        schoolDecoLayer,
-        shopHouseLayer,
-        shopDecoLayer,
-        libraryHouseLayer,
-        libraryDecoLayer
-      ].filter(Boolean);
-
-      // Store collision layers for later use
-      this.collisionLayers = collisionLayers.filter((layer): layer is Phaser.Tilemaps.TilemapLayer => layer !== null);
-
-      // Scale and position all layers
-      const layers = [
-        groundLayer, groundDecoLayer,
-        homeHouseLayer, homeDecoLayer,
-        schoolHouseLayer, schoolDecoLayer,
-        shopHouseLayer, shopDecoLayer,
-        libraryHouseLayer, libraryDecoLayer
-      ].filter(Boolean);
-      layers.forEach(layer => {
-        if (layer) {
-          layer.setScale(scale);
-          layer.setPosition(mapOffsetX, mapOffsetY);
-        }
-      });
-
-      // Create Matter.js collision bodies AFTER scaling, with scaled coordinates
-      collisionLayers.forEach(layer => {
-        if (layer && this.map) {
-          let bodiesCreated = 0;
-
-          // Iterate through all tiles in the layer
-          for (let y = 0; y < this.map.height; y++) {
-            for (let x = 0; x < this.map.width; x++) {
-              const tile = layer.getTileAt(x, y);
-
-              if (tile && tile.index !== -1 && tile.tileset) {
-                const tileset = tile.tileset;
-                const localId = tile.index - tileset.firstgid;
-                const tileData = (tileset.tileData as any)[localId];
-
-                // Check if this tile has collision shapes defined
-                if (tileData && tileData.objectgroup && tileData.objectgroup.objects) {
-                  const objects = tileData.objectgroup.objects;
-
-                  // Create Matter.js bodies for each collision object
-                  objects.forEach((obj: any) => {
-                    // Handle tile flipping (Tiled uses flipped coordinates for collision shapes)
-                    const flippedHorizontally = tile.flipX;
-                    const flippedVertically = tile.flipY;
-
-                    // Calculate collision object position accounting for flips
-                    let objX = obj.x;
-                    let objY = obj.y;
-
-                    if (flippedHorizontally) {
-                      // Flip X coordinate: mirror around tile center
-                      objX = tile.width - obj.x - obj.width;
-                    }
-
-                    if (flippedVertically) {
-                      // Flip Y coordinate: mirror around tile center
-                      objY = tile.height - obj.y - obj.height;
-                    }
-
-                    // Calculate world position with scaling and offset
-                    const tileWorldX = (tile.pixelX + objX + obj.width / 2) * scale + mapOffsetX;
-                    const tileWorldY = (tile.pixelY + objY + obj.height / 2) * scale + mapOffsetY;
-
-                    // Create a static rectangle body at the collision shape position
-                    this.matter.add.rectangle(
-                      tileWorldX,
-                      tileWorldY,
-                      obj.width * scale,
-                      obj.height * scale,
-                      {
-                        isStatic: true,
-                        friction: 0.1,
-                        restitution: 0, // No bouncing
-                        label: `tile_collision_${layer.name}`
-                      }
-                    );
-
-                    bodiesCreated++;
-                  });
-                }
-              }
-            }
-          }
-
-          console.log(`✅ Created ${bodiesCreated} collision bodies for layer: ${layer.name}`);
-        }
-      });
-    }
+    // Create collision bodies
+    this.collisionManager.createCollisionBodies(this.map, this.collisionLayers, 'town_map');
 
     // Initialize tile property helper
     this.tilePropertyHelper = new TilePropertyHelper(this);
     this.tilePropertyHelper.setMap(this.map);
 
-    // Initialize custom tile animations
-    this.initializeTileAnimations();
-  }
-
-  /**
-   * Initializes custom tile animations for animated tiles in the tilemap
-   */
-  private initializeTileAnimations(): void {
-    if (!this.map) return;
-
-    // Get the tilemap data from the tilemap cache
-    const tilemapData = this.cache.tilemap.get('town_map');
-    if (!tilemapData) return;
-
-    // The actual map data is in the .data property
-    const mapData = tilemapData.data;
-    if (!mapData?.tilesets) return;
-
-    // Find the Props-All tileset that contains animation data
-    const propsTileset = mapData.tilesets.find((tileset: any) => tileset.name === 'Props-All');
-    if (!propsTileset?.tiles) return;
-
-    // Process each tile with animation data
-    propsTileset.tiles.forEach((tileData: any) => {
-      if (tileData.animation && Array.isArray(tileData.animation)) {
-        const globalTileId = tileData.id + propsTileset.firstgid;
-
-        // Convert animation frames to our format
-        const animationFrames = tileData.animation.map((frame: any) => ({
-          tileId: frame.tileid + propsTileset.firstgid,
-          duration: frame.duration
-        }));
-
-        // Apply animation to all instances of this tile
-        this.animateTilesWithId(globalTileId, animationFrames);
-      }
-    });
-  }
-
-  /**
-   * Finds and animates all tiles with the specified ID across all layers
-   */
-  private animateTilesWithId(tileId: number, frames: Array<{ tileId: number, duration: number }>): void {
-    if (!this.map || frames.length === 0) return;
-
-    // Get the Dirt Deco layer specifically
-    const dirtDecoLayer = this.map.getLayer('Ground/Dirt Deco')?.tilemapLayer;
-    if (!dirtDecoLayer) return;
-
-    // Search for tiles with the specified ID in the Dirt Deco layer
-    for (let y = 0; y < this.map.height; y++) {
-      for (let x = 0; x < this.map.width; x++) {
-        const tile = dirtDecoLayer.getTileAt(x, y);
-
-        if (tile && tile.index === tileId) {
-          this.startTileAnimation(tile, frames);
-        }
-      }
-    }
-  }
-
-  /**
-   * Starts the animation cycle for a specific tile
-   */
-  private startTileAnimation(tile: Phaser.Tilemaps.Tile, frames: Array<{ tileId: number, duration: number }>): void {
-    let currentFrameIndex = 0;
-
-    const animateFrame = () => {
-      // Set the current frame
-      const currentFrame = frames[currentFrameIndex];
-      tile.index = currentFrame.tileId;
-
-      // Move to next frame (loop back to 0 when reaching the end)
-      currentFrameIndex = (currentFrameIndex + 1) % frames.length;
-
-      // Schedule the next frame
-      this.time.delayedCall(currentFrame.duration, animateFrame);
-    };
-
-    // Start the animation
-    animateFrame();
+    // Initialize tile animations
+    this.tileAnimationManager.initialize(this.map, 'Props-All', 'Ground/Dirt Deco');
   }
 
   /**
    * Creates building entities for all buildings in the town
    */
   private createBuildings(): void {
-    if (!this.ecsWorld || !this.map) return;
+    if (!this.ecsWorld || !this.map || !this.mapTransform) return;
 
-    // Calculate map scaling and positioning (same as in createTiledMap)
-    const mapWidthInPixels = this.map.width * this.map.tileWidth;
-    const mapHeightInPixels = this.map.height * this.map.tileHeight;
-    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-    const scale = Math.min(scaleX, scaleY, 2);
-    const scaledMapWidth = mapWidthInPixels * scale;
-    const scaledMapHeight = mapHeightInPixels * scale;
-    const mapOffsetX = (GameConfig.screenWidth - scaledMapWidth) / 2;
-    const mapOffsetY = (GameConfig.screenHeight - scaledMapHeight) / 2;
+    const buildingConfig = {
+      transform: this.mapTransform,
+      tileWidth: this.map.tileWidth,
+      tileHeight: this.map.tileHeight,
+      depthOffset: this.DEPTH_OFFSET,
+      buildings: [
+        {
+          name: 'home',
+          centerTileX: 3,
+          centerTileY: 3.5,
+          width: 5,
+          height: 4,
+          buildingType: BuildingType.RESIDENTIAL,
+          entranceTileX: 3,
+          entranceTileY: 5,
+          baseDepthRow: 5,
+        },
+        {
+          name: 'shop',
+          centerTileX: 26,
+          centerTileY: 3,
+          width: 6,
+          height: 5,
+          buildingType: BuildingType.COMMERCIAL,
+          entranceTileX: 26,
+          entranceTileY: 5,
+          baseDepthRow: 5,
+        },
+        {
+          name: 'school',
+          centerTileX: 3,
+          centerTileY: 17,
+          width: 5,
+          height: 5,
+          buildingType: BuildingType.EDUCATIONAL,
+          entranceTileX: 3,
+          entranceTileY: 19,
+          baseDepthRow: 19,
+        },
+        {
+          name: 'library',
+          centerTileX: 26,
+          centerTileY: 17,
+          width: 6,
+          height: 5,
+          buildingType: BuildingType.PUBLIC,
+          entranceTileX: 26,
+          entranceTileY: 19,
+          baseDepthRow: 19,
+        },
+      ],
+    };
 
-    const tileWidth = this.map.tileWidth;
-    const tileHeight = this.map.tileHeight;
+    const result = this.buildingManager.createBuildings(buildingConfig);
+    this.buildingEntities = result.buildingEntities;
 
-    // Helper function to convert tile coords to world coords
-    const tileToWorld = (tileX: number, tileY: number) => ({
-      x: mapOffsetX + (tileX * tileWidth + tileWidth / 2) * scale,
-      y: mapOffsetY + (tileY * tileHeight + tileHeight / 2) * scale,
-    });
-
-    // Define building configurations based on tilemap structure
-    const buildingConfigs: BuildingOptions[] = [
-      {
-        name: 'home',
-        x: tileToWorld(3, 3.5).x, // Center of home building (columns 1-5, rows 2-5)
-        y: tileToWorld(3, 3.5).y,
-        width: 5 * tileWidth * scale,
-        height: 4 * tileHeight * scale,
-        buildingType: BuildingType.RESIDENTIAL,
-        entranceX: tileToWorld(3, 5).x,
-        entranceY: tileToWorld(3, 5).y,
-        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale),
-      },
-      {
-        name: 'shop',
-        x: tileToWorld(26, 3).x, // Center of shop building (columns 24-29, rows 1-5)
-        y: tileToWorld(26, 3).y,
-        width: 6 * tileWidth * scale,
-        height: 5 * tileHeight * scale,
-        buildingType: BuildingType.COMMERCIAL,
-        entranceX: tileToWorld(26, 5).x,
-        entranceY: tileToWorld(26, 5).y,
-        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (5 * tileHeight * scale),
-      },
-      {
-        name: 'school',
-        x: tileToWorld(3, 17).x, // Center of school building (columns 1-5, rows 15-19)
-        y: tileToWorld(3, 17).y,
-        width: 5 * tileWidth * scale,
-        height: 5 * tileHeight * scale,
-        buildingType: BuildingType.EDUCATIONAL,
-        entranceX: tileToWorld(3, 19).x,
-        entranceY: tileToWorld(3, 19).y,
-        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale),
-      },
-      {
-        name: 'library',
-        x: tileToWorld(26, 17).x, // Center of library building (columns 24-29, rows 15-19)
-        y: tileToWorld(26, 17).y,
-        width: 6 * tileWidth * scale,
-        height: 5 * tileHeight * scale,
-        buildingType: BuildingType.PUBLIC,
-        entranceX: tileToWorld(26, 19).x,
-        entranceY: tileToWorld(26, 19).y,
-        baseDepth: this.DEPTH_OFFSET + mapOffsetY + (19 * tileHeight * scale),
-      },
-    ];
-
-    // Create building entities
-    for (const config of buildingConfigs) {
-      const buildingEid = EntityFactory.createBuilding(this.ecsWorld, config);
-      this.buildingEntities.set(config.name, buildingEid);
-    }
-
-    // Create door entities for each building
-    this.createDoors(scale, mapOffsetX, mapOffsetY, tileWidth, tileHeight);
-
-    // Log building system info for debugging
-    if (this.buildingSystem) {
-      this.buildingSystem.logBuildingsInfo(this.ecsWorld);
-    }
-  }
-
-  /**
-   * Creates door entities from Tiled object layer
-   */
-  private createDoors(
-    scale: number,
-    mapOffsetX: number,
-    mapOffsetY: number,
-    tileWidth: number,
-    tileHeight: number
-  ): void {
-    if (!this.ecsWorld || !this.map) return;
-
-    // Get the Interactables object layer
-    const interactablesLayer = this.map.getObjectLayer('Interactables');
-    if (!interactablesLayer) {
-      console.warn('⚠️ No Interactables object layer found in tilemap');
-      return;
-    }
-
-    // Get building DECO layers for door rendering (doors are typically on decoration layers)
-    const buildingLayers = new Map([
-      ['home', this.map.getLayer('Home/House Deco')?.tilemapLayer],
-      ['shop', this.map.getLayer('Shop/House Deco')?.tilemapLayer],
-      ['school', this.map.getLayer('School/House Deco')?.tilemapLayer],
-      ['library', this.map.getLayer('Library/House Deco')?.tilemapLayer],
+    // Create doors from Tiled object layer
+    const buildingLayerMap = new Map([
+      ['home', 'Home/House Deco'],
+      ['shop', 'Shop/House Deco'],
+      ['school', 'School/House Deco'],
+      ['library', 'Library/House Deco'],
     ]);
 
-    console.log(`🚪 Loading doors from Interactables layer (${interactablesLayer.objects.length} objects)`);
-
-    // Process each door object
-    interactablesLayer.objects.forEach(obj => {
-      if (obj.type === 'door' && obj.name) {
-        this.createDoorFromTiledObject(obj, scale, mapOffsetX, mapOffsetY, tileWidth, tileHeight, buildingLayers);
-      }
-    });
-  }
-
-  /**
-   * Creates a door entity from a Tiled object
-   */
-  private createDoorFromTiledObject(
-    obj: Phaser.Types.Tilemaps.TiledObject,
-    scale: number,
-    mapOffsetX: number,
-    mapOffsetY: number,
-    tileWidth: number,
-    tileHeight: number,
-    buildingLayers: Map<string, Phaser.Tilemaps.TilemapLayer | undefined>
-  ): void {
-    if (!this.ecsWorld || !obj.x || !obj.y || !obj.width || !obj.height) return;
-
-    // Extract building name from door name (e.g., "home_door" -> "home")
-    const buildingName = obj.name.replace('_door', '');
-    const buildingEid = this.buildingEntities.get(buildingName) ?? 0;
-    const layer = buildingLayers.get(buildingName);
-
-    if (!layer) {
-      console.warn(`⚠️ No building layer found for door: ${obj.name}`);
-      return;
-    }
-
-    // Convert Tiled object coordinates to world coordinates
-    const worldX = mapOffsetX + (obj.x + obj.width / 2) * scale;
-    const worldY = mapOffsetY + (obj.y + obj.height / 2) * scale;
-
-    // Convert to tile coordinates for tilemap operations
-    const tileX = Math.floor(obj.x / tileWidth);
-    const tileY = Math.floor(obj.y / tileHeight);
-
-    // Calculate door dimensions based on Tiled object size
-    const tileWidth_pixels = this.map!.tileWidth;
-    const tileHeight_pixels = this.map!.tileHeight;
-    const doorTileWidth = Math.ceil(obj.width! / tileWidth_pixels);
-    const doorTileHeight = Math.ceil(obj.height! / tileHeight_pixels);
-
-    // Convert Tiled properties array to object for easier access
-    const properties: Record<string, any> = {};
-    if (obj.properties) {
-      obj.properties.forEach((prop: any) => {
-        properties[prop.name] = prop.value;
-      });
-    }
-
-    const requiresKey = properties.requiresKey || false;
-    const promptText = properties.promptText || `Press SPACE to enter ${buildingName}`;
-    const interactionRange = properties.interactionRange || 40; // Unified range: ~2.5 tiles
-
-    // Parse tile arrays from properties or use defaults
-    let closedTileIds: number[];
-    let openTileIds: number[];
-
-    if (properties.closedTileIds && properties.openTileIds) {
-      // Custom tile arrays provided (support both arrays and comma-separated strings)
-      if (typeof properties.closedTileIds === 'string') {
-        closedTileIds = properties.closedTileIds.split(',').map((id: string) => parseInt(id.trim()));
-      } else if (Array.isArray(properties.closedTileIds)) {
-        closedTileIds = properties.closedTileIds;
-      } else {
-        closedTileIds = [properties.closedTileIds];
-      }
-
-      if (typeof properties.openTileIds === 'string') {
-        openTileIds = properties.openTileIds.split(',').map((id: string) => parseInt(id.trim()));
-      } else if (Array.isArray(properties.openTileIds)) {
-        openTileIds = properties.openTileIds;
-      } else {
-        openTileIds = [properties.openTileIds];
-      }
-    } else {
-      // Generate default tile arrays based on door size
-      // For 2x1 doors: [leftTile, rightTile]
-      // For 1x1 doors: [singleTile]
-      const baseClosed = properties.closedTileId || 221;
-      const baseOpen = properties.openTileId || 222;
-
-      closedTileIds = [];
-      openTileIds = [];
-
-      for (let y = 0; y < doorTileHeight; y++) {
-        for (let x = 0; x < doorTileWidth; x++) {
-          const offset = y * doorTileWidth + x;
-          closedTileIds.push(baseClosed + offset);
-          openTileIds.push(baseOpen + offset);
-        }
-      }
-    }
-
-    // Create door entity
-    const doorEid = EntityFactory.createDoor(this.ecsWorld, {
-      buildingEntityId: buildingEid,
-      tileX,
-      tileY,
-      x: worldX,
-      y: worldY,
-      tileWidth: doorTileWidth,
-      tileHeight: doorTileHeight,
-      closedTileIds,
-      openTileIds,
-      layer,
-      requiresKey,
-      interactionRange,
-      promptText,
-    });
-
-    // Store door-to-building mapping for scene transitions
-    this.doorToBuilding.set(doorEid, buildingName);
-
-    console.log(`🚪 Created door: ${obj.name} at (${tileX}, ${tileY}) (eid: ${doorEid})`);
+    this.doorToBuilding = this.buildingManager.createDoorsFromTiledLayer(
+      this.map,
+      this.buildingEntities,
+      this.mapTransform,
+      this.map.tileWidth,
+      this.map.tileHeight,
+      buildingLayerMap
+    );
   }
 
   /**
@@ -625,10 +319,8 @@ export class Town extends Scene {
     let worldCenterX: number, worldCenterY: number;
     let scale: number;
 
-    if (map && this.map) {
-      // Calculate consistent scaling and positioning
-      const transform = calculateMapTransform(this.map);
-      scale = transform.scale;
+    if (map && this.map && this.mapTransform) {
+      scale = this.mapTransform.scale;
 
       // Check if player is exiting from a building
       if (exitBuilding === 'home' && this.buildingEntities.has('home')) {
@@ -641,8 +333,6 @@ export class Town extends Scene {
         worldCenterX = homeEntranceX;
         worldCenterY = homeEntranceY + 40; // Move player slightly forward from door
 
-        console.log(`🚪 Player exiting from home, positioning at door exit (${worldCenterX.toFixed(1)}, ${worldCenterY.toFixed(1)})`);
-
         // Ensure home door is open when returning
         const homeDoorEid = BuildingComponent.doorEntityId[homeBuildingEid];
         if (homeDoorEid && this.doorInteractionSystem && this.ecsWorld) {
@@ -652,13 +342,10 @@ export class Town extends Scene {
         }
       } else {
         // Default to map center
-        const mapCenterX = transform.mapWidthInPixels / 2;
-        const mapCenterY = transform.mapHeightInPixels / 2;
-        worldCenterX = transform.mapOffsetX + mapCenterX * scale;
-        worldCenterY = transform.mapOffsetY + mapCenterY * scale;
-
-        console.log(`🎮 Player spawn: Map center (${mapCenterX}, ${mapCenterY}) → World (${worldCenterX.toFixed(1)}, ${worldCenterY.toFixed(1)})`);
-        console.log(`   Scale: ${scale.toFixed(2)}, Offset: (${transform.mapOffsetX.toFixed(1)}, ${transform.mapOffsetY.toFixed(1)})`);
+        const mapCenterX = this.mapTransform.mapWidthInPixels / 2;
+        const mapCenterY = this.mapTransform.mapHeightInPixels / 2;
+        worldCenterX = this.mapTransform.mapOffsetX + mapCenterX * scale;
+        worldCenterY = this.mapTransform.mapOffsetY + mapCenterY * scale;
       }
 
       // Create player using utility function
@@ -676,9 +363,6 @@ export class Town extends Scene {
 
         this.player = result.player;
         this.playerEntityId = result.playerEntityId;
-
-        console.log(`🎮 Player physics body created at (${this.player.x}, ${this.player.y}) with collision box ${GameConfig.PLAYER.COLLISION_WIDTH * scale}x${GameConfig.PLAYER.COLLISION_HEIGHT * scale} (scale: ${scale.toFixed(2)})`);
-        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics`);
       }
     } else {
       // Fallback to screen center if map data is unavailable
@@ -701,23 +385,59 @@ export class Town extends Scene {
 
         this.player = result.player;
         this.playerEntityId = result.playerEntityId;
-
-        console.log(`🎮 Using ${this.collisionLayers.length} collision layers for player physics (fallback)`);
       }
     }
+  }
 
-    // Player creation complete
+  /**
+   * Sets up the interaction manager after all components are ready
+   */
+  private setupInteractionManager(): void {
+    if (!this.doorInteractionSystem || !this.ecsWorld || !this.player || !this.playerController || !this.interactionPrompt || !this.map || !this.mapTransform) {
+      console.warn('⚠️ Cannot setup interaction manager - missing required components');
+      return;
+    }
+    this.interactionManager.setupDoorInteractions({
+      doorInteractionSystem: this.doorInteractionSystem,
+      ecsWorld: this.ecsWorld,
+      player: this.player,
+      playerController: this.playerController,
+      interactionPrompt: this.interactionPrompt,
+      doorToBuilding: this.doorToBuilding,
+      map: this.map,
+      transform: this.mapTransform,
+      onTransition: (doorEntityId, buildingName) => this.handleDoorTransition(doorEntityId, buildingName),
+    });
+  }
+
+  /**
+   * Handles transition to building interior scene
+   */
+  private handleDoorTransition(doorEntityId: number, buildingName: string): void {
+    // Only handle home transition for now
+    if (buildingName === 'home') {
+      const doorX = PositionComponent.x[doorEntityId];
+      const doorY = PositionComponent.y[doorEntityId];
+
+      // Calculate entrance position (slightly inside the door)
+      const entranceX = doorX;
+      const entranceY = doorY + 30; // Move player slightly forward from door
+
+      this.scene.start('Home', {
+        exitBuilding: 'home',
+        entranceX: entranceX,
+        entranceY: entranceY,
+      });
+    }
   }
 
   /**
    * Update method called every frame to handle player movement
-   * @param _time - Current time
-   * @param delta - Time elapsed since last frame
    */
   update(_time: number, delta: number): void {
     this.updatePlayerMovement(delta);
     this.updateECS();
-    this.updateDoorInteractions();
+    this.interactionManager.updateDoorInteractions();
 
     // Only update debug system if player exists
     if (this.player) {
@@ -728,98 +448,6 @@ export class Town extends Scene {
     if (this.doorInteractionSystem && this.doorDebugKey && Phaser.Input.Keyboard.JustDown(this.doorDebugKey)) {
       const currentState = (this.doorInteractionSystem as any).showDebugHighlights;
       this.doorInteractionSystem.setDebugHighlights(!currentState);
-      console.log(`🚪 Door highlights ${!currentState ? 'enabled' : 'disabled'}`);
-    }
-  }
-
-  /**
-   * Handles door interactions with the player
-   */
-  private updateDoorInteractions(): void {
-    if (!this.doorInteractionSystem || !this.ecsWorld || !this.player || !this.playerController || !this.interactionPrompt) return;
-
-    // Find nearest door to player
-    const nearestDoor = this.doorInteractionSystem.findNearestDoor(
-      this.ecsWorld,
-      this.player.x,
-      this.player.y
-    );
-
-    // Update interaction prompt
-    if (nearestDoor !== null) {
-      const isOpen = this.doorInteractionSystem.isDoorOpen(nearestDoor);
-      const buildingName = this.doorToBuilding.get(nearestDoor);
-
-      // Check if player is walking through an open door
-      if (isOpen && this.isPlayerWalkingThroughDoor(nearestDoor)) {
-        this.handleDoorTransition(nearestDoor, buildingName);
-        return;
-      }
-
-      const action = isOpen ? 'close' : 'open';
-      this.interactionPrompt.setText(`Press SPACE to ${action} door`);
-      this.interactionPrompt.setVisible(true);
-
-      // Check if SPACE key was pressed
-      if (this.playerController['keyboardHandler'].isSpaceJustPressed()) {
-        this.doorInteractionSystem.toggleDoor(this.ecsWorld, nearestDoor);
-      }
-    } else {
-      this.interactionPrompt.setVisible(false);
-    }
-  }
-
-  /**
-   * Checks if player is walking through an open door
-   */
-  private isPlayerWalkingThroughDoor(doorEntityId: number): boolean {
-    if (!this.ecsWorld || !this.player) return false;
-
-    // Get door position and dimensions
-    const doorX = PositionComponent.x[doorEntityId];
-    const doorY = PositionComponent.y[doorEntityId];
-    const doorWidth = DoorComponent.tileWidth[doorEntityId] * (this.map?.tileWidth || 16);
-    const doorHeight = DoorComponent.tileHeight[doorEntityId] * (this.map?.tileHeight || 16);
-
-    // Calculate map scale to determine door size in world coordinates
-    const mapWidthInPixels = this.map!.width * this.map!.tileWidth;
-    const mapHeightInPixels = this.map!.height * this.map!.tileHeight;
-    const scaleX = GameConfig.screenWidth / mapWidthInPixels;
-    const scaleY = GameConfig.screenHeight / mapHeightInPixels;
-    const scale = Math.min(scaleX, scaleY, 2);
-    const scaledDoorWidth = doorWidth * scale;
-    const scaledDoorHeight = doorHeight * scale;
-
-    // Check if player is within the door area (with some tolerance)
-    const threshold = Math.max(scaledDoorWidth, scaledDoorHeight) * 0.6; // 60% of door size
-    const distanceX = Math.abs(this.player.x - doorX);
-    const distanceY = Math.abs(this.player.y - doorY);
-
-    // Player is walking through if they're close to the door center
-    return distanceX < threshold && distanceY < threshold;
-  }
-
-  /**
-   * Handles transition to building interior scene
-   */
-  private handleDoorTransition(doorEntityId: number, buildingName?: string): void {
-    if (!buildingName) return;
-
-    // Only handle home transition for now
-    if (buildingName === 'home') {
-      const doorX = PositionComponent.x[doorEntityId];
-      const doorY = PositionComponent.y[doorEntityId];
-
-      // Calculate entrance position (slightly inside the door)
-      const entranceX = doorX;
-      const entranceY = doorY + 30; // Move player slightly forward from door
-
-      console.log(`🚪 Transitioning to Home scene from door at (${doorX}, ${doorY})`);
-      this.scene.start('Home', {
-        exitBuilding: 'home',
-        entranceX: entranceX,
-        entranceY: entranceY,
-      });
     }
   }
 
@@ -841,10 +469,8 @@ export class Town extends Scene {
     }
   }
 
-
   /**
    * Handles player movement with keyboard controls using Matter.js physics
-   * @param _delta - Time elapsed since last frame (unused for velocity-based movement)
    */
   private updatePlayerMovement(_delta: number): void {
     if (!this.player || !this.playerController) return;
@@ -865,7 +491,6 @@ export class Town extends Scene {
       playerState: this.playerState,
     });
   }
-
 
   /**
    * Clean up resources when scene is destroyed
@@ -892,6 +517,5 @@ export class Town extends Scene {
     this.doorInteractionSystem = null;
     this.buildingSystem = null;
     this.buildingEntities.clear();
-    // Note: Phaser Scene cleanup is handled automatically
   }
 }

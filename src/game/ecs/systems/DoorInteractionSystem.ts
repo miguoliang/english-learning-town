@@ -115,8 +115,6 @@ export class DoorInteractionSystem {
 
     // Open doors have no collision - players can walk through the doorway
     // (No collision body management needed)
-
-    console.log(`🚪 Opened ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
 
   /**
@@ -158,8 +156,6 @@ export class DoorInteractionSystem {
 
     // Closed doors have no collision - players can walk up to them and interact
     // (No collision body creation needed)
-
-    console.log(`🚪 Closed ${tileWidth}x${tileHeight} door at (${tileX}, ${tileY}) (eid: ${doorEntityId})`);
   }
 
   /**
