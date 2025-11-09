@@ -1,0 +1,247 @@
+//
+//  ContentView.swift
+//  VocabularyImageManager
+//
+//  Created by Frank Mi on 2025/11/9.
+//
+
+import SwiftUI
+import AppKit
+internal import UniformTypeIdentifiers
+
+struct ContentView: View {
+    @StateObject private var viewModel = WordListViewModel()
+    
+    var body: some View {
+        GeometryReader { geometry in
+            HSplitView {
+            // Left panel: File selection and word list
+            VStack(alignment: .leading, spacing: 0) {
+                // File selection button
+                HStack {
+                    Button(action: openCSVFile) {
+                        Label("Open CSV File", systemImage: "folder")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding()
+                    
+                    Spacer()
+                    
+                    if let url = viewModel.csvFileURL {
+                        Text(url.lastPathComponent)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                            .padding(.trailing)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .background(Color(NSColor.controlBackgroundColor))
+                
+                // Search bar
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField("Search words...", text: $viewModel.searchText)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(NSColor.controlBackgroundColor))
+                
+                // Word list
+                if viewModel.words.isEmpty && !viewModel.isLoading {
+                    VStack(spacing: 16) {
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text("No words loaded")
+                            .foregroundColor(.secondary)
+                        Text("Click 'Open CSV File' to begin")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List(viewModel.filteredWords, id: \.englishWord) { word in
+                        WordRowView(word: word, hasImage: viewModel.hasImage(word))
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.selectWord(word)
+                            }
+                    }
+                    .listStyle(.plain)
+                }
+            }
+            .frame(width: geometry.size.width * 0.2)
+            .frame(maxHeight: .infinity)
+            
+            // Right panel: Word details and image
+            VStack(alignment: .leading, spacing: 20) {
+                if let word = viewModel.selectedWord {
+                    // Word information
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(word.englishWord)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                        
+                        Text(word.chineseTranslation)
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                        
+                        Text(word.exampleSentence)
+                            .font(.body)
+                            .italic()
+                            .foregroundColor(.secondary)
+                        
+                        HStack {
+                            Text("POS: \(word.pos)")
+                            Spacer()
+                            Text("Level: \(word.level)")
+                            Spacer()
+                            Text("Theme: \(word.theme)")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(NSColor.controlBackgroundColor))
+                    .cornerRadius(8)
+                    
+                    // Image preview area - uses remaining height
+                    VStack(spacing: 16) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(NSColor.controlBackgroundColor))
+                            
+                            if let image = viewModel.currentImage {
+                                Image(nsImage: image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .cornerRadius(8)
+                                    .padding(10)
+                            } else {
+                                VStack(spacing: 20) {
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 64))
+                                        .foregroundColor(.secondary)
+                                    
+                                    Button(action: pasteImage) {
+                                        Label("Paste from Clipboard", systemImage: "doc.on.clipboard")
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .controlSize(.large)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        
+                        // Image status
+                        if viewModel.hasImage(word) {
+                            HStack {
+                                Label("Image saved", systemImage: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Spacer()
+                                if let imageName = word.imageName {
+                                    Text("Asset: \(imageName)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(NSColor.windowBackgroundColor))
+                    .cornerRadius(8)
+                    
+                } else {
+                    // No word selected
+                    VStack(spacing: 16) {
+                        Image(systemName: "hand.point.left")
+                            .font(.system(size: 64))
+                            .foregroundColor(.secondary)
+                        Text("Select a word from the list")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error)
+            }
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView("Loading...")
+                    .padding()
+                    .background(Color(NSColor.windowBackgroundColor).opacity(0.9))
+                    .cornerRadius(8)
+            }
+        }
+    }
+    
+    private func openCSVFile() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        panel.title = "Select CSV File"
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            viewModel.loadCSV(from: url)
+        }
+    }
+    
+    private func pasteImage() {
+        if let image = viewModel.pasteImageFromClipboard() {
+            viewModel.currentImage = image
+        } else {
+            viewModel.errorMessage = "No image found in clipboard. Please copy an image first (Cmd+C or right-click > Copy)."
+        }
+    }
+}
+
+struct WordRowView: View {
+    let word: VocabularyWord
+    let hasImage: Bool
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(word.englishWord)
+                    .font(.headline)
+                Text(word.chineseTranslation)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            if hasImage {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            } else {
+                Image(systemName: "photo")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+#Preview {
+    ContentView()
+}

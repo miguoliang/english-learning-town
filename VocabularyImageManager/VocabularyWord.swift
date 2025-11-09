@@ -1,6 +1,6 @@
 //
 //  VocabularyWord.swift
-//  EnglishLearningTown
+//  VocabularyImageManager
 //
 //  Created by Frank Mi on 2025/11/8.
 //

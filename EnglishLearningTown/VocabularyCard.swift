@@ -18,7 +18,8 @@ class VocabularyCard: SKNode {
     
     var cardBack: SKShapeNode!
     var cardFront: SKShapeNode!
-    private var emojiLabel: SKLabelNode!
+    private var emojiLabel: SKLabelNode?
+    private var imageNode: SKSpriteNode?
     private var questionLabel: SKLabelNode!
     private var statusLabel: SKLabelNode!
     private var startButton: SKNode!
@@ -67,12 +68,23 @@ class VocabularyCard: SKNode {
         cardFront.isHidden = true
         addChild(cardFront)
         
-        let emoji = EmojiMapper.emoji(for: vocabularyWord.englishWord) ?? "❓"
-        emojiLabel = SKLabelNode(fontNamed: "Arial")
-        emojiLabel.text = emoji
-        emojiLabel.fontSize = 50
-        emojiLabel.position = CGPoint(x: 0, y: 10)
-        cardFront.addChild(emojiLabel)
+        // Try to load image from Asset Catalog first
+        if let imageName = vocabularyWord.imageName, let image = NSImage(named: imageName) {
+            // Create sprite node from image
+            let texture = SKTexture(image: image)
+            imageNode = SKSpriteNode(texture: texture)
+            imageNode?.size = CGSize(width: 80, height: 80)
+            imageNode?.position = CGPoint(x: 0, y: 10)
+            cardFront.addChild(imageNode!)
+        } else {
+            // Fall back to emoji if no image available
+            let emoji = EmojiMapper.emoji(for: vocabularyWord.englishWord) ?? "❓"
+            emojiLabel = SKLabelNode(fontNamed: "Arial")
+            emojiLabel.text = emoji
+            emojiLabel.fontSize = 50
+            emojiLabel.position = CGPoint(x: 0, y: 10)
+            cardFront.addChild(emojiLabel)
+        }
         
         questionLabel = SKLabelNode(fontNamed: "Arial")
         questionLabel.text = "Say the word"

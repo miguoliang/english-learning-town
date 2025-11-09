@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		1B197DC82EBF9D4A000991E3 /* EnglishLearningTown.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnglishLearningTown.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B9D065D2EC0B0B700D9941D /* VocabularyImageManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VocabularyImageManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +17,22 @@
 			path = EnglishLearningTown;
 			sourceTree = "<group>";
 		};
+		1B9D065E2EC0B0B700D9941D /* VocabularyImageManager */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = VocabularyImageManager;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		1B197DC52EBF9D4A000991E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1B9D065A2EC0B0B700D9941D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +46,7 @@
 			isa = PBXGroup;
 			children = (
 				1B197DCA2EBF9D4A000991E3 /* EnglishLearningTown */,
+				1B9D065E2EC0B0B700D9941D /* VocabularyImageManager */,
 				1B197DC92EBF9D4A000991E3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				1B197DC82EBF9D4A000991E3 /* EnglishLearningTown.app */,
+				1B9D065D2EC0B0B700D9941D /* VocabularyImageManager.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +85,28 @@
 			productReference = 1B197DC82EBF9D4A000991E3 /* EnglishLearningTown.app */;
 			productType = "com.apple.product-type.application";
 		};
+		1B9D065C2EC0B0B700D9941D /* VocabularyImageManager */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1B9D06652EC0B0B700D9941D /* Build configuration list for PBXNativeTarget "VocabularyImageManager" */;
+			buildPhases = (
+				1B9D06592EC0B0B700D9941D /* Sources */,
+				1B9D065A2EC0B0B700D9941D /* Frameworks */,
+				1B9D065B2EC0B0B700D9941D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1B9D065E2EC0B0B700D9941D /* VocabularyImageManager */,
+			);
+			name = VocabularyImageManager;
+			packageProductDependencies = (
+			);
+			productName = VocabularyImageManager;
+			productReference = 1B9D065D2EC0B0B700D9941D /* VocabularyImageManager.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -81,6 +118,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					1B197DC72EBF9D4A000991E3 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					1B9D065C2EC0B0B700D9941D = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -100,6 +140,7 @@
 			projectRoot = "";
 			targets = (
 				1B197DC72EBF9D4A000991E3 /* EnglishLearningTown */,
+				1B9D065C2EC0B0B700D9941D /* VocabularyImageManager */,
 			);
 		};
 /* End PBXProject section */
@@ -112,10 +153,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1B9D065B2EC0B0B700D9941D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1B197DC42EBF9D4A000991E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1B9D06592EC0B0B700D9941D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -317,6 +372,68 @@
 			};
 			name = Release;
 		};
+		1B9D06662EC0B0B700D9941D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app needs speech recognition to help you practice pronunciation and vocabulary.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miguoliang.VocabularyImageManager;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1B9D06672EC0B0B700D9941D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app needs speech recognition to help you practice pronunciation and vocabulary.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miguoliang.VocabularyImageManager;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -334,6 +451,15 @@
 			buildConfigurations = (
 				1B197DDD2EBF9D4B000991E3 /* Debug */,
 				1B197DDE2EBF9D4B000991E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1B9D06652EC0B0B700D9941D /* Build configuration list for PBXNativeTarget "VocabularyImageManager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B9D06662EC0B0B700D9941D /* Debug */,
+				1B9D06672EC0B0B700D9941D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
