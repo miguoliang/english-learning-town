@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VocabularyWord {
+struct VocabularyWord: Codable {
     let englishWord: String
     let pos: String
     let level: String

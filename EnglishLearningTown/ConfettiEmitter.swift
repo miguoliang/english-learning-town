@@ -37,6 +37,8 @@ class ConfettiEmitter: SKNode {
         let particleSize = CGSize(width: 8, height: 8)
         let texture = createParticleTexture(size: particleSize)
         
+        var particleEmitters: [SKEmitterNode] = []
+        
         for (index, color) in colors.enumerated() {
             let particleEmitter = SKEmitterNode()
             particleEmitter.particleTexture = texture
@@ -74,12 +76,29 @@ class ConfettiEmitter: SKNode {
             particleEmitter.particlePositionRange = CGVector(dx: 0, dy: 0)
             particleEmitter.yAcceleration = -300
             
+            particleEmitters.append(particleEmitter)
             emitter.addChild(particleEmitter)
         }
         
-        // Auto-remove after animation completes
+        // Smooth fade-out: stop creating new particles gradually, then wait for existing ones to finish
+        let burstDuration: TimeInterval = 0.5
+        let fadeOutDuration: TimeInterval = 0.3
+        let maxParticleLifetime = 2.0 + 0.5 // particleLifetime + particleLifetimeRange
+        
         emitter.run(SKAction.sequence([
-            SKAction.wait(forDuration: 2.5),
+            // Burst phase - particles emit at full rate
+            SKAction.wait(forDuration: burstDuration),
+            // Fade-out phase - gradually reduce birth rate to 0
+            SKAction.customAction(withDuration: fadeOutDuration) { node, elapsedTime in
+                let progress = elapsedTime / CGFloat(fadeOutDuration)
+                let newBirthRate = 50.0 * (1.0 - progress)
+                for particleEmitter in particleEmitters {
+                    particleEmitter.particleBirthRate = newBirthRate
+                }
+            },
+            // Wait for all particles to finish their lifetime
+            SKAction.wait(forDuration: maxParticleLifetime),
+            // Remove the emitter
             SKAction.run {
                 emitter.removeFromParent()
             }
@@ -124,8 +143,22 @@ class ConfettiEmitter: SKNode {
         
         emitter.addChild(sparkleEmitter)
         
+        // Smooth fade-out: stop creating new particles gradually, then wait for existing ones to finish
+        let burstDuration: TimeInterval = 0.3
+        let fadeOutDuration: TimeInterval = 0.2
+        let maxParticleLifetime = 1.0 + 0.3 // particleLifetime + particleLifetimeRange
+        
         emitter.run(SKAction.sequence([
-            SKAction.wait(forDuration: 1.5),
+            // Burst phase - particles emit at full rate
+            SKAction.wait(forDuration: burstDuration),
+            // Fade-out phase - gradually reduce birth rate to 0
+            SKAction.customAction(withDuration: fadeOutDuration) { node, elapsedTime in
+                let progress = elapsedTime / CGFloat(fadeOutDuration)
+                sparkleEmitter.particleBirthRate = 30.0 * (1.0 - progress)
+            },
+            // Wait for all particles to finish their lifetime
+            SKAction.wait(forDuration: maxParticleLifetime),
+            // Remove the emitter
             SKAction.run {
                 emitter.removeFromParent()
             }

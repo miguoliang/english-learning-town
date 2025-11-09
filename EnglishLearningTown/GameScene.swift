@@ -34,7 +34,7 @@ class GameScene: SKScene {
     
     private func loadVocabularyData() {
         let fileName = "cefr-\(selectedLevel.lowercased())"
-        vocabularyWords = CSVParser.parseCSV(fileName: fileName)
+        vocabularyWords = VocabularyLoader.loadVocabulary(fileName: fileName)
         print("Loaded \(vocabularyWords.count) words for level \(selectedLevel)")
     }
     
