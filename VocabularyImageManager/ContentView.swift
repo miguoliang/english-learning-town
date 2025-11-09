@@ -318,6 +318,8 @@ struct ContentView: View {
     private func pasteImage() {
         if let image = viewModel.pasteImageFromClipboard() {
             viewModel.currentImage = image
+            // Ensure scale is always 1.0 on first paste to match zoom indicator
+            viewModel.imageScale = 1.0
         } else {
             viewModel.errorMessage = "No image found in clipboard. Please copy an image first (Cmd+C or right-click > Copy)."
         }
