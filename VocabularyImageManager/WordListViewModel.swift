@@ -117,13 +117,20 @@ class WordListViewModel: ObservableObject {
     ///
     /// - Parameter word: The vocabulary word to select
     func selectWord(_ word: VocabularyWord) {
+        print("[ImageEdit] Selecting word: \(word.englishWord) (Level: \(word.level))")
         selectedWord = word
         currentImage = ImageManager.loadImage(for: word.englishWord, level: word.level)
+        if let image = currentImage {
+            print("[ImageEdit] Image loaded - Size: \(image.size.width)x\(image.size.height)")
+        } else {
+            print("[ImageEdit] No image found for word")
+        }
         // Reset zoom and offset when selecting a new word
         imageScale = 1.0
         imageOffset = .zero
         baseOffset = .zero
         isClipped = false
+        print("[ImageEdit] Reset transform - Scale: 1.0, Offset: (0, 0), Clipped: false")
     }
     
     /// Save an image for the selected word.
@@ -131,17 +138,28 @@ class WordListViewModel: ObservableObject {
     /// - Parameter image: The image to save
     /// - Returns: True if successful, false otherwise
     func saveImage(_ image: NSImage) -> Bool {
-        guard let word = selectedWord else { return false }
+        guard let word = selectedWord else {
+            print("[ImageEdit] Save failed - No word selected")
+            return false
+        }
+        
+        print("[ImageEdit] Saving image for word: \(word.englishWord) (Level: \(word.level))")
+        print("[ImageEdit] Image size: \(image.size.width)x\(image.size.height), Clipped: \(isClipped)")
         
         // Save image to repository
-        guard ImageManager.saveImage(image, for: word.englishWord, level: word.level, projectRoot: projectRoot) != nil else {
+        guard let savedPath = ImageManager.saveImage(image, for: word.englishWord, level: word.level, projectRoot: projectRoot) else {
+            print("[ImageEdit] Save failed - Could not save to repository. Project root: \(projectRoot?.path ?? "not found")")
             errorMessage = "Failed to save image to repository. Project root: \(projectRoot?.path ?? "not found")"
             return false
         }
         
+        print("[ImageEdit] Image saved to: \(savedPath)")
+        
         // Update JSON file with imageName (find corresponding JSON file)
         let assetCatalogName = ImageManager.assetCatalogName(level: word.level, word: word.englishWord)
+        print("[ImageEdit] Asset catalog name: \(assetCatalogName)")
         if updateWordImageName(word: word, imageName: assetCatalogName) {
+            print("[ImageEdit] JSON file updated successfully")
             currentImage = image
             // Update the word in the current list with imageName
             if let index = words.firstIndex(where: { $0.englishWord == word.englishWord }) {
@@ -159,9 +177,11 @@ class WordListViewModel: ObservableObject {
                 words[index] = updatedWord
                 selectWord(updatedWord)
             }
+            print("[ImageEdit] Save complete - Success")
             return true
         }
         
+        print("[ImageEdit] Save failed - Could not update JSON file")
         errorMessage = "Failed to update JSON file"
         return false
     }
@@ -213,22 +233,25 @@ class WordListViewModel: ObservableObject {
     ///
     /// - Returns: The pasted image, or nil if clipboard doesn't contain an image
     func pasteImageFromClipboard() -> NSImage? {
+        print("[ImageEdit] Attempting to paste image from clipboard")
         let pasteboard = NSPasteboard.general
         
         // Check available types for debugging
         let availableTypes = pasteboard.types
-        print("Available clipboard types: \(availableTypes)")
+        print("[ImageEdit] Available clipboard types: \(availableTypes)")
         
         // Method 1: Try reading as NSImage directly (most common)
         if pasteboard.canReadObject(forClasses: [NSImage.self], options: nil) {
             if let images = pasteboard.readObjects(forClasses: [NSImage.self], options: nil) as? [NSImage],
                let image = images.first {
-                print("Successfully read image using NSImage class")
+                print("[ImageEdit] Successfully read image using NSImage class")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 // Reset zoom and offset when pasting new image
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
         }
@@ -237,11 +260,13 @@ class WordListViewModel: ObservableObject {
         if pasteboard.availableType(from: [.png]) != nil {
             if let pngData = pasteboard.data(forType: .png),
                let image = NSImage(data: pngData) {
-                print("Successfully read image from PNG data")
+                print("[ImageEdit] Successfully read image from PNG data")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
         }
@@ -250,11 +275,13 @@ class WordListViewModel: ObservableObject {
         if pasteboard.availableType(from: [.tiff]) != nil {
             if let tiffData = pasteboard.data(forType: .tiff),
                let image = NSImage(data: tiffData) {
-                print("Successfully read image from TIFF data")
+                print("[ImageEdit] Successfully read image from TIFF data")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
         }
@@ -265,11 +292,13 @@ class WordListViewModel: ObservableObject {
             if let filePaths = pasteboard.propertyList(forType: fileURLType) as? [String],
                let firstPath = filePaths.first,
                let image = NSImage(contentsOfFile: firstPath) {
-                print("Successfully read image from file path (property list)")
+                print("[ImageEdit] Successfully read image from file path (property list): \(firstPath)")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
             // Try as data/string
@@ -277,11 +306,13 @@ class WordListViewModel: ObservableObject {
                let fileURLString = String(data: fileURLData, encoding: .utf8),
                let fileURL = URL(string: fileURLString),
                let image = NSImage(contentsOf: fileURL) {
-                print("Successfully read image from file URL (data)")
+                print("[ImageEdit] Successfully read image from file URL (data): \(fileURLString)")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
         }
@@ -293,31 +324,38 @@ class WordListViewModel: ObservableObject {
                let urlString = String(data: urlData, encoding: .utf8),
                let fileURL = URL(string: urlString),
                let image = NSImage(contentsOf: fileURL) {
-                print("Successfully read image from public.file-url")
+                print("[ImageEdit] Successfully read image from public.file-url: \(urlString)")
+                print("[ImageEdit] Pasted image size: \(image.size.width)x\(image.size.height)")
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
                 isClipped = false
+                print("[ImageEdit] Reset transform after paste - Scale: 1.0, Offset: (0, 0), Clipped: false")
                 return image
             }
         }
         
-        print("Failed to read image from clipboard")
+        print("[ImageEdit] Failed to read image from clipboard")
         return nil
     }
     
     /// Zoom in the image.
     func zoomIn() {
+        let oldScale = imageScale
         imageScale = min(imageScale + 0.1, 5.0)
+        print("[ImageEdit] Zoom in - Scale: \(String(format: "%.1f", oldScale)) -> \(String(format: "%.1f", imageScale)) (\(Int(imageScale * 100))%)")
     }
     
     /// Zoom out the image.
     func zoomOut() {
+        let oldScale = imageScale
         imageScale = max(imageScale - 0.1, 0.1)
+        print("[ImageEdit] Zoom out - Scale: \(String(format: "%.1f", oldScale)) -> \(String(format: "%.1f", imageScale)) (\(Int(imageScale * 100))%)")
     }
     
     /// Reset image transform (zoom and offset).
     func resetImageTransform() {
+        print("[ImageEdit] Reset transform - Scale: \(String(format: "%.1f", imageScale)) -> 1.0, Offset: (\(String(format: "%.1f", imageOffset.width)), \(String(format: "%.1f", imageOffset.height))) -> (0, 0)")
         imageScale = 1.0
         imageOffset = .zero
         baseOffset = .zero
@@ -327,91 +365,116 @@ class WordListViewModel: ObservableObject {
     ///
     /// - Parameter viewSize: The size of the view containing the image
     func clipImage(viewSize: CGSize? = nil) {
-        guard let originalImage = currentImage else { return }
+        guard let originalImage = currentImage else {
+            print("[ImageEdit] Clip failed - No image available")
+            return
+        }
         
+        print("[ImageEdit] Starting clip operation")
         let clipSize: CGFloat = 256
         let imageSize = originalImage.size
+        print("[ImageEdit] Original image size: \(imageSize.width)x\(imageSize.height)")
+        print("[ImageEdit] Current scale: \(String(format: "%.2f", imageScale)), Offset: (\(String(format: "%.1f", imageOffset.width)), \(String(format: "%.1f", imageOffset.height)))")
         
         // Use provided view size or estimate based on image
         let viewWidth = viewSize?.width ?? max(imageSize.width, clipSize * 2)
         let viewHeight = viewSize?.height ?? max(imageSize.height, clipSize * 2)
+        print("[ImageEdit] View size: \(viewWidth)x\(viewHeight)")
         
-        // Calculate displayed image size with aspect ratio fit
-        let imageAspectRatio = imageSize.width / imageSize.height
-        let viewAspectRatio = viewWidth / viewHeight
-        
-        let displayedWidth: CGFloat
-        let displayedHeight: CGFloat
-        
-        if imageAspectRatio > viewAspectRatio {
-            // Image is wider - width is limiting
-            displayedWidth = viewWidth
-            displayedHeight = viewWidth / imageAspectRatio
-        } else {
-            // Image is taller - height is limiting
-            displayedHeight = viewHeight
-            displayedWidth = viewHeight * imageAspectRatio
-        }
-        
-        // Calculate scale factor from displayed to original
-        let scaleX = imageSize.width / displayedWidth
-        let scaleY = imageSize.height / displayedHeight
+        // Calculate displayed image size using actual pixel size scaled by zoom
+        // Displayed size = actual image size * zoom scale
+        let displayedWidth = imageSize.width * imageScale
+        let displayedHeight = imageSize.height * imageScale
+        print("[ImageEdit] Displayed image size (real size * scale): \(displayedWidth)x\(displayedHeight)")
         
         // Clip rectangle is centered in view
         let clipCenterX = viewWidth / 2
         let clipCenterY = viewHeight / 2
         
-        // Image center in view coordinates
+        // Image center in view coordinates (accounting for offset)
+        // The image is displayed at its actual size, so we need to find where its center is
         let imageCenterX = viewWidth / 2 + imageOffset.width
         let imageCenterY = viewHeight / 2 + imageOffset.height
+        print("[ImageEdit] Clip center: (\(clipCenterX), \(clipCenterY)), Image center: (\(imageCenterX), \(imageCenterY))")
         
-        // Calculate clip area relative to image center
-        let clipOffsetX = (clipCenterX - imageCenterX) * imageScale
-        let clipOffsetY = (clipCenterY - imageCenterY) * imageScale
+        // Clip rectangle is 256x256 in view coordinates
+        // When zoomed, this represents a smaller area in displayed image coordinates
+        // Clip size in displayed image coordinates = clipSize / imageScale
+        let clipSizeInDisplayedX = clipSize / imageScale
+        let clipSizeInDisplayedY = clipSize / imageScale
         
-        // Convert to original image coordinates
-        let clipSizeInImageX = clipSize * imageScale * scaleX
-        let clipSizeInImageY = clipSize * imageScale * scaleY
+        // Convert clip size from displayed image coordinates to original image coordinates
+        // Since displayed = original * scale, we divide by scale to get original coordinates
+        let clipSizeInImageX = clipSizeInDisplayedX
+        let clipSizeInImageY = clipSizeInDisplayedY
+        print("[ImageEdit] Clip size in displayed coordinates: \(clipSizeInDisplayedX)x\(clipSizeInDisplayedY)")
+        print("[ImageEdit] Clip size in image coordinates: \(clipSizeInImageX)x\(clipSizeInImageY)")
         
-        let sourceClipX = (imageSize.width / 2) + (clipOffsetX * scaleX) - (clipSizeInImageX / 2)
-        let sourceClipY = (imageSize.height / 2) - (clipOffsetY * scaleY) - (clipSizeInImageY / 2)
+        // Calculate offset from image center to clip center
+        // The offset is in view coordinates, need to convert to original image coordinates
+        let clipOffsetInViewX = clipCenterX - imageCenterX
+        let clipOffsetInViewY = clipCenterY - imageCenterY
+        
+        // Convert view offset to original image coordinates
+        // Since displayed = original * scale, we divide by scale
+        let clipOffsetInImageX = clipOffsetInViewX / imageScale
+        let clipOffsetInImageY = clipOffsetInViewY / imageScale
+        
+        // Calculate clip position in original image coordinates
+        let sourceClipX = (imageSize.width / 2) + clipOffsetInImageX - (clipSizeInImageX / 2)
+        let sourceClipY = (imageSize.height / 2) - clipOffsetInImageY - (clipSizeInImageY / 2)
+        print("[ImageEdit] Clip offset in view: (\(clipOffsetInViewX), \(clipOffsetInViewY))")
+        print("[ImageEdit] Clip offset in image: (\(clipOffsetInImageX), \(clipOffsetInImageY))")
+        print("[ImageEdit] Source clip position (before clamp): (\(sourceClipX), \(sourceClipY))")
         
         // Clamp to image bounds
         let clampedX = max(0, min(sourceClipX, imageSize.width - clipSizeInImageX))
         let clampedY = max(0, min(sourceClipY, imageSize.height - clipSizeInImageY))
         let clampedWidth = min(clipSizeInImageX, imageSize.width - clampedX)
         let clampedHeight = min(clipSizeInImageY, imageSize.height - clampedY)
+        print("[ImageEdit] Clamped clip rect: (\(clampedX), \(clampedY), \(clampedWidth), \(clampedHeight))")
         
         // Create clipped image
         guard let cgImage = originalImage.cgImage(forProposedRect: nil, context: nil, hints: nil),
               let croppedCGImage = cgImage.cropping(to: CGRect(x: clampedX, y: clampedY, width: clampedWidth, height: clampedHeight)) else {
+            print("[ImageEdit] Clip failed - Could not create CGImage or crop")
             errorMessage = "Failed to clip image"
             return
         }
         
         // Create new NSImage and scale to exact clip size
         let clippedImage = NSImage(cgImage: croppedCGImage, size: NSSize(width: clipSize, height: clipSize))
+        print("[ImageEdit] Clipped image created - Size: \(clippedImage.size.width)x\(clippedImage.size.height)")
         
         // Update the image and reset transform
+        // After clipping, treat the new image as a fresh start (isClipped = false)
+        // so it can be zoomed and clipped again if needed
         currentImage = clippedImage
         imageScale = 1.0
         imageOffset = .zero
         baseOffset = .zero
-        isClipped = true
+        isClipped = false
+        print("[ImageEdit] Clip complete - Reset transform to Scale: 1.0, Offset: (0, 0), Fresh start (isClipped: false)")
     }
     
     /// Update image offset from drag gesture.
     ///
     /// - Parameter translation: The drag translation
     func updateImageOffset(translation: CGSize) {
+        let oldOffset = imageOffset
         imageOffset = CGSize(
             width: baseOffset.width + translation.width,
             height: baseOffset.height + translation.height
         )
+        // Only log periodically to avoid spam during dragging
+        if abs(imageOffset.width - oldOffset.width) > 10 || abs(imageOffset.height - oldOffset.height) > 10 {
+            print("[ImageEdit] Pan update - Offset: (\(String(format: "%.1f", imageOffset.width)), \(String(format: "%.1f", imageOffset.height))), Translation: (\(String(format: "%.1f", translation.width)), \(String(format: "%.1f", translation.height)))")
+        }
     }
     
     /// End drag gesture and save final position.
     func endDrag() {
+        print("[ImageEdit] Drag ended - Final offset: (\(String(format: "%.1f", imageOffset.width)), \(String(format: "%.1f", imageOffset.height)))")
         baseOffset = imageOffset
     }
     
