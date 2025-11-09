@@ -23,8 +23,12 @@ class VocabularyCard: SKNode {
     private var statusLabel: SKLabelNode!
     private var startButton: SKNode!
     private var stopButton: SKNode!
+    private var showPromptButton: SKNode!
+    private var promptLabel: SKLabelNode!
+    private var isPromptVisible: Bool = false
     private var isListening: Bool = false
     private var isManuallyStopping: Bool = false
+    private var starLabel: SKLabelNode?
     
     private var speechRecognizer: SFSpeechRecognizer?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -93,6 +97,20 @@ class VocabularyCard: SKNode {
         stopButton.name = "stopButton"
         stopButton.isHidden = true
         cardFront.addChild(stopButton)
+        
+        showPromptButton = createButton(text: "Show Prompt", color: SKColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1.0))
+        showPromptButton.position = CGPoint(x: 0, y: -115)
+        showPromptButton.name = "showPromptButton"
+        cardFront.addChild(showPromptButton)
+        
+        promptLabel = SKLabelNode(fontNamed: "Arial")
+        promptLabel.fontSize = 11
+        promptLabel.fontColor = .darkGray
+        promptLabel.position = CGPoint(x: 0, y: -145)
+        promptLabel.horizontalAlignmentMode = .center
+        promptLabel.verticalAlignmentMode = .top
+        promptLabel.isHidden = true
+        cardFront.addChild(promptLabel)
     }
     
     private func createButton(text: String, color: SKColor) -> SKNode {
@@ -310,8 +328,31 @@ class VocabularyCard: SKNode {
         } else if stopButton.contains(localLocation) && !stopButton.isHidden {
             stopListening()
             return true
+        } else if showPromptButton.contains(localLocation) && !showPromptButton.isHidden {
+            togglePrompt()
+            return true
         }
         return false
+    }
+    
+    private func togglePrompt() {
+        isPromptVisible.toggle()
+        promptLabel.isHidden = !isPromptVisible
+        
+        if isPromptVisible {
+            let promptText = "\(vocabularyWord.chineseTranslation)\n\(vocabularyWord.exampleSentence)"
+            promptLabel.text = promptText
+            updateButtonText(showPromptButton, text: "Hide Prompt")
+        } else {
+            promptLabel.text = ""
+            updateButtonText(showPromptButton, text: "Show Prompt")
+        }
+    }
+    
+    private func updateButtonText(_ button: SKNode, text: String) {
+        if let label = button.children.first(where: { $0 is SKLabelNode }) as? SKLabelNode {
+            label.text = text
+        }
     }
     
     func markAsAnswered(correct: Bool) {
@@ -319,13 +360,48 @@ class VocabularyCard: SKNode {
         
         if correct {
             cardFront.fillColor = SKColor(red: 0.4, green: 0.8, blue: 0.4, alpha: 1.0)
+            playSuccessAnimation()
         } else {
             cardFront.fillColor = SKColor(red: 0.8, green: 0.4, blue: 0.4, alpha: 1.0)
         }
         
         startButton.isHidden = true
         stopButton.isHidden = true
+        showPromptButton.isHidden = true
+        promptLabel.isHidden = true
         performStopListening()
+    }
+    
+    private func playSuccessAnimation() {
+        guard self.scene != nil else { return }
+        
+        // Add confetti/sparkle effect
+        let confetti = ConfettiEmitter.createSparkle(at: CGPoint(x: 0, y: 0))
+        addChild(confetti)
+        
+        // Add star above card
+        let star = SKLabelNode(fontNamed: "Arial")
+        star.text = "⭐"
+        star.fontSize = 40
+        star.position = CGPoint(x: 0, y: cardFront.frame.height / 2 + 30)
+        star.alpha = 0
+        star.setScale(0.5)
+        addChild(star)
+        starLabel = star
+        
+        // Animate star appearance
+        let scaleUp = SKAction.scale(to: 1.2, duration: 0.3)
+        let scaleDown = SKAction.scale(to: 1.0, duration: 0.1)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.2)
+        let bounce = SKAction.sequence([scaleUp, scaleDown])
+        
+        star.run(SKAction.group([bounce, fadeIn]))
+        
+        // Pulse animation for card
+        let pulseUp = SKAction.scale(to: 1.1, duration: 0.15)
+        let pulseDown = SKAction.scale(to: 1.0, duration: 0.15)
+        let pulse = SKAction.sequence([pulseUp, pulseDown])
+        run(pulse)
     }
     
     deinit {
