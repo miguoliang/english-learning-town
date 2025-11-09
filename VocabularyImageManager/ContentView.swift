@@ -9,8 +9,11 @@ import SwiftUI
 import AppKit
 internal import UniformTypeIdentifiers
 
+private let clipRectangleSize: CGFloat = 256
+
 struct ContentView: View {
     @StateObject private var viewModel = WordListViewModel()
+    @State private var imageViewSize: CGSize = .zero
     
     var body: some View {
         GeometryReader { geometry in
@@ -110,31 +113,104 @@ struct ContentView: View {
                     
                     // Image preview area - uses remaining height
                     VStack(spacing: 16) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(NSColor.controlBackgroundColor))
+                        // Zoom controls
+                        HStack {
+                            Button(action: { viewModel.zoomOut() }) {
+                                Image(systemName: "minus")
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.imageScale <= 0.1)
                             
-                            if let image = viewModel.currentImage {
-                                Image(nsImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .cornerRadius(8)
-                                    .padding(10)
-                            } else {
-                                VStack(spacing: 20) {
-                                    Image(systemName: "photo")
-                                        .font(.system(size: 64))
-                                        .foregroundColor(.secondary)
-                                    
-                                    Button(action: pasteImage) {
-                                        Label("Paste from Clipboard", systemImage: "doc.on.clipboard")
+                            Text("Zoom: \(Int(viewModel.imageScale * 100))%")
+                                .font(.caption)
+                                .frame(minWidth: 80)
+                            
+                            Button(action: { viewModel.zoomIn() }) {
+                                Image(systemName: "plus")
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.imageScale >= 5.0)
+                            
+                            Spacer()
+                            
+                            Button(action: pasteImage) {
+                                Label("Paste", systemImage: "doc.on.clipboard")
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Button(action: { 
+                                viewModel.clipImage(viewSize: imageViewSize)
+                            }) {
+                                Label("Clip", systemImage: "scissors")
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.currentImage == nil)
+                            
+                            Button(action: { viewModel.resetImageTransform() }) {
+                                Text("Reset")
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(viewModel.currentImage == nil)
+                        }
+                        .padding(.horizontal)
+                        
+                        // Image clipping area
+                        GeometryReader { geometry in
+                            ZStack {
+                                // Background
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(NSColor.controlBackgroundColor))
+                                
+                                if let image = viewModel.currentImage {
+                                    // Image with zoom and pan
+                                    Image(nsImage: image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .scaleEffect(viewModel.imageScale)
+                                        .offset(viewModel.imageOffset)
+                                        .gesture(
+                                            DragGesture()
+                                                .onChanged { value in
+                                                    viewModel.updateImageOffset(translation: value.translation)
+                                                }
+                                                .onEnded { _ in
+                                                    viewModel.endDrag()
+                                                }
+                                        )
+                                } else {
+                                    VStack(spacing: 20) {
+                                        Image(systemName: "photo")
+                                            .font(.system(size: 64))
+                                            .foregroundColor(.secondary)
+                                        
+                                        Text("No image")
+                                            .foregroundColor(.secondary)
                                     }
-                                    .buttonStyle(.borderedProminent)
-                                    .controlSize(.large)
                                 }
+                                
+                                // 256x256 clip rectangle overlay - highlight the clip area
+                                Rectangle()
+                                    .fill(Color.blue.opacity(0.2))
+                                    .frame(width: clipRectangleSize, height: clipRectangleSize)
+                                    .overlay(
+                                        Rectangle()
+                                            .stroke(Color.blue, lineWidth: 2)
+                                            .frame(width: clipRectangleSize, height: clipRectangleSize)
+                                    )
+                                    .overlay(
+                                        Rectangle()
+                                            .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                                            .frame(width: clipRectangleSize, height: clipRectangleSize)
+                                    )
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .onAppear {
+                                imageViewSize = geometry.size
+                            }
+                            .onChange(of: geometry.size) { newSize in
+                                imageViewSize = newSize
                             }
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         
                         // Image status
                         if viewModel.hasImage(word) {

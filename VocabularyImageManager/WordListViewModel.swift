@@ -15,6 +15,9 @@ class WordListViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var selectedWord: VocabularyWord?
     @Published var currentImage: NSImage?
+    @Published var imageScale: CGFloat = 1.0
+    @Published var imageOffset: CGSize = .zero
+    private var baseOffset: CGSize = .zero
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var csvFileURL: URL?
@@ -115,6 +118,10 @@ class WordListViewModel: ObservableObject {
     func selectWord(_ word: VocabularyWord) {
         selectedWord = word
         currentImage = ImageManager.loadImage(for: word.englishWord, level: word.level)
+        // Reset zoom and offset when selecting a new word
+        imageScale = 1.0
+        imageOffset = .zero
+        baseOffset = .zero
     }
     
     /// Save an image for the selected word.
@@ -215,6 +222,10 @@ class WordListViewModel: ObservableObject {
             if let images = pasteboard.readObjects(forClasses: [NSImage.self], options: nil) as? [NSImage],
                let image = images.first {
                 print("Successfully read image using NSImage class")
+                // Reset zoom and offset when pasting new image
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
         }
@@ -224,6 +235,9 @@ class WordListViewModel: ObservableObject {
             if let pngData = pasteboard.data(forType: .png),
                let image = NSImage(data: pngData) {
                 print("Successfully read image from PNG data")
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
         }
@@ -233,6 +247,9 @@ class WordListViewModel: ObservableObject {
             if let tiffData = pasteboard.data(forType: .tiff),
                let image = NSImage(data: tiffData) {
                 print("Successfully read image from TIFF data")
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
         }
@@ -244,6 +261,9 @@ class WordListViewModel: ObservableObject {
                let firstPath = filePaths.first,
                let image = NSImage(contentsOfFile: firstPath) {
                 print("Successfully read image from file path (property list)")
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
             // Try as data/string
@@ -252,6 +272,9 @@ class WordListViewModel: ObservableObject {
                let fileURL = URL(string: fileURLString),
                let image = NSImage(contentsOf: fileURL) {
                 print("Successfully read image from file URL (data)")
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
         }
@@ -264,12 +287,123 @@ class WordListViewModel: ObservableObject {
                let fileURL = URL(string: urlString),
                let image = NSImage(contentsOf: fileURL) {
                 print("Successfully read image from public.file-url")
+                imageScale = 1.0
+                imageOffset = .zero
+                baseOffset = .zero
                 return image
             }
         }
         
         print("Failed to read image from clipboard")
         return nil
+    }
+    
+    /// Zoom in the image.
+    func zoomIn() {
+        imageScale = min(imageScale + 0.1, 5.0)
+    }
+    
+    /// Zoom out the image.
+    func zoomOut() {
+        imageScale = max(imageScale - 0.1, 0.1)
+    }
+    
+    /// Reset image transform (zoom and offset).
+    func resetImageTransform() {
+        imageScale = 1.0
+        imageOffset = .zero
+        baseOffset = .zero
+    }
+    
+    /// Clip the image to the 256x256 area defined by the clip rectangle.
+    ///
+    /// - Parameter viewSize: The size of the view containing the image
+    func clipImage(viewSize: CGSize? = nil) {
+        guard let originalImage = currentImage else { return }
+        
+        let clipSize: CGFloat = 256
+        let imageSize = originalImage.size
+        
+        // Use provided view size or estimate based on image
+        let viewWidth = viewSize?.width ?? max(imageSize.width, clipSize * 2)
+        let viewHeight = viewSize?.height ?? max(imageSize.height, clipSize * 2)
+        
+        // Calculate displayed image size with aspect ratio fit
+        let imageAspectRatio = imageSize.width / imageSize.height
+        let viewAspectRatio = viewWidth / viewHeight
+        
+        let displayedWidth: CGFloat
+        let displayedHeight: CGFloat
+        
+        if imageAspectRatio > viewAspectRatio {
+            // Image is wider - width is limiting
+            displayedWidth = viewWidth
+            displayedHeight = viewWidth / imageAspectRatio
+        } else {
+            // Image is taller - height is limiting
+            displayedHeight = viewHeight
+            displayedWidth = viewHeight * imageAspectRatio
+        }
+        
+        // Calculate scale factor from displayed to original
+        let scaleX = imageSize.width / displayedWidth
+        let scaleY = imageSize.height / displayedHeight
+        
+        // Clip rectangle is centered in view
+        let clipCenterX = viewWidth / 2
+        let clipCenterY = viewHeight / 2
+        
+        // Image center in view coordinates
+        let imageCenterX = viewWidth / 2 + imageOffset.width
+        let imageCenterY = viewHeight / 2 + imageOffset.height
+        
+        // Calculate clip area relative to image center
+        let clipOffsetX = (clipCenterX - imageCenterX) * imageScale
+        let clipOffsetY = (clipCenterY - imageCenterY) * imageScale
+        
+        // Convert to original image coordinates
+        let clipSizeInImageX = clipSize * imageScale * scaleX
+        let clipSizeInImageY = clipSize * imageScale * scaleY
+        
+        let sourceClipX = (imageSize.width / 2) + (clipOffsetX * scaleX) - (clipSizeInImageX / 2)
+        let sourceClipY = (imageSize.height / 2) - (clipOffsetY * scaleY) - (clipSizeInImageY / 2)
+        
+        // Clamp to image bounds
+        let clampedX = max(0, min(sourceClipX, imageSize.width - clipSizeInImageX))
+        let clampedY = max(0, min(sourceClipY, imageSize.height - clipSizeInImageY))
+        let clampedWidth = min(clipSizeInImageX, imageSize.width - clampedX)
+        let clampedHeight = min(clipSizeInImageY, imageSize.height - clampedY)
+        
+        // Create clipped image
+        guard let cgImage = originalImage.cgImage(forProposedRect: nil, context: nil, hints: nil),
+              let croppedCGImage = cgImage.cropping(to: CGRect(x: clampedX, y: clampedY, width: clampedWidth, height: clampedHeight)) else {
+            errorMessage = "Failed to clip image"
+            return
+        }
+        
+        // Create new NSImage and scale to exact clip size
+        let clippedImage = NSImage(cgImage: croppedCGImage, size: NSSize(width: clipSize, height: clipSize))
+        
+        // Update the image and reset transform
+        currentImage = clippedImage
+        imageScale = 1.0
+        imageOffset = .zero
+        baseOffset = .zero
+    }
+    
+    /// Update image offset from drag gesture.
+    ///
+    /// - Parameter translation: The drag translation
+    func updateImageOffset(translation: CGSize) {
+        imageOffset = CGSize(
+            width: baseOffset.width + translation.width,
+            height: baseOffset.height + translation.height
+        )
+    }
+    
+    /// End drag gesture and save final position.
+    func endDrag() {
+        baseOffset = imageOffset
     }
     
     /// Check if a word has an image.
