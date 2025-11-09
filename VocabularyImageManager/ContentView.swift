@@ -15,6 +15,25 @@ struct ContentView: View {
     @StateObject private var viewModel = WordListViewModel()
     @State private var imageViewSize: CGSize = .zero
     
+    /// Calculate the natural display size of the image maintaining aspect ratio.
+    ///
+    /// - Parameters:
+    ///   - imageSize: The original image size
+    ///   - containerSize: The container size
+    /// - Returns: The display size that fits the container while maintaining aspect ratio
+    private func calculateDisplaySize(imageSize: CGSize, containerSize: CGSize) -> CGSize {
+        let imageAspectRatio = imageSize.width / imageSize.height
+        let containerAspectRatio = containerSize.width / containerSize.height
+        
+        if imageAspectRatio > containerAspectRatio {
+            // Image is wider - width is limiting
+            return CGSize(width: containerSize.width, height: containerSize.width / imageAspectRatio)
+        } else {
+            // Image is taller - height is limiting
+            return CGSize(width: containerSize.height * imageAspectRatio, height: containerSize.height)
+        }
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             HSplitView {
@@ -162,11 +181,26 @@ struct ContentView: View {
                                     .fill(Color(NSColor.controlBackgroundColor))
                                 
                                 if let image = viewModel.currentImage {
+                                    // Calculate scaled dimensions
+                                    let imageSize = image.size
+                                    let (scaledWidth, scaledHeight): (CGFloat, CGFloat) = {
+                                        if viewModel.isClipped {
+                                            // Clipped images should not exceed clip rectangle size
+                                            let maxSize = min(clipRectangleSize, min(geometry.size.width, geometry.size.height))
+                                            let scale = min(maxSize / clipRectangleSize, 1.0) * viewModel.imageScale
+                                            return (clipRectangleSize * scale, clipRectangleSize * scale)
+                                        } else {
+                                            // Calculate natural display size maintaining aspect ratio
+                                            let displaySize = calculateDisplaySize(imageSize: imageSize, containerSize: geometry.size)
+                                            return (displaySize.width * viewModel.imageScale, displaySize.height * viewModel.imageScale)
+                                        }
+                                    }()
+                                    
                                     // Image with zoom and pan
                                     Image(nsImage: image)
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .scaleEffect(viewModel.imageScale)
+                                        .frame(width: scaledWidth, height: scaledHeight)
                                         .offset(viewModel.imageOffset)
                                         .gesture(
                                             DragGesture()

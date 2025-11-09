@@ -17,6 +17,7 @@ class WordListViewModel: ObservableObject {
     @Published var currentImage: NSImage?
     @Published var imageScale: CGFloat = 1.0
     @Published var imageOffset: CGSize = .zero
+    @Published var isClipped: Bool = false
     private var baseOffset: CGSize = .zero
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
@@ -122,6 +123,7 @@ class WordListViewModel: ObservableObject {
         imageScale = 1.0
         imageOffset = .zero
         baseOffset = .zero
+        isClipped = false
     }
     
     /// Save an image for the selected word.
@@ -226,6 +228,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
         }
@@ -238,6 +241,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
         }
@@ -250,6 +254,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
         }
@@ -264,6 +269,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
             // Try as data/string
@@ -275,6 +281,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
         }
@@ -290,6 +297,7 @@ class WordListViewModel: ObservableObject {
                 imageScale = 1.0
                 imageOffset = .zero
                 baseOffset = .zero
+                isClipped = false
                 return image
             }
         }
@@ -389,6 +397,7 @@ class WordListViewModel: ObservableObject {
         imageScale = 1.0
         imageOffset = .zero
         baseOffset = .zero
+        isClipped = true
     }
     
     /// Update image offset from drag gesture.
