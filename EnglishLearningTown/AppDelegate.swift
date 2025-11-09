@@ -18,6 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window.restorationClass = nil
             window.isRestorable = false
             window.delegate = self
+            
+            // Enter full screen mode
+            window.toggleFullScreen(nil)
         }
     }
     
@@ -29,5 +32,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // Terminate the app when the window is closed
         NSApplication.shared.terminate(nil)
         return true
+    }
+    
+    func windowWillEnterFullScreen(_ notification: Notification) {
+        // Window is entering full screen
+    }
+    
+    func windowWillExitFullScreen(_ notification: Notification) {
+        // Prevent exiting full screen - re-enter full screen immediately
+        if let window = notification.object as? NSWindow {
+            DispatchQueue.main.async {
+                window.toggleFullScreen(nil)
+            }
+        }
     }
 }
