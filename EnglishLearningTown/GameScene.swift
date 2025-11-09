@@ -8,105 +8,276 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
-    var entities = [GKEntity]()
-    var graphs = [String : GKGraph]()
+    var selectedLevel: String = "A1"
+    var vocabularyWords: [VocabularyWord] = []
     
-    private var lastUpdateTime : TimeInterval = 0
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
+    // Game nodes
+    private var player: SKSpriteNode!
+    private var ground: SKShapeNode!
+    private var vocabularyBoxes: [VocabularyBox] = []
+    private var currentDialog: VocabularyDialog?
     
-    override func sceneDidLoad() {
+    // Score tracking
+    private var scoreLabel: SKLabelNode!
+    private var correctAnswers: Int = 0
+    private var totalQuestions: Int = 0
+    
+    // Movement
+    private var isMovingLeft = false
+    private var isMovingRight = false
+    private let playerSpeed: CGFloat = 200
+    
+    // Physics
+    private let playerCategory: UInt32 = PhysicsCategory.player
+    private let groundCategory: UInt32 = PhysicsCategory.ground
+    private let boxCategory: UInt32 = PhysicsCategory.vocabularyBox
+    
+    override func didMove(to view: SKView) {
+        setupScene()
+        loadVocabularyData()
+        setupPhysics()
+        createGround()
+        createPlayer()
+        createScoreLabel()
+        placeVocabularyBoxes()
+    }
+    
+    private func setupScene() {
+        backgroundColor = SKColor(red: 0.5, green: 0.7, blue: 0.9, alpha: 1.0)
+    }
+    
+    private func loadVocabularyData() {
+        let fileName = "cefr-\(selectedLevel.lowercased())"
+        vocabularyWords = CSVParser.parseCSV(fileName: fileName)
+        print("Loaded \(vocabularyWords.count) words for level \(selectedLevel)")
+    }
+    
+    private func setupPhysics() {
+        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+        physicsWorld.contactDelegate = self
+    }
+    
+    private func createGround() {
+        let groundHeight: CGFloat = 100
+        ground = SKShapeNode(rectOf: CGSize(width: size.width, height: groundHeight))
+        ground.fillColor = SKColor(red: 0.4, green: 0.6, blue: 0.3, alpha: 1.0)
+        ground.strokeColor = .darkGray
+        ground.lineWidth = 2
+        ground.position = CGPoint(x: size.width / 2, y: groundHeight / 2)
         
-        self.lastUpdateTime = 0
+        ground.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width, height: groundHeight))
+        ground.physicsBody?.isDynamic = false
+        ground.physicsBody?.categoryBitMask = groundCategory
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
+        addChild(ground)
+    }
+    
+    private func createPlayer() {
+        // Create simple player sprite
+        player = SKSpriteNode(color: .blue, size: CGSize(width: 40, height: 60))
+        player.position = CGPoint(x: 100, y: 150)
+        
+        // Physics body
+        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
+        player.physicsBody?.categoryBitMask = playerCategory
+        player.physicsBody?.contactTestBitMask = boxCategory
+        player.physicsBody?.collisionBitMask = groundCategory
+        player.physicsBody?.restitution = 0.0
+        player.physicsBody?.friction = 0.5
+        
+        addChild(player)
+    }
+    
+    private func createScoreLabel() {
+        scoreLabel = SKLabelNode(fontNamed: "Arial-BoldMT")
+        scoreLabel.text = "Score: 0/0"
+        scoreLabel.fontSize = 24
+        scoreLabel.fontColor = .white
+        scoreLabel.position = CGPoint(x: 100, y: size.height - 50)
+        scoreLabel.horizontalAlignmentMode = .left
+        addChild(scoreLabel)
+    }
+    
+    private func placeVocabularyBoxes() {
+        // Filter words to only those with emoji mappings
+        let wordsWithEmoji = vocabularyWords.filter { EmojiMapper.hasEmoji(for: $0.englishWord) }
+        
+        guard !wordsWithEmoji.isEmpty else {
+            print("No words with emoji mappings found!")
+            return
         }
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        // Place boxes on the ground, spaced apart
+        let boxWidth: CGFloat = 80
+        let boxHeight: CGFloat = 60
+        let spacing: CGFloat = 150
+        let startX: CGFloat = 200
+        let yPosition: CGFloat = 130 // On top of ground
         
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
+        // Use first 10 words with emojis for MVP
+        let wordsToUse = Array(wordsWithEmoji.prefix(10))
+        totalQuestions = wordsToUse.count
+        
+        for (index, word) in wordsToUse.enumerated() {
+            let box = VocabularyBox(vocabularyWord: word, size: CGSize(width: boxWidth, height: boxHeight))
+            box.position = CGPoint(x: startX + CGFloat(index) * spacing, y: yPosition)
+            vocabularyBoxes.append(box)
+            addChild(box)
         }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func mouseDown(with event: NSEvent) {
-        self.touchDown(atPoint: event.location(in: self))
-    }
-    
-    override func mouseDragged(with event: NSEvent) {
-        self.touchMoved(toPoint: event.location(in: self))
-    }
-    
-    override func mouseUp(with event: NSEvent) {
-        self.touchUp(atPoint: event.location(in: self))
     }
     
     override func keyDown(with event: NSEvent) {
+        guard currentDialog == nil else { return }
+        
         switch event.keyCode {
-        case 0x31:
-            if let label = self.label {
-                label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-            }
+        case 0x00: // A key
+            isMovingLeft = true
+        case 0x02: // D key
+            isMovingRight = true
+        case 0x7B: // Left arrow
+            isMovingLeft = true
+        case 0x7C: // Right arrow
+            isMovingRight = true
+        case 0x0D: // W key
+            jump()
+        case 0x31: // Space bar
+            jump()
+        case 0x35: // ESC key - return to level selection
+            returnToLevelSelection()
         default:
-            print("keyDown: \(event.characters!) keyCode: \(event.keyCode)")
+            break
         }
     }
     
+    override func keyUp(with event: NSEvent) {
+        switch event.keyCode {
+        case 0x00: // A key
+            isMovingLeft = false
+        case 0x02: // D key
+            isMovingRight = false
+        case 0x7B: // Left arrow
+            isMovingLeft = false
+        case 0x7C: // Right arrow
+            isMovingRight = false
+        default:
+            break
+        }
+    }
+    
+    private func jump() {
+        guard currentDialog == nil else { return }
+        if let physicsBody = player.physicsBody, physicsBody.velocity.dy == 0 {
+            physicsBody.applyImpulse(CGVector(dx: 0, dy: 300))
+        }
+    }
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-        
-        // Initialize _lastUpdateTime if it has not already been
-        if (self.lastUpdateTime == 0) {
-            self.lastUpdateTime = currentTime
+        // Handle player movement
+        if let physicsBody = player.physicsBody, currentDialog == nil {
+            if isMovingLeft {
+                physicsBody.velocity.dx = -playerSpeed
+            } else if isMovingRight {
+                physicsBody.velocity.dx = playerSpeed
+            } else {
+                physicsBody.velocity.dx *= 0.9 // Friction
+            }
         }
         
-        // Calculate time since last update
-        let dt = currentTime - self.lastUpdateTime
+        // Keep player in bounds
+        if player.position.x < 0 {
+            player.position.x = 0
+            player.physicsBody?.velocity.dx = 0
+        } else if player.position.x > size.width {
+            player.position.x = size.width
+            player.physicsBody?.velocity.dx = 0
+        }
+    }
+    
+    // MARK: - Physics Contact Delegate
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        guard currentDialog == nil else { return }
         
-        // Update entities
-        for entity in self.entities {
-            entity.update(deltaTime: dt)
+        var boxNode: VocabularyBox?
+        
+        if contact.bodyA.categoryBitMask == boxCategory {
+            boxNode = contact.bodyA.node as? VocabularyBox
+        } else if contact.bodyB.categoryBitMask == boxCategory {
+            boxNode = contact.bodyB.node as? VocabularyBox
         }
         
-        self.lastUpdateTime = currentTime
+        if let box = boxNode, !box.isCollected {
+            showDialog(for: box)
+        }
+    }
+    
+    private func showDialog(for box: VocabularyBox) {
+        // Stop player movement
+        player.physicsBody?.velocity.dx = 0
+        isMovingLeft = false
+        isMovingRight = false
+        
+        // Create dialog
+        let dialog = VocabularyDialog(vocabularyWord: box.vocabularyWord, allWords: vocabularyWords)
+        dialog.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        
+        dialog.onAnswerSelected = { [weak self] isCorrect in
+            self?.handleAnswer(isCorrect: isCorrect, box: box)
+        }
+        
+        currentDialog = dialog
+        addChild(dialog)
+    }
+    
+    private func handleAnswer(isCorrect: Bool, box: VocabularyBox) {
+        if isCorrect {
+            correctAnswers += 1
+            // Remove box after a delay
+            run(SKAction.sequence([
+                SKAction.wait(forDuration: 0.5),
+                SKAction.run {
+                    box.removeFromParent()
+                    box.isCollected = true
+                }
+            ]))
+        }
+        
+        // Update score
+        updateScore()
+        
+        // Clean up and remove dialog after feedback
+        run(SKAction.sequence([
+            SKAction.wait(forDuration: 1.5),
+            SKAction.run { [weak self] in
+                self?.currentDialog?.cleanup()
+                self?.currentDialog?.removeFromParent()
+                self?.currentDialog = nil
+            }
+        ]))
+    }
+    
+    private func updateScore() {
+        scoreLabel.text = "Score: \(correctAnswers)/\(totalQuestions)"
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        let location = event.location(in: self)
+        
+        if let dialog = currentDialog {
+            if dialog.handleClick(at: location) {
+                // Dialog handled the click (cancel button)
+                return
+            }
+        }
+    }
+    
+    private func returnToLevelSelection() {
+        let levelSelectionScene = LevelSelectionScene(size: size)
+        levelSelectionScene.scaleMode = .aspectFill
+        
+        let transition = SKTransition.fade(withDuration: 0.5)
+        view?.presentScene(levelSelectionScene, transition: transition)
     }
 }
