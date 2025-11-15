@@ -238,7 +238,7 @@ class WordListViewModel: ObservableObject {
         
         // Check available types for debugging
         let availableTypes = pasteboard.types
-        print("[ImageEdit] Available clipboard types: \(availableTypes)")
+        print("[ImageEdit] Available clipboard types: \(String(describing: availableTypes))")
         
         // Method 1: Try reading as NSImage directly (most common)
         if pasteboard.canReadObject(forClasses: [NSImage.self], options: nil) {
