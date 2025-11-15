@@ -79,11 +79,12 @@ class VocabularyCard: SKNode {
         } else {
             // Fall back to emoji if no image available
             let emoji = EmojiMapper.emoji(for: vocabularyWord.englishWord) ?? "❓"
-            emojiLabel = SKLabelNode(fontNamed: "Arial")
-            emojiLabel.text = emoji
-            emojiLabel.fontSize = 50
-            emojiLabel.position = CGPoint(x: 0, y: 10)
-            cardFront.addChild(emojiLabel)
+            let label = SKLabelNode(fontNamed: "Arial")
+            label.text = emoji
+            label.fontSize = 50
+            label.position = CGPoint(x: 0, y: 10)
+            emojiLabel = label
+            cardFront.addChild(label)
         }
         
         questionLabel = SKLabelNode(fontNamed: "Arial")

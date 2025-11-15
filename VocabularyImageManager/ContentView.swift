@@ -212,7 +212,7 @@ struct ContentView: View {
                             .onAppear {
                                 imageViewSize = geometry.size
                             }
-                            .onChange(of: geometry.size) { newSize in
+                            .onChange(of: geometry.size) { oldValue, newSize in
                                 imageViewSize = newSize
                             }
                         }

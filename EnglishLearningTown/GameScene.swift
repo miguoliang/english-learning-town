@@ -20,10 +20,22 @@ class GameScene: SKScene {
     private var correctAnswers: Int = 0
     private var totalQuestions: Int = 3
     
+    // Combo system
+    private var currentCombo: Int = 0
+    private var comboLabel: SKLabelNode?
+    
+    // Progress tracking
+    private var progressBar: SKShapeNode!
+    private var progressBarBackground: SKShapeNode!
+    
     override func didMove(to view: SKView) {
         setupScene()
         loadVocabularyData()
+        // Set question count based on level
+        totalQuestions = getQuestionCount(for: selectedLevel)
         createScoreLabel()
+        createComboLabel()
+        createProgressBar()
         createInstructionLabel()
         placeVocabularyCards()
     }
@@ -38,6 +50,28 @@ class GameScene: SKScene {
         print("Loaded \(vocabularyWords.count) words for level \(selectedLevel)")
     }
     
+    /**
+     * Get the question count based on the selected level.
+     * Higher levels have more questions for increased challenge.
+     *
+     * - Parameter level: The CEFR level (A1, A2, B1, B2)
+     * - Returns: Number of questions for this level
+     */
+    private func getQuestionCount(for level: String) -> Int {
+        switch level {
+        case "A1":
+            return 5
+        case "A2":
+            return 7
+        case "B1":
+            return 10
+        case "B2":
+            return 12
+        default:
+            return 5
+        }
+    }
+    
     private func createScoreLabel() {
         scoreLabel = SKLabelNode(fontNamed: "Arial-BoldMT")
         scoreLabel.text = "Score: 0/\(totalQuestions)"
@@ -49,18 +83,66 @@ class GameScene: SKScene {
         addChild(scoreLabel)
     }
     
+    /**
+     * Create combo label to display current combo streak.
+     * Initially hidden, shown when combo > 0.
+     */
+    private func createComboLabel() {
+        let label = SKLabelNode(fontNamed: "Arial-BoldMT")
+        label.text = ""
+        label.fontSize = 32
+        label.fontColor = .yellow
+        label.position = CGPoint(x: size.width / 2, y: size.height - 100)
+        label.horizontalAlignmentMode = .center
+        label.verticalAlignmentMode = .top
+        label.isHidden = true
+        comboLabel = label
+        addChild(label)
+    }
+    
+    /**
+     * Create progress bar to show completion progress (X/Y cards completed).
+     */
+    private func createProgressBar() {
+        let barWidth: CGFloat = size.width * 0.6
+        let barHeight: CGFloat = 20
+        let barY: CGFloat = size.height - 130
+        let leftEdge = size.width / 2 - barWidth / 2
+        
+        // Background bar
+        progressBarBackground = SKShapeNode(rectOf: CGSize(width: barWidth, height: barHeight), cornerRadius: 10)
+        progressBarBackground.fillColor = SKColor(white: 0.3, alpha: 0.5)
+        progressBarBackground.strokeColor = SKColor(white: 0.5, alpha: 0.8)
+        progressBarBackground.lineWidth = 2
+        progressBarBackground.position = CGPoint(x: size.width / 2, y: barY)
+        addChild(progressBarBackground)
+        
+        // Progress bar (starts at 0 width)
+        progressBar = SKShapeNode(rectOf: CGSize(width: 0, height: barHeight - 4), cornerRadius: 8)
+        progressBar.fillColor = SKColor(red: 0.2, green: 0.8, blue: 0.2, alpha: 1.0)
+        progressBar.strokeColor = .clear
+        // Position at left edge of background bar
+        progressBar.position = CGPoint(x: leftEdge, y: barY)
+        addChild(progressBar)
+    }
+    
     private func createInstructionLabel() {
         let instructionLabel = SKLabelNode(fontNamed: "Arial")
         instructionLabel.text = "Click a card to flip it, then click 'Start Listening'"
         instructionLabel.fontSize = 16
         instructionLabel.fontColor = .lightGray
-        instructionLabel.position = CGPoint(x: size.width / 2, y: size.height - 75)
+        instructionLabel.position = CGPoint(x: size.width / 2, y: size.height - 160)
         instructionLabel.horizontalAlignmentMode = .center
         instructionLabel.verticalAlignmentMode = .top
         instructionLabel.name = "instructionLabel"
         addChild(instructionLabel)
     }
     
+    /**
+     * Place vocabulary cards on the screen.
+     * Dynamically adjusts layout based on number of cards.
+     * Uses word pool system to avoid repetition.
+     */
     private func placeVocabularyCards() {
         let wordsWithEmoji = vocabularyWords.filter { EmojiMapper.hasEmoji(for: $0.englishWord) }
         
@@ -69,18 +151,38 @@ class GameScene: SKScene {
             return
         }
         
+        // Shuffle and select words - ensure we have enough words
         let shuffledWords = wordsWithEmoji.shuffled()
-        let wordsToUse = Array(shuffledWords.prefix(3))
+        let wordsToUse = Array(shuffledWords.prefix(totalQuestions))
         
+        if wordsToUse.count != totalQuestions {
+            print("Warning: Not enough words with emoji. Need \(totalQuestions), got \(wordsToUse.count)")
+            // Fallback: use what we have
+        }
+        
+        // Calculate card layout based on number of cards
         let cardWidth: CGFloat = 150
         let cardHeight: CGFloat = 200
         let spacing: CGFloat = 180
-        let startX = (size.width - (CGFloat(wordsToUse.count - 1) * spacing)) / 2
-        let yPosition: CGFloat = size.height / 2
+        let maxCardsPerRow = min(totalQuestions, 5) // Max 5 cards per row
+        let cardsPerRow = min(wordsToUse.count, maxCardsPerRow)
+        let numberOfRows = (wordsToUse.count + maxCardsPerRow - 1) / maxCardsPerRow
+        
+        // Calculate starting positions
+        let totalWidth = CGFloat(cardsPerRow - 1) * spacing
+        let startX = (size.width - totalWidth) / 2
+        let rowSpacing: CGFloat = 220
+        let startY = size.height / 2 + CGFloat(numberOfRows - 1) * rowSpacing / 2
         
         for (index, word) in wordsToUse.enumerated() {
+            let row = index / maxCardsPerRow
+            let col = index % maxCardsPerRow
+            
             let card = VocabularyCard(vocabularyWord: word, size: CGSize(width: cardWidth, height: cardHeight))
-            card.position = CGPoint(x: startX + CGFloat(index) * spacing, y: yPosition)
+            card.position = CGPoint(
+                x: startX + CGFloat(col) * spacing,
+                y: startY - CGFloat(row) * rowSpacing
+            )
             card.name = "card_\(index)"
             
             card.onAnswerSelected = { [weak self] isCorrect in
@@ -128,15 +230,102 @@ class GameScene: SKScene {
         }
     }
     
+    /**
+     * Handle card answer result.
+     * Updates score, combo system, and visual feedback.
+     *
+     * - Parameters:
+     *   - isCorrect: Whether the answer was correct
+     *   - card: The vocabulary card that was answered
+     */
     private func handleCardAnswer(isCorrect: Bool, card: VocabularyCard) {
         if isCorrect {
             correctAnswers += 1
+            currentCombo += 1
+            
             // Add confetti effect for correct answer
             let confetti = ConfettiEmitter.createConfetti(at: card.position)
             addChild(confetti)
+            
+            // Show combo feedback if combo > 1
+            if currentCombo > 1 {
+                showComboFeedback(combo: currentCombo, at: card.position)
+            }
+        } else {
+            // Reset combo on incorrect answer
+            if currentCombo > 0 {
+                currentCombo = 0
+                hideComboLabel()
+            }
         }
+        
         updateScore()
+        updateProgressBar()
         checkGameCompletion()
+    }
+    
+    /**
+     * Show combo feedback with visual effects.
+     *
+     * - Parameters:
+     *   - combo: Current combo count
+     *   - at: Position to show the combo text
+     */
+    private func showComboFeedback(combo: Int, at position: CGPoint) {
+        // Update combo label
+        if let comboLabel = comboLabel {
+            let multiplier = min(1 + (combo / 3), 5) // Max 5x multiplier
+            comboLabel.text = "🔥 COMBO x\(multiplier)!"
+            comboLabel.isHidden = false
+            
+            // Animate combo label
+            comboLabel.removeAllActions()
+            comboLabel.setScale(1.0)
+            comboLabel.alpha = 1.0
+            
+            let scaleUp = SKAction.scale(to: 1.3, duration: 0.2)
+            let scaleDown = SKAction.scale(to: 1.0, duration: 0.2)
+            let pulse = SKAction.sequence([scaleUp, scaleDown])
+            comboLabel.run(pulse)
+        }
+        
+        // Create combo text at card position
+        let comboText = SKLabelNode(fontNamed: "Arial-BoldMT")
+        comboText.text = "x\(combo) COMBO!"
+        comboText.fontSize = 36
+        comboText.fontColor = .yellow
+        comboText.position = CGPoint(x: position.x, y: position.y + 120)
+        comboText.horizontalAlignmentMode = .center
+        comboText.alpha = 0
+        
+        addChild(comboText)
+        
+        // Animate combo text
+        let fadeIn = SKAction.fadeIn(withDuration: 0.2)
+        let moveUp = SKAction.moveBy(x: 0, y: 30, duration: 0.5)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let remove = SKAction.removeFromParent()
+        let sequence = SKAction.sequence([fadeIn, SKAction.group([moveUp, fadeOut]), remove])
+        comboText.run(sequence)
+        
+        // Add sparkle effect for higher combos
+        if combo >= 3 {
+            let sparkle = ConfettiEmitter.createSparkle(at: position)
+            addChild(sparkle)
+        }
+    }
+    
+    /**
+     * Hide combo label when combo resets.
+     */
+    private func hideComboLabel() {
+        if let comboLabel = comboLabel {
+            let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+            comboLabel.run(fadeOut) {
+                comboLabel.isHidden = true
+                comboLabel.alpha = 1.0
+            }
+        }
     }
     
     private func checkGameCompletion() {
@@ -279,12 +468,60 @@ class GameScene: SKScene {
         return button
     }
     
+    /**
+     * Update score label display.
+     */
     private func updateScore() {
         scoreLabel.text = "Score: \(correctAnswers)/\(totalQuestions)"
     }
     
+    /**
+     * Update progress bar to reflect current completion.
+     */
+    private func updateProgressBar() {
+        guard let progressBar = progressBar, let progressBarBackground = progressBarBackground else { return }
+        
+        let answeredCount = vocabularyCards.filter { $0.isAnswered }.count
+        let progress = CGFloat(answeredCount) / CGFloat(totalQuestions)
+        let barWidth = progressBarBackground.frame.width * 0.96 // Leave small margin
+        let barHeight = progressBar.frame.height
+        let leftEdge = size.width / 2 - barWidth / 2
+        let barY = size.height - 130
+        
+        // Calculate new width
+        let newWidth = max(barWidth * progress, 2) // Minimum 2 pixels wide
+        
+        // Animate the update
+        let currentWidth = progressBar.frame.width
+        let duration = 0.3
+        
+        let animate = SKAction.customAction(withDuration: duration) { node, elapsedTime in
+            guard let shapeNode = node as? SKShapeNode else { return }
+            let t = min(CGFloat(elapsedTime / duration), 1.0)
+            let interpolatedWidth = currentWidth + (newWidth - currentWidth) * t
+            
+            let rect = CGRect(
+                x: leftEdge,
+                y: barY - barHeight / 2,
+                width: interpolatedWidth,
+                height: barHeight
+            )
+            shapeNode.path = CGPath(roundedRect: rect, cornerWidth: 8, cornerHeight: 8, transform: nil)
+        }
+        
+        progressBar.run(animate)
+    }
+    
+    /**
+     * Return to level selection screen.
+     * Cleans up all game resources.
+     */
     private func returnToLevelSelection() {
         vocabularyCards.forEach { $0.cleanup() }
+        
+        // Reset combo
+        currentCombo = 0
+        hideComboLabel()
         
         // Remove completion screen if present
         childNode(withName: "completionOverlay")?.removeFromParent()
