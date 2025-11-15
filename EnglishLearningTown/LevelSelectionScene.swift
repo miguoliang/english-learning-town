@@ -13,10 +13,10 @@ class LevelSelectionScene: SKScene {
     private var instructionLabel: SKLabelNode!
     
     // Available CEFR levels
-    private let levels = ["A1", "A2", "B1", "B2"]
+    private let levels = GameConstants.Config.levels
     
     override func didMove(to view: SKView) {
-        backgroundColor = SKColor(red: 0.2, green: 0.3, blue: 0.5, alpha: 1.0)
+        backgroundColor = GameConstants.Colors.levelSelectionBackground
         
         setupUI()
         createLevelButtons()
@@ -24,34 +24,53 @@ class LevelSelectionScene: SKScene {
     
     private func setupUI() {
         // Title
-        titleLabel = SKLabelNode(fontNamed: "Arial-BoldMT")
-        titleLabel.text = "Select Your Level"
-        titleLabel.fontSize = 56
-        titleLabel.fontColor = .white
+        titleLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontNameBold)
+        titleLabel.text = GameConstants.Strings.selectLevel
+        titleLabel.fontSize = GameConstants.Typography.FontSize.levelSelectionTitle
+        titleLabel.fontColor = GameConstants.Colors.white
         titleLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.8)
         addChild(titleLabel)
         
         // Instruction label
-        instructionLabel = SKLabelNode(fontNamed: "Arial")
-        instructionLabel.text = "Choose a CEFR level to begin learning"
-        instructionLabel.fontSize = 24
-        instructionLabel.fontColor = .lightGray
+        instructionLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontName)
+        instructionLabel.text = GameConstants.Strings.chooseLevel
+        instructionLabel.fontSize = GameConstants.Typography.FontSize.levelSelectionInstruction
+        instructionLabel.fontColor = GameConstants.Colors.lightGray
         instructionLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.7)
         addChild(instructionLabel)
     }
     
     private func createLevelButtons() {
-        let buttonWidth: CGFloat = 200
-        let buttonHeight: CGFloat = 80
-        let spacing: CGFloat = 30
-        let totalHeight = CGFloat(levels.count) * buttonHeight + CGFloat(levels.count - 1) * spacing
-        let startY = size.height * 0.5 + totalHeight / 2 - buttonHeight / 2
+        // Calculate button size based on screen dimensions
+        let buttonWidth = min(GameConstants.Layout.Button.LevelSelection.maxWidth, max(GameConstants.Layout.Button.LevelSelection.minWidth, size.width * GameConstants.Layout.Button.LevelSelection.widthRatio))
+        let buttonHeight = min(GameConstants.Layout.Button.LevelSelection.maxHeight, max(GameConstants.Layout.Button.LevelSelection.minHeight, size.height * GameConstants.Layout.Button.LevelSelection.heightRatio))
+        
+        // Grid layout: 2 columns, 2 rows
+        let columnsPerRow = 2
+        let horizontalSpacing = buttonWidth * GameConstants.Layout.Button.LevelSelection.spacingRatio
+        let verticalSpacing = buttonHeight * GameConstants.Layout.Button.LevelSelection.spacingRatio
+        
+        // Reserve space for title and instruction
+        let topSpace: CGFloat = size.height * GameConstants.Layout.LevelSelection.topSpaceRatio
+        let bottomMargin: CGFloat = size.height * GameConstants.Layout.LevelSelection.bottomMarginRatio
+        let availableHeight = size.height - topSpace - bottomMargin
+        
+        // Calculate grid dimensions
+        let gridWidth = CGFloat(columnsPerRow) * buttonWidth + CGFloat(columnsPerRow - 1) * horizontalSpacing
+        let gridHeight = CGFloat(2) * buttonHeight + CGFloat(1) * verticalSpacing
+        
+        // Center the grid horizontally and vertically
+        let startX = (size.width - gridWidth) / 2 + buttonWidth / 2
+        let startY = topSpace + (availableHeight - gridHeight) / 2 + buttonHeight / 2
         
         for (index, level) in levels.enumerated() {
+            let row = index / columnsPerRow
+            let col = index % columnsPerRow
+            
             let button = createLevelButton(level: level, width: buttonWidth, height: buttonHeight)
             button.position = CGPoint(
-                x: size.width / 2,
-                y: startY - CGFloat(index) * (buttonHeight + spacing)
+                x: startX + CGFloat(col) * (buttonWidth + horizontalSpacing),
+                y: startY - CGFloat(row) * (buttonHeight + verticalSpacing)
             )
             addChild(button)
         }
@@ -62,28 +81,28 @@ class LevelSelectionScene: SKScene {
         button.name = "levelButton_\(level)"
         
         // Background
-        let background = SKShapeNode(rectOf: CGSize(width: width, height: height), cornerRadius: 12)
+        let background = SKShapeNode(rectOf: CGSize(width: width, height: height), cornerRadius: GameConstants.Layout.Button.LevelSelection.cornerRadius)
         background.fillColor = getLevelColor(for: level)
-        background.strokeColor = .white
-        background.lineWidth = 3
+        background.strokeColor = GameConstants.Colors.white
+        background.lineWidth = GameConstants.Layout.Button.LevelSelection.strokeWidth
         button.addChild(background)
         
-        // Level label
-        let levelLabel = SKLabelNode(fontNamed: "Arial-BoldMT")
+        // Level label - scale font size based on button height
+        let levelLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontNameBold)
         levelLabel.text = level
-        levelLabel.fontSize = 36
-        levelLabel.fontColor = .white
+        levelLabel.fontSize = height * GameConstants.Typography.FontMultiplier.levelButton
+        levelLabel.fontColor = GameConstants.Colors.white
         levelLabel.verticalAlignmentMode = .center
-        levelLabel.position = CGPoint(x: 0, y: -8)
+        levelLabel.position = CGPoint(x: 0, y: height * 0.1)
         button.addChild(levelLabel)
         
-        // Description label
-        let descLabel = SKLabelNode(fontNamed: "Arial")
+        // Description label - scale font size based on button height
+        let descLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontName)
         descLabel.text = getLevelDescription(for: level)
-        descLabel.fontSize = 14
-        descLabel.fontColor = .white
+        descLabel.fontSize = height * GameConstants.Typography.FontMultiplier.levelButtonDescription
+        descLabel.fontColor = GameConstants.Colors.white
         descLabel.verticalAlignmentMode = .center
-        descLabel.position = CGPoint(x: 0, y: -28)
+        descLabel.position = CGPoint(x: 0, y: -height * 0.35)
         button.addChild(descLabel)
         
         return button
@@ -92,28 +111,28 @@ class LevelSelectionScene: SKScene {
     private func getLevelColor(for level: String) -> SKColor {
         switch level {
         case "A1":
-            return SKColor(red: 0.2, green: 0.7, blue: 0.2, alpha: 1.0) // Green
+            return GameConstants.Colors.Level.a1
         case "A2":
-            return SKColor(red: 0.3, green: 0.6, blue: 0.9, alpha: 1.0) // Blue
+            return GameConstants.Colors.Level.a2
         case "B1":
-            return SKColor(red: 0.9, green: 0.6, blue: 0.2, alpha: 1.0) // Orange
+            return GameConstants.Colors.Level.b1
         case "B2":
-            return SKColor(red: 0.8, green: 0.2, blue: 0.2, alpha: 1.0) // Red
+            return GameConstants.Colors.Level.b2
         default:
-            return SKColor.gray
+            return GameConstants.Colors.darkGray
         }
     }
     
     private func getLevelDescription(for level: String) -> String {
         switch level {
         case "A1":
-            return "Beginner"
+            return GameConstants.LevelDescription.a1
         case "A2":
-            return "Elementary"
+            return GameConstants.LevelDescription.a2
         case "B1":
-            return "Intermediate"
+            return GameConstants.LevelDescription.b1
         case "B2":
-            return "Upper Intermediate"
+            return GameConstants.LevelDescription.b2
         default:
             return ""
         }
@@ -133,11 +152,8 @@ class LevelSelectionScene: SKScene {
     }
     
     private func startGame(with level: String) {
-        let gameScene = GameScene(size: size)
-        gameScene.scaleMode = .aspectFill
-        gameScene.selectedLevel = level
-        
-        let transition = SKTransition.fade(withDuration: 0.5)
+        let gameScene = SceneFactory.createGameScene(size: size, level: level)
+        let transition = SceneFactory.createTransition()
         view?.presentScene(gameScene, transition: transition)
     }
 }

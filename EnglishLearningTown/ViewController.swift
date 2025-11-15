@@ -17,8 +17,7 @@ class ViewController: NSViewController {
         
         // Start with welcome scene to request permissions
         if let view = self.skView {
-            let scene = WelcomeScene(size: view.bounds.size)
-            scene.scaleMode = .aspectFill
+            let scene = SceneFactory.createWelcomeScene(size: view.bounds.size)
             
             view.presentScene(scene)
             view.ignoresSiblingOrder = true

@@ -20,7 +20,7 @@ class WelcomeScene: SKScene {
     private var microphonePermissionGranted = false
     
     override func didMove(to view: SKView) {
-        backgroundColor = SKColor(red: 0.2, green: 0.3, blue: 0.5, alpha: 1.0)
+        backgroundColor = GameConstants.Colors.welcomeBackground
         
         setupUI()
         
@@ -30,28 +30,28 @@ class WelcomeScene: SKScene {
     
     private func setupUI() {
         // Title
-        titleLabel = SKLabelNode(fontNamed: "Arial-BoldMT")
+        titleLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontNameBold)
         titleLabel.text = "Welcome to English Learning Town"
-        titleLabel.fontSize = 48
-        titleLabel.fontColor = .white
+        titleLabel.fontSize = GameConstants.Typography.FontSize.welcomeTitle
+        titleLabel.fontColor = GameConstants.Colors.white
         titleLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.75)
         addChild(titleLabel)
         
         // Status label
-        statusLabel = SKLabelNode(fontNamed: "Arial")
+        statusLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontName)
         statusLabel.text = "Requesting permissions..."
-        statusLabel.fontSize = 32
-        statusLabel.fontColor = .yellow
+        statusLabel.fontSize = GameConstants.Typography.FontSize.welcomeStatus
+        statusLabel.fontColor = GameConstants.Colors.yellow
         statusLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.5)
         addChild(statusLabel)
         
         // Instruction label (initially hidden)
-        instructionLabel = SKLabelNode(fontNamed: "Arial")
+        instructionLabel = SKLabelNode(fontNamed: GameConstants.Typography.fontName)
         instructionLabel.text = ""
-        instructionLabel.fontSize = 20
-        instructionLabel.fontColor = .lightGray
+        instructionLabel.fontSize = GameConstants.Typography.FontSize.welcomeInstruction
+        instructionLabel.fontColor = GameConstants.Colors.lightGray
         instructionLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.3)
-        instructionLabel.preferredMaxLayoutWidth = size.width * 0.8
+        instructionLabel.preferredMaxLayoutWidth = size.width * GameConstants.Layout.InstructionLabel.maxWidthRatio
         instructionLabel.numberOfLines = 0
         instructionLabel.horizontalAlignmentMode = .center
         addChild(instructionLabel)
@@ -71,7 +71,7 @@ class WelcomeScene: SKScene {
                     print("[WelcomeScene] Speech recognition authorized")
                     self.speechPermissionGranted = true
                     self.statusLabel.text = "Speech Recognition granted ✓"
-                    self.statusLabel.fontColor = .green
+                    self.statusLabel.fontColor = GameConstants.Colors.green
                     
                     // Now request microphone permission
                     self.requestMicrophonePermission()
@@ -79,24 +79,24 @@ class WelcomeScene: SKScene {
                 case .denied:
                     print("[WelcomeScene] Speech recognition denied")
                     self.statusLabel.text = "Speech Recognition DENIED"
-                    self.statusLabel.fontColor = .red
+                    self.statusLabel.fontColor = GameConstants.Colors.red
                     self.showPermissionDeniedInstructions(for: "Speech Recognition")
                     
                 case .restricted:
                     print("[WelcomeScene] Speech recognition restricted")
                     self.statusLabel.text = "Speech Recognition RESTRICTED"
-                    self.statusLabel.fontColor = .red
+                    self.statusLabel.fontColor = GameConstants.Colors.red
                     self.showPermissionDeniedInstructions(for: "Speech Recognition")
                     
                 case .notDetermined:
                     print("[WelcomeScene] Speech recognition not determined")
                     self.statusLabel.text = "Speech Recognition permission required"
-                    self.statusLabel.fontColor = .orange
+                    self.statusLabel.fontColor = GameConstants.Colors.orange
                     
                 @unknown default:
                     print("[WelcomeScene] Unknown speech recognition status")
                     self.statusLabel.text = "Unknown permission status"
-                    self.statusLabel.fontColor = .red
+                    self.statusLabel.fontColor = GameConstants.Colors.red
                 }
             }
         }
@@ -125,12 +125,12 @@ class WelcomeScene: SKScene {
                     print("[WelcomeScene] Microphone permission granted")
                     self.microphonePermissionGranted = true
                     self.statusLabel.text = "Microphone granted ✓"
-                    self.statusLabel.fontColor = .green
+                    self.statusLabel.fontColor = GameConstants.Colors.green
                     self.checkAllPermissionsGranted()
                 } else {
                     print("[WelcomeScene] Microphone permission denied")
                     self.statusLabel.text = "Microphone Permission DENIED"
-                    self.statusLabel.fontColor = .red
+                    self.statusLabel.fontColor = GameConstants.Colors.red
                     self.showPermissionDeniedInstructions(for: "Microphone")
                 }
             }
@@ -140,7 +140,7 @@ class WelcomeScene: SKScene {
     private func checkAllPermissionsGranted() {
         if speechPermissionGranted && microphonePermissionGranted {
             statusLabel.text = "All permissions granted!"
-            statusLabel.fontColor = .green
+            statusLabel.fontColor = GameConstants.Colors.green
             
             // Show start button instead of auto-transitioning
             showStartButton()
@@ -151,20 +151,25 @@ class WelcomeScene: SKScene {
         // Remove existing button if any
         startButton?.removeFromParent()
         
-        // Create start button
+        // Create start button with responsive sizing
         let button = SKNode()
         button.name = "startButton"
         
-        let background = SKShapeNode(rectOf: CGSize(width: 250, height: 70), cornerRadius: 12)
-        background.fillColor = SKColor(red: 0.2, green: 0.7, blue: 0.2, alpha: 1.0)
-        background.strokeColor = .white
-        background.lineWidth = 3
+        // Calculate button size based on screen dimensions
+        let buttonWidth = min(GameConstants.Layout.Button.StartGame.maxWidth, max(GameConstants.Layout.Button.StartGame.minWidth, size.width * GameConstants.Layout.Button.StartGame.widthRatio))
+        let buttonHeight = min(GameConstants.Layout.Button.StartGame.maxHeight, max(GameConstants.Layout.Button.StartGame.minHeight, size.height * GameConstants.Layout.Button.StartGame.heightRatio))
+        
+        let background = SKShapeNode(rectOf: CGSize(width: buttonWidth, height: buttonHeight), cornerRadius: GameConstants.Layout.Button.StartGame.cornerRadius)
+        background.fillColor = GameConstants.Colors.Button.startGame
+        background.strokeColor = GameConstants.Colors.white
+        background.lineWidth = GameConstants.Layout.Button.StartGame.strokeWidth
         button.addChild(background)
         
-        let label = SKLabelNode(fontNamed: "Arial-BoldMT")
-        label.text = "Start Game"
-        label.fontSize = 32
-        label.fontColor = .white
+        let label = SKLabelNode(fontNamed: GameConstants.Typography.fontNameBold)
+        label.text = GameConstants.Strings.startGame
+        // Scale font size based on button height
+        label.fontSize = buttonHeight * GameConstants.Typography.FontMultiplier.welcomeButton
+        label.fontColor = GameConstants.Colors.white
         label.verticalAlignmentMode = .center
         button.addChild(label)
         
@@ -175,10 +180,8 @@ class WelcomeScene: SKScene {
     }
     
     private func transitionToLevelSelection() {
-        let levelSelectionScene = LevelSelectionScene(size: size)
-        levelSelectionScene.scaleMode = .aspectFill
-        
-        let transition = SKTransition.fade(withDuration: 0.5)
+        let levelSelectionScene = SceneFactory.createLevelSelectionScene(size: size)
+        let transition = SceneFactory.createTransition()
         view?.presentScene(levelSelectionScene, transition: transition)
     }
     
@@ -192,7 +195,7 @@ class WelcomeScene: SKScene {
         }
         
         instructionLabel.text = instructions
-        instructionLabel.fontColor = .yellow
+        instructionLabel.fontColor = GameConstants.Colors.yellow
         
         // Optionally, add a button to retry or open settings
         // For now, the user needs to manually enable permissions in System Settings
