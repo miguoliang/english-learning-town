@@ -78,7 +78,7 @@ def convert_csv_to_json(csv_file_path: Path, json_file_path: Path) -> int:
             # Field is not required, ignore KeyError for optional fields
             pass
         return 0
-    except Exception as e:
+    except (OSError, PermissionError, csv.Error, UnicodeDecodeError, ValueError, TypeError) as e:
         print(f"Error converting {csv_file_path}: {e}")
         return 0
 
